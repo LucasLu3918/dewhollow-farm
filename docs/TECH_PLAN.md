@@ -62,6 +62,9 @@ domain 負責判斷「可否觸發」與「效果結算」；presentation 的事
 
 - **M0 已完成的 v2**：`SAVE_SCHEMA_VERSION = 2`，內容為背包改成通用物品堆疊（`inventory`）、出貨箱改成物品條目（`shipBox.entries`）、新增 `playtimeSeconds`。其餘欄位（季節、天氣、技能、好感、任務、成就、動物、圖鑑、設定）**隨各自系統在後續里程碑各升一版**，不預先放空欄位。
 - 遷移：`save-migrations.ts` 的遷移表（鍵為來源版本，每版一個純函式、各有測試）；舊版 schema 凍結在 `save-schema-v1.ts`。讀取時先依版本驗證舊格式、遷移、再驗證新格式；版本比遊戲新、缺版本、舊格式損毀都顯示真實錯誤，不覆蓋原檔。遷移容量不足時加大背包，不丟東西。
+- **M3 的 v3**：`SAVE_SCHEMA_VERSION = 3`，日曆改為四季（`calendar.day` 是季節內的第幾天，`season` 為四季之一）；新增今天的天氣 `weather` 與明天的預報 `forecast`。遷移 v2 → v3：舊的 `day` 是從開始算起的總天數（全部在春天），依 `calendarOnDay` 換成年、季、日；舊存檔的今天與明天天氣都設為晴（之後照常抽）。
+- **M4 的 v4**：`SAVE_SCHEMA_VERSION = 4`，新增 `toolTiers`（每件工具的階級）與 `worldChanges`（砍樹、採野薄荷的紀錄，鍵為 "地圖,x,y"）；工具新增斧頭（`axe`）。遷移 v3 → v4：階級全部為 0、變化為空。
+- **M4 P1 的 v5–v9**：v5 礦坑種子 `mineSeed` 與檢查點 `mineCheckpoint`（礦坑層由種子生成，不存進存檔）；v6 技能經驗 `skills`；v7 釣魚狀態 `fishing`；v8 動物 `animals`；v9 料理（只升版本）；v10 加工機 `processing`（加工中與已完成的批次，舊存檔從空的開始）。v11 施肥：田 `plots[*].fertilizer` 為選填欄位（舊存檔的田都沒有肥料，只升版本）。
 - 遊玩時數：`GameSession` 以兩次指令的間隔累加，超過 60 秒視為離開座位不計入，存檔時寫入；時鐘可注入，方便測試。
 - 尚未做（M7）：多存檔槽（3 個）、匯出／匯入 JSON 檔（含版本與雜湊檢查）、遊戲版本號寫入存檔。
 
