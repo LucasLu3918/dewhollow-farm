@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { ActionFeedback } from '../application/game-commands';
 import { TILE_SIZE, UNIT } from './constants';
 import { pickupPoint } from './pickup-arc';
+import { lidAngle, SHIP_FLIGHT_MS, SHIP_LID_TOTAL_MS, shipIconDelay } from './ship-animation';
 
 /**
  * 動作效果：只負責視覺回饋（粒子、飄字、閃爍），不影響任何規則。
@@ -62,6 +63,73 @@ export function playActionEffect(scene: Phaser.Scene, action: ActionFeedback, x:
 export function footstepDust(scene: Phaser.Scene, x: number, y: number, color: string): void {
   const { px: cx, py: cy } = tileCenter(x, y);
   puff(scene, cx, cy + px(10), Number.parseInt(color.slice(1), 16), 3, 0.5);
+}
+
+/** 出貨時一種物品的圖示；沒有圖的物品（例如種子、魚）用一個色點代替。 */
+export interface ShipIcon {
+  texture: string | null;
+  scale: number;
+}
+
+const LID_COLOR = 0x8a5a3a;
+const LID_EDGE_COLOR = 0x5a3a24;
+const SHIP_TOKEN_COLOR = 0xe0b25c;
+
+/**
+ * 出貨：物品從 from（玩家頭上）飛進出貨箱，依序一種接一種（見 shipIconDelay），箱蓋同時開合一次（見 lidAngle）。
+ * box 是箱子那一格的左上角（世界座標）。onLanded 在第一種物品落地時呼叫一次，之後的出貨效果才出現。
+ * 箱蓋與圖示都是程式繪製，不需要素材。
+ */
+export function shipFlight(
+  scene: Phaser.Scene,
+  icons: readonly ShipIcon[],
+  from: { x: number; y: number },
+  box: { x: number; y: number },
+  onLanded: () => void,
+): void {
+  const hinge = scene.add.container(box.x + TILE_SIZE * 0.1, box.y + TILE_SIZE * 0.2).setDepth(21);
+  const lidWidth = TILE_SIZE * 0.8;
+  const lidHeight = TILE_SIZE * 0.16;
+  const lid = scene.add.graphics();
+  lid.fillStyle(LID_COLOR, 1).fillRect(0, 0, lidWidth, lidHeight);
+  lid.lineStyle(px(1), LID_EDGE_COLOR, 1).strokeRect(0, 0, lidWidth, lidHeight);
+  hinge.add(lid);
+  const lidProgress = { ms: 0 };
+  scene.tweens.add({
+    targets: lidProgress,
+    ms: SHIP_LID_TOTAL_MS,
+    duration: SHIP_LID_TOTAL_MS,
+    ease: 'Linear',
+    onUpdate: () => hinge.setRotation(lidAngle(lidProgress.ms)),
+    onComplete: () => hinge.destroy(),
+  });
+
+  const to = { x: box.x + TILE_SIZE / 2, y: box.y + TILE_SIZE / 2 };
+  icons.forEach((icon, index) => {
+    scene.time.delayedCall(shipIconDelay(index), () => flyIcon(scene, icon, from, to));
+  });
+  scene.time.delayedCall(SHIP_FLIGHT_MS, onLanded);
+}
+
+function flyIcon(scene: Phaser.Scene, icon: ShipIcon, from: { x: number; y: number }, to: { x: number; y: number }): void {
+  const scale = icon.texture ? icon.scale : 1;
+  const image: Phaser.GameObjects.Image | Phaser.GameObjects.Arc = icon.texture
+    ? scene.add.image(from.x, from.y, icon.texture)
+    : scene.add.circle(from.x, from.y, px(4), SHIP_TOKEN_COLOR);
+  image.setDepth(25).setScale(scale);
+  const progress = { t: 0 };
+  scene.tweens.add({
+    targets: progress,
+    t: 1,
+    duration: SHIP_FLIGHT_MS,
+    ease: 'Quad.easeIn',
+    onUpdate: () => {
+      const p = pickupPoint(from, to, progress.t, px(16));
+      image.setPosition(p.x, p.y);
+      image.setScale(scale * p.scale);
+    },
+    onComplete: () => image.destroy(),
+  });
 }
 
 /** 拾取飛行的時間（毫秒）。 */
