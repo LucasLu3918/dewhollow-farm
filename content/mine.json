@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "note": "礦坑的深層規則（第 41 層起，見 domain/mine.ts）。第 1 到 40 層的寬度與落石牆數已校準，寫在程式裡，不在這裡。寬度每層加 widthPerLayer 欄、直到 maxWidth；落石牆每層多一道（整欄石頭，數量 = 寬度 - 6）。礦石比例 = min(max, base + perLayer × 層數)。礦石的售價與說明在 items.json；yield 省略時用 tuning.json 的 gathering.ore。",
+  "widthPerLayer": 2,
+  "maxWidth": 120,
+  "oreChance": {
+    "base": 0.05,
+    "perLayer": 0.006,
+    "max": 0.4
+  },
+  "ores": [
+    { "item": "copper-ore", "symbol": "o", "fromLayer": 1, "toLayer": 60, "weight": 1 },
+    { "item": "silver-ore", "symbol": "s", "fromLayer": 41, "weight": 1, "yield": { "min": 1, "max": 2 } },
+    { "item": "gold-ore", "symbol": "g", "fromLayer": 61, "weight": 1, "yield": { "min": 1, "max": 2 } }
+  ]
+}

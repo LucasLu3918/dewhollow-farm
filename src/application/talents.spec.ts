@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import mineRulesJson from '../../content/mine.json';
 import type { ContentPack, MapDef } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { countOf } from '../domain/inventory';
@@ -45,6 +46,7 @@ const content: ContentPack = {
   processing: [],
   shops: [],
   start: { mapId: 'grove', gold: 0, seeds: {} },
+  mine: mineRulesJson,
   talents: {
     unlockLevel: 5,
     defs: [

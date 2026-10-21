@@ -1,5 +1,6 @@
 import { loadContent, type RawContentFiles } from '../infrastructure/content/load-content';
 import crops from '../../content/crops.json';
+import mine from '../../content/mine.json';
 import npcs from '../../content/npcs.json';
 import start from '../../content/start.json';
 import tuning from '../../content/tuning.json';
@@ -57,6 +58,7 @@ const raw: RawContentFiles = {
   processing,
   crafting,
   talents,
+  mine,
 };
 
 const FIELD = plotKey(4, 4);

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import mineRulesJson from '../../content/mine.json';
 import type { ContentPack, MapDef } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { addItem, countOf, createInventory } from '../domain/inventory';
@@ -46,6 +47,7 @@ const content: ContentPack = {
   fish: [],
   crafting: [],
   talents: { unlockLevel: 5, defs: [] },
+  mine: mineRulesJson,
   processing: [],
   recipes: [],
   animals: [{ id: 'chicken', name: '雞', eggItem: 'egg', eggQuality: 0.3 }],

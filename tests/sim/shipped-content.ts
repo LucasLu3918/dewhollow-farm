@@ -1,4 +1,5 @@
 import crops from '../../content/crops.json';
+import mine from '../../content/mine.json';
 import npcs from '../../content/npcs.json';
 import start from '../../content/start.json';
 import tuning from '../../content/tuning.json';
@@ -51,6 +52,7 @@ const { pack } = loadContent({
   processing,
   crafting,
   talents,
+  mine,
 });
 
 export const shippedPack = pack;

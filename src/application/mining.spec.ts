@@ -2,10 +2,29 @@ import { describe, expect, it } from 'vitest';
 import type { ContentPack, MapDef } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { countOf, addItem, createInventory } from '../domain/inventory';
-import { generateMineLayer, mineId } from '../domain/mine';
+import { generateMineLayer, mineId, type MineRules } from '../domain/mine';
 import { changeAt, withChange } from '../domain/world-changes';
 import { executeCommand, type Command } from './game-commands';
 import { createContentIndex, type ContentIndex } from './content-index';
+import mineRulesJson from '../../content/mine.json';
+
+const mineRules: MineRules = mineRulesJson;
+
+/** 深層礦脈：一格銀礦石（s），站在左邊敲它。 */
+const pit: MapDef = {
+  id: 'pit',
+  name: '深層礦脈',
+  width: 4,
+  height: 3,
+  rows: ['####', '#.s#', '####'],
+  legend: {
+    '#': { kind: 'wall' },
+    '.': { kind: 'path' },
+    s: { kind: 'ore', item: 'silver-ore' },
+  },
+  spawn: { x: 1, y: 1 },
+  npcs: [],
+};
 
 /**
  * M4（P1）：礦坑。小地圖 entrance（4×4）：
@@ -44,9 +63,11 @@ const content: ContentPack = {
     { id: 'wood', name: '木材', kind: 'material', maxStack: 99, sellPrice: 6 },
     { id: 'stone', name: '石頭', kind: 'material', maxStack: 99, sellPrice: 2 },
     { id: 'copper-ore', name: '銅礦石', kind: 'ore', maxStack: 99, sellPrice: 20 },
+    { id: 'silver-ore', name: '銀礦石', kind: 'ore', maxStack: 99, sellPrice: 50 },
   ],
   shops: [],
   start: { mapId: 'entrance', gold: 100, seeds: {} },
+  mine: mineRules,
   tuning: {
     energy: { max: 40, costs: { till: 2, water: 1, plant: 1, harvest: 1, ship: 0, chop: 3, forage: 1, mine: 2, fish: 2, cook: 1, process: 1 } },
     inventory: { capacity: 8 },
@@ -65,7 +86,7 @@ const content: ContentPack = {
     autumn: [{ weather: 'sunny', weight: 1 }],
     winter: [{ weather: 'snow', weight: 1 }],
   },
-  maps: [entrance],
+  maps: [entrance, pit],
 };
 
 const index: ContentIndex = createContentIndex(content);
@@ -108,6 +129,16 @@ describe('mining rocks and ore with the pick', () => {
     const ore = countOf(out.state.inventory, 'copper-ore');
     expect(ore).toBeGreaterThanOrEqual(1);
     expect(ore).toBeLessThanOrEqual(2);
+  });
+
+  it('a deep silver vein gives silver ore (its own item, not copper)', () => {
+    const state = at({ ...fresh(), mapId: 'pit' }, 1, 1, 'right');
+    const out = run(state, { type: 'interact' });
+    const silver = countOf(out.state.inventory, 'silver-ore');
+    expect(silver).toBeGreaterThanOrEqual(1);
+    expect(silver).toBeLessThanOrEqual(2);
+    expect(countOf(out.state.inventory, 'copper-ore')).toBe(0);
+    expect(changeAt(out.state.worldChanges, 'pit', 2, 1)).toBe('mined');
   });
 
   it('a mined spot is empty: a second swing finds nothing there', () => {
@@ -153,7 +184,7 @@ describe('the cave mouth', () => {
 describe('going down and up in the mine', () => {
   it('walking onto the down staircase goes one floor deeper, and a checkpoint floor is remembered', () => {
     // 第 4 層：站在 '>' 旁邊，往 '>' 走。
-    const layer = generateMineLayer(4, 7);
+    const layer = generateMineLayer(4, 7, mineRules);
     const down = layer.rows.map((row, y) => [row.indexOf('>'), y]).find(([x]) => (x ?? -1) >= 0);
     if (!down) throw new Error('no down staircase');
     const [dx, dy] = down as [number, number];
@@ -166,13 +197,45 @@ describe('going down and up in the mine', () => {
 
   it('walking onto the up staircase goes back up', () => {
     index.ensureMine(2, 7);
-    const layer = generateMineLayer(2, 7);
+    const layer = generateMineLayer(2, 7, mineRules);
     const up = layer.rows.map((row, y) => [row.indexOf('<'), y]).find(([x]) => (x ?? -1) >= 0);
     if (!up) throw new Error('no up staircase');
     const [ux, uy] = up as [number, number];
     const state = fresh({ mapId: mineId(2), mineSeed: 7, player: { x: ux - 1, y: uy, facing: 'right' } });
     const out = run(state, { type: 'move', direction: 'right' });
     expect(out.state.mapId).toBe(mineId(1));
+  });
+});
+
+describe('the deep mine: elevator and checkpoints past floor 40', () => {
+  function downStairOf(layer: number, seed: number): { x: number; y: number } {
+    const map = generateMineLayer(layer, seed, mineRules);
+    for (let y = 0; y < map.height; y += 1) {
+      const x = map.rows[y]?.indexOf('>') ?? -1;
+      if (x >= 0) return { x, y };
+    }
+    throw new Error(`layer ${layer} has no down staircase`);
+  }
+
+  it('after checkpoint 45 is reached, the cave takes you straight to floor 45', () => {
+    const cleared = fresh({ mineCheckpoint: 45, worldChanges: withChange({}, 'entrance', 1, 1, 'cleared') });
+    const entered = run(at(cleared, 1, 2, 'up'), { type: 'move', direction: 'up' });
+    expect(entered.state.mapId).toBe(mineId(45));
+    expect(entered.state.mineCheckpoint).toBe(45);
+  });
+
+  it('walking down onto floor 44 stairs reaches floor 45 and remembers that checkpoint; floor 46 is not a checkpoint', () => {
+    const down44 = downStairOf(44, 7);
+    index.ensureMine(44, 7);
+    const onto44 = fresh({ mapId: mineId(44), mineSeed: 7, player: { x: down44.x + 1, y: down44.y, facing: 'left' } });
+    const to45 = run(onto44, { type: 'move', direction: 'left' });
+    expect(to45.state.mapId).toBe(mineId(45));
+    expect(to45.state.mineCheckpoint).toBe(45);
+
+    const down45 = downStairOf(45, 7);
+    const to46 = run({ ...to45.state, player: { x: down45.x + 1, y: down45.y, facing: 'left' } }, { type: 'move', direction: 'left' });
+    expect(to46.state.mapId).toBe(mineId(46));
+    expect(to46.state.mineCheckpoint).toBe(45);
   });
 });
 

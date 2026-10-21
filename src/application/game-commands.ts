@@ -225,7 +225,7 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
   const kind = effectiveKind(tile.kind, changeAt(state.worldChanges, state.mapId, target.x, target.y));
 
   if (tile.kind === 'rock' || tile.kind === 'ore') {
-    if (kind === tile.kind) return mineRock(state, target, tile.kind, index);
+    if (kind === tile.kind) return mineRock(state, target, tile, index);
   }
   if (tile.kind === 'water') return cast(state, target, index);
   if (tile.kind === 'trough') return feedAnimals(state, index);
@@ -533,15 +533,19 @@ function reel(state: GameState, hit: boolean, index: ContentIndex): CommandOutco
   return reply({ ...cleared, inventory: stored.value }, [`釣到了${index.item(`fish.${fishId}`).name}`]);
 }
 
-/** 用鎬敲石頭或礦石：得到石頭或銅礦石，那一格變成路。 */
-function mineRock(state: GameState, target: Point, kind: 'rock' | 'ore', index: ContentIndex): CommandOutcome {
+/**
+ * 用鎬敲石頭或礦石：得到石頭或礦石（礦石的物品由地圖的符號決定，預設銅礦石），那一格變成路。
+ * 礦石的產量：深層礦石在 mine.json 指定；沒有指定或是銅礦石時用 tuning.gathering.ore。
+ */
+function mineRock(state: GameState, target: Point, tile: TileDef, index: ContentIndex): CommandOutcome {
   if (state.tool !== 'pick') return reply(state, [messageFor('NEED_PICK')], [refused('NEED_PICK')]);
-  const itemId = kind === 'ore' ? 'copper-ore' : 'stone';
-  const range = kind === 'ore' ? index.tuning.gathering.ore : index.tuning.gathering.stone;
+  const isOre = tile.kind === 'ore';
+  const itemId = isOre ? (tile.item ?? 'copper-ore') : 'stone';
+  const range = isOre ? (index.mine.ores.find((ore) => ore.item === itemId)?.yield ?? index.tuning.gathering.ore) : index.tuning.gathering.stone;
   let yielded = 0;
   const result = spendThen(state, 'mine', index, (s) => {
     const roll = rollInt(s.rng, range.min, range.max);
-    const bonus = kind === 'ore' ? bonusYield(levelOf(s.skills.mining, index.tuning.skills.thresholds), index.tuning.skills) : 0;
+    const bonus = isOre ? bonusYield(levelOf(s.skills.mining, index.tuning.skills.thresholds), index.tuning.skills) : 0;
     const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'mine', itemId));
     const count = roll.value + bonus + extra.value;
     const stored = addItem(s.inventory, index.item(itemId), count);

@@ -176,6 +176,31 @@ const tuningSchema = z.object({
 
 export const tuningFileSchema = tuningSchema;
 
+/** 礦坑的深層規則（第 41 層起）。符號與物品的關係、寬度上限等由 load-content.ts 的 mineProblems 檢查。 */
+const mineOreSchema = z.object({
+  item: z.string().min(1),
+  symbol: z.string().length(1),
+  fromLayer: z.number().int().min(1),
+  toLayer: z.number().int().min(1).optional(),
+  weight: z.number().positive(),
+  yield: z
+    .object({ min: z.number().int().min(0), max: z.number().int().min(0) })
+    .refine((range) => range.min <= range.max, { message: 'yield.min 不可大於 yield.max' })
+    .optional(),
+});
+export const mineFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  widthPerLayer: z.number().int().min(1),
+  maxWidth: z.number().int().positive(),
+  oreChance: z.object({
+    base: z.number().min(0).max(1),
+    perLayer: z.number().min(0),
+    max: z.number().min(0).max(1),
+  }),
+  ores: z.array(mineOreSchema).min(1),
+});
+
 export const itemsFileSchema = z.object({
   version: z.literal(1),
   items: z.array(

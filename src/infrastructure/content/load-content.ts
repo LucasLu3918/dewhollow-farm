@@ -1,6 +1,7 @@
 import { SEASONS } from '../../domain/calendar';
 import type { ContentPack, MapDef, Point } from '../../domain/content';
 import { isWalkable, tileAt } from '../../domain/world';
+import { MINE_WIDTH } from '../../domain/mine';
 import { assetProblems, missingAssetIds, requiredAssetIds, type AssetManifest } from '../assets/asset-manifest';
 import { companionProblems, type CompanionManifest } from '../assets/companion-manifest';
 import { rigProblems, type RigManifest } from '../assets/rig-manifest';
@@ -21,6 +22,7 @@ import {
   craftingFileSchema,
   musicFileSchema,
   talentsFileSchema,
+  mineFileSchema,
   soundsFileSchema,
   startFileSchema,
   terrainFileSchema,
@@ -54,6 +56,7 @@ export interface RawContentFiles {
   processing: unknown;
   crafting: unknown;
   talents: unknown;
+  mine: unknown;
 }
 
 export interface LoadedContent {
@@ -101,8 +104,9 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const processing = processingFileSchema.parse(raw.processing);
   const crafting = craftingFileSchema.parse(raw.crafting);
   const talents = talentsFileSchema.parse(raw.talents);
+  const mine = mineFileSchema.parse(raw.mine);
 
-  const pack: ContentPack = { crops, npcs, maps, start, tuning, weather: weather.seasons, items: items.items, shops: shops.shops, fish: fish.fish, animals: animals.animals, recipes: recipes.recipes, processing: processing.recipes, crafting: crafting.recipes, talents: { unlockLevel: talents.unlockLevel, defs: talents.talents } };
+  const pack: ContentPack = { crops, npcs, maps, start, tuning, weather: weather.seasons, items: items.items, shops: shops.shops, fish: fish.fish, animals: animals.animals, recipes: recipes.recipes, processing: processing.recipes, crafting: crafting.recipes, talents: { unlockLevel: talents.unlockLevel, defs: talents.talents }, mine: { widthPerLayer: mine.widthPerLayer, maxWidth: mine.maxWidth, oreChance: mine.oreChance, ores: mine.ores } };
   const problems = [
     ...validateCrossReferences(pack, assets),
     ...rigProblems(rigs, assets),
@@ -112,6 +116,7 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     ...musicProblems(music),
     ...economyProblems(pack),
     ...talentProblems(pack),
+    ...mineProblems(pack),
   ];
   if (problems.length > 0) throw new ContentError(problems);
   return { pack, assets, rigs, companions, tools, sounds, music, terrain };
@@ -274,6 +279,27 @@ export function talentProblems(pack: ContentPack): string[] {
       problems.push(`天賦 ${talent.id} 指定的物品 ${effect.item} 不存在`);
     }
   }
+  return problems;
+}
+
+/**
+ * 礦坑深層規則的檢查：礦石的物品要存在、符號不重複且不與地圖符號（# r . < >）衝突、
+ * 層數範圍要合理、寬度上限不能小於第一段的寬度（第一段寬度是程式的校準值）。
+ */
+export function mineProblems(pack: ContentPack): string[] {
+  const problems: string[] = [];
+  const itemIds = new Set(pack.items.map((i) => i.id));
+  const reserved = new Set(['#', 'r', '.', '<', '>']);
+  const symbols = new Set<string>();
+  for (const ore of pack.mine.ores) {
+    if (!itemIds.has(ore.item)) problems.push(`礦石 ${ore.item} 不存在`);
+    if (reserved.has(ore.symbol)) problems.push(`礦石符號 ${ore.symbol} 與地圖符號衝突（${ore.item}）`);
+    if (symbols.has(ore.symbol)) problems.push(`礦石符號 ${ore.symbol} 重複（${ore.item}）`);
+    symbols.add(ore.symbol);
+    if (ore.toLayer !== undefined && ore.toLayer < ore.fromLayer) problems.push(`礦石 ${ore.item} 的 toLayer 小於 fromLayer`);
+  }
+  if (!pack.mine.ores.some((ore) => ore.fromLayer === 1)) problems.push('礦坑第 1 層沒有任何礦石');
+  if (pack.mine.maxWidth < MINE_WIDTH) problems.push('礦坑寬度上限不可小於第一段的寬度');
   return problems;
 }
 
