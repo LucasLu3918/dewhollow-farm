@@ -16,7 +16,7 @@ import { IndexedDbSaveRepository, hasIndexedDb } from './infrastructure/persiste
 import { Hud } from './presentation/hud';
 import { BootScene } from './presentation/scenes/BootScene';
 import { MapScene } from './presentation/scenes/MapScene';
-import { TILE_SIZE } from './presentation/constants';
+import { VIEW_SIZE } from './presentation/constants';
 
 /**
  * 組裝點（composition root）：這裡是唯一知道具體實作的地方。
@@ -29,7 +29,7 @@ async function bootstrap(): Promise<void> {
 
   let repository: SaveRepository;
   if (hasIndexedDb()) {
-    repository = new IndexedDbSaveRepository();
+    repository = new IndexedDbSaveRepository({ inventoryCapacity: loaded.pack.tuning.inventory.capacity });
   } else {
     repository = new MemorySaveRepository();
     hud.error('這個瀏覽器無法使用 IndexedDB，存檔只會保留在本頁面，重新整理後會遺失。');
@@ -47,8 +47,8 @@ async function bootstrap(): Promise<void> {
   new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
-    width: 16 * TILE_SIZE,
-    height: 12 * TILE_SIZE,
+    width: VIEW_SIZE.width,
+    height: VIEW_SIZE.height,
     backgroundColor: '#1d2a1f',
     pixelArt: true,
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },

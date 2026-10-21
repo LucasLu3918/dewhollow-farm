@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { countOf } from './inventory';
 import { createNewGame } from './game-state';
 import type { ContentPack } from './content';
 
@@ -23,6 +24,7 @@ const pack = {
   start: { mapId: 'farm', gold: 100, seeds: { 'moon-bean': 2 } },
   tuning: {
     energy: { max: 100, costs: { till: 2, water: 1, plant: 1, harvest: 1, ship: 0 } },
+    inventory: { capacity: 12 },
     time: { wakeMinute: 360, minutesPerAction: 10 },
   },
 } as unknown as ContentPack;
@@ -35,5 +37,22 @@ describe('createNewGame', () => {
   it('falls back to the first crop when no seeds are held', () => {
     const empty = { ...pack, start: { ...pack.start, seeds: {} } };
     expect(createNewGame(empty, 1).selectedSeed).toBe('dew-grass');
+  });
+
+  it('puts the starting seeds into an inventory sized by the tuning', () => {
+    const state = createNewGame(pack, 1);
+    expect(state.inventory.capacity).toBe(12);
+    expect(countOf(state.inventory, 'seed.moon-bean')).toBe(2);
+  });
+
+  it('starts with an empty shipping box and no play time', () => {
+    const state = createNewGame(pack, 1);
+    expect(state.shipBox).toEqual({ entries: [] });
+    expect(state.playtimeSeconds).toBe(0);
+  });
+
+  it('refuses a starting loadout that does not fit in the bag', () => {
+    const tiny = { ...pack, tuning: { ...pack.tuning, inventory: { capacity: 0 } } } as ContentPack;
+    expect(() => createNewGame(tiny, 1)).toThrow('背包放不下起始種子');
   });
 });

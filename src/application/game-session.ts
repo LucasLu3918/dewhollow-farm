@@ -6,22 +6,44 @@ import type { SaveRepository } from './ports';
 
 export const DEFAULT_SLOT = 'slot-1';
 
+/** 兩次指令相隔超過這麼久，視為玩家離開座位，這段時間不計入遊玩時數。 */
+const IDLE_LIMIT_MS = 60_000;
+
+export interface SessionOptions {
+  slot?: string;
+  /** 是否從既有存檔還原（用於 UI 顯示「繼續」或「新遊戲」）。 */
+  restored?: boolean;
+  /** 時鐘，單位毫秒；測試時可注入假時鐘。 */
+  now?: () => number;
+}
+
 /**
  * 一局遊戲的應用層入口：持有目前狀態、執行指令、處理存檔。
  * 畫面層只透過這裡送出指令與讀取狀態。
  */
 export class GameSession {
   private current: GameState;
+  private readonly slot: string;
+  private readonly now: () => number;
+  readonly restored: boolean;
+
+  /** 本次開啟前已累計的遊玩秒數，與 activeMs 相加後寫入存檔。 */
+  private readonly baseSeconds: number;
+  private activeMs = 0;
+  private lastActivityAt: number;
 
   constructor(
     initial: GameState,
     private readonly index: ContentIndex,
     private readonly repository: SaveRepository,
-    private readonly slot: string = DEFAULT_SLOT,
-    /** 是否從既有存檔還原（用於 UI 顯示「繼續」或「新遊戲」）。 */
-    readonly restored: boolean = false,
+    options: SessionOptions = {},
   ) {
     this.current = initial;
+    this.slot = options.slot ?? DEFAULT_SLOT;
+    this.restored = options.restored ?? false;
+    this.now = options.now ?? Date.now;
+    this.baseSeconds = initial.playtimeSeconds;
+    this.lastActivityAt = this.now();
   }
 
   /** 讀取既有存檔；沒有存檔時建立新遊戲。存檔損毀時直接拋出，不會覆蓋玩家資料。 */
@@ -31,12 +53,13 @@ export class GameSession {
     repository: SaveRepository,
     seed: number,
     slot: string = DEFAULT_SLOT,
+    options: Omit<SessionOptions, 'slot' | 'restored'> = {},
   ): Promise<GameSession> {
     const existing = await repository.load(slot);
     if (existing) {
-      return new GameSession(existing.state, index, repository, slot, true);
+      return new GameSession(existing.state, index, repository, { ...options, slot, restored: true });
     }
-    return new GameSession(createNewGame(pack, seed), index, repository, slot, false);
+    return new GameSession(createNewGame(pack, seed), index, repository, { ...options, slot, restored: false });
   }
 
   get state(): GameState {
@@ -44,6 +67,7 @@ export class GameSession {
   }
 
   async dispatch(command: Command): Promise<CommandOutcome> {
+    this.trackActivity();
     const outcome = executeCommand(this.current, command, this.index);
     this.current = outcome.state;
 
@@ -63,11 +87,19 @@ export class GameSession {
   }
 
   async save(): Promise<void> {
+    this.current = { ...this.current, playtimeSeconds: this.baseSeconds + Math.floor(this.activeMs / 1000) };
     await this.repository.save({
       slot: this.slot,
-      savedAt: new Date().toISOString(),
+      savedAt: new Date(this.now()).toISOString(),
       state: this.current,
     });
+  }
+
+  private trackActivity(): void {
+    const at = this.now();
+    const gap = at - this.lastActivityAt;
+    if (gap > 0 && gap <= IDLE_LIMIT_MS) this.activeMs += gap;
+    this.lastActivityAt = at;
   }
 }
 

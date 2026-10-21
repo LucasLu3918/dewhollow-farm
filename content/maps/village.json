@@ -21,7 +21,7 @@
     "#": { "kind": "wall" },
     ".": { "kind": "grass" },
     "=": { "kind": "path" },
-    "D": { "kind": "door", "to": "farm", "spawn": { "x": 7, "y": 10 } }
+    "D": { "kind": "door", "to": "farm", "spawn": { "x": 7, "y": 22 } }
   },
   "spawn": { "x": 7, "y": 10 },
   "npcs": [{ "npcId": "maomao", "x": 10, "y": 5 }]

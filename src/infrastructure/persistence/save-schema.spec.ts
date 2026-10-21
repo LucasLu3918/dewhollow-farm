@@ -8,9 +8,11 @@ import village from '../../../content/maps/village.json';
 import { createNewGame } from '../../domain/game-state';
 import { loadContent } from '../content/load-content';
 import assets from '../../../content/assets.json';
-import { SaveFormatError, parseSaveRecord } from './save-schema';
+import { SaveFormatError } from './save-errors';
+import { parseSaveRecord } from './save-schema';
 
 const { pack } = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets });
+const context = { inventoryCapacity: pack.tuning.inventory.capacity };
 
 function record(state: unknown) {
   return { slot: 'slot-1', savedAt: '2026-10-21T00:00:00.000Z', state };
@@ -19,13 +21,13 @@ function record(state: unknown) {
 describe('save schema', () => {
   it('accepts a new game state and returns it unchanged', () => {
     const state = createNewGame(pack, 1);
-    expect(parseSaveRecord(record(state)).state).toEqual(state);
+    expect(parseSaveRecord(record(state), context).state).toEqual(state);
   });
 
   it('rejects an unknown tool with the field path', () => {
     const state = { ...createNewGame(pack, 1), tool: 'bow' };
     try {
-      parseSaveRecord(record(state));
+      parseSaveRecord(record(state), context);
       throw new Error('should have thrown');
     } catch (error) {
       expect(error).toBeInstanceOf(SaveFormatError);
@@ -34,10 +36,58 @@ describe('save schema', () => {
   });
 
   it('rejects a negative gold amount', () => {
-    expect(() => parseSaveRecord(record({ ...createNewGame(pack, 1), gold: -1 }))).toThrow(SaveFormatError);
+    expect(() => parseSaveRecord(record({ ...createNewGame(pack, 1), gold: -1 }), context)).toThrow(SaveFormatError);
   });
 
   it('rejects a record without a slot', () => {
-    expect(() => parseSaveRecord({ savedAt: 'x', state: createNewGame(pack, 1) })).toThrow(SaveFormatError);
+    expect(() => parseSaveRecord({ savedAt: 'x', state: createNewGame(pack, 1) }, context)).toThrow(SaveFormatError);
+  });
+
+  it('rejects an inventory stack with an unknown quality', () => {
+    const state = createNewGame(pack, 1);
+    const broken = {
+      ...state,
+      inventory: { ...state.inventory, stacks: [{ itemId: 'seed.moon-bean', quality: 'shiny', count: 1 }] },
+    };
+    expect(() => parseSaveRecord(record(broken), context)).toThrow('inventory.stacks.0.quality');
+  });
+
+  it('rejects an inventory with more stacks than it has slots', () => {
+    const state = createNewGame(pack, 1);
+    const stack = { itemId: 'seed.moon-bean', quality: 'normal', count: 1 };
+    const broken = { ...state, inventory: { capacity: 1, stacks: [stack, stack] } };
+    expect(() => parseSaveRecord(record(broken), context)).toThrow(SaveFormatError);
+  });
+});
+
+describe('save schema with an old save', () => {
+  const v1 = {
+    schemaVersion: 1,
+    calendar: { year: 1, season: 'spring', day: 2, minuteOfDay: 360 },
+    energy: { current: 100, max: 100 },
+    gold: 100,
+    mapId: 'farm',
+    player: { x: 7, y: 9, facing: 'down' },
+    plots: {},
+    bag: { seeds: { 'moon-bean': 2 }, crops: {} },
+    shipBox: { items: {} },
+    flags: {},
+    tool: 'hoe',
+    selectedSeed: 'moon-bean',
+    rng: 7,
+  };
+
+  it('loads a v1 save as a current-version state', () => {
+    const { state } = parseSaveRecord(record(v1), context);
+    expect(state.schemaVersion).toBe(2);
+    expect(state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
+    expect(state.playtimeSeconds).toBe(0);
+    expect(state.calendar.day).toBe(2);
+  });
+
+  it('keeps the slot and save time of the record', () => {
+    const parsed = parseSaveRecord(record(v1), context);
+    expect(parsed.slot).toBe('slot-1');
+    expect(parsed.savedAt).toBe('2026-10-21T00:00:00.000Z');
   });
 });

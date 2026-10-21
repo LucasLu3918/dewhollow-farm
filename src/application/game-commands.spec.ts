@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import type { ContentPack } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { plotKey } from '../domain/farm';
+import { countOf, createInventory, type Inventory } from '../domain/inventory';
+import type { ItemStack } from '../domain/items';
 import { rollInt } from '../domain/random';
-import { sellPriceOf } from '../domain/pricing';
+import { priceWithQuality, sellPriceOf } from '../domain/pricing';
 import { executeCommand } from './game-commands';
 import { createContentIndex } from './content-index';
 
@@ -17,6 +19,7 @@ const content: ContentPack = {
   start: { mapId: 'farm', gold: 100, seeds: { 'sweet-radish': 5 } },
   tuning: {
     energy: { max: 20, costs: { till: 2, water: 1, plant: 1, harvest: 1, ship: 0 } },
+    inventory: { capacity: 4 },
     harvest: { min: 1, max: 5 },
     time: { wakeMinute: 360, minutesPerAction: 10 },
   },
@@ -69,6 +72,15 @@ const BED_SIDE = { x: 3, y: 1, facing: 'right' as const };
 
 function start(overrides: Partial<GameState> = {}): GameState {
   return { ...createNewGame(content, 1), ...overrides };
+}
+
+/** 組出指定內容的背包（容量沿用內容設定，可覆寫）。 */
+function bagOf(stacks: ItemStack[], capacity = 4): Inventory {
+  return { ...createInventory(capacity), stacks };
+}
+
+function crops(cropId: string, count: number, quality: ItemStack['quality'] = 'normal'): ItemStack {
+  return { itemId: `crop.${cropId}`, quality, count };
 }
 
 function at(state: GameState, player: GameState['player']): GameState {
@@ -128,7 +140,7 @@ describe('farming actions', () => {
     state = executeCommand(state, { type: 'cycleTool' }, index).state; // 種子袋
     state = act(state); // 播種
     expect(state.plots[FIELD]?.crop).toEqual({ cropId: 'sweet-radish', growthDays: 0 });
-    expect(state.bag.seeds['sweet-radish']).toBe(4);
+    expect(countOf(state.inventory, 'seed.sweet-radish')).toBe(4);
 
     state = executeCommand(state, { type: 'cycleTool' }, index).state; // 鋤頭
     state = executeCommand(state, { type: 'cycleTool' }, index).state; // 水壺
@@ -142,7 +154,7 @@ describe('farming actions', () => {
     state = executeCommand(state, { type: 'cycleTool' }, index).state; // 種子袋
     const again = executeCommand(at(state, FIELD_SIDE), { type: 'interact' }, index);
     expect(again.messages).toEqual(['這塊田已經種了作物']);
-    expect(again.state.bag.seeds['sweet-radish']).toBe(4);
+    expect(countOf(again.state.inventory, 'seed.sweet-radish')).toBe(4);
   });
 
   it('does not grow an unwatered crop overnight', () => {
@@ -159,8 +171,20 @@ describe('farming actions', () => {
     const out = executeCommand(at(ripe, FIELD_SIDE), { type: 'interact' }, index);
     expect(out.state.plots[FIELD]?.crop).toBeNull();
     const expected = rollInt(ripe.rng, 1, 5).value;
-    expect(out.state.bag.crops['sweet-radish']).toBe(expected);
+    expect(countOf(out.state.inventory, 'crop.sweet-radish')).toBe(expected);
     expect(out.messages).toEqual([`收成了 甜蘿蔔 × ${expected}`]);
+  });
+
+  it('refuses to harvest when the bag is full and keeps the crop in the ground', () => {
+    const ripe = start({
+      inventory: bagOf([{ itemId: 'seed.moon-bean', quality: 'normal', count: 1 }], 1),
+      plots: { [FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 2 } } },
+    });
+    const state = at(ripe, FIELD_SIDE);
+    const out = executeCommand(state, { type: 'interact' }, index);
+    expect(out.messages).toEqual(['背包已滿']);
+    expect(out.state).toEqual(state);
+    expect(out.events).toEqual([]);
   });
 
   it('yields between 1 and 5 crops and advances the random state', () => {
@@ -168,7 +192,7 @@ describe('farming actions', () => {
       plots: { [FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } },
     });
     const out = executeCommand(at(ripe, FIELD_SIDE), { type: 'interact' }, index);
-    const count = out.state.bag.crops['sweet-radish'] ?? 0;
+    const count = countOf(out.state.inventory, 'crop.sweet-radish');
     expect(count).toBeGreaterThanOrEqual(1);
     expect(count).toBeLessThanOrEqual(5);
     expect(out.state.rng).not.toBe(ripe.rng);
@@ -198,7 +222,7 @@ describe('action feedback', () => {
   });
 
   it('emits an acted event at the shipping box when shipping', () => {
-    const state = at(start({ bag: { seeds: {}, crops: { 'sweet-radish': 1 } } }), SHIP_SIDE);
+    const state = at(start({ inventory: bagOf([crops('sweet-radish', 1)]) }), SHIP_SIDE);
     const out = executeCommand(state, { type: 'interact' }, index);
     expect(out.events).toContainEqual({ type: 'acted', action: 'ship', x: 1, y: 2 });
   });
@@ -206,16 +230,38 @@ describe('action feedback', () => {
 
 describe('shipping and sleep', () => {
   it('ships crops from the bag and pays out after sleeping', () => {
-    const state = at(start({ bag: { seeds: {}, crops: { 'sweet-radish': 2 } } }), SHIP_SIDE);
+    const state = at(start({ inventory: bagOf([crops('sweet-radish', 2)]) }), SHIP_SIDE);
     const shipped = act(state);
-    expect(shipped.bag.crops).toEqual({});
-    expect(shipped.shipBox.items).toEqual({ 'sweet-radish': 2 });
+    expect(shipped.inventory.stacks).toEqual([]);
+    expect(shipped.shipBox.entries).toEqual([crops('sweet-radish', 2)]);
 
     const slept = sleep(shipped);
     expect(slept.gold).toBe(100 + 2 * sellPriceOf(20, 2)); // 甜蘿蔔：20 × 3 × 1.2 = 72
-    expect(slept.shipBox.items).toEqual({});
+    expect(slept.shipBox.entries).toEqual([]);
     expect(slept.calendar.day).toBe(2);
     expect(slept.energy.current).toBe(20);
+  });
+
+  it('ships only sellable items and keeps the seeds in the bag', () => {
+    const state = at(
+      start({ inventory: bagOf([{ itemId: 'seed.sweet-radish', quality: 'normal', count: 5 }, crops('moon-bean', 1)]) }),
+      SHIP_SIDE,
+    );
+    const shipped = act(state);
+    expect(shipped.inventory.stacks).toEqual([{ itemId: 'seed.sweet-radish', quality: 'normal', count: 5 }]);
+    expect(shipped.shipBox.entries).toEqual([crops('moon-bean', 1)]);
+  });
+
+  it('pays more for higher quality produce', () => {
+    const state = at(start({ inventory: bagOf([crops('sweet-radish', 2, 'fine')]) }), SHIP_SIDE);
+    const slept = sleep(act(state));
+    expect(slept.gold).toBe(100 + 2 * priceWithQuality(sellPriceOf(20, 2), 'fine'));
+  });
+
+  it('reports nothing to ship when the bag holds only seeds', () => {
+    const out = executeCommand(at(start(), SHIP_SIDE), { type: 'interact' }, index);
+    expect(out.messages).toEqual(['背包裡沒有可出貨的作物']);
+    expect(out.state).toEqual(at(start(), SHIP_SIDE));
   });
 
   it('reports nothing to ship when the bag has no crops', () => {
@@ -233,13 +279,24 @@ describe('villagers', () => {
   it('gives the gift once and then repeats only the last line', () => {
     const village = at({ ...start(), mapId: 'village' }, { x: 1, y: 1, facing: 'up' });
     const first = executeCommand(village, { type: 'interact' }, index);
-    expect(first.state.bag.seeds['sweet-radish']).toBe(5 + 3);
+    expect(countOf(first.state.inventory, 'seed.sweet-radish')).toBe(5 + 3);
     expect(first.state.flags['talked:mira']).toBe(true);
     expect(first.messages).toEqual(['早安。', '今天也辛苦了。', '獲得 甜蘿蔔種子 × 3']);
 
     const second = executeCommand(first.state, { type: 'interact' }, index);
-    expect(second.state.bag.seeds['sweet-radish']).toBe(8);
+    expect(countOf(second.state.inventory, 'seed.sweet-radish')).toBe(8);
     expect(second.messages).toEqual(['今天也辛苦了。']);
+  });
+});
+
+describe('villager gift with a full bag', () => {
+  it('keeps the gift for later instead of losing it', () => {
+    const full = bagOf([{ itemId: 'crop.moon-bean', quality: 'normal', count: 1 }], 1);
+    const village = at({ ...start({ inventory: full }), mapId: 'village' }, { x: 1, y: 1, facing: 'up' });
+    const out = executeCommand(village, { type: 'interact' }, index);
+    expect(out.messages).toContain('背包已滿，先整理一下再來領禮物');
+    expect(out.state.flags['talked:mira']).toBeUndefined();
+    expect(out.state.inventory).toEqual(full);
   });
 });
 

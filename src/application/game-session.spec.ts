@@ -71,4 +71,61 @@ describe('GameSession', () => {
     const outcome = await session.dispatch({ type: 'interact' });
     expect(outcome.messages).toContain('自動存檔失敗：QuotaExceededError');
   });
+
+  describe('play time', () => {
+    /** 假時鐘：每次呼叫 tick() 前進指定毫秒。 */
+    function clock(startMs = 1_000_000) {
+      let now = startMs;
+      return { now: () => now, tick: (ms: number) => void (now += ms) };
+    }
+
+    it('adds up the time between commands while the player is active', async () => {
+      const time = clock();
+      const repo = new MemorySaveRepository();
+      const session = new GameSession(createNewGame(pack, 1), index, repo, { now: time.now });
+      time.tick(4_000);
+      await session.dispatch({ type: 'cycleTool' });
+      time.tick(6_000);
+      await session.dispatch({ type: 'cycleTool' });
+      await session.save();
+      expect(session.state.playtimeSeconds).toBe(10);
+      expect((await repo.load('slot-1'))?.state.playtimeSeconds).toBe(10);
+    });
+
+    it('does not count a long idle gap as play time', async () => {
+      const time = clock();
+      const session = new GameSession(createNewGame(pack, 1), index, new MemorySaveRepository(), { now: time.now });
+      time.tick(5_000);
+      await session.dispatch({ type: 'cycleTool' });
+      time.tick(10 * 60_000); // 離開座位十分鐘
+      await session.dispatch({ type: 'cycleTool' });
+      await session.save();
+      expect(session.state.playtimeSeconds).toBe(5);
+    });
+
+    it('keeps counting from the saved total after a reload', async () => {
+      const time = clock();
+      const repo = new MemorySaveRepository();
+      const first = new GameSession(createNewGame(pack, 1), index, repo, { now: time.now });
+      time.tick(30_000);
+      await first.dispatch({ type: 'cycleTool' });
+      await first.save();
+
+      const second = await GameSession.open(pack, index, repo, 1, 'slot-1', { now: time.now });
+      time.tick(12_000);
+      await second.dispatch({ type: 'cycleTool' });
+      await second.save();
+      expect(second.state.playtimeSeconds).toBe(42);
+    });
+
+    it('does not double count when saving twice in a row', async () => {
+      const time = clock();
+      const session = new GameSession(createNewGame(pack, 1), index, new MemorySaveRepository(), { now: time.now });
+      time.tick(8_000);
+      await session.dispatch({ type: 'cycleTool' });
+      await session.save();
+      await session.save();
+      expect(session.state.playtimeSeconds).toBe(8);
+    });
+  });
 });

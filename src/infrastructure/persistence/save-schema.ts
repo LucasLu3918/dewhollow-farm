@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { SAVE_SCHEMA_VERSION, type GameState } from '../../domain/game-state';
 import type { SaveRecord } from '../../application/ports';
+import { describeIssue, SaveFormatError } from './save-errors';
+import { migrateState, type MigrationContext } from './save-migrations';
+
+export { SaveFormatError } from './save-errors';
 
 const calendar = z.object({
   year: z.number().int().positive(),
@@ -28,9 +32,17 @@ const plotState = z.object({
   dryDays: z.number().int().nonnegative(),
 });
 
-const counts = z.record(z.string(), z.number().int().nonnegative());
+const itemStack = z.object({
+  itemId: z.string().min(1),
+  quality: z.enum(['normal', 'good', 'fine']),
+  count: z.number().int().positive(),
+});
 
-/** 存檔的 schema。版本升級時在這裡加入遷移，而不是改寫舊版欄位。 */
+const inventory = z
+  .object({ capacity: z.number().int().positive(), stacks: z.array(itemStack) })
+  .refine((inv) => inv.stacks.length <= inv.capacity, '背包的堆疊數超過格數');
+
+/** 目前版本的存檔 schema。版本升級時凍結舊版（見 save-schema-v1.ts）並在 save-migrations.ts 加遷移。 */
 export const gameStateSchema: z.ZodType<GameState> = z.object({
   schemaVersion: z.literal(SAVE_SCHEMA_VERSION),
   calendar,
@@ -39,12 +51,13 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   mapId: z.string().min(1),
   player,
   plots: z.record(z.string(), plotState),
-  bag: z.object({ seeds: counts, crops: counts }),
-  shipBox: z.object({ items: counts }),
+  inventory,
+  shipBox: z.object({ entries: z.array(itemStack) }),
   flags: z.record(z.string(), z.boolean()),
   tool: z.enum(['hoe', 'can', 'seedbag']),
   selectedSeed: z.string().min(1),
   rng: z.number().int().nonnegative().max(4294967295),
+  playtimeSeconds: z.number().int().nonnegative(),
 });
 
 const recordSchema = z.object({
@@ -53,24 +66,19 @@ const recordSchema = z.object({
   state: z.unknown(),
 });
 
-export class SaveFormatError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'SaveFormatError';
-  }
-}
-
-/** 解析存檔紀錄；格式錯誤時拋出可讀的 SaveFormatError，而不是靜默忽略。 */
-export function parseSaveRecord(raw: unknown): SaveRecord {
+/**
+ * 解析存檔紀錄：先依版本遷移到目前格式，再驗證。
+ * 格式錯誤時拋出可讀的 SaveFormatError，而不是靜默忽略。
+ */
+export function parseSaveRecord(raw: unknown, context: MigrationContext): SaveRecord {
   const envelope = recordSchema.safeParse(raw);
   if (!envelope.success) {
     throw new SaveFormatError(`存檔外層格式錯誤：${envelope.error.issues[0]?.message ?? '未知'}`);
   }
-  const state = gameStateSchema.safeParse(envelope.data.state);
+  const migrated = migrateState(envelope.data.state, context);
+  const state = gameStateSchema.safeParse(migrated);
   if (!state.success) {
-    const issue = state.error.issues[0];
-    const where = issue ? issue.path.join('.') || '(根)' : '(未知)';
-    throw new SaveFormatError(`存檔內容格式錯誤於 ${where}：${issue?.message ?? '未知'}`);
+    throw new SaveFormatError(`存檔內容格式錯誤於 ${describeIssue(state.error.issues[0])}`);
   }
   return { slot: envelope.data.slot, savedAt: envelope.data.savedAt, state: state.data };
 }

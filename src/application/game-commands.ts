@@ -1,13 +1,14 @@
-import { addCrop, addSeeds, removeSeed, takeAllCrops } from '../domain/bag';
 import { advanceMinutes, formatClock, sleepUntilMorning } from '../domain/calendar';
 import type { Direction, MapDef, MapNpcPlacement } from '../domain/content';
 import { trySpend, restore } from '../domain/energy';
 import { growCrops, harvestPlot, isRipe, plantCrop, plotKey, tillPlot, waterPlot, type PlotMap } from '../domain/farm';
 import { TOOL_ORDER, type GameState } from '../domain/game-state';
+import { addItem, removeItem, takeMatching } from '../domain/inventory';
+import { cropItemId, seedItemId } from '../domain/items';
 import { fail, ok, type Result } from '../domain/result';
-import { settleShipBox, shipCrop } from '../domain/shipping';
+import { settleShipBox, shipStack } from '../domain/shipping';
 import { rollInt } from '../domain/random';
-import { sellPriceOf } from '../domain/pricing';
+import { priceWithQuality } from '../domain/pricing';
 import { isWalkable, neighbor, tileAt } from '../domain/world';
 import type { ActionKind } from '../domain/tuning';
 import type { ContentIndex } from './content-index';
@@ -43,6 +44,7 @@ const FAILURE_MESSAGES: Record<string, string> = {
   NO_CROP: '這裡沒有作物',
   NOT_RIPE: '作物還沒成熟',
   NO_SEED: '種子袋裡沒有這種種子',
+  BAG_FULL: '背包已滿',
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
@@ -147,13 +149,10 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
       const harvested = harvestPlot(s.plots, key, cropDef.growthDays);
       if (!harvested.ok) return fail(harvested.reason);
       const roll = rollInt(s.rng, index.tuning.harvest.min, index.tuning.harvest.max);
+      const stored = addItem(s.inventory, index.item(cropItemId(harvested.value.cropId)), roll.value);
+      if (!stored.ok) return fail(stored.reason);
       yielded = roll.value;
-      return ok({
-        ...s,
-        plots: harvested.value.plots,
-        bag: addCrop(s.bag, harvested.value.cropId, roll.value),
-        rng: roll.rng,
-      });
+      return ok({ ...s, plots: harvested.value.plots, inventory: stored.value, rng: roll.rng });
     });
     return finish(state, result, `收成了 ${cropDef.name} × ${yielded}`, { action: 'harvest', key });
   }
@@ -178,11 +177,11 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
 
   const seedName = index.crop(state.selectedSeed).name;
   const result = spendThen(state, 'plant', index, (s) => {
-    const seeds = removeSeed(s.bag, s.selectedSeed);
-    if (!seeds.ok) return fail(seeds.reason);
+    const seeds = removeItem(s.inventory, seedItemId(s.selectedSeed), 1);
+    if (!seeds.ok) return fail('NO_SEED');
     const planted = plantCrop(s.plots, key, s.selectedSeed);
     if (!planted.ok) return fail(planted.reason);
-    return ok({ ...s, bag: seeds.value, plots: planted.value });
+    return ok({ ...s, inventory: seeds.value, plots: planted.value });
   });
   return finish(state, result, `播下了 ${seedName} 種子`, { action: 'plant', key });
 }
@@ -208,14 +207,13 @@ function messageFor(reason: string): string {
 }
 
 function shipAll(state: GameState, index: ContentIndex): CommandOutcome {
-  const { bag, crops } = takeAllCrops(state.bag);
-  const entries = Object.entries(crops);
-  if (entries.length === 0) return reply(state, ['背包裡沒有可出貨的作物']);
+  const { inventory, taken } = takeMatching(state.inventory, (stack) => index.item(stack.itemId).sellPrice !== undefined);
+  if (taken.length === 0) return reply(state, ['背包裡沒有可出貨的作物']);
 
   const result = spendThen(state, 'ship', index, (s) => {
     let box = s.shipBox;
-    for (const [cropId, count] of entries) box = shipCrop(box, cropId, count);
-    return ok({ ...s, bag, shipBox: box });
+    for (const stack of taken) box = shipStack(box, stack);
+    return ok({ ...s, inventory, shipBox: box });
   });
   const box = neighbor(state.player, state.player.facing);
   return finish(state, result, '把作物放進了出貨箱', { action: 'ship', key: `${box.x},${box.y}` });
@@ -229,9 +227,12 @@ function talk(state: GameState, placement: MapNpcPlacement, index: ContentIndex)
   const messages = [...npc.lines];
   let next: GameState = { ...state, flags: { ...state.flags, [`talked:${npc.id}`]: true } };
   if (npc.gift) {
-    const crop = index.crop(npc.gift.cropId);
-    next = { ...next, bag: addSeeds(next.bag, npc.gift.cropId, npc.gift.count) };
-    messages.push(`獲得 ${crop.name}種子 × ${npc.gift.count}`);
+    const seed = index.item(seedItemId(npc.gift.cropId));
+    const stored = addItem(next.inventory, seed, npc.gift.count);
+    // 背包放不下時不標記「已對話」，讓玩家整理後還能領到禮物。
+    if (!stored.ok) return reply(state, [...messages, '背包已滿，先整理一下再來領禮物']);
+    next = { ...next, inventory: stored.value };
+    messages.push(`獲得 ${seed.name} × ${npc.gift.count}`);
   }
   return reply(next, messages);
 }
@@ -239,10 +240,9 @@ function talk(state: GameState, placement: MapNpcPlacement, index: ContentIndex)
 function sleep(state: GameState, index: ContentIndex): CommandOutcome {
   const growth = growCrops(state.plots, (id) => index.crop(id).growthDays);
   const plots: PlotMap = growth.plots;
-  const settled = settleShipBox(state.shipBox, (id) => {
-    const crop = index.crop(id);
-    return sellPriceOf(crop.seedPrice, crop.growthDays);
-  });
+  const settled = settleShipBox(state.shipBox, (itemId, quality) =>
+    priceWithQuality(index.item(itemId).sellPrice ?? 0, quality),
+  );
   const calendar = sleepUntilMorning(state.calendar, index.tuning.time.wakeMinute);
   const next: GameState = {
     ...state,

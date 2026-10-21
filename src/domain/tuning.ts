@@ -10,6 +10,10 @@ export interface Tuning {
     /** 每個動作消耗的體力。 */
     costs: Record<ActionKind, number>;
   };
+  inventory: {
+    /** 背包格數。 */
+    capacity: number;
+  };
   harvest: {
     /** 每次收穫隨機產出的數量範圍（含兩端）。 */
     min: number;

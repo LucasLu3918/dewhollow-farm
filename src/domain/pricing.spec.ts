@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sellPriceOf } from './pricing';
+import { priceWithQuality, sellPriceOf } from './pricing';
 
 describe('sellPriceOf', () => {
   it('applies the linear growth bonus to three times the seed price', () => {
@@ -10,5 +10,17 @@ describe('sellPriceOf', () => {
 
   it('rounds half up to a whole number', () => {
     expect(sellPriceOf(25, 3)).toBe(98); // 25 × 3 × 1.3 = 97.5
+  });
+});
+
+describe('priceWithQuality', () => {
+  it('leaves normal quality untouched', () => {
+    expect(priceWithQuality(98, 'normal')).toBe(98);
+  });
+
+  it('pays 25% more for good and 50% more for fine, rounded to whole gold', () => {
+    expect(priceWithQuality(98, 'good')).toBe(123); // 122.5
+    expect(priceWithQuality(98, 'fine')).toBe(147);
+    expect(priceWithQuality(33, 'good')).toBe(41); // 41.25
   });
 });
