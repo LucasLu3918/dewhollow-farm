@@ -3,13 +3,13 @@ import { advanceRng } from './random';
 
 /**
  * 礦坑：逐層以種子程序生成（同一層、同一個種子永遠長一樣）。
- * 每層是一張 24×16 的地圖：左邊有下樓的梯子 '>'，右邊有上樓的梯子 '<'，中間是隨機游走挖出來的路。
- * 路上有幾塊落石（r）擋著，要用鎬敲開才能往下（數量見 blocksOn）；其餘的石頭與礦石都可以敲掉。
+ * 每層是一張 40×16 的地圖：左邊有下樓的梯子 '>'，右邊有上樓的梯子 '<'，中間是隨機游走挖出來的路。
+ * 路上有幾道落石牆（整欄的石頭，數量見 blocksOn），每一道都要用鎬敲開一塊才能往下；其餘的石頭與礦石都可以敲掉。
  * 上下層的樓梯位置對齊（見 stairRow），敲得開的話每一層都走得到下一層，所以不會把玩家鎖在礦坑裡。
  */
 
 export const MINE_DEPTH = 40;
-export const MINE_WIDTH = 24;
+export const MINE_WIDTH = 40;
 export const MINE_HEIGHT = 16;
 /** 每幾層有一個檢查點：從入口下來會直接到最深的檢查點。 */
 export const CHECKPOINT_STEP = 5;
@@ -41,11 +41,15 @@ export function stairRow(layer: number, seed: number): number {
   return 2 + Math.floor((first / 2 ** 32) * (MINE_HEIGHT - 4));
 }
 
-/** 路上的落石數：每 2 層多一塊，最多 MAX_BLOCKS 塊（這是深度的閘門，見 domain/mine.spec.ts）。 */
-export const MAX_BLOCKS = 12;
+/**
+ * 路上的落石牆數：每層多 2 道，最多 MAX_BLOCKS 道（這是深度的閘門，見 domain/mine.spec.ts）。
+ * 牆只排在第 3 到 MINE_WIDTH-4 欄，兩端的欄留給樓梯與走廊頭尾，所以上限是 MINE_WIDTH-6。
+ * 模擬（npm run sim）的校準：第 20 層約在第 38 天（夏末）。
+ */
+export const MAX_BLOCKS = MINE_WIDTH - 6;
 
 export function blocksOn(layer: number): number {
-  return Math.min(MAX_BLOCKS, 2 + Math.floor(layer / 2));
+  return Math.min(MAX_BLOCKS, 2 + 2 * layer);
 }
 
 /** 每一層的礦石比例：越深越多，但有上限。 */
@@ -93,14 +97,16 @@ export function generateMineLayer(layer: number, seed: number): MapDef {
     const cy = 2 + Math.floor(rand() * (height - 5));
     for (let dy = 0; dy < 2; dy += 1) for (let dx = 0; dx < 3; dx += 1) grid[cy + dy]![cx + dx] = '.';
   }
-  // 路上的落石：從路的中段挑幾格（不挑頭尾），要用鎬敲開；可以連成一段。
-  for (let placed = 0, tries = 0; placed < blocksOn(layer) && tries < 1000; tries += 1) {
-    const at = 3 + Math.floor(rand() * (corridor.length - 6));
-    const [bx, by] = corridor[at]!;
-    if (grid[by]![bx] === '.') {
-      grid[by]![bx] = 'r';
-      placed += 1;
-    }
+  // 落石牆：在 3 到 width-4 的欄裡挑 blocksOn(layer) 欄，整欄（上下牆之間）都變成石頭。
+  // 整欄都是石頭，走廊與房間都無法從旁邊跨過，所以旁路繞不過去；從右邊走到左邊，每一道牆至少要敲開一塊。
+  const wallColumns: number[] = [];
+  for (let x = 3; x <= width - 4; x += 1) wallColumns.push(x);
+  for (let i = wallColumns.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rand() * (i + 1));
+    [wallColumns[i], wallColumns[j]] = [wallColumns[j]!, wallColumns[i]!];
+  }
+  for (const wx of wallColumns.slice(0, blocksOn(layer))) {
+    for (let y = 1; y < height - 1; y += 1) grid[y]![wx] = 'r';
   }
   // 礦石：只會長在石頭上。
   const chance = oreChance(layer);
