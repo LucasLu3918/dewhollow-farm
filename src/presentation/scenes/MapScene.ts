@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import type { ContentPack, Direction } from '../../domain/content';
+import type { ContentPack, Direction, MapDef } from '../../domain/content';
 import { tileAt } from '../../domain/world';
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
 import type { Command, GameEvent } from '../../application/game-commands';
 import type { Hud } from '../hud';
+import { cameraBounds, deadzoneOf } from '../camera';
 import { TILE_SIZE } from '../constants';
 import { footstepDust, playActionEffect, sleepEffect, squashSprite, walkBob } from '../effects';
 
@@ -31,6 +32,16 @@ const COMMAND_KEYS: Record<string, Command> = {
 
 const MOVE_DURATION_MS = 110;
 
+/** 鏡頭跟隨的平滑度：越大越貼緊玩家，1 為完全貼緊。 */
+const FOLLOW_LERP = 0.15;
+
+/** 開發模式下讓端對端測試讀取鏡頭位置；正式建置會被移除。 */
+declare global {
+  interface Window {
+    __dewhollow?: { cameraScroll(): { x: number; y: number }; mapId(): string };
+  }
+}
+
 /**
  * 地圖場景：只負責把 GameState 畫出來，並把按鍵轉成指令交給 GameSession。
  * 規則判斷留在應用層；這裡只決定怎麼呈現（方向、走路節奏、動作效果）。
@@ -56,11 +67,38 @@ export class MapScene extends Phaser.Scene {
   create(): void {
     this.world = this.add.container(0, 0);
     this.player = this.add.image(0, 0, 'player.down').setOrigin(0).setDepth(10);
+    this.setupCamera();
     window.addEventListener('keydown', this.onKeyDown);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener('keydown', this.onKeyDown);
     });
     this.refresh();
+  }
+
+  /** 鏡頭跟隨玩家：中央留一塊死區，玩家走到邊緣才捲動；邊界在換地圖時重設。 */
+  private setupCamera(): void {
+    const camera = this.cameras.main;
+    const zone = deadzoneOf({ width: camera.width, height: camera.height });
+    camera.setDeadzone(zone.width, zone.height);
+    // 玩家圖以左上角為原點，位移量把跟隨點移到格子中心。
+    camera.startFollow(this.player, true, FOLLOW_LERP, FOLLOW_LERP, -TILE_SIZE / 2, -TILE_SIZE / 2);
+    if (import.meta.env.DEV) {
+      window.__dewhollow = {
+        cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
+        mapId: () => this.deps.session.state.mapId,
+      };
+    }
+  }
+
+  /** 換地圖時：重設邊界並直接把鏡頭放到玩家身上，避免從上一張圖的位置慢慢滑過來。 */
+  private frameCamera(map: MapDef): void {
+    const camera = this.cameras.main;
+    const bounds = cameraBounds(
+      { width: map.width * TILE_SIZE, height: map.height * TILE_SIZE },
+      { width: camera.width, height: camera.height },
+    );
+    camera.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+    camera.centerOn(this.player.x + TILE_SIZE / 2, this.player.y + TILE_SIZE / 2);
   }
 
   private async handleKey(event: KeyboardEvent): Promise<void> {
@@ -107,6 +145,7 @@ export class MapScene extends Phaser.Scene {
       this.renderedMapId = map.id;
       this.drawMap(map.id);
       this.player.setPosition(state.player.x * TILE_SIZE, state.player.y * TILE_SIZE);
+      this.frameCamera(map);
     }
 
     this.showFacing(state.player.facing);

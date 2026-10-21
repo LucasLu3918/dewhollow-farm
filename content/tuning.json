@@ -9,6 +9,9 @@
       "ship": 0
     }
   },
+  "inventory": {
+    "capacity": 24
+  },
   "harvest": {
     "min": 1,
     "max": 5

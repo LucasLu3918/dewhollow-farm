@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import type { SaveRecord, SaveRepository } from '../../application/ports';
+import type { MigrationContext } from './save-migrations';
 import { parseSaveRecord } from './save-schema';
 
 class FarmDatabase extends Dexie {
@@ -18,10 +19,12 @@ class FarmDatabase extends Dexie {
 export class IndexedDbSaveRepository implements SaveRepository {
   private readonly db = new FarmDatabase();
 
+  constructor(private readonly migration: MigrationContext) {}
+
   async load(slot: string): Promise<SaveRecord | null> {
     const raw = await this.db.saves.get(slot);
     if (!raw) return null;
-    return parseSaveRecord(raw);
+    return parseSaveRecord(raw, this.migration);
   }
 
   async save(record: SaveRecord): Promise<void> {

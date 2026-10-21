@@ -5,7 +5,7 @@ import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
 import type { ContentPack, Direction } from '../../domain/content';
 import { MapScene, type MapSceneDeps } from './MapScene';
-import { TILE_SIZE } from '../constants';
+import { TILE_SIZE, UNIT } from '../constants';
 
 
 export interface BootDeps {
@@ -53,11 +53,12 @@ export class BootScene extends Phaser.Scene {
     const graphics = this.make.graphics({ x: 0, y: 0 }, false);
     const size = TILE_SIZE;
     const mid = size / 2;
+    const u = UNIT;
 
     switch (entry.kind) {
       case 'crop':
-        graphics.fillStyle(0x3d6b3a, 1).fillRect(mid - 2, mid, 4, mid - 2);
-        graphics.fillStyle(color, 1).fillCircle(mid, mid - 3, 8);
+        graphics.fillStyle(0x3d6b3a, 1).fillRect(mid - 2 * u, mid, 4 * u, mid - 2 * u);
+        graphics.fillStyle(color, 1).fillCircle(mid, mid - 3 * u, 8 * u);
         break;
       case 'character':
         drawCharacter(graphics, color, facingOf(entry.id), size);
@@ -67,7 +68,7 @@ export class BootScene extends Phaser.Scene {
         break;
       default:
         graphics.fillStyle(color, 1).fillRect(0, 0, size, size);
-        graphics.lineStyle(1, 0x000000, 0.18).strokeRect(0.5, 0.5, size - 1, size - 1);
+        graphics.lineStyle(u, 0x000000, 0.18).strokeRect(u / 2, u / 2, size - u, size - u);
     }
 
     graphics.generateTexture(entry.id, size, size);
@@ -88,24 +89,26 @@ function facingOf(id: string): Direction | null {
 /**
  * 占位角色：身體用指定色，頭部與五官依方向變化。
  * 朝上只看得到後腦，朝下看到兩眼，朝左右時眼睛靠向該側，讓方向在占位圖上就能分辨。
+ * 數字以 32 px 設計稿為基準，乘上 UNIT 換算。
  */
 function drawCharacter(graphics: Phaser.GameObjects.Graphics, color: number, facing: Direction | null, size: number): void {
   const mid = size / 2;
-  graphics.fillStyle(color, 1).fillRect(mid - 8, mid + 2, 16, 12);
-  graphics.fillStyle(SKIN, 1).fillCircle(mid, mid - 6, 8);
+  const u = UNIT;
+  graphics.fillStyle(color, 1).fillRect(mid - 8 * u, mid + 2 * u, 16 * u, 12 * u);
+  graphics.fillStyle(SKIN, 1).fillCircle(mid, mid - 6 * u, 8 * u);
 
   if (facing === 'up') {
-    graphics.fillStyle(HAIR, 1).fillCircle(mid, mid - 7, 9);
+    graphics.fillStyle(HAIR, 1).fillCircle(mid, mid - 7 * u, 9 * u);
     return;
   }
 
-  graphics.fillStyle(HAIR, 1).fillRect(mid - 8, mid - 15, 16, 6);
+  graphics.fillStyle(HAIR, 1).fillRect(mid - 8 * u, mid - 15 * u, 16 * u, 6 * u);
   graphics.fillStyle(EYE, 1);
   if (facing === 'down' || facing === null) {
-    graphics.fillCircle(mid - 3, mid - 6, 1.5).fillCircle(mid + 3, mid - 6, 1.5);
+    graphics.fillCircle(mid - 3 * u, mid - 6 * u, 1.5 * u).fillCircle(mid + 3 * u, mid - 6 * u, 1.5 * u);
   } else if (facing === 'left') {
-    graphics.fillCircle(mid - 4, mid - 6, 1.5);
+    graphics.fillCircle(mid - 4 * u, mid - 6 * u, 1.5 * u);
   } else {
-    graphics.fillCircle(mid + 4, mid - 6, 1.5);
+    graphics.fillCircle(mid + 4 * u, mid - 6 * u, 1.5 * u);
   }
 }

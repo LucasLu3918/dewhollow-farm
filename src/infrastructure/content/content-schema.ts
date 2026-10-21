@@ -60,6 +60,7 @@ const tuningSchema = z.object({
       ship: cost,
     }),
   }),
+  inventory: z.object({ capacity: z.number().int().positive() }),
   harvest: z
     .object({ min: z.number().int().positive(), max: z.number().int().positive() })
     .refine((h) => h.min <= h.max, '收穫的最小值不可大於最大值'),

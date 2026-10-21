@@ -1,0 +1,112 @@
+import { describe, expect, it } from 'vitest';
+import { SaveFormatError } from './save-errors';
+import { migrateState } from './save-migrations';
+
+const context = { inventoryCapacity: 24 };
+
+/** 一份合法的 v1 存檔內容（MVP 時期的格式）。 */
+function v1State(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    schemaVersion: 1,
+    calendar: { year: 1, season: 'spring', day: 3, minuteOfDay: 400 },
+    energy: { current: 60, max: 100 },
+    gold: 250,
+    mapId: 'farm',
+    player: { x: 7, y: 9, facing: 'down' },
+    plots: { '4,3': { watered: true, dryDays: 0, crop: { cropId: 'moon-bean', growthDays: 1 } } },
+    bag: { seeds: { 'moon-bean': 2, 'sweet-radish': 5 }, crops: { 'sweet-radish': 3 } },
+    shipBox: { items: { 'sweet-radish': 2 } },
+    flags: { 'talked:maomao': true },
+    tool: 'can',
+    selectedSeed: 'moon-bean',
+    rng: 12345,
+    ...overrides,
+  };
+}
+
+describe('migrateState v1 → v2', () => {
+  it('turns the bag into inventory stacks, seeds first then produce', () => {
+    const migrated = migrateState(v1State(), context) as Record<string, unknown>;
+    expect(migrated.schemaVersion).toBe(2);
+    expect(migrated.inventory).toEqual({
+      capacity: 24,
+      stacks: [
+        { itemId: 'seed.moon-bean', quality: 'normal', count: 2 },
+        { itemId: 'seed.sweet-radish', quality: 'normal', count: 5 },
+        { itemId: 'crop.sweet-radish', quality: 'normal', count: 3 },
+      ],
+    });
+    expect(migrated).not.toHaveProperty('bag');
+  });
+
+  it('turns the shipping box into normal-quality entries', () => {
+    const migrated = migrateState(v1State(), context) as Record<string, unknown>;
+    expect(migrated.shipBox).toEqual({ entries: [{ itemId: 'crop.sweet-radish', quality: 'normal', count: 2 }] });
+  });
+
+  it('starts play time at zero and keeps every other field as it was', () => {
+    const before = v1State();
+    const migrated = migrateState(before, context) as Record<string, unknown>;
+    expect(migrated.playtimeSeconds).toBe(0);
+    for (const key of ['calendar', 'energy', 'gold', 'mapId', 'player', 'plots', 'flags', 'tool', 'selectedSeed', 'rng']) {
+      expect(migrated[key]).toEqual(before[key]);
+    }
+  });
+
+  it('splits a stack that is larger than the stack limit', () => {
+    const migrated = migrateState(v1State({ bag: { seeds: {}, crops: { 'sweet-radish': 120 } } }), context) as {
+      inventory: { stacks: { count: number }[] };
+    };
+    expect(migrated.inventory.stacks.map((s) => s.count)).toEqual([99, 21]);
+  });
+
+  it('grows the capacity rather than dropping items that no longer fit', () => {
+    const migrated = migrateState(v1State(), { inventoryCapacity: 2 }) as { inventory: { capacity: number } };
+    expect(migrated.inventory.capacity).toBe(3);
+  });
+
+  it('migrates an empty bag and an empty shipping box', () => {
+    const migrated = migrateState(v1State({ bag: { seeds: {}, crops: {} }, shipBox: { items: {} } }), context) as Record<
+      string,
+      unknown
+    >;
+    expect(migrated.inventory).toEqual({ capacity: 24, stacks: [] });
+    expect(migrated.shipBox).toEqual({ entries: [] });
+  });
+
+  it('does not mutate the input', () => {
+    const before = v1State();
+    const snapshot = structuredClone(before);
+    migrateState(before, context);
+    expect(before).toEqual(snapshot);
+  });
+});
+
+describe('migrateState version handling', () => {
+  it('passes a current-version state through untouched', () => {
+    const current = { schemaVersion: 2, anything: 'goes' };
+    expect(migrateState(current, context)).toBe(current);
+  });
+
+  it('refuses a save from a newer game version with a clear message', () => {
+    expect(() => migrateState({ schemaVersion: 3 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState({ schemaVersion: 3 }, context)).toThrow('更新版本');
+  });
+
+  it('refuses a state without a usable version', () => {
+    expect(() => migrateState({}, context)).toThrow('缺少存檔版本');
+    expect(() => migrateState({ schemaVersion: 0 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState('nope', context)).toThrow(SaveFormatError);
+  });
+
+  it('reports where a damaged v1 state is wrong instead of guessing', () => {
+    try {
+      migrateState(v1State({ bag: { seeds: { 'moon-bean': -1 }, crops: {} } }), context);
+      throw new Error('should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(SaveFormatError);
+      expect((error as Error).message).toContain('v1');
+      expect((error as Error).message).toContain('bag.seeds.moon-bean');
+    }
+  });
+});
