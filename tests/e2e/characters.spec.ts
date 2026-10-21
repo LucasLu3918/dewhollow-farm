@@ -11,6 +11,7 @@ interface SpriteInfo {
   top: number;
   width: number;
   height: number;
+  flipX: boolean;
 }
 
 async function sprites(page: Page, prefix: string): Promise<SpriteInfo[]> {
@@ -53,14 +54,43 @@ test('the player is drawn from the real 2x image at half scale, standing on her 
   expect(player).toMatchObject({ key: 'player.down', left: 448, top: 560, width: 64, height: 80 });
 });
 
-test('turning keeps the same size and foot position (four directions share one image for now)', async ({ page }) => {
+test('each direction has its own image, and facing right mirrors the side image', async ({ page }) => {
+  const requested: string[] = [];
+  page.on('response', (r) => {
+    if (r.url().includes('/assets/characters/') && r.ok()) requested.push(r.url().split('/').pop() ?? '');
+  });
   await waitForGame(page);
-  await page.keyboard.press('ArrowLeft'); // 左邊 (6,9) 是草地，會移動一格
-  await expect.poll(async () => (await sprites(page, 'player.'))[0]?.key).toBe('player.left');
-  await expect.poll(async () => (await sprites(page, 'player.'))[0]?.left).toBe(6 * 64);
-  const [player] = await sprites(page, 'player.');
-  expect(player).toMatchObject({ top: 560, width: 64, height: 80 });
-  expect(await textureSize(page, 'player.left')).toEqual({ width: 128, height: 160 });
+
+  // 前、後、側三張都是真正載入的 2x 圖（128×160）；朝右沒有自己的貼圖，直接用朝左的翻轉。
+  for (const key of ['player.down', 'player.up', 'player.left']) {
+    expect(await textureSize(page, key), key).toEqual({ width: 128, height: 160 });
+  }
+  expect(await page.evaluate(() => window.__dewhollow?.textureSize('player.right'))).toBeNull();
+  expect(requested).toEqual(expect.arrayContaining(['xiaohan-2x.png', 'xiaohan-back-2x.png', 'xiaohan-side-2x.png']));
+  await expect(page.locator('#hud-log')).not.toContainText('素材載入失敗');
+
+  const current = async () => (await sprites(page, 'player.'))[0];
+
+  // 往上：背面。出生點 (7,9) → (7,8)，腳底 (8+1)×64 = 576。
+  await page.keyboard.press('ArrowUp');
+  await expect.poll(async () => (await current())?.key).toBe('player.up');
+  await expect.poll(async () => (await current())?.top).toBe(496);
+  expect(await current()).toMatchObject({ left: 448, width: 64, height: 80, flipX: false });
+
+  // 往左：側面，不翻轉。(7,8) → (6,8)。
+  await page.keyboard.press('ArrowLeft');
+  await expect.poll(async () => (await current())?.left).toBe(6 * 64);
+  expect(await current()).toMatchObject({ key: 'player.left', top: 496, width: 64, height: 80, flipX: false });
+
+  // 往右：同一張側面圖，水平翻轉。大小與腳底位置不變。(6,8) → (7,8)。
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(async () => (await current())?.left).toBe(7 * 64);
+  expect(await current()).toMatchObject({ key: 'player.left', top: 496, width: 64, height: 80, flipX: true });
+
+  // 往下：回到正面，不翻轉。
+  await page.keyboard.press('ArrowDown');
+  await expect.poll(async () => (await current())?.key).toBe('player.down');
+  expect(await current()).toMatchObject({ flipX: false, width: 64, height: 80 });
 });
 
 test('Maomao in the village uses the real image and stands on his tile', async ({ page }) => {

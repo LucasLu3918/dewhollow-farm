@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { ContentPack, Direction, MapDef } from '../../domain/content';
 import { tileAt } from '../../domain/world';
-import { displayScale, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
+import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
 import type { Command, GameEvent } from '../../application/game-commands';
@@ -46,6 +46,7 @@ interface SpriteDebugInfo {
   top: number;
   width: number;
   height: number;
+  flipX: boolean;
 }
 
 declare global {
@@ -71,7 +72,6 @@ export class MapScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Image;
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
-  private scales = new Map<string, number>();
   private onKeyDown = (event: KeyboardEvent): void => {
     void this.handleKey(event);
   };
@@ -82,14 +82,13 @@ export class MapScene extends Phaser.Scene {
 
   init(deps: MapSceneDeps): void {
     this.deps = deps;
-    this.scales = new Map(deps.assets.assets.map((a) => [a.id, displayScale(a)]));
   }
 
   create(): void {
     this.world = this.add.container(0, 0);
     // 角色圖比格子高：原點放在左下，腳底貼齊格子底部。
-    this.player = this.add.image(0, 0, 'player.down').setOrigin(0, 1).setDepth(10);
-    this.applyScale(this.player, 'player.down');
+    this.player = this.add.image(0, 0, this.resolveTexture('player.down')).setOrigin(0, 1).setDepth(10);
+    this.applyAsset(this.player, 'player.down');
     this.setupCamera();
     window.addEventListener('keydown', this.onKeyDown);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -188,8 +187,7 @@ export class MapScene extends Phaser.Scene {
   private showFacing(facing: Direction): void {
     if (facing === this.shownFacing) return;
     this.shownFacing = facing;
-    this.player.setTexture(`player.${facing}`);
-    this.applyScale(this.player, `player.${facing}`);
+    this.applyAsset(this.player, `player.${facing}`);
   }
 
   private drawMap(mapId: string): void {
@@ -245,9 +243,18 @@ export class MapScene extends Phaser.Scene {
     walkBob(this, this.player, foot.x, foot.y, MOVE_DURATION_MS);
   }
 
-  /** 設定顯示縮放（例如 2x 母版 0.5 倍），並記下基準縮放，讓壓扁伸展等效果以它為準。 */
-  private applyScale(image: Phaser.GameObjects.Image, key: string): void {
-    const scale = this.scales.get(key) ?? 1;
+  private resolveTexture(assetId: string): string {
+    return resolveAsset(this.deps.assets, assetId).textureId;
+  }
+
+  /**
+   * 把素材套到圖片上：換成實際的貼圖（翻轉素材用原圖）、水平翻轉、顯示縮放（例如 2x 母版 0.5 倍），
+   * 並記下基準縮放，讓壓扁伸展等效果以它為準。
+   */
+  private applyAsset(image: Phaser.GameObjects.Image, assetId: string): void {
+    const { textureId, flipX, scale } = resolveAsset(this.deps.assets, assetId);
+    image.setTexture(textureId);
+    image.setFlipX(flipX);
     image.setScale(scale);
     image.setData('baseScale', scale);
   }
@@ -255,8 +262,8 @@ export class MapScene extends Phaser.Scene {
   /** 站立的角色（玩家以外，例如 NPC）：腳底貼齊格子底部。 */
   private character(key: string, x: number, y: number, depth: number): Phaser.GameObjects.Image {
     const foot = footOf(x, y);
-    const image = this.add.image(foot.x, foot.y, key).setOrigin(0, 1).setDepth(depth);
-    this.applyScale(image, key);
+    const image = this.add.image(foot.x, foot.y, this.resolveTexture(key)).setOrigin(0, 1).setDepth(depth);
+    this.applyAsset(image, key);
     return image;
   }
 
@@ -273,6 +280,7 @@ export class MapScene extends Phaser.Scene {
         top: Math.round(bounds.y),
         width: Math.round(bounds.width),
         height: Math.round(bounds.height),
+        flipX: image.flipX,
       };
     });
   }

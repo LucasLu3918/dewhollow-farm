@@ -86,7 +86,7 @@ Bright saturated hand-painted cartoon style, thick dark brown outline, soft high
 - 小涵與毛毛的臉部比例不完全相同（毛毛的頭髮占比大），之後要統一頭身比。
 - 黑貓的尾巴偏短（設定是長尾）；有袋動物偏像小熊，要更像有袋動物需再調整描述。
 - 已入庫（2026-10-21）：四個 2x 母版放在 `public/assets/characters/`，`content/assets.json` 以 `file`、`density: 2` 與 `source`（模型、授權、seed、處理方式）登錄；`player.up/down/left/right` 暫用同一張小涵正面圖，`npc.maomao` 用毛毛，`pet.cat`、`pet.marsupial` 先登錄、尚未接進畫面。引擎以線性取樣、0.5 倍顯示，角色以腳底對齊格子。瀏覽器實測臉部與服裝清楚，縮小沒有鋸齒。
-- 四方向暫用同一張，所以左右走動時角色不會轉頭，這是已知的暫時限制。
+- 四方向暫用同一張的限制已解除（見下方「四方向試驗」）。
 
 ### 四方向試驗（2026-10-21）
 
@@ -101,7 +101,7 @@ Bright saturated hand-painted cartoon style, thick dark brown outline, soft high
 | 朝右 | 以側面水平翻轉，肩背包與平板會左右對調，可接受 |
 | 色彩 | 背面與側面量化到共用調色盤後用色 43–44 色，沒有新增顏色 |
 
-結論：四方向可行，不需要圖生圖。這兩張尚未入庫；走路動畫的做法與原型結果見 [../ANIMATION_DESIGN.md](../ANIMATION_DESIGN.md)。
+結論：四方向可行，不需要圖生圖。背面與側面（seed 101）已於 2026-10-21 入庫（`public/assets/characters/xiaohan-back-2x.png`、`xiaohan-side-2x.png`），`player.up`、`player.left` 各用其一，`player.right` 以 `mirrorOf` 翻轉 `player.left`；走路動畫的做法與原型結果見 [../ANIMATION_DESIGN.md](../ANIMATION_DESIGN.md)。
 
 ## 毛毛（NPC）
 

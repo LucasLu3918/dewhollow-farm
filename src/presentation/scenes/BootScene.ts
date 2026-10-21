@@ -33,6 +33,8 @@ export class BootScene extends Phaser.Scene {
 
   create(): void {
     for (const entry of this.deps.assets.assets) {
+      // 翻轉素材沒有自己的貼圖，畫面會改用原圖並翻轉（見 resolveAsset）。
+      if (entry.mirrorOf) continue;
       if (this.textures.exists(entry.id)) continue;
       // 檔案存在但無法解碼（或路徑錯誤）時，Phaser 不一定發出 loaderror，
       // 因此以「有 file 卻沒有貼圖」作為失敗判斷，並明確告知玩家。

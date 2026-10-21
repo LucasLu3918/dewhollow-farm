@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import assets from '../../../content/assets.json';
 import { assetsFileSchema } from '../content/content-schema';
-import { assetProblems, displayScale, missingFiles, type AssetEntry, type AssetManifest } from './asset-manifest';
+import {
+  assetProblems,
+  displayScale,
+  missingFiles,
+  resolveAsset,
+  type AssetEntry,
+  type AssetManifest,
+} from './asset-manifest';
 
 function manifestOf(...entries: AssetEntry[]): AssetManifest {
   return { version: 1, assets: entries };
@@ -69,6 +76,82 @@ describe('assetProblems', () => {
   });
 });
 
+describe('mirrorOf', () => {
+  const left: AssetEntry = { ...real, id: 'player.left', file: 'assets/characters/xiaohan-side-2x.png' };
+  const right: AssetEntry = {
+    id: 'player.right',
+    kind: 'character',
+    color: '#4a7fd0',
+    mirrorOf: 'player.left',
+    source: '水平翻轉 player.left，不另存檔',
+  };
+
+  it('is accepted by the schema and must be a non-empty id', () => {
+    const parse = (mirrorOf: unknown) =>
+      assetsFileSchema.safeParse({ version: 1, assets: [{ id: 'a', kind: 'character', mirrorOf, source: 's' }] });
+    expect(parse('player.left').success).toBe(true);
+    expect(parse('').success).toBe(false);
+    expect(parse(3).success).toBe(false);
+  });
+
+  it('is fine when it points at a real asset', () => {
+    expect(assetProblems(manifestOf(left, right))).toEqual([]);
+  });
+
+  it('resolves to the texture of its target, flipped, at the target scale', () => {
+    expect(resolveAsset(manifestOf(left, right), 'player.right')).toEqual({ textureId: 'player.left', flipX: true, scale: 0.5 });
+  });
+
+  it('resolves an ordinary asset to itself, not flipped', () => {
+    expect(resolveAsset(manifestOf(left, right), 'player.left')).toEqual({ textureId: 'player.left', flipX: false, scale: 0.5 });
+    expect(resolveAsset(manifestOf({ id: 'tile.grass', kind: 'tile', source: '占位（程式產生）' }), 'tile.grass')).toEqual({
+      textureId: 'tile.grass',
+      flipX: false,
+      scale: 1,
+    });
+  });
+
+  it('refuses to resolve an unknown asset instead of guessing', () => {
+    expect(() => resolveAsset(manifestOf(left), 'player.nope')).toThrow('找不到素材：player.nope');
+  });
+
+  it('rejects a target that does not exist', () => {
+    expect(assetProblems(manifestOf(right))).toEqual(['素材 player.right 的 mirrorOf 指向不存在的素材 player.left']);
+  });
+
+  it('rejects mirroring itself', () => {
+    expect(assetProblems(manifestOf({ ...right, mirrorOf: 'player.right' }))).toEqual(['素材 player.right 不能翻轉自己']);
+  });
+
+  it('rejects mirroring another mirror (no chains, so no cycles)', () => {
+    const second: AssetEntry = { ...right, id: 'player.again', mirrorOf: 'player.right' };
+    expect(assetProblems(manifestOf(left, right, second))).toEqual([
+      '素材 player.again 的 mirrorOf 指向另一個翻轉素材 player.right，請直接指向原圖',
+    ]);
+  });
+
+  it('rejects a mirror that also has its own file or density', () => {
+    expect(assetProblems(manifestOf(left, { ...right, file: 'assets/characters/x.png' }))).toEqual([
+      '素材 player.right 設了 mirrorOf，就不能再有 file 或 density',
+    ]);
+    expect(assetProblems(manifestOf(left, { ...right, density: 2 }))).toEqual([
+      '素材 player.right 設了 mirrorOf，就不能再有 file 或 density',
+    ]);
+  });
+
+  it('rejects mirroring a different kind of asset', () => {
+    expect(assetProblems(manifestOf(left, { ...right, kind: 'tile' }))).toEqual([
+      '素材 player.right 的種類（tile）必須與 player.left 相同（character）',
+    ]);
+  });
+
+  it('rejects a placeholder source on a mirror of real art', () => {
+    expect(assetProblems(manifestOf(left, { ...right, source: '占位（程式產生）' }))).toEqual([
+      '素材 player.right 翻轉的是正式素材，來源不能是占位',
+    ]);
+  });
+});
+
 describe('missingFiles', () => {
   it('lists assets whose file is not on disk', () => {
     const ghost = { ...real, id: 'npc.ghost', file: 'assets/characters/ghost-2x.png' };
@@ -93,12 +176,22 @@ describe('shipped assets', () => {
     expect(assetProblems(manifest)).toEqual([]);
   });
 
-  it('uses the approved 2x masters for the player and Maomao', () => {
+  it('gives the player a front, back and side image, and mirrors the side for facing right', () => {
     const byId = new Map(manifest.assets.map((a) => [a.id, a]));
-    for (const id of ['player.up', 'player.down', 'player.left', 'player.right']) {
-      expect(byId.get(id), id).toMatchObject({ file: 'assets/characters/xiaohan-2x.png', density: 2 });
-    }
-    expect(byId.get('npc.maomao')).toMatchObject({ file: 'assets/characters/maomao-2x.png', density: 2 });
+    expect(byId.get('player.down')).toMatchObject({ file: 'assets/characters/xiaohan-2x.png', density: 2 });
+    expect(byId.get('player.up')).toMatchObject({ file: 'assets/characters/xiaohan-back-2x.png', density: 2 });
+    expect(byId.get('player.left')).toMatchObject({ file: 'assets/characters/xiaohan-side-2x.png', density: 2 });
+    expect(byId.get('player.right')).toMatchObject({ mirrorOf: 'player.left' });
+    expect(byId.get('player.right')?.file).toBeUndefined();
+  });
+
+  it('resolves facing right to the left image, flipped, at half scale', () => {
+    expect(resolveAsset(manifest, 'player.right')).toEqual({ textureId: 'player.left', flipX: true, scale: 0.5 });
+  });
+
+  it('uses the approved 2x master for Maomao', () => {
+    const maomao = manifest.assets.find((a) => a.id === 'npc.maomao');
+    expect(maomao).toMatchObject({ file: 'assets/characters/maomao-2x.png', density: 2 });
   });
 
   it('registers the two pets as assets too', () => {

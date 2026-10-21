@@ -9,6 +9,8 @@ export interface AssetEntry {
   file?: string;
   /** 圖檔是設計尺寸的幾倍（2 代表 2x 母版）；顯示時自動縮小。只有 file 存在時才有意義。 */
   density?: number;
+  /** 這張圖是另一個素材的水平翻轉（例如朝右 = 朝左的翻轉），不另存檔、也不另外載入。 */
+  mirrorOf?: string;
   /** 素材來源，用於授權紀錄。 */
   source: string;
 }
@@ -44,15 +46,21 @@ export function displayScale(entry: AssetEntry): number {
 
 /**
  * 素材清單自身的問題（不含地圖與作物的交叉參照）：
- * 有檔案的素材必須填實際來源（ORIGINALITY.md）、density 只能搭配檔案、路徑必須在 assets/ 底下、id 不可重複。
+ * 有檔案的素材必須填實際來源（ORIGINALITY.md）、density 只能搭配檔案、路徑必須在 assets/ 底下、id 不可重複；
+ * 翻轉素材（mirrorOf）必須指向存在的、非翻轉的、同種類的素材，且不能自己帶 file 或 density。
  */
 export function assetProblems(manifest: AssetManifest): string[] {
   const problems: string[] = [];
   const seen = new Set<string>();
+  const byId = new Map(manifest.assets.map((a) => [a.id, a]));
   for (const entry of manifest.assets) {
     if (seen.has(entry.id)) problems.push(`素材 id 重複：${entry.id}`);
     seen.add(entry.id);
 
+    if (entry.mirrorOf !== undefined) {
+      problems.push(...mirrorProblems(entry, byId));
+      continue;
+    }
     if (!entry.file) {
       if (entry.density !== undefined) problems.push(`素材 ${entry.id} 設了 density 卻沒有 file`);
       continue;
@@ -65,6 +73,41 @@ export function assetProblems(manifest: AssetManifest): string[] {
     }
   }
   return problems;
+}
+
+function mirrorProblems(entry: AssetEntry, byId: ReadonlyMap<string, AssetEntry>): string[] {
+  const targetId = entry.mirrorOf as string;
+  if (targetId === entry.id) return [`素材 ${entry.id} 不能翻轉自己`];
+  const target = byId.get(targetId);
+  if (!target) return [`素材 ${entry.id} 的 mirrorOf 指向不存在的素材 ${targetId}`];
+
+  const problems: string[] = [];
+  if (target.mirrorOf !== undefined) {
+    problems.push(`素材 ${entry.id} 的 mirrorOf 指向另一個翻轉素材 ${targetId}，請直接指向原圖`);
+  }
+  if (entry.file !== undefined || entry.density !== undefined) {
+    problems.push(`素材 ${entry.id} 設了 mirrorOf，就不能再有 file 或 density`);
+  }
+  if (entry.kind !== target.kind) {
+    problems.push(`素材 ${entry.id} 的種類（${entry.kind}）必須與 ${targetId} 相同（${target.kind}）`);
+  }
+  if (target.file !== undefined && entry.source.startsWith('占位')) {
+    problems.push(`素材 ${entry.id} 翻轉的是正式素材，來源不能是占位`);
+  }
+  return problems;
+}
+
+/** 畫面上實際要用的貼圖：一般素材是自己；翻轉素材是原圖的貼圖，加上水平翻轉與原圖的顯示縮放。 */
+export function resolveAsset(
+  manifest: AssetManifest,
+  id: string,
+): { textureId: string; flipX: boolean; scale: number } {
+  const entry = manifest.assets.find((a) => a.id === id);
+  if (!entry) throw new Error(`找不到素材：${id}`);
+  if (entry.mirrorOf === undefined) return { textureId: entry.id, flipX: false, scale: displayScale(entry) };
+  const target = manifest.assets.find((a) => a.id === entry.mirrorOf);
+  if (!target) throw new Error(`找不到素材：${entry.mirrorOf}`);
+  return { textureId: target.id, flipX: true, scale: displayScale(target) };
 }
 
 /** 宣告了檔案但 public/ 裡找不到的素材。`existing` 是 public/ 底下存在的檔案路徑。 */

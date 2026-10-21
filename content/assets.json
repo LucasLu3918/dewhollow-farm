@@ -71,9 +71,9 @@
       "id": "player.up",
       "kind": "character",
       "color": "#4a7fd0",
-      "file": "assets/characters/xiaohan-2x.png",
+      "file": "assets/characters/xiaohan-back-2x.png",
       "density": 2,
-      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md；四方向暫用同一張正面圖"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md（背面；提示詞 xiaohan-back-v1）"
     },
     {
       "id": "player.down",
@@ -81,23 +81,22 @@
       "color": "#4a7fd0",
       "file": "assets/characters/xiaohan-2x.png",
       "density": 2,
-      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md；四方向暫用同一張正面圖"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md（正面）"
     },
     {
       "id": "player.left",
       "kind": "character",
       "color": "#4a7fd0",
-      "file": "assets/characters/xiaohan-2x.png",
+      "file": "assets/characters/xiaohan-side-2x.png",
       "density": 2,
-      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md；四方向暫用同一張正面圖"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md（側面朝左；提示詞 xiaohan-side-v1）"
     },
     {
       "id": "player.right",
       "kind": "character",
       "color": "#4a7fd0",
-      "file": "assets/characters/xiaohan-2x.png",
-      "density": 2,
-      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md；四方向暫用同一張正面圖"
+      "mirrorOf": "player.left",
+      "source": "水平翻轉 player.left，不另存檔"
     },
     {
       "id": "npc.maomao",

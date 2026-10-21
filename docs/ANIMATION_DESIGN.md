@@ -19,9 +19,9 @@
 | 方向 | 素材 | 備註 |
 | --- | --- | --- |
 | down | 正面站姿 | 已入庫（`xiaohan-2x.png`） |
-| up | 背面站姿 | 試驗完成，暫定 seed 101，待入庫 |
-| left | 側面站姿（朝左） | 試驗完成，暫定 seed 101，待入庫 |
-| right | `left` 的水平翻轉 | 引擎翻轉（`flipX`），不產生檔案 |
+| up | 背面站姿 | 已入庫（`xiaohan-back-2x.png`，seed 101） |
+| left | 側面站姿（朝左） | 已入庫（`xiaohan-side-2x.png`，seed 101） |
+| right | `left` 的水平翻轉 | 已完成：`assets.json` 以 `mirrorOf` 指向 `player.left`，引擎翻轉（`flipX`），不產生檔案 |
 
 翻轉的代價：不對稱的配件會左右對調（肩背包、手上的平板）。可接受；若日後在意，再為朝右另外產圖。
 
@@ -90,7 +90,7 @@
 | `src/presentation/walk-pose.ts` | `walkPose(step, u, view, rig, params)` → `{ y, rotation, scaleX, scaleY, legA, legB, stretch }`；純函式 |
 | `src/presentation/character-rig.ts` | 依 rig 資料把一張貼圖切成「上半身／左腳／右腳」三個 Phaser 影格，包成 Container，套用姿勢；處理 `flipX` |
 | `content/rigs.json` | 每個角色素材的 `legTop`、`split`、`mode`（`split-legs` 或 `stretch-feet`）與參數覆寫，以 zod 驗證 |
-| `content/assets.json` | 新增 `mirrorOf`：`player.right` 指向 `player.left`，引擎翻轉，不另存檔 |
+| `content/assets.json` | `mirrorOf`（已完成）：`player.right` 指向 `player.left`，引擎翻轉，不另存檔 |
 
 切影格用 Phaser 的 `texture.add(name, 0, x, y, w, h)`：**一張貼圖、多個影格**，不產生額外檔案，也不需要預處理工具。
 
@@ -129,7 +129,7 @@
 
 ## 實作拆分（M2，建議順序）
 
-1. 四方向素材入庫（背面、側面）、`assets.json` 與 `mirrorOf`，含素材清單測試。
+1. ✅ 四方向素材入庫（背面、側面）、`assets.json` 與 `mirrorOf`，含素材清單與 e2e 測試（2026-10-21 完成）。
 2. `walk-pose.ts` 與測試。
 3. `character-rig.ts`、`rigs.json` 與其驗證，先接玩家；`walkBob` 改接姿勢。
 4. e2e 與人工視覺驗收；調參數。
