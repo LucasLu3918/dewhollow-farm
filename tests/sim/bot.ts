@@ -154,7 +154,7 @@ export class Bot {
     if (!map) return out;
     for (const d of DIRECTIONS) {
       const t = neighbor(current, d);
-      if (passable(this.state, map, t.x, t.y) && !lockedDoor(this.state, this.index, map, t.x, t.y)) {
+      if (passable(this.state, this.index, map, t.x, t.y) && !lockedDoor(this.state, this.index, map, t.x, t.y)) {
         const land = landingOf(this.state, this.index, map, t.x, t.y);
         const node = land ? { mapId: land.mapId, x: land.x, y: land.y, f: d } : { mapId: current.mapId, x: t.x, y: t.y, f: d };
         out.push({ ...node, parent, step: d });

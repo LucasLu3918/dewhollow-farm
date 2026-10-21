@@ -26,7 +26,7 @@ export interface CompanionManifest {
 export function companionProblems(
   manifest: CompanionManifest,
   rigs: RigManifest,
-  pack: Pick<ContentPack, 'maps' | 'npcs'>,
+  pack: Pick<ContentPack, 'maps' | 'npcs' | 'schedule'>,
 ): string[] {
   const problems: string[] = [];
   const rigById = new Map(rigs.rigs.map((r) => [r.id, r]));
@@ -47,7 +47,7 @@ export function companionProblems(
       problems.push(`夥伴 ${c.id} 必須擇一設定 follows 或 home`);
     }
 
-    if (c.home) problems.push(...homeProblems(c.id, c.home, mapById, homes));
+    if (c.home) problems.push(...homeProblems(c.id, c.home, mapById, homes, pack.schedule.entries));
     if (c.reactsTo !== undefined && !npcIds.has(c.reactsTo)) {
       problems.push(`夥伴 ${c.id} 的 reactsTo NPC ${c.reactsTo} 不存在`);
     }
@@ -60,6 +60,7 @@ function homeProblems(
   home: { mapId: string; x: number; y: number },
   mapById: ReadonlyMap<string, ContentPack['maps'][number]>,
   homes: Map<string, string>,
+  schedule: ContentPack['schedule']['entries'],
 ): string[] {
   const map = mapById.get(home.mapId);
   if (!map) return [`夥伴 ${id} 的 home 地圖 ${home.mapId} 不存在`];
@@ -68,8 +69,9 @@ function homeProblems(
   if (!tile || !isWalkable(tile.kind) || tile.kind === 'door') {
     return [`夥伴 ${id} 的 home (${home.x},${home.y}) 在 ${map.id} 不可行走`];
   }
-  const npc = map.npcs.find((n) => n.x === home.x && n.y === home.y);
-  if (npc) return [`夥伴 ${id} 的 home (${home.x},${home.y}) 與 NPC ${npc.npcId} 重疊`];
+  // 居民的行程（任何時段、天氣）若會站在夥伴的家，就重疊了。
+  const resident = schedule.find((e) => e.mapId === home.mapId && e.x === home.x && e.y === home.y);
+  if (resident) return [`夥伴 ${id} 的 home (${home.x},${home.y}) 與 NPC ${resident.npcId} 重疊`];
 
   const key = `${map.id},${home.x},${home.y}`;
   const other = homes.get(key);

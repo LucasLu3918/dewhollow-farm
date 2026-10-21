@@ -35,6 +35,10 @@ import { addItem, countOf, createInventory } from '../domain/inventory';
 import { emptySkills } from '../domain/skills';
 import { executeCommand, type Command } from './game-commands';
 import { createContentIndex, type ContentIndex } from './content-index';
+import plaza from '../../content/maps/plaza.json';
+import schedules from '../../content/schedules.json';
+import events from '../../content/events.json';
+import friendship from '../../content/friendship.json';
 
 /**
  * M4b：合成（工作台）。站在小屋的工作台 (4,1) 前面，也就是 (4,2) 面向上方。
@@ -42,7 +46,10 @@ import { createContentIndex, type ContentIndex } from './content-index';
 const { pack } = loadContent({
   crops,
   npcs,
-  maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+  schedules,
+  events,
+  friendship,
+  maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,

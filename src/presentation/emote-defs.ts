@@ -47,6 +47,12 @@ export function emotesForEvent(event: GameEvent): EmoteRequest[] {
       if (event.gifted) return [{ who, kind: 'heart' }];
       return [{ who, kind: event.first ? 'surprise' : 'note' }];
     }
+    case 'heartEvent':
+      return [{ who: { npc: event.npcId }, kind: event.emote }];
+    case 'gifted': {
+      const kind: EmoteKind = event.reaction === 'love' ? 'heart' : event.reaction === 'hate' ? 'sweat' : 'note';
+      return [{ who: { npc: event.npcId }, kind }];
+    }
     case 'refused':
       return [{ who: 'player', kind: refusalEmote(event.reason) }];
     case 'slept':

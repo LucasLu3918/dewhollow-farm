@@ -17,12 +17,14 @@ const kitchen: MapDef = {
   rows: ['####', '#K.#', 'B..#'],
   legend: { '#': { kind: 'wall' }, '.': { kind: 'floor' }, K: { kind: 'kitchen' }, B: { kind: 'bed' } },
   spawn: { x: 2, y: 2 },
-  npcs: [],
 };
 
 const content: ContentPack = {
   crops: [{ id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 20, growthDays: 2, seasons: ['spring'] }],
   npcs: [],
+  schedule: { periods: { noon: 720, evening: 1020 }, entries: [] },
+  heartEvents: [],
+  friendship: { pointsPerHeart: 100, maxHearts: 10, earlyCap: { hearts: 4, untilSeason: 'summer' }, talkPoints: 10, gift: { love: 80, neutral: 30, hate: -40 }, cropQuality: { minHearts: 2, perResident: 0.05, cap: 0.15 } },
   items: [
     { id: 'mint', name: '野薄荷', kind: 'forage', maxStack: 99, sellPrice: 14 },
     { id: 'egg', name: '雞蛋', kind: 'animal', maxStack: 99, sellPrice: 25 },

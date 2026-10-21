@@ -1,6 +1,9 @@
 import crops from '../../content/crops.json';
 import mine from '../../content/mine.json';
 import npcs from '../../content/npcs.json';
+import schedules from '../../content/schedules.json';
+import events from '../../content/events.json';
+import friendship from '../../content/friendship.json';
 import start from '../../content/start.json';
 import tuning from '../../content/tuning.json';
 import assets from '../../content/assets.json';
@@ -21,6 +24,7 @@ import crafting from '../../content/crafting.json';
 import talents from '../../content/talents.json';
 import farm from '../../content/maps/farm.json';
 import village from '../../content/maps/village.json';
+import plaza from '../../content/maps/plaza.json';
 import forest from '../../content/maps/forest.json';
 import lake from '../../content/maps/lake.json';
 import house from '../../content/maps/house.json';
@@ -35,7 +39,10 @@ import { createContentIndex } from '../../src/application/content-index';
 const { pack } = loadContent({
   crops,
   npcs,
-  maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+  schedules,
+  events,
+  friendship,
+  maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,

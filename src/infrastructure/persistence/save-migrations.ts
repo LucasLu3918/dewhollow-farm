@@ -35,6 +35,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   10: migrateV10ToV11,
   11: migrateV11ToV12,
   12: migrateV12ToV13,
+  13: migrateV13ToV14,
 };
 
 /**
@@ -196,6 +197,23 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v13 → v14：居民好感（每位居民都從 0 顆心開始，今天還沒對話或送禮）、已觸發的心形事件（沒有）、待處理的事件（沒有）。
+ */
+function migrateV13ToV14(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(13) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v13 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 14,
+    friendship: {},
+    heartEvents: [],
+    pendingHeartEvent: null,
+  };
 }
 
 /**

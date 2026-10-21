@@ -36,12 +36,19 @@ import { SEASONS } from '../domain/calendar';
 import { plotKey } from '../domain/farm';
 import { executeCommand } from './game-commands';
 import { createContentIndex } from './content-index';
+import plaza from '../../content/maps/plaza.json';
+import schedules from '../../content/schedules.json';
+import events from '../../content/events.json';
+import friendship from '../../content/friendship.json';
 
 /** 一整年（80 天）連續遊玩：每天種植當季作物、睡醒，不應出現任何錯誤或不合規則的狀態。 */
 const raw: RawContentFiles = {
   crops,
   npcs,
-  maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+  schedules,
+  events,
+  friendship,
+  maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,

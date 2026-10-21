@@ -27,7 +27,7 @@ function v1State(overrides: Record<string, unknown> = {}): Record<string, unknow
 describe('migrateState v1 → v2', () => {
   it('turns the bag into inventory stacks, seeds first then produce', () => {
     const migrated = migrateState(v1State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(13);
+    expect(migrated.schemaVersion).toBe(14);
     expect(migrated.inventory).toEqual({
       capacity: 24,
       stacks: [
@@ -84,13 +84,13 @@ describe('migrateState v1 → v2', () => {
 
 describe('migrateState version handling', () => {
   it('passes a current-version state through untouched', () => {
-    const current = { schemaVersion: 13, anything: 'goes' };
+    const current = { schemaVersion: 14, anything: 'goes' };
     expect(migrateState(current, context)).toBe(current);
   });
 
   it('refuses a save from a newer game version with a clear message', () => {
-    expect(() => migrateState({ schemaVersion: 14 }, context)).toThrow(SaveFormatError);
-    expect(() => migrateState({ schemaVersion: 14 }, context)).toThrow('更新版本');
+    expect(() => migrateState({ schemaVersion: 15 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState({ schemaVersion: 15 }, context)).toThrow('更新版本');
   });
 
   it('refuses a state without a usable version', () => {
@@ -134,7 +134,7 @@ function v2State(day: number): Record<string, unknown> {
 describe('v2 → v3 (seasons and weather)', () => {
   it('reads the old total day as a season position: day 25 is summer day 5 of year 1', () => {
     const migrated = migrateState(v2State(25), context) as { calendar: unknown; schemaVersion: number };
-    expect(migrated.schemaVersion).toBe(13);
+    expect(migrated.schemaVersion).toBe(14);
     expect(migrated.calendar).toEqual({ year: 1, season: 'summer', day: 5, minuteOfDay: 420 });
   });
 
@@ -163,7 +163,7 @@ function v3State(): Record<string, unknown> {
 describe('v3 → v4 (tool tiers and world changes)', () => {
   it('starts every tool at the basic tier and nothing has been changed in the world yet', () => {
     const migrated = migrateState(v3State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(13);
+    expect(migrated.schemaVersion).toBe(14);
     expect(migrated.toolTiers).toEqual({ hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 });
     expect(migrated.worldChanges).toEqual({});
   });
@@ -198,7 +198,7 @@ function v11State(overrides: Record<string, unknown> = {}): Record<string, unkno
 describe('v11 → v12 (skill talents and the sickle)', () => {
   it('starts with no talent chosen for any skill, even for a skill already at level 5', () => {
     const migrated = migrateState(v11State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(13);
+    expect(migrated.schemaVersion).toBe(14);
     expect(migrated.talents).toEqual({});
   });
 
@@ -231,7 +231,7 @@ function v12State(overrides: Record<string, unknown> = {}): Record<string, unkno
 describe('v12 → v13 (cows and milking)', () => {
   it('gives every chicken a not-yet-milked flag, and starts the cow barn empty', () => {
     const migrated = migrateState(v12State(), context) as { schemaVersion: number; animals: unknown[]; cows: unknown[] };
-    expect(migrated.schemaVersion).toBe(13);
+    expect(migrated.schemaVersion).toBe(14);
     expect(migrated.animals).toEqual([{ kind: 'chicken', fed: true, petted: false, milked: false, mood: 6 }]);
     expect(migrated.cows).toEqual([]);
   });
@@ -247,5 +247,23 @@ describe('v12 → v13 (cows and milking)', () => {
   it('does not invent a remodeled barn: the flags are kept as they were', () => {
     const migrated = migrateState(v12State({ flags: { sprinkler: true } }), context) as { flags: Record<string, boolean> };
     expect(migrated.flags).toEqual({ sprinkler: true });
+  });
+});
+
+describe('v13 → v14 (friendship and heart events)', () => {
+  it('starts every resident at zero hearts, with no heart event seen or pending', () => {
+    const migrated = migrateState({ schemaVersion: 13, flags: { 'talked:maomao': true } }, context) as Record<string, unknown>;
+    expect(migrated.schemaVersion).toBe(14);
+    expect(migrated.friendship).toEqual({});
+    expect(migrated.heartEvents).toEqual([]);
+    expect(migrated.pendingHeartEvent).toBeNull();
+  });
+
+  it('keeps everything else, including the first-talk flags from before', () => {
+    const before = { schemaVersion: 13, flags: { 'talked:maomao': true }, gold: 300, mapId: 'village' };
+    const migrated = migrateState(before, context) as Record<string, unknown>;
+    expect(migrated.flags).toEqual({ 'talked:maomao': true });
+    expect(migrated.gold).toBe(300);
+    expect(migrated.mapId).toBe('village');
   });
 });

@@ -33,6 +33,12 @@ export interface NpcDef {
   lines: string[];
   /** 首次對話時贈送的種子；沒有則不送。 */
   gift?: { cropId: string; count: number };
+  /** 喜歡的物品 id（送禮 +好感；收成這種作物時提高品質，見 friendship.ts）。 */
+  loves: string[];
+  /** 討厭的物品 id（送禮 −好感）。 */
+  hates: string[];
+  /** 內容時數的估計（分鐘），見 docs/PLAYTIME_PLAN.md。 */
+  playMinutes: number;
 }
 
 export type TileKind =
@@ -76,12 +82,6 @@ export interface TileDef {
   seasons?: Season[];
 }
 
-export interface MapNpcPlacement {
-  npcId: string;
-  x: number;
-  y: number;
-}
-
 export interface MapDef {
   id: string;
   name: string;
@@ -91,12 +91,18 @@ export interface MapDef {
   rows: string[];
   legend: Record<string, TileDef>;
   spawn: Point;
-  npcs: MapNpcPlacement[];
   /** 這棟建築裡住的動物（雞舍住雞，牛舍住牛）；座位數就是能養的數量。 */
   flock?: FlockId;
 }
 
 import type { Tuning } from './tuning';
+import type { ScheduleDef } from './schedule';
+import type { HeartEventDef } from './heart-events';
+import type { FriendshipRules } from './friendship';
+
+export type { ScheduleDef, ScheduleEntry, PeriodRules, Period } from './schedule';
+export type { HeartEventDef, HeartEventOption, HeartEmote } from './heart-events';
+export type { FriendshipRules } from './friendship';
 
 /** 新遊戲的起始設定。 */
 export interface StartConfig {
@@ -129,6 +135,12 @@ export interface ContentPack {
   talents: TalentSet;
   /** 礦坑的深層規則（第 41 層起，見 mine.ts 與 content/mine.json）。 */
   mine: MineRules;
+  /** 居民行程（依時段與天氣的位置，見 schedule.ts 與 content/schedules.json）。 */
+  schedule: ScheduleDef;
+  /** 心形事件（見 heart-events.ts 與 content/events.json）。 */
+  heartEvents: HeartEventDef[];
+  /** 好感規則（點數、上限、送禮與作物品質，見 friendship.ts 與 content/friendship.json）。 */
+  friendship: FriendshipRules;
 }
 
 export interface RecipeDef {

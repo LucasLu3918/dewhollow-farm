@@ -17,7 +17,6 @@ const map: MapDef = {
     D: { kind: 'door', to: 'other', spawn: { x: 1, y: 1 } },
   },
   spawn: { x: 2, y: 0 },
-  npcs: [],
 };
 
 describe('world', () => {

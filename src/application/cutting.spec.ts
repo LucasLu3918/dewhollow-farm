@@ -37,6 +37,10 @@ import pasture from '../../content/maps/pasture.json';
 import cowbarn from '../../content/maps/cowbarn.json';
 import farm from '../../content/maps/farm.json';
 import village from '../../content/maps/village.json';
+import plaza from '../../content/maps/plaza.json';
+import schedules from '../../content/schedules.json';
+import events from '../../content/events.json';
+import friendship from '../../content/friendship.json';
 
 /**
  * 鐮刀（M4 P1）：割除草叢（tuft）得到乾草；體力沿用砍樹的消耗，由鐮刀階級打折；沒有鐮刀時說明原因。
@@ -54,12 +58,14 @@ const meadow: MapDef = {
     V: { kind: 'tuft' },
   },
   spawn: { x: 2, y: 1 },
-  npcs: [],
 };
 
 const content: ContentPack = {
   crops: [{ id: 'dew-grass', name: '晨露草', seedPrice: 10, growthDays: 1, seasons: ['spring'] }],
   npcs: [],
+  schedule: { periods: { noon: 720, evening: 1020 }, entries: [] },
+  heartEvents: [],
+  friendship: { pointsPerHeart: 100, maxHearts: 10, earlyCap: { hearts: 4, untilSeason: 'summer' }, talkPoints: 10, gift: { love: 80, neutral: 30, hate: -40 }, cropQuality: { minHearts: 2, perResident: 0.05, cap: 0.15 } },
   items: [{ id: 'hay', name: '乾草', kind: 'material', maxStack: 99 }],
   fish: [],
   animals: [],
@@ -170,7 +176,10 @@ describe('the shipped forest has tufts a player can reach', () => {
   const { pack } = loadContent({
     crops,
     npcs,
-    maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+    schedules,
+    events,
+    friendship,
+    maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
     start,
     tuning,
     assets,

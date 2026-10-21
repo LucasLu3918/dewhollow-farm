@@ -107,6 +107,36 @@
       "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md"
     },
     {
+      "id": "npc.rong-bo",
+      "kind": "character",
+      "color": "#8a6d3b",
+      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+    },
+    {
+      "id": "npc.a-gan",
+      "kind": "character",
+      "color": "#e0a040",
+      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+    },
+    {
+      "id": "npc.shi-shifu",
+      "kind": "character",
+      "color": "#6b6f78",
+      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+    },
+    {
+      "id": "npc.zhi-lan",
+      "kind": "character",
+      "color": "#5f9e6e",
+      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+    },
+    {
+      "id": "npc.xiao-sui",
+      "kind": "character",
+      "color": "#e8c3a0",
+      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+    },
+    {
       "id": "crop.dew-grass",
       "kind": "crop",
       "color": "#9be07a",

@@ -69,6 +69,18 @@ describe('emotesForEvent: who shows what', () => {
     expect(emotesForEvent({ type: 'acted', action: 'harvest', x: 1, y: 1 })).toEqual([{ who: 'player', kind: 'note' }]);
   });
 
+  it('shows the heart event’s own emote over the villager who starts it', () => {
+    expect(emotesForEvent({ type: 'heartEvent', npcId: 'a-gan', eventId: 'a-gan-heart-1', emote: 'question' })).toEqual([
+      { who: { npc: 'a-gan' }, kind: 'question' },
+    ]);
+  });
+
+  it('shows a heart for a loved gift, a sweat drop for a disliked one, and a note for a neutral one', () => {
+    expect(emotesForEvent({ type: 'gifted', npcId: 'maomao', reaction: 'love' })).toEqual([{ who: { npc: 'maomao' }, kind: 'heart' }]);
+    expect(emotesForEvent({ type: 'gifted', npcId: 'maomao', reaction: 'hate' })).toEqual([{ who: { npc: 'maomao' }, kind: 'sweat' }]);
+    expect(emotesForEvent({ type: 'gifted', npcId: 'maomao', reaction: 'neutral' })).toEqual([{ who: { npc: 'maomao' }, kind: 'note' }]);
+  });
+
   it('shows nothing for events that need no reaction', () => {
     expect(emotesForEvent({ type: 'acted', action: 'till', x: 1, y: 1 })).toEqual([]);
     expect(emotesForEvent({ type: 'acted', action: 'ship', x: 1, y: 1 })).toEqual([]);

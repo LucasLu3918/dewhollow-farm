@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "note": "心形事件（M5a）。每位居民春夏各 2 個：2 顆心（春）與 4 顆心（夏）。觸發條件：好感達到顆心數、在指定地圖與時段找他說話、每個事件只觸發一次。選項的 points 是好感點數（100 點 = 1 顆心）。文字為本專案原創。",
+  "events": [
+    {
+      "id": "maomao-heart-1",
+      "npcId": "maomao",
+      "hearts": 2,
+      "phase": "spring",
+      "mapId": "village",
+      "periods": ["morning"],
+      "emote": "heart",
+      "pages": [
+        "毛毛蹲在村口的路邊，正在數地上的小石頭。看見你來，他抬起頭笑了。",
+        "「我在想，你剛來的那天，是不是也像這樣一直在看四周？」他把石頭放進口袋，「我那天也是，什麼都覺得新鮮。」",
+        "他拍拍身上的灰，站起來：「下次田裡有什麼問題，先來跟我說，好嗎？」"
+      ],
+      "options": [
+        { "id": "promise", "label": "好，我答應你", "reply": "毛毛開心地揮揮手，跑去找他的小夥伴了。", "points": 30 },
+        { "id": "tease", "label": "你數的石頭有幾顆？", "reply": "「才不告訴你！」毛毛把口袋拍得更緊了。", "points": 10 }
+      ],
+      "playMinutes": 2.5
+    },
+    {
+      "id": "maomao-heart-2",
+      "npcId": "maomao",
+      "hearts": 4,
+      "phase": "summer",
+      "mapId": "plaza",
+      "periods": ["noon"],
+      "emote": "note",
+      "pages": [
+        "中午的廣場人來人往，毛毛坐在花圃邊上，手裡攤著一張畫歪了的地圖。",
+        "「這是我畫的晨露鎮，但畫得不太像。」他指著一間小屋，「這裡是你的家，我想你應該每天都會經過。」",
+        "他停了一下，把地圖折起來：「我想一直看著這個地方變好。你覺得呢？」"
+      ],
+      "options": [
+        { "id": "agree", "label": "我也是", "reply": "毛毛把地圖遞給你，又把它收回去，「先放你那裡，下次再一起補上。」", "points": 40 },
+        { "id": "tease", "label": "地圖畫得太醜了", "reply": "「喂！」毛毛假裝生氣，然後自己先笑出來。", "points": -10 }
+      ],
+      "playMinutes": 3
+    },
+    {
+      "id": "rong-bo-heart-1",
+      "npcId": "rong-bo",
+      "hearts": 2,
+      "phase": "spring",
+      "mapId": "village",
+      "periods": ["morning"],
+      "emote": "question",
+      "pages": [
+        "榕伯正在鎮公所門口翻一本厚厚的帳冊，眉頭皺得很深。",
+        "「這本是鎮上三十年前的記錄，有不少地方的字看不清楚了。」他把帳冊闔上，「年輕人，你覺得該先修哪一頁？」"
+      ],
+      "options": [
+        { "id": "board", "label": "從佈告欄開始吧", "reply": "「好主意，佈告欄是大家每天都看得到的地方。」榕伯點點頭。", "points": 30 },
+        { "id": "help", "label": "我幫你一起看看", "reply": "「那就辛苦你了。」榕伯把帳冊往你這邊挪了挪。", "points": 20 }
+      ],
+      "playMinutes": 2.5
+    },
+    {
+      "id": "rong-bo-heart-2",
+      "npcId": "rong-bo",
+      "hearts": 4,
+      "phase": "summer",
+      "mapId": "plaza",
+      "periods": ["noon"],
+      "emote": "note",
+      "pages": [
+        "中午的廣場，榕伯站在佈告欄前面，把一張新貼的紙又撫平了一次。",
+        "「每一張紙，都是有人想讓大家知道的事。」他回頭看著你，「有時候，一張紙就能讓一個人安心。」",
+        "「我年輕的時候，也貼過一張找人的告示。後來那個人真的回來了。」他笑了笑，「所以我一直相信，佈告欄是有用的。」"
+      ],
+      "options": [
+        { "id": "keep", "label": "我會好好看佈告欄", "reply": "榕伯滿意地點頭，「那就交給你了。」", "points": 40 },
+        { "id": "wind", "label": "有時候紙會被風吹走", "reply": "「那就再貼一張。」榕伯把手上的紙遞給你，「我相信你會記得的。」", "points": 10 }
+      ],
+      "playMinutes": 3
+    },
+    {
+      "id": "a-gan-heart-1",
+      "npcId": "a-gan",
+      "hearts": 2,
+      "phase": "spring",
+      "mapId": "village",
+      "periods": ["morning"],
+      "emote": "note",
+      "pages": [
+        "阿柑一早就在整理貨架，把種子袋一包一包排好。",
+        "「做雜貨的人最怕什麼？」她自己先回答，「怕客人需要的東西沒有。所以我每次進貨，都會多留一點空間。」",
+        "她把一袋種子推到櫃檯邊：「這個給你，你種得出來再說。」"
+      ],
+      "options": [
+        { "id": "thanks", "label": "謝謝，我會種好它", "reply": "阿柑笑著把種子袋放進你的手裡，「等收成的時候，記得來告訴我。」", "points": 30 },
+        { "id": "buy", "label": "你先賣給我吧", "reply": "「還是這麼會算。」阿柑把種子袋收回櫃檯後面，「下次可要付錢喔。」", "points": 10 }
+      ],
+      "playMinutes": 2.5
+    },
+    {
+      "id": "a-gan-heart-2",
+      "npcId": "a-gan",
+      "hearts": 4,
+      "phase": "summer",
+      "mapId": "village",
+      "periods": ["noon"],
+      "emote": "heart",
+      "pages": [
+        "中午的雜貨店沒什麼客人，阿柑靠在櫃檯上打盹，聽見你進來就醒了。",
+        "「其實我一直想開一間能讓大家歇腳的店。」她揉揉眼睛，「只是一個人忙不過來。」",
+        "「如果哪天我真的開了，你會來幫忙嗎？」她笑著補了一句，「不用付錢，給我一碗麵就好。」"
+      ],
+      "options": [
+        { "id": "help", "label": "好，我來幫忙", "reply": "「說定了！」阿柑把算盤推到你面前，「先練習一下怎麼算。」", "points": 40 },
+        { "id": "noodle", "label": "麵要加蛋", "reply": "「加蛋要另外算錢喔！」阿柑笑得直不起腰。", "points": 10 }
+      ],
+      "playMinutes": 3
+    },
+    {
+      "id": "shi-shifu-heart-1",
+      "npcId": "shi-shifu",
+      "hearts": 2,
+      "phase": "spring",
+      "mapId": "village",
+      "periods": ["morning"],
+      "emote": "question",
+      "pages": [
+        "石師傅把一把鈍掉的斧頭放在砧上，正用小錘子一下一下地敲。",
+        "「工具用久了會變鈍，不是它不好，是我們還沒學會怎麼照顧它。」他抬起頭，「你的鋤頭，最近有沒有覺得特別沉？」",
+        "他把斧頭舉起來看了看，像是滿意了，「下次拿來，免費幫你磨一次。」"
+      ],
+      "options": [
+        { "id": "heavy", "label": "我的鋤頭確實很沉", "reply": "「那就拿來吧。」石師傅把錘子收進圍裙。", "points": 30 },
+        { "id": "self", "label": "我自己會磨", "reply": "「嘴硬。」石師傅哼了一聲，嘴角卻有點上揚。", "points": 10 }
+      ],
+      "playMinutes": 2.5
+    },
+    {
+      "id": "shi-shifu-heart-2",
+      "npcId": "shi-shifu",
+      "hearts": 4,
+      "phase": "summer",
+      "mapId": "village",
+      "periods": ["evening"],
+      "emote": "note",
+      "pages": [
+        "傍晚的鐵匠鋪，爐火還沒熄，石師傅正在收拾工具。",
+        "「我以前以為打鐵只要力氣就夠了。」他把一根釘子丟進水桶，發出一聲嘶，「後來才知道，火候和耐心比較重要。」",
+        "他轉過身，把一個小小的鐵環遞給你：「這是我練手的時候打的，送你。別跟別人說是我做的。」"
+      ],
+      "options": [
+        { "id": "keep", "label": "我會好好收著", "reply": "石師傅擺擺手，「收著就好，別拿去賣。」", "points": 40 },
+        { "id": "shape", "label": "這個形狀很特別", "reply": "「眼光不錯。」石師傅挑了挑眉，「下次再做一個更難的給你看。」", "points": 20 }
+      ],
+      "playMinutes": 3
+    },
+    {
+      "id": "zhi-lan-heart-1",
+      "npcId": "zhi-lan",
+      "hearts": 2,
+      "phase": "spring",
+      "mapId": "village",
+      "periods": ["morning"],
+      "emote": "note",
+      "pages": [
+        "芷蘭蹲在村子北邊的角落，小心翼翼地從土裡挖出一小株嫩綠色的植物。",
+        "「這個要連根一起拿，不然很快就會枯掉。」她抬頭看見你，「你來得正好，幫我拿一下這個小籃子。」",
+        "「春天的第一批嫩芽最珍貴，我想留一些給鎮上的孩子們。」她輕輕拍掉手上的泥土，「你覺得呢？」"
+      ],
+      "options": [
+        { "id": "pick", "label": "我可以幫忙採", "reply": "芷蘭把小籃子交到你手上，「要輕一點，像是在跟它們說話一樣。」", "points": 30 },
+        { "id": "learn", "label": "我更想學怎麼認草藥", "reply": "「那下次我先教你一種最常見的。」芷蘭的語氣溫和了許多。", "points": 20 }
+      ],
+      "playMinutes": 2.5
+    },
+    {
+      "id": "zhi-lan-heart-2",
+      "npcId": "zhi-lan",
+      "hearts": 4,
+      "phase": "summer",
+      "mapId": "plaza",
+      "periods": ["noon"],
+      "emote": "note",
+      "pages": [
+        "中午的廣場，芷蘭坐在花圃邊上，把一袋剛採來的草藥分成小束。",
+        "「草藥要趁新鮮的時候晾乾，少一天，味道就差很多。」她舉起一束給你看，「我以前總是等太久，後來才學會。」",
+        "她停了一下，把其中一束放在你的手裡：「這個給你，之後如果有人不舒服，就拿去泡茶。」"
+      ],
+      "options": [
+        { "id": "keep", "label": "我會好好保存", "reply": "「嗯，要記得放在陰涼的地方。」芷蘭的聲音很輕。", "points": 40 },
+        { "id": "tea", "label": "我可以泡給毛毛喝嗎", "reply": "「可以呀，但要先問過他有沒有過敏。」芷蘭忍不住笑了。", "points": 10 }
+      ],
+      "playMinutes": 3
+    },
+    {
+      "id": "xiao-sui-heart-1",
+      "npcId": "xiao-sui",
+      "hearts": 2,
+      "phase": "spring",
+      "mapId": "village",
+      "periods": ["morning"],
+      "emote": "note",
+      "pages": [
+        "小穗的麵包店門口已經排起小小的隊伍，她正把一籃剛出爐的麵包遞給第一位客人。",
+        "等到隊伍慢慢散掉，她才看見你，擦了擦手上的麵粉：「早安！今天的麵包是我新做的口味。」",
+        "她從籃子裡挑出一個小小的，塞進你手裡：「先吃吃看，告訴我好不好吃，我才知道要不要再做。」"
+      ],
+      "options": [
+        { "id": "good", "label": "好吃！下次我還要", "reply": "小穗笑得眼睛都彎了，「那我多做一點。」", "points": 30 },
+        { "id": "sweet", "label": "有點太甜了", "reply": "「那下次少放糖。」小穗認真地在紙上記了一筆。", "points": 10 }
+      ],
+      "playMinutes": 2.5
+    },
+    {
+      "id": "xiao-sui-heart-2",
+      "npcId": "xiao-sui",
+      "hearts": 4,
+      "phase": "summer",
+      "mapId": "plaza",
+      "periods": ["noon"],
+      "emote": "heart",
+      "pages": [
+        "中午的廣場，小穗推著小推車，把烤好的點心分給路過的孩子們。",
+        "「每次看到大家吃得開心，我就覺得一早起床都值得。」她回頭看見你，把一塊還溫熱的點心放在你的手上。",
+        "「我一直想做一個節慶用的大麵包，要很多人一起分著吃的那種。你能幫我想想它該叫什麼名字嗎？」"
+      ],
+      "options": [
+        { "id": "name", "label": "叫豐收麵包吧", "reply": "「豐收麵包！好名字！」小穗把名字寫在紙袋上。", "points": 40 },
+        { "id": "unsure", "label": "我想不出來", "reply": "「沒關係，那我慢慢想。」小穗歪著頭笑了。", "points": 10 }
+      ],
+      "playMinutes": 3
+    }
+  ]
+}

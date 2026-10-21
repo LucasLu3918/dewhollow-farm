@@ -2,6 +2,8 @@ import { SEASONS } from '../../domain/calendar';
 import type { ContentPack, MapDef, Point } from '../../domain/content';
 import { isWalkable, tileAt } from '../../domain/world';
 import { MINE_WIDTH } from '../../domain/mine';
+import { PERIODS, spotOf } from '../../domain/schedule';
+import { WEATHERS } from '../../domain/weather';
 import { assetProblems, missingAssetIds, requiredAssetIds, type AssetManifest } from '../assets/asset-manifest';
 import { companionProblems, type CompanionManifest } from '../assets/companion-manifest';
 import { rigProblems, type RigManifest } from '../assets/rig-manifest';
@@ -29,6 +31,9 @@ import {
   toolsFileSchema,
   tuningFileSchema,
   weatherFileSchema,
+  scheduleFileSchema,
+  heartEventsFileSchema,
+  friendshipFileSchema,
   type MusicFile,
   type SoundsFile,
   type TerrainFile,
@@ -37,6 +42,12 @@ import {
 export interface RawContentFiles {
   crops: unknown;
   npcs: unknown;
+  /** 居民行程（content/schedules.json）。 */
+  schedules: unknown;
+  /** 心形事件（content/events.json）。 */
+  events: unknown;
+  /** 好感規則（content/friendship.json）。 */
+  friendship: unknown;
   maps: unknown[];
   start: unknown;
   tuning: unknown;
@@ -105,10 +116,33 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const crafting = craftingFileSchema.parse(raw.crafting);
   const talents = talentsFileSchema.parse(raw.talents);
   const mine = mineFileSchema.parse(raw.mine);
+  const schedule = scheduleFileSchema.parse(raw.schedules);
+  const heartEvents = heartEventsFileSchema.parse(raw.events);
+  const friendship = friendshipFileSchema.parse(raw.friendship);
 
-  const pack: ContentPack = { crops, npcs, maps, start, tuning, weather: weather.seasons, items: items.items, shops: shops.shops, fish: fish.fish, animals: animals.animals, recipes: recipes.recipes, processing: processing.recipes, crafting: crafting.recipes, talents: { unlockLevel: talents.unlockLevel, defs: talents.talents }, mine: { widthPerLayer: mine.widthPerLayer, maxWidth: mine.maxWidth, oreChance: mine.oreChance, ores: mine.ores } };
+  const pack: ContentPack = {
+    crops,
+    npcs,
+    maps,
+    start,
+    tuning,
+    weather: weather.seasons,
+    items: items.items,
+    shops: shops.shops,
+    fish: fish.fish,
+    animals: animals.animals,
+    recipes: recipes.recipes,
+    processing: processing.recipes,
+    crafting: crafting.recipes,
+    talents: { unlockLevel: talents.unlockLevel, defs: talents.talents },
+    mine: { widthPerLayer: mine.widthPerLayer, maxWidth: mine.maxWidth, oreChance: mine.oreChance, ores: mine.ores },
+    schedule: { periods: schedule.periods, entries: schedule.entries },
+    heartEvents: heartEvents.events,
+    friendship,
+  };
   const problems = [
     ...validateCrossReferences(pack, assets),
+    ...residentProblems(pack),
     ...rigProblems(rigs, assets),
     ...companionProblems(companions, rigs, pack),
     ...toolProblems(tools, assets),
@@ -170,7 +204,6 @@ export function terrainProblems(terrain: TerrainFile, sounds: SoundsFile, maps: 
 export function validateCrossReferences(pack: ContentPack, assets: AssetManifest): string[] {
   const problems: string[] = [];
   const cropIds = new Set(pack.crops.map((c) => c.id));
-  const npcIds = new Set(pack.npcs.map((n) => n.id));
   const mapById = new Map(pack.maps.map((m) => [m.id, m]));
 
   duplicates(pack.crops.map((c) => c.id), 'crop', problems);
@@ -199,18 +232,6 @@ export function validateCrossReferences(pack: ContentPack, assets: AssetManifest
         }
       }
     }
-    const seen = new Set<string>();
-    for (const placement of map.npcs) {
-      if (!npcIds.has(placement.npcId)) {
-        problems.push(`地圖 ${map.id} 的 NPC ${placement.npcId} 不存在`);
-      }
-      const key = `${placement.x},${placement.y}`;
-      if (seen.has(key)) problems.push(`地圖 ${map.id} 在 (${key}) 有重複的 NPC`);
-      seen.add(key);
-      if (!isWalkableAt(map, placement)) {
-        problems.push(`地圖 ${map.id} 的 NPC ${placement.npcId} 位於不可行走的格子 (${key})`);
-      }
-    }
   }
 
   const start = mapById.get(pack.start.mapId);
@@ -237,6 +258,71 @@ export function validateCrossReferences(pack: ContentPack, assets: AssetManifest
 
   return problems;
 }
+
+/**
+ * 居民的交叉參照：行程的居民與地圖要存在、站的格子要能走；每個時段都有預設位置；
+ * 同一個時段與天氣下，同一張地圖上不能有兩位居民站在同一格；心形事件的居民要在事件的地點與時段找得到；
+ * 居民的偏好物品要存在。
+ */
+export function residentProblems(pack: ContentPack): string[] {
+  const problems: string[] = [];
+  const npcIds = new Set(pack.npcs.map((n) => n.id));
+  const maps = new Map(pack.maps.map((m) => [m.id, m]));
+  const itemIds = new Set([
+    ...pack.items.map((i) => i.id),
+    ...pack.crops.flatMap((c) => [`seed.${c.id}`, `crop.${c.id}`]),
+    ...pack.fish.map((f) => `fish.${f.id}`),
+  ]);
+  const schedule = pack.schedule;
+
+  duplicates(pack.npcs.map((n) => n.id), 'npc', problems);
+  duplicates(pack.heartEvents.map((e) => e.id), 'heart event', problems);
+
+  for (const npc of pack.npcs) {
+    for (const id of [...npc.loves, ...npc.hates]) {
+      if (!itemIds.has(id)) problems.push(`居民 ${npc.id} 的偏好物品 ${id} 不存在`);
+    }
+    for (const period of PERIODS) {
+      if (!spotOf(schedule, npc.id, period, 'sunny')) problems.push(`居民 ${npc.id} 在${PERIOD_LABEL[period]}沒有預設行程`);
+    }
+  }
+
+  for (const entry of schedule.entries) {
+    if (!npcIds.has(entry.npcId)) problems.push(`行程的居民 ${entry.npcId} 不存在`);
+    const map = maps.get(entry.mapId);
+    if (!map) {
+      problems.push(`居民 ${entry.npcId} 的行程指向不存在的地圖 ${entry.mapId}`);
+      continue;
+    }
+    if (!isWalkableAt(map, entry)) problems.push(`居民 ${entry.npcId} 的行程 ${entry.mapId} (${entry.x},${entry.y}) 不可行走`);
+  }
+
+  for (const period of PERIODS) {
+    for (const weather of WEATHERS) {
+      const taken = new Map<string, string>();
+      for (const npc of pack.npcs) {
+        const spot = spotOf(schedule, npc.id, period, weather);
+        if (!spot) continue;
+        const key = `${spot.mapId}:${spot.x},${spot.y}`;
+        const other = taken.get(key);
+        if (other) problems.push(`${PERIOD_LABEL[period]}（${weather}）時，${other} 與 ${npc.id} 站在同一格 ${key}`);
+        else taken.set(key, npc.id);
+      }
+    }
+  }
+
+  for (const event of pack.heartEvents) {
+    if (!npcIds.has(event.npcId)) problems.push(`心形事件 ${event.id} 的居民 ${event.npcId} 不存在`);
+    if (!maps.has(event.mapId)) problems.push(`心形事件 ${event.id} 的地點 ${event.mapId} 不存在`);
+    for (const period of event.periods) {
+      const found = WEATHERS.some((w) => spotOf(schedule, event.npcId, period, w)?.mapId === event.mapId);
+      if (!found) problems.push(`心形事件 ${event.id}：${event.npcId} 在${PERIOD_LABEL[period]}不會到 ${event.mapId}`);
+    }
+  }
+  return problems;
+}
+
+const PERIOD_LABEL = { morning: '早上', noon: '中午', evening: '傍晚' } as const;
 
 function validateMapShape(map: MapDef, problems: string[]): void {
   if (map.rows.length !== map.height) {
