@@ -46,6 +46,14 @@ const inventory = z
   .object({ capacity: z.number().int().positive(), stacks: z.array(itemStack) })
   .refine((inv) => inv.stacks.length <= inv.capacity, '背包的堆疊數超過格數');
 
+const animal = z.object({
+  kind: z.string().min(1),
+  fed: z.boolean(),
+  petted: z.boolean(),
+  milked: z.boolean(),
+  mood: z.number().int().min(0).max(10),
+});
+
 /** 目前版本的存檔 schema。版本升級時凍結舊版（見 save-schema-v1.ts）並在 save-migrations.ts 加遷移。 */
 export const gameStateSchema: z.ZodType<GameState> = z.object({
   schemaVersion: z.literal(SAVE_SCHEMA_VERSION),
@@ -86,7 +94,9 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
     cooking: z.string().min(1).optional(),
   }),
   fishing: z.object({ fishId: z.string().min(1) }).nullable(),
-  animals: z.array(z.object({ kind: z.string().min(1), fed: z.boolean(), petted: z.boolean(), mood: z.number().int().min(0).max(10) })),
+  /** 雞舍的雞與牛舍的牛：餵飽、摸過、擠過奶（牛）與心情；牛舍是否改建在 flags.cowbarn。 */
+  animals: z.array(animal),
+  cows: z.array(animal),
   processing: z.array(z.object({ recipeId: z.string().min(1), daysLeft: z.number().int().nonnegative() })),
   mineSeed: z.number().int().nonnegative().max(4294967295),
   /** 礦坑沒有底，檢查點可以是任何正整數層（見 domain/mine.ts）。 */

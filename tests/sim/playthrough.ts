@@ -23,7 +23,7 @@ import { shippedIndex, shippedPack } from './shipped-content';
  * 各活動停手的體力下限（每天的體力分配）：農場最多用 40 點，其餘各自有配額，
  * 不然農場的收益會把其他活動整個擠掉（這正是要量的平衡問題）。
  */
-const FLOOR = { farm: 60, forest: 40, mine: 20, lake: 8 } as const;
+const FLOOR = { farm: 60, pasture: 30, forest: 40, mine: 20, lake: 8 } as const;
 
 export interface DayRecord {
   day: number;
@@ -36,7 +36,10 @@ export interface DayRecord {
   deepest: number;
   levels: Record<SkillId, number>;
   tiers: Record<string, number>;
+  /** 雞舍的雞數。 */
   animals: number;
+  /** 牛舍的牛數。 */
+  cows: number;
   /** 當天結束時，估計累計的真實遊玩分鐘。 */
   minutes: number;
   refusals: Record<string, number>;
@@ -91,6 +94,7 @@ export function simulate(totalDays: number, seed = 7, index: ContentIndex = ship
       levels: Object.fromEntries(SKILL_IDS.map((id) => [id, levelOf(s.skills[id], index.tuning.skills.thresholds)])) as Record<SkillId, number>,
       tiers: { ...s.toolTiers },
       animals: s.animals.length,
+      cows: s.cows.length,
       minutes,
       refusals: { ...stats.refusals },
     };
@@ -118,6 +122,11 @@ function milestonesOf(s: GameState, record: DayRecord, index: ContentIndex): str
   const out: string[] = [];
   if (record.gold >= 300 || s.animals.length > 0) out.push('金幣 300 或買到雞');
   if (s.animals.length > 0) out.push('第一隻雞');
+  if (s.flags.cowbarn) out.push('牛舍改建');
+  if (s.cows.length > 0) out.push('第一頭牛');
+  if (record.day >= 15) out.push('牧草地開放（春 15）');
+  // 牛奶擠出來當天就會放進加工機（或出貨），所以用加工機的紀錄判斷乳製品的第一批。
+  if (s.processing.some((job) => job.recipeId === 'cheese' || job.recipeId === 'butter')) out.push('第一批乳製品加工');
   for (const tool of ['hoe', 'can', 'axe', 'pick'] as const) {
     if (s.toolTiers[tool] >= 1) out.push(`${tool} 銅級`);
     if (s.toolTiers[tool] >= 2) out.push(`${tool} 銀級`);
@@ -144,6 +153,8 @@ function playDay(bot: Bot, index: ContentIndex): void {
   farmWork(bot, index);
   villageTrip(bot, index);
   coopCare(bot, index);
+  cowCare(bot, index);
+  pastureWork(bot, index);
   forestWork(bot, index);
   mineWork(bot, index);
   lakeWork(bot, index);
@@ -251,7 +262,9 @@ function villageTrip(bot: Bot, index: ContentIndex): void {
     if (line) toBuy.seed = Math.min(wantSeeds, Math.floor(bot.state.gold / line.price));
   }
   const hayPrice = general.stock.find((l) => l.itemId === 'hay')?.price ?? 0;
-  if (bot.state.animals.length > 0 && countOf(bot.state.inventory, 'hay') < 2 && hayPrice > 0) toBuy.hay = 2;
+  // 每座有動物的建築（雞舍、牛舍）每天要一包乾草。
+  const barns = (bot.state.animals.length > 0 ? 1 : 0) + (bot.state.cows.length > 0 ? 1 : 0);
+  if (barns > 0 && countOf(bot.state.inventory, 'hay') < 2 && hayPrice > 0) toBuy.hay = 2;
   const chickenLine = general.stock.find((l) => l.itemId === 'animal.chicken');
   const seats = bot.state.animals.length < 3 && chickenLine && bot.state.gold >= chickenLine.price + 20;
   if (seats) toBuy.chicken = 1;
@@ -259,6 +272,17 @@ function villageTrip(bot: Bot, index: ContentIndex): void {
   if (toBuy.seed > 0 && crop) bot.actOn(counters('general'), { type: 'buy', shopId: 'general', itemId: `seed.${crop}`, count: toBuy.seed });
   if (toBuy.hay > 0) bot.actOn(counters('general'), { type: 'buy', shopId: 'general', itemId: 'hay', count: toBuy.hay });
   if (toBuy.chicken > 0) bot.actOn(counters('general'), { type: 'buy', shopId: 'general', itemId: 'animal.chicken', count: 1 });
+
+  // 牛舍：金幣夠了就改建（只做一次），改建後再買牛，直到座位滿（座位數由牛舍地圖決定）。
+  const remodel = general.stock.find((l) => l.itemId === 'building.cowbarn');
+  if (remodel && !bot.state.flags.cowbarn && bot.state.gold >= remodel.price + COW_RESERVE) {
+    bot.actOn(counters('general'), { type: 'buy', shopId: 'general', itemId: 'building.cowbarn', count: 1 });
+  }
+  const cowLine = general.stock.find((l) => l.itemId === 'animal.cow');
+  const barnSeats = tilesWhere(bot.state, index.map('cowbarn'), (_k, t) => !!t.slot).length;
+  if (cowLine && bot.state.flags.cowbarn && bot.state.cows.length < barnSeats && bot.state.gold >= cowLine.price + COW_RESERVE) {
+    bot.actOn(counters('general'), { type: 'buy', shopId: 'general', itemId: 'animal.cow', count: 1 });
+  }
 
   // 鐵匠：依序升級（只在材料與金幣都夠時才去櫃檯前，免得白走）。
   const smithy = index.shop('smithy');
@@ -281,6 +305,35 @@ function coopCare(bot: Bot, index: ContentIndex): void {
   }
   const seats = tilesWhere(bot.state, coop, (_k, t) => !!t.slot);
   seats.slice(0, bot.state.animals.length).forEach((seat) => bot.actOn([seat], { type: 'interact' }));
+}
+
+/** 牛舍：先餵乾草（乾草槽），再逐頭牛先摸一下、再擠奶（每天一次）。牛沒吃飽時擠不出奶，所以順序不能反。 */
+function cowCare(bot: Bot, index: ContentIndex): void {
+  if (bot.state.cows.length === 0) return;
+  const barn = mapOrNull(index, 'cowbarn');
+  if (!barn) return;
+  if (countOf(bot.state.inventory, 'hay') > 0) {
+    bot.actOn(tilesWhere(bot.state, barn, (kind) => kind === 'trough'), { type: 'interact' });
+  }
+  const seats = tilesWhere(bot.state, barn, (_k, t) => !!t.slot);
+  seats.slice(0, bot.state.cows.length).forEach((seat) => {
+    bot.actOn([seat], { type: 'interact' }); // 摸
+    bot.actOn([seat], { type: 'interact' }); // 擠（已餵飽才會成功）
+  });
+}
+
+/** 牧草地：有牛時割牧草得乾草（用鐮刀，體力沿用砍樹的基礎值）；乾草夠了就不去割。 */
+function pastureWork(bot: Bot, index: ContentIndex): void {
+  if (bot.state.cows.length === 0) return;
+  const pasture = mapOrNull(index, 'pasture');
+  if (!pasture) return;
+  const enough = 4;
+  if (countOf(bot.state.inventory, 'hay') >= enough) return;
+  bot.useTool('sickle');
+  for (let guard = 0; guard < 60 && bot.state.energy.current > FLOOR.pasture && countOf(bot.state.inventory, 'hay') < enough; guard += 1) {
+    const tufts = tilesWhere(bot.state, pasture, (kind) => kind === 'tuft');
+    if (tufts.length === 0 || !bot.actOn(tufts, { type: 'interact' })) break;
+  }
 }
 
 function forestWork(bot: Bot, index: ContentIndex): void {
@@ -443,6 +496,9 @@ function houseWork(bot: Bot, index: ContentIndex): void {
     bot.actOn(kitchen, { type: 'cook', recipeId: recipe.id });
   }
 }
+
+/** 買牛舍與牛時，金幣要留多少給下一步（種子與乾草）；避免把錢花光。 */
+const COW_RESERVE = 200;
 
 /** 留給工具升級的材料不賣（木材、銅礦石）；其餘能賣的全部放進出貨箱（睡覺時結算）。 */
 const KEPT_FOR_UPGRADES = new Set(['wood', 'copper-ore']);

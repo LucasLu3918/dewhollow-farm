@@ -11,6 +11,8 @@ import lake from '../../../content/maps/lake.json';
 import house from '../../../content/maps/house.json';
 import mineEntrance from '../../../content/maps/mine-entrance.json';
 import coop from '../../../content/maps/coop.json';
+import pasture from '../../../content/maps/pasture.json';
+import cowbarn from '../../../content/maps/cowbarn.json';
 import { createNewGame } from '../../domain/game-state';
 import { loadContent } from '../content/load-content';
 import assets from '../../../content/assets.json';
@@ -32,7 +34,7 @@ import terrain from '../../../content/terrain.json';
 import { SaveFormatError } from './save-errors';
 import { parseSaveRecord } from './save-schema';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
 const context = { inventoryCapacity: pack.tuning.inventory.capacity, daysPerSeason: pack.tuning.time.daysPerSeason, wakeMinute: pack.tuning.time.wakeMinute };
 
 function record(state: unknown) {
@@ -125,7 +127,7 @@ describe('save schema with an old save', () => {
 
   it('loads a v1 save as a current-version state', () => {
     const { state } = parseSaveRecord(record(v1), context);
-    expect(state.schemaVersion).toBe(12);
+    expect(state.schemaVersion).toBe(13);
     expect(state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
     expect(state.playtimeSeconds).toBe(0);
     expect(state.calendar.day).toBe(2);

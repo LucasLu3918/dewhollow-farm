@@ -21,14 +21,32 @@ const npcSchema = z.object({
   gift: z.object({ cropId: z.string().min(1), count: z.number().int().positive() }).optional(),
 });
 
+/** 解鎖條件：日期（從某季某天起開放）或旗標；hint 是條件不符時給玩家看的話。 */
+const requirementSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('date'),
+    season: z.enum(SEASONS),
+    day: z.number().int().positive().max(60),
+    hint: z.string().min(1),
+    note: z.string().optional(),
+  }),
+  z.object({
+    type: z.literal('flag'),
+    flag: z.string().min(1),
+    hint: z.string().min(1),
+    note: z.string().optional(),
+  }),
+]);
+
 const tileSchema = z.object({
-  kind: z.enum(['grass', 'field', 'path', 'wall', 'bed', 'shipbox', 'door', 'tree', 'water', 'floor', 'furniture', 'cave', 'rock', 'shop', 'forage', 'ore', 'stairs', 'trough', 'kitchen', 'workshop', 'workbench', 'tuft']),
+  kind: z.enum(['grass', 'field', 'path', 'wall', 'bed', 'shipbox', 'door', 'tree', 'water', 'floor', 'furniture', 'cave', 'rock', 'shop', 'forage', 'ore', 'stairs', 'trough', 'kitchen', 'workshop', 'workbench', 'tuft', 'fence']),
   item: z.string().min(1).optional(),
   seasons: z.array(z.enum(SEASONS)).min(1).optional(),
   slot: z.boolean().optional(),
   to: z.string().min(1).optional(),
   shop: z.string().min(1).optional(),
   spawn: point.optional(),
+  requires: requirementSchema.optional(),
 });
 
 const mapSchema = z.object({
@@ -40,6 +58,7 @@ const mapSchema = z.object({
   legend: z.record(z.string().length(1), tileSchema),
   spawn: point,
   npcs: z.array(z.object({ npcId: z.string().min(1), x: z.number().int(), y: z.number().int() })),
+  flock: z.enum(['animals', 'cows']).optional(),
 });
 
 const startSchema = z.object({
@@ -207,7 +226,7 @@ export const itemsFileSchema = z.object({
     z.object({
       id: z.string().min(1),
       name: z.string().min(1),
-      kind: z.enum(['material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft']),
+      kind: z.enum(['material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft', 'building']),
       maxStack: z.number().int().positive(),
       sellPrice: z.number().int().nonnegative().optional(),
     }),
@@ -267,15 +286,26 @@ export const processingFileSchema = z.object({
     }),
   ),
 });
+const milkSchema = z
+  .object({
+    item: z.string().min(1),
+    goodChance: z.number().min(0).max(1),
+    fineChance: z.number().min(0).max(1),
+  })
+  .refine((m) => m.fineChance <= m.goodChance, '精良奶的機率不可高於優良奶');
 export const animalsFileSchema = z.object({
   version: z.literal(1),
   animals: z.array(
-    z.object({
-      id: z.string().min(1),
-      name: z.string().min(1),
-      eggItem: z.string().min(1),
-      eggQuality: z.number().min(0).max(1),
-    }),
+    z
+      .object({
+        id: z.string().min(1),
+        name: z.string().min(1),
+        eggItem: z.string().min(1).optional(),
+        eggQuality: z.number().min(0).max(1).optional(),
+        milk: milkSchema.optional(),
+      })
+      .refine((a) => (a.eggItem !== undefined) !== (a.milk !== undefined), '動物要嘛下蛋、要嘛產奶，且只能是其中一種')
+      .refine((a) => a.eggItem === undefined || a.eggQuality !== undefined, '下蛋的動物要有 eggQuality'),
   ),
 });
 export const fishFileSchema = z.object({

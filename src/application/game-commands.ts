@@ -16,7 +16,8 @@ import { bonusYield, levelOf, qualityFor, skillOfAction, type SkillId, type Skil
 import { passDays, startJob, takeReady } from '../domain/processing';
 import { fertilizedSkillTuning } from '../domain/fertilizer';
 import { biteChanceFor } from '../domain/fishing';
-import { dailyCare, feedAll, newAnimal, petAnimal, produceEggs, slotsOf, type Animal } from '../domain/animals';
+import { dailyCare, feedAll, milkQuality, newAnimal, petAnimal, produceEggs, slotsOf, type Animal, type FlockId } from '../domain/animals';
+import { requirementMet } from '../domain/unlock';
 import type { Quality } from '../domain/items';
 import { energyCostFor, toolForAction, TIER_NAMES, TOOL_NAMES } from '../domain/tools';
 import { rollWeather, WEATHER_NAMES, waters } from '../domain/weather';
@@ -102,11 +103,16 @@ const FAILURE_MESSAGES: Record<string, string> = {
   NEED_ROD: '要先切到釣竿才能釣魚',
   NO_BITE: '現在沒有魚上鉤',
   NO_ROOM: '雞舍已經滿了',
+  NO_COW_ROOM: '牛舍已經滿了',
   NOT_AT_STOVE: '要站在廚房前面才能做菜',
   TOO_LOW_LEVEL: '烹飪還不夠高，做不了這道菜',
   NO_DISH: '沒有這道料理',
   NO_HAY: '沒有乾草了（雜貨店有賣）',
   NO_ANIMAL: '雞舍裡還沒有動物',
+  NO_COW: '牛舍裡還沒有牛',
+  NO_BARN: '牛舍還沒改建，先到雜貨店找人改建',
+  NOT_FED: '牛還沒吃飽，先去乾草槽餵牠',
+  CARED_TODAY: '今天已經照顧過這頭牛了',
   NOT_AT_WORKSHOP: '要站在加工台前面才能加工',
   MACHINE_FULL: '加工機已經在忙，等有空位再來',
   NOTHING_READY: '加工機裡還沒有完成的成品',
@@ -198,6 +204,10 @@ function move(state: GameState, direction: Direction, index: ContentIndex): Comm
  * 從入口進礦坑時，會直接到最深的檢查點（見 mine.ts）；到了檢查點層，就記下來。
  */
 function enter(state: GameState, tile: TileDef, direction: Direction, index: ContentIndex): CommandOutcome {
+  // 門的解鎖條件（日期或旗標）不符時門是鎖著的：留在原地，顯示內容裡寫的 hint。
+  if (tile.requires && !requirementMet(tile.requires, state.calendar, state.flags, index.tuning.time.daysPerSeason)) {
+    return reply({ ...state, player: { ...state.player, facing: direction } }, [tile.requires.hint], [refused('LOCKED_DOOR')]);
+  }
   let destinationId = tile.to ?? '';
   if (tile.kind === 'cave' && destinationId === mineId(1) && state.mineCheckpoint > 1) {
     destinationId = mineId(state.mineCheckpoint);
@@ -442,6 +452,7 @@ function sleep(state: GameState, index: ContentIndex): CommandOutcome {
     plots,
     inventory: laid.inventory,
     animals: laid.animals,
+    cows: dailyCare(state.cows),
     processing,
     gold: state.gold + settled.gold,
     shipBox: settled.box,
@@ -657,6 +668,7 @@ function buy(state: GameState, command: Extract<Command, { type: 'buy' }>, index
   const cost = line.price * command.count;
   if (state.gold < cost) return reply(state, [messageFor('NO_GOLD')], [refused('NO_GOLD')]);
   if (command.itemId.startsWith('animal.')) return buyAnimal(state, command.itemId.slice('animal.'.length), cost, command.count, index);
+  if (command.itemId.startsWith('building.')) return remodel(state, command.itemId, cost, command.count, index);
   const stored = addItem(state.inventory, index.item(command.itemId), command.count);
   if (!stored.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
   const name = index.item(command.itemId).name;
@@ -706,46 +718,128 @@ function gainXp(skills: SkillXp, action: ActionKind, index: ContentIndex): Skill
   return { ...skills, [skill]: skills[skill] + amount };
 }
 
-/** 雞舍在地圖 coop 上；座位數就是雞舍能養的動物數。 */
+/** 雞舍在地圖 coop 上、牛舍在地圖 cowbarn 上；座位數就是那棟建築能養的動物數。 */
 const COOP_ID = 'coop';
+const COWBARN_ID = 'cowbarn';
+/** 牛舍改建的旗標（店家賣的 building.cowbarn 會把它設為真）；沒改建前買不到牛，牛舍的門也開不了。 */
+const COWBARN_FLAG = 'cowbarn';
 
-function coopSeats(index: ContentIndex): number {
-  return slotsOf(index.map(COOP_ID)).length;
+function seatsIn(index: ContentIndex, mapId: string): number {
+  return slotsOf(index.map(mapId)).length;
+}
+
+/** 這棟建築住的是哪一群動物（地圖的 flock）；沒有動物的地圖回傳 null。 */
+function flockAt(state: GameState, index: ContentIndex): FlockId | null {
+  return index.map(state.mapId).flock ?? null;
+}
+
+function herdOf(state: GameState, flock: FlockId): Animal[] {
+  return flock === 'cows' ? state.cows : state.animals;
+}
+
+function withHerd(state: GameState, flock: FlockId, herd: Animal[]): GameState {
+  return flock === 'cows' ? { ...state, cows: herd } : { ...state, animals: herd };
 }
 
 function buyAnimal(state: GameState, kind: string, cost: number, count: number, index: ContentIndex): CommandOutcome {
   const def = index.animal(kind);
   if (count !== 1) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
-  if (state.animals.length >= coopSeats(index)) return reply(state, [messageFor('NO_ROOM')], [refused('NO_ROOM')]);
+  if (def.milk) return buyCow(state, kind, cost, index);
+  if (state.animals.length >= seatsIn(index, COOP_ID)) return reply(state, [messageFor('NO_ROOM')], [refused('NO_ROOM')]);
   return reply({ ...state, gold: state.gold - cost, animals: [...state.animals, newAnimal(kind)] }, [`買了一隻${def.name}，放進雞舍`]);
 }
 
-/** 餵乾草：一包乾草餵全部的動物（每天一次，睡醒後就要再餵）。 */
+/** 牛要牛舍已經改建、而且還有座位才能買；牛舍改建後才有座位。 */
+function buyCow(state: GameState, kind: string, cost: number, index: ContentIndex): CommandOutcome {
+  const def = index.animal(kind);
+  if (state.flags[COWBARN_FLAG] !== true) return reply(state, [messageFor('NO_BARN')], [refused('NO_BARN')]);
+  if (state.cows.length >= seatsIn(index, COWBARN_ID)) return reply(state, [messageFor('NO_COW_ROOM')], [refused('NO_COW_ROOM')]);
+  return reply({ ...state, gold: state.gold - cost, cows: [...state.cows, newAnimal(kind)] }, [`買了一頭${def.name}，牽進牛舍`]);
+}
+
+/**
+ * 改建店家賣的建築（itemId 為 building.<旗標>）：花金幣，把旗標設為真；不進背包。只能改建一次。
+ */
+function remodel(state: GameState, itemId: string, cost: number, count: number, index: ContentIndex): CommandOutcome {
+  const flag = itemId.slice('building.'.length);
+  if (count !== 1) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
+  if (state.flags[flag]) return reply(state, [messageFor('ALREADY_OWNED')], [refused('ALREADY_OWNED')]);
+  const name = index.item(itemId).name;
+  return reply({ ...state, gold: state.gold - cost, flags: { ...state.flags, [flag]: true } }, [`${name}完成，花了 ${cost} 金`]);
+}
+
+/** 餵乾草：一包乾草餵這棟建築裡的全部動物（雞舍的雞或牛舍的牛；每天一次，睡醒後就要再餵）。 */
 function feedAnimals(state: GameState, index: ContentIndex): CommandOutcome {
-  if (state.animals.length === 0) return reply(state, [messageFor('NO_ANIMAL')], [refused('NO_ANIMAL')]);
+  const flock = flockAt(state, index) ?? 'animals';
+  const herd = herdOf(state, flock);
+  if (herd.length === 0) {
+    const reason = flock === 'cows' ? 'NO_COW' : 'NO_ANIMAL';
+    return reply(state, [messageFor(reason)], [refused(reason)]);
+  }
   if (countOf(state.inventory, 'hay') < 1) return reply(state, [messageFor('NO_HAY')], [refused('NO_HAY')]);
   const taken = removeItem(state.inventory, 'hay', 1);
   if (!taken.ok) return reply(state, [messageFor('NO_HAY')], [refused('NO_HAY')]);
-  const next: GameState = {
-    ...state,
-    inventory: taken.value,
-    animals: feedAll(state.animals),
-    calendar: advanceMinutes(state.calendar, index.tuning.time.minutesPerAction),
-  };
-  return reply(next, ['餵了雞']);
+  const next = withHerd(
+    { ...state, inventory: taken.value, calendar: advanceMinutes(state.calendar, index.tuning.time.minutesPerAction) },
+    flock,
+    feedAll(herd),
+  );
+  return reply(next, [flock === 'cows' ? '餵了牛' : '餵了雞']);
 }
 
-/** 摸座位上的動物；空位就只是地板。 */
+/** 摸座位上的動物；空位就只是地板。牛另有擠奶（見 careForCow）。 */
 function petAt(state: GameState, target: Point, index: ContentIndex): CommandOutcome {
-  const slot = slotsOf(index.map(state.mapId)).findIndex((p) => p.x === target.x && p.y === target.y);
-  const animal = state.animals[slot];
-  if (slot < 0 || !animal) return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
+  const map = index.map(state.mapId);
+  const slot = slotsOf(map).findIndex((p) => p.x === target.x && p.y === target.y);
+  const animal = map.flock ? herdOf(state, map.flock)[slot] : undefined;
+  if (slot < 0 || !map.flock || !animal) return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
+  if (map.flock === 'cows') return careForCow(state, slot, index);
   const next: GameState = {
     ...state,
     animals: petAnimal(state.animals, slot),
     calendar: advanceMinutes(state.calendar, index.tuning.time.minutesPerAction),
   };
   return reply(next, [`摸了摸${index.animal(animal.kind).name}`]);
+}
+
+/**
+ * 站在牛的座位前面：第一次先摸牠（心情加一），之後擠奶（要已餵飽、今天還沒擠過）。
+ * 每頭牛每天一次摸、一次擠；摸與擠各花一次動作的時間，不花體力（和其他畜牧動作相同）。
+ */
+function careForCow(state: GameState, slot: number, index: ContentIndex): CommandOutcome {
+  const cow = state.cows[slot];
+  if (!cow) return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
+  const name = index.animal(cow.kind).name;
+  if (!cow.petted) {
+    const next: GameState = {
+      ...state,
+      cows: petAnimal(state.cows, slot),
+      calendar: advanceMinutes(state.calendar, index.tuning.time.minutesPerAction),
+    };
+    return reply(next, [`摸了摸${name}`]);
+  }
+  if (!cow.fed) return reply(state, [messageFor('NOT_FED')], [refused('NOT_FED')]);
+  if (cow.milked) return reply(state, [messageFor('CARED_TODAY')], [refused('CARED_TODAY')]);
+  return milkCow(state, slot, index);
+}
+
+/** 擠奶：奶的品質由心情與一次隨機數決定；奶放進背包，放不下就不擠（牛與時間都不變）。 */
+function milkCow(state: GameState, slot: number, index: ContentIndex): CommandOutcome {
+  const cow = state.cows[slot];
+  const milk = cow ? index.animal(cow.kind).milk : undefined;
+  if (!cow || !milk) return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
+  const roll = rollInt(state.rng, 0, 999);
+  const quality = milkQuality(cow.mood, roll.value / 1000, milk);
+  const stored = addItem(state.inventory, index.item(milk.item), 1, quality);
+  if (!stored.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
+  const next: GameState = {
+    ...state,
+    rng: roll.rng,
+    inventory: stored.value,
+    cows: state.cows.map((c, i) => (i === slot ? { ...c, milked: true } : c)),
+    calendar: advanceMinutes(state.calendar, index.tuning.time.minutesPerAction),
+  };
+  return reply(next, [`擠了${index.animal(cow.kind).name}的奶，得到${index.item(milk.item).name}${QUALITY_LABEL[quality]}`]);
 }
 
 /** 睡醒前的產蛋：每隻餵飽的動物各下一顆蛋（優良與否由心情與隨機數決定），蛋放進背包；放不下的壞掉。 */
@@ -756,7 +850,9 @@ function layEggs(state: GameState, index: ContentIndex): { inventory: Inventory;
   let lost = 0;
   for (const animal of state.animals) {
     const def = index.animal(animal.kind);
-    for (const egg of produceEggs([animal], def, roll.value / 1000).eggs) {
+    // 只有會下蛋的動物（雞）睡醒時產蛋；牛要人去擠奶。
+    if (def.eggItem === undefined || def.eggQuality === undefined) continue;
+    for (const egg of produceEggs([animal], { eggItem: def.eggItem, eggQuality: def.eggQuality }, roll.value / 1000).eggs) {
       const stored = addItem(inventory, index.item(egg.itemId), 1, egg.quality);
       if (stored.ok) {
         inventory = stored.value;

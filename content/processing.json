@@ -51,6 +51,26 @@
       "output": "dried-bass",
       "days": 2,
       "level": 4
+    },
+    {
+      "id": "butter",
+      "name": "奶油",
+      "ingredients": {
+        "milk": 1
+      },
+      "output": "butter",
+      "days": 1,
+      "level": 1
+    },
+    {
+      "id": "cheese",
+      "name": "起司",
+      "ingredients": {
+        "milk": 2
+      },
+      "output": "cheese",
+      "days": 2,
+      "level": 3
     }
   ]
 }

@@ -24,13 +24,13 @@ describe('playthrough simulation', () => {
   it.runIf(REPORT)('prints the report for a full year', () => {
     const result = simulate(DAYS);
     const lines: string[] = [];
-    lines.push('| 日 | 季 | 金幣 | 動作 | 步數 | 花費 | 出貨 | 礦坑 | 農 | 採 | 釣 | 礦 | 廚 | 工具(鋤/壺/斧/鎬) | 雞 | 估計分鐘 |');
-    lines.push('| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: |');
+    lines.push('| 日 | 季 | 金幣 | 動作 | 步數 | 花費 | 出貨 | 礦坑 | 農 | 採 | 釣 | 礦 | 廚 | 工具(鋤/壺/斧/鎬) | 雞 | 牛 | 估計分鐘 |');
+    lines.push('| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: |');
     for (const d of result.days) {
       if (d.day % 5 !== 0 && d.day !== 1) continue;
       const t = d.tiers;
       lines.push(
-        `| ${d.day} | ${d.season} | ${d.gold} | ${d.actions} | ${d.steps} | ${d.spent} | ${d.shipped} | ${d.deepest} | ${d.levels.farming} | ${d.levels.foraging} | ${d.levels.fishing} | ${d.levels.mining} | ${d.levels.cooking} | ${t.hoe}/${t.can}/${t.axe}/${t.pick} | ${d.animals} | ${d.minutes.toFixed(1)} |`,
+        `| ${d.day} | ${d.season} | ${d.gold} | ${d.actions} | ${d.steps} | ${d.spent} | ${d.shipped} | ${d.deepest} | ${d.levels.farming} | ${d.levels.foraging} | ${d.levels.fishing} | ${d.levels.mining} | ${d.levels.cooking} | ${t.hoe}/${t.can}/${t.axe}/${t.pick} | ${d.animals} | ${d.cows} | ${d.minutes.toFixed(1)} |`,
       );
     }
     lines.push('');

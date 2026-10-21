@@ -46,6 +46,8 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
+    registerAnimalTextures(this);
     for (const entry of this.deps.assets.assets) {
       // 翻轉素材沒有自己的貼圖，畫面會改用原圖並翻轉（見 resolveAsset）。
       if (entry.mirrorOf) continue;
@@ -57,7 +59,6 @@ export class BootScene extends Phaser.Scene {
     }
     // 表情氣泡不產圖：用 Graphics 畫成貼圖（顏色取自共用調色盤）。
     registerEmoteTextures(this);
-    registerAnimalTextures(this);
     // 入庫的圖片多半是縮小顯示的高解析母版；遊戲設定為像素風（最近鄰），縮小時會鋸齒，改用線性取樣。
     for (const entry of this.deps.assets.assets) {
       if (entry.file && this.textures.exists(entry.id)) {

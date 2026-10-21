@@ -27,6 +27,8 @@ import lake from '../../content/maps/lake.json';
 import house from '../../content/maps/house.json';
 import mineEntrance from '../../content/maps/mine-entrance.json';
 import coop from '../../content/maps/coop.json';
+import pasture from '../../content/maps/pasture.json';
+import cowbarn from '../../content/maps/cowbarn.json';
 import { describe, expect, it } from 'vitest';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { WEATHERS } from '../domain/weather';
@@ -39,7 +41,7 @@ import { createContentIndex } from './content-index';
 const raw: RawContentFiles = {
   crops,
   npcs,
-  maps: [farm, village, forest, lake, house, mineEntrance, coop],
+  maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,

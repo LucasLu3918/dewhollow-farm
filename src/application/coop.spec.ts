@@ -35,6 +35,7 @@ const coop: MapDef = {
   legend: { '#': { kind: 'wall' }, '.': { kind: 'floor' }, P: { kind: 'floor', slot: true }, T: { kind: 'trough' } },
   spawn: { x: 2, y: 1 },
   npcs: [],
+  flock: 'animals',
 };
 
 const content: ContentPack = {
