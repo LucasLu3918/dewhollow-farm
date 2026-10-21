@@ -89,8 +89,10 @@
 | 檔案 | 責任 |
 | --- | --- |
 | `src/presentation/walk-pose.ts`（**已完成**） | `walkPose(step, u, view, params?)` → `{ y, rotation, scaleX, scaleY, legA, legB, stretch }`；另有 `idlePose(stillMs)`、`REST_POSE`、`footModeOf(view)`、`effectiveSplit(view, split, textureWidth)`；純函式。`legA`、`legB` 是腳塊的垂直位移（≤ 0，只往上），`stretch` 是側面腳部的水平伸縮。姿勢數學與 rig 無關，所以不收 rig 參數 |
-| `src/presentation/character-rig.ts` | 依 rig 資料把一張貼圖切成「上半身／左腳／右腳」三個 Phaser 影格，包成 Container，套用姿勢；處理 `flipX`（朝右時分界改用 `effectiveSplit`） |
-| `content/rigs.json` | 每個角色素材的 `legTop`、各方向的 `split`（正面、背面、朝左；朝右由程式翻轉）與參數覆寫，以 zod 驗證。腳的做法（`split-legs`／`stretch-feet`）由方向決定（`footModeOf`），不放進資料 |
+| `src/presentation/rig-layout.ts`（**已完成**） | `rigLayout(rig, view)`：每個方向的切塊區域與顯示位置（純函式，朝右時從原圖另一端取區域、分界翻到另一側） |
+| `src/presentation/character-rig.ts`（**已完成**） | 依 `rigLayout` 把一張貼圖切成上半身與腳的 Phaser 影格（同一張貼圖多個影格），結構為 root（腳底中心，鏡頭跟隨、位置補間）→ body（姿勢）→ 切塊；`setView`、`walkTo`（每次呼叫算一步）、`squash`、`update`（站定後呼吸）、`preview`；載入時核對貼圖大小與 `rigs.json` 宣告一致 |
+| `src/infrastructure/assets/rig-manifest.ts`（**已完成**） | `RigDef` 型別與 `rigProblems`（rig 與素材清單的交叉檢查） |
+| `content/rigs.json`（**已完成**，目前只有 `player`） | 每個角色素材的 `legTop`、各方向的 `split`（正面、背面、朝左；朝右由程式翻轉）與參數覆寫，以 zod 驗證。腳的做法（`split-legs`／`stretch-feet`）由方向決定（`footModeOf`），不放進資料 |
 | `content/assets.json` | `mirrorOf`（已完成）：`player.right` 指向 `player.left`，引擎翻轉，不另存檔 |
 
 切影格用 Phaser 的 `texture.add(name, 0, x, y, w, h)`：**一張貼圖、多個影格**，不產生額外檔案，也不需要預處理工具。
@@ -118,6 +120,21 @@
 
 視覺驗收（人工，各里程碑一次）：用原型頁面的格狀截圖逐格檢查有無撕裂、切線外露、腳底浮空。
 
+## 視覺驗收的注意事項（M2 第 3 步的發現）
+
+逐格截圖時發現：**無頭 Chromium（Playwright 預設，使用 SwiftShader 軟體繪圖）會把旋轉的切塊畫壞**，上半身被斜切或挖掉一塊矩形，破損位置因相位而異。查證過程：
+
+- 直接讀 WebGL 畫面（`window.__dewhollow.snapshot()`，不經瀏覽器合成）仍然壞，所以不是截圖假象；
+- 把 `swayDegrees` 設為 0（不旋轉）後破損完全消失，所以和「旋轉的容器」有關；
+- 在 Mac 的實際 GPU（Apple M5 Pro，ANGLE Metal）上，四個方向、12 個相位的輪廓面積與靜止姿勢相比都是 1.00（±0.01），**畫面正確**。
+
+結論與做法：
+
+- 目前判斷是 SwiftShader 的繪製問題，遊戲在實際 GPU 上正常；根本原因（Phaser 4 的繪製方式還是 SwiftShader 本身）**尚未查明**。
+- e2e 只驗證姿勢數值與外框，不比對像素，所以不受影響。**像素層級的視覺驗收必須在實際 GPU 上做**（內建瀏覽器或本機有頭瀏覽器），不要用無頭 Chromium 的截圖判斷。
+- 開發模式的 `window.__dewhollow.setPose(view, step, u)` 擺出任意相位、`snapshot()` 讀出 WebGL 畫面，供逐格檢查。
+- 風險：使用軟體繪圖的玩家（例如某些遠端桌面、虛擬機器）可能看到同樣的破圖。M7 的相容性檢查要確認；若屬實，可偵測軟體繪圖器時把 `swayDegrees` 設為 0 作為保底（已證實關掉旋轉即可避免），或改查 Phaser 的繪製路徑。
+
 ## 風險與限制
 
 | 風險 | 影響 | 對策 |
@@ -125,7 +142,8 @@
 | 不是真的走路幀，只是變形 | 近看像「滑步＋搖擺」，不像真的邁步 | 卡通 Q 版、角色小（64×80），多數遊戲採類似做法；若不滿意，再評估人工修兩張走路幀（第二方案）或外包 |
 | 一格 110 毫秒，一步很短 | 起伏與抬腳可能快到看不清 | 先沿用，試玩後再決定是否放慢到 140–160 毫秒（只改一個常數） |
 | 頭髮、肩背包、平板不會晃動 | 少了次要動態，顯得硬 | 第 1 層的傾斜帶動整體；日後可用 `skew` 或把髮尾切成獨立圖層（P2） |
-| 切線在高解析螢幕上露出 | 腳塊與裙子之間出現細縫 | 切線放在裙擺上方 2 px 內（`legTop = 130` 略高於裙擺）；抬腳只往上移，被裙子蓋住 |
+| 切線在高解析螢幕上露出 | 腳塊與裙子之間出現細縫 | 切線放在裙擺上方 2 px 內（`legTop = 130` 略高於裙擺）；抬腳只往上移，被裙子蓋住。實際 GPU 上逐格檢查未見外露 |
+| 軟體繪圖器（SwiftShader）畫壞旋轉的切塊 | 在無頭瀏覽器或使用軟體繪圖的環境，上半身被切掉一塊 | 見上節：視覺驗收用實際 GPU；M7 做相容性檢查，必要時偵測後關掉傾斜 |
 | 朝右用翻轉 | 肩背包、平板左右對調 | 已知可接受 |
 | 抬腳、搖擺對其他角色（毛毛、寵物）不一定適用 | 每個角色需要各自量出 `legTop` 與 `split` | 資料化（`rigs.json`），新增角色時用同一套工具量測 |
 
@@ -133,6 +151,6 @@
 
 1. ✅ 四方向素材入庫（背面、側面）、`assets.json` 與 `mirrorOf`，含素材清單與 e2e 測試（2026-10-21 完成）。
 2. ✅ `walk-pose.ts` 與測試（2026-10-21 完成，30 項；另做兩個變異測試確認測試抓得到錯誤）。
-3. `character-rig.ts`、`rigs.json` 與其驗證，先接玩家；`walkBob` 改接姿勢。
+3. ✅ `character-rig.ts`、`rigs.json` 與其驗證，先接玩家；`walkBob` 已移除，改由姿勢驅動（2026-10-21 完成；單元 220 項、e2e 15 項）。
 4. e2e 與人工視覺驗收；調參數。
 5. 毛毛與寵物沿用同一套（寵物走路另議：跟隨與小跳步）。

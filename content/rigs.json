@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "rigs": [
+    {
+      "id": "player",
+      "textureSize": { "width": 128, "height": 160 },
+      "legTop": 130,
+      "views": { "down": "player.down", "up": "player.up", "left": "player.left", "right": "player.right" },
+      "splits": { "down": 60, "up": 60, "left": 62 }
+    }
+  ]
+}

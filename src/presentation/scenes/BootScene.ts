@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { AssetEntry, AssetManifest } from '../../infrastructure/assets/asset-manifest';
+import type { RigManifest } from '../../infrastructure/assets/rig-manifest';
 import type { Hud } from '../hud';
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
@@ -10,6 +11,7 @@ import { TILE_SIZE, UNIT } from '../constants';
 
 export interface BootDeps {
   assets: AssetManifest;
+  rigs: RigManifest;
   session: GameSession;
   index: ContentIndex;
   pack: ContentPack;
@@ -53,6 +55,7 @@ export class BootScene extends Phaser.Scene {
       pack: this.deps.pack,
       hud: this.deps.hud,
       assets: this.deps.assets,
+      rigs: this.deps.rigs,
     };
     this.scene.start('map', sceneDeps);
   }

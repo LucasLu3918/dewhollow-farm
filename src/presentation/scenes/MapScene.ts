@@ -5,11 +5,14 @@ import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/as
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
 import type { Command, GameEvent } from '../../application/game-commands';
+import type { RigManifest } from '../../infrastructure/assets/rig-manifest';
 import type { Hud } from '../hud';
 import { cameraBounds, deadzoneOf } from '../camera';
 import { TILE_SIZE } from '../constants';
-import { centerOf, footOf } from '../layout';
-import { footstepDust, playActionEffect, sleepEffect, squashSprite, walkBob } from '../effects';
+import { CharacterRig } from '../character-rig';
+import { centerOf, footOf, standOf } from '../layout';
+import { footstepDust, playActionEffect, sleepEffect } from '../effects';
+import type { View } from '../walk-pose';
 
 export interface MapSceneDeps {
   session: GameSession;
@@ -18,6 +21,8 @@ export interface MapSceneDeps {
   hud: Hud;
   /** 素材清單：用來決定每張圖的顯示縮放（density）。 */
   assets: AssetManifest;
+  /** 角色骨架資料：玩家的走路動畫用。 */
+  rigs: RigManifest;
 }
 
 const MOVE_KEYS: Record<string, Direction> = {
@@ -58,6 +63,14 @@ declare global {
       sprites(): SpriteDebugInfo[];
       /** 貼圖的原始圖片大小；占位圖與入庫圖片可以由此分辨。 */
       textureSize(key: string): { width: number; height: number } | null;
+      /** 玩家目前的走路姿勢（見 walk-pose.ts）。 */
+      pose(): { y: number; rotation: number; scaleX: number; scaleY: number; legA: number; legB: number; stretch: number };
+      /** 玩家骨架目前的方向、腳的做法與看得見的切塊。 */
+      rig(): { view: string; mode: string; visible: string[] };
+      /** 直接擺出走路循環的某一刻，供逐格檢視。 */
+      setPose(view: View, step: number, u: number): void;
+      /** 直接讀取 WebGL 畫面（原始像素，不經瀏覽器合成）；回傳 PNG 的 data URL。供逐格視覺檢查用。 */
+      snapshot(): Promise<string>;
     };
   }
 }
@@ -69,7 +82,7 @@ declare global {
 export class MapScene extends Phaser.Scene {
   private deps!: MapSceneDeps;
   private world!: Phaser.GameObjects.Container;
-  private player!: Phaser.GameObjects.Image;
+  private rig!: CharacterRig;
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
   private onKeyDown = (event: KeyboardEvent): void => {
@@ -86,9 +99,11 @@ export class MapScene extends Phaser.Scene {
 
   create(): void {
     this.world = this.add.container(0, 0);
-    // 角色圖比格子高：原點放在左下，腳底貼齊格子底部。
-    this.player = this.add.image(0, 0, this.resolveTexture('player.down')).setOrigin(0, 1).setDepth(10);
-    this.applyAsset(this.player, 'player.down');
+    // 玩家骨架：腳底中心站在格子底邊中央，上半身與腳分開動作。
+    const def = this.deps.rigs.rigs.find((r) => r.id === 'player');
+    if (!def) throw new Error('rigs.json 缺少 player 的骨架');
+    this.rig = new CharacterRig(this, def, this.deps.assets);
+    this.rig.root.setDepth(10);
     this.setupCamera();
     window.addEventListener('keydown', this.onKeyDown);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -102,13 +117,24 @@ export class MapScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const zone = deadzoneOf({ width: camera.width, height: camera.height });
     camera.setDeadzone(zone.width, zone.height);
-    // 玩家圖以左下角（腳底）為原點，位移量把跟隨點移到格子中心。
-    camera.startFollow(this.player, true, FOLLOW_LERP, FOLLOW_LERP, -TILE_SIZE / 2, TILE_SIZE / 2);
+    // 跟隨骨架的軸心（腳底中心，不含身體起伏，鏡頭才不會跟著抖）；位移量把跟隨點移到格子中心。
+    camera.startFollow(this.rig.root, true, FOLLOW_LERP, FOLLOW_LERP, 0, TILE_SIZE / 2);
     if (import.meta.env.DEV) {
       window.__dewhollow = {
         cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
         mapId: () => this.deps.session.state.mapId,
         sprites: () => this.debugSprites(),
+        pose: () => ({ ...this.rig.currentPose() }),
+        rig: () => {
+          const { view, mode, visible } = this.rig.debugInfo();
+          return { view, mode, visible: [...visible] };
+        },
+        setPose: (view, step, u) => this.rig.preview(view, step, u),
+        snapshot: () =>
+          new Promise((resolve, reject) => {
+            if (!('snapshot' in this.game.renderer)) return reject(new Error('目前的繪圖器不支援 snapshot'));
+            this.game.renderer.snapshot((image) => resolve((image as HTMLImageElement).src));
+          }),
         textureSize: (key) => {
           if (!this.textures.exists(key)) return null;
           const source = this.textures.get(key).getSourceImage();
@@ -152,7 +178,7 @@ export class MapScene extends Phaser.Scene {
   private playEvents(events: readonly GameEvent[], before: { x: number; y: number }): void {
     for (const event of events) {
       if (event.type === 'acted') {
-        squashSprite(this, this.player);
+        this.rig.squash();
         playActionEffect(this, event.action, event.x, event.y);
       } else if (event.type === 'slept') {
         sleepEffect(this, this.deps.session.state.player.x, this.deps.session.state.player.y);
@@ -173,8 +199,8 @@ export class MapScene extends Phaser.Scene {
     if (this.renderedMapId !== map.id) {
       this.renderedMapId = map.id;
       this.drawMap(map.id);
-      const foot = footOf(state.player.x, state.player.y);
-      this.player.setPosition(foot.x, foot.y);
+      const stand = standOf(state.player.x, state.player.y);
+      this.rig.teleport(stand.x, stand.y);
       this.frameCamera(map, state.player);
     }
 
@@ -187,7 +213,7 @@ export class MapScene extends Phaser.Scene {
   private showFacing(facing: Direction): void {
     if (facing === this.shownFacing) return;
     this.shownFacing = facing;
-    this.applyAsset(this.player, `player.${facing}`);
+    this.rig.setView(facing);
   }
 
   private drawMap(mapId: string): void {
@@ -238,9 +264,12 @@ export class MapScene extends Phaser.Scene {
   }
 
   private movePlayer(x: number, y: number): void {
-    const foot = footOf(x, y);
-    if (this.player.x === foot.x && this.player.y === foot.y) return;
-    walkBob(this, this.player, foot.x, foot.y, MOVE_DURATION_MS);
+    const stand = standOf(x, y);
+    this.rig.walkTo(stand.x, stand.y, MOVE_DURATION_MS);
+  }
+
+  override update(_time: number, delta: number): void {
+    this.rig.update(delta);
   }
 
   private resolveTexture(assetId: string): string {
@@ -268,11 +297,9 @@ export class MapScene extends Phaser.Scene {
   }
 
   private debugSprites(): SpriteDebugInfo[] {
-    const images = [
-      this.player,
-      ...this.world.getAll().filter((c): c is Phaser.GameObjects.Image => c instanceof Phaser.GameObjects.Image),
-    ];
-    return images.map((image) => {
+    const player = this.rig.debugInfo();
+    const images = this.world.getAll().filter((c): c is Phaser.GameObjects.Image => c instanceof Phaser.GameObjects.Image);
+    const others = images.map((image) => {
       const bounds = image.getBounds();
       return {
         key: image.texture.key,
@@ -283,6 +310,10 @@ export class MapScene extends Phaser.Scene {
         flipX: image.flipX,
       };
     });
+    return [
+      { key: player.key, left: player.left, top: player.top, width: player.width, height: player.height, flipX: player.flipX },
+      ...others,
+    ];
   }
 
   private image(key: string, x: number, y: number, depth: number): Phaser.GameObjects.Image {

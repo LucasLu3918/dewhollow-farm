@@ -43,7 +43,7 @@ domain 負責判斷「可否觸發」與「效果結算」；presentation 的事
 
 ### presentation 擴充
 
-- **鏡頭**（M0 已完成）：跟隨主角，中央留死區、平滑、邊界夾限；地圖比視窗小時邊界擴張讓地圖置中（純函式在 `presentation/camera.ts`，有單元測試）。格子 64 px，視窗固定 16×12 格；效果與占位圖的像素值以 32 px 設計稿為基準，乘上 `UNIT`。開發模式下 `window.__dewhollow` 提供鏡頭位置與地圖 id 給 e2e，正式建置不含。
+- **鏡頭**（M0 已完成）：跟隨主角，中央留死區、平滑、邊界夾限；地圖比視窗小時邊界擴張讓地圖置中（純函式在 `presentation/camera.ts`，有單元測試）。格子 64 px，視窗固定 16×12 格；效果與占位圖的像素值以 32 px 設計稿為基準，乘上 `UNIT`。開發模式下 `window.__dewhollow` 提供鏡頭位置、地圖 id、玩家姿勢與骨架資訊、`setPose`（擺出走路循環任一相位）與 `snapshot`（讀 WebGL 畫面）給 e2e 與逐格檢查，正式建置不含。
 - **地圖**：沿用 ASCII 格式為底，擴充多圖層（地表、物件、遮擋）；碰撞與互動點由 domain 讀取。是否改用 Tiled 見「工具」。
 - **精靈動畫**：以貼圖集（texture atlas）載入，動畫由 `content/animations.json` 描述。
 - **UI**：DOM HUD 擴充為背包、任務、地圖、設定、對話框，遵守 `game-ui-ux` 技能的鍵盤焦點與事件驅動更新。

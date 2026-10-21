@@ -7,6 +7,11 @@ export function footOf(x: number, y: number): { x: number; y: number } {
   return { x: x * TILE_SIZE, y: (y + 1) * TILE_SIZE };
 }
 
+/** 格子底邊的正中央：角色骨架（rig）的軸心，腳底中心站在這裡。 */
+export function standOf(x: number, y: number): { x: number; y: number } {
+  return { x: x * TILE_SIZE + TILE_SIZE / 2, y: (y + 1) * TILE_SIZE };
+}
+
 /** 格子正中央，鏡頭看的位置。 */
 export function centerOf(x: number, y: number): { x: number; y: number } {
   return { x: x * TILE_SIZE + TILE_SIZE / 2, y: y * TILE_SIZE + TILE_SIZE / 2 };

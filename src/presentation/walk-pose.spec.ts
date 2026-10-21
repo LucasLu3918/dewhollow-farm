@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { WALK_PARAM_KEYS } from '../infrastructure/assets/rig-manifest';
 import {
   DEFAULT_WALK_PARAMS,
   REST_POSE,
@@ -226,6 +227,12 @@ describe('effectiveSplit', () => {
 
   it('is its own inverse: flipping twice gives the original', () => {
     expect(effectiveSplit('right', effectiveSplit('right', 62, 128), 128)).toBe(62);
+  });
+});
+
+describe('walk parameters', () => {
+  it('can all be overridden from rigs.json, and nothing else can (one list, two places)', () => {
+    expect([...WALK_PARAM_KEYS].sort()).toEqual(Object.keys(DEFAULT_WALK_PARAMS).sort());
   });
 });
 

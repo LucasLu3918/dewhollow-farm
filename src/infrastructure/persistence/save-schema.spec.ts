@@ -8,10 +8,11 @@ import village from '../../../content/maps/village.json';
 import { createNewGame } from '../../domain/game-state';
 import { loadContent } from '../content/load-content';
 import assets from '../../../content/assets.json';
+import rigs from '../../../content/rigs.json';
 import { SaveFormatError } from './save-errors';
 import { parseSaveRecord } from './save-schema';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets, rigs });
 const context = { inventoryCapacity: pack.tuning.inventory.capacity };
 
 function record(state: unknown) {

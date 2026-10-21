@@ -4,12 +4,13 @@ import npcs from '../../../content/npcs.json';
 import start from '../../../content/start.json';
 import tuning from '../../../content/tuning.json';
 import assets from '../../../content/assets.json';
+import rigs from '../../../content/rigs.json';
 import farm from '../../../content/maps/farm.json';
 import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village], start, tuning, assets, ...overrides };
+  return { crops, npcs, maps: [farm, village], start, tuning, assets, rigs, ...overrides };
 }
 
 describe('loadContent with shipped content', () => {
@@ -25,6 +26,28 @@ describe('loadContent with shipped content', () => {
     ]);
     expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village']);
     expect(pack.start.mapId).toBe('farm');
+  });
+});
+
+describe('loadContent with rigs', () => {
+  it('returns the rigs beside the assets', () => {
+    const loaded = loadContent(shipped());
+    expect(loaded.rigs.rigs.map((r) => r.id)).toEqual(['player']);
+  });
+
+  it('reports a rig that points at a missing asset together with the other problems', () => {
+    const broken = { ...rigs, rigs: [{ ...rigs.rigs[0], views: { ...rigs.rigs[0]?.views, up: 'player.nope' } }] };
+    try {
+      loadContent(shipped({ rigs: broken }));
+      throw new Error('should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ContentError);
+      expect((error as ContentError).problems).toContain('rig player 的 up 素材 player.nope 不存在');
+    }
+  });
+
+  it('rejects a malformed rigs file', () => {
+    expect(() => loadContent(shipped({ rigs: { version: 1, rigs: [{ id: 'x' }] } }))).toThrow();
   });
 });
 

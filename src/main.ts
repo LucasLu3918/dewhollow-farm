@@ -5,6 +5,7 @@ import npcs from '../content/npcs.json';
 import start from '../content/start.json';
 import tuning from '../content/tuning.json';
 import assets from '../content/assets.json';
+import rigs from '../content/rigs.json';
 import farm from '../content/maps/farm.json';
 import village from '../content/maps/village.json';
 import { createContentIndex } from './application/content-index';
@@ -24,7 +25,7 @@ import { VIEW_SIZE } from './presentation/constants';
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
-  const loaded = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets });
+  const loaded = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets, rigs });
   const index = createContentIndex(loaded.pack);
 
   let repository: SaveRepository;
@@ -52,7 +53,7 @@ async function bootstrap(): Promise<void> {
     backgroundColor: '#1d2a1f',
     pixelArt: true,
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
-    scene: [new BootScene({ assets: loaded.assets, session, index, pack: loaded.pack, hud }), new MapScene()],
+    scene: [new BootScene({ assets: loaded.assets, rigs: loaded.rigs, session, index, pack: loaded.pack, hud }), new MapScene()],
   });
 }
 

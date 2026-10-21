@@ -50,7 +50,7 @@ export function footstepDust(scene: Phaser.Scene, x: number, y: number): void {
 }
 
 /** 角色動作的壓扁伸展回饋，例如開墾、澆水時的一下下壓。 */
-export function squashSprite(scene: Phaser.Scene, target: Phaser.GameObjects.Image): void {
+export function squashSprite(scene: Phaser.Scene, target: Phaser.GameObjects.Image | Phaser.GameObjects.Container): void {
   // 以顯示縮放（例如 2x 母版的 0.5）為基準相對變化，不能直接寫死 1.12。
   const base = (target.getData('baseScale') as number | undefined) ?? 1;
   // 連按時上一個壓扁可能還沒結束；先回到基準縮放，避免每次都從歪掉的大小開始。
@@ -64,34 +64,6 @@ export function squashSprite(scene: Phaser.Scene, target: Phaser.GameObjects.Ima
     yoyo: true,
     ease: 'Quad.easeOut',
   });
-}
-
-/**
- * 走路時的上下起伏。位置由一個計數器每幀計算，避免 x、y 兩組補間互相覆蓋。
- * 新的移動會取消尚未結束的舊移動，確保快速按鍵時不會留下殘影。
- */
-export function walkBob(scene: Phaser.Scene, target: Phaser.GameObjects.Image, toX: number, toY: number, duration: number): void {
-  const previous = target.getData('walk') as Phaser.Tweens.Tween | undefined;
-  previous?.stop();
-
-  const fromX = target.x;
-  const fromY = target.y;
-  const walk = scene.tweens.addCounter({
-    from: 0,
-    to: 1,
-    duration,
-    ease: 'Linear',
-    onUpdate: (tween) => {
-      const t = tween.getValue() ?? 0;
-      target.x = fromX + (toX - fromX) * t;
-      target.y = fromY + (toY - fromY) * t - px(3) * Math.sin(Math.PI * t);
-    },
-    onComplete: () => {
-      target.setPosition(toX, toY);
-      target.setData('walk', undefined);
-    },
-  });
-  target.setData('walk', walk);
 }
 
 /** 睡覺時在角色上方飄出 z 字，並以淡出淡入表示時間流逝。 */
