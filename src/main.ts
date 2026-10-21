@@ -83,7 +83,6 @@ async function bootstrap(): Promise<void> {
     hud.error(`無法讀取存檔：${error instanceof Error ? error.message : String(error)}`);
     return;
   }
-  if (session.restored) hud.messages(['已讀取存檔，繼續遊玩。']);
 
   const game = new Phaser.Game({
     type: Phaser.AUTO,

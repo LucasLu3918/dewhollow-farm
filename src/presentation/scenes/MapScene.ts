@@ -288,6 +288,8 @@ export class MapScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener('keydown', this.onKeyDown);
     });
+    // 讀取存檔的提示等到鍵盤已經接上才顯示：提示出現時，按鍵一定會被接到（載入素材的期間按的鍵不算）。
+    if (this.deps.session.restored) this.deps.hud.messages(['已讀取存檔，繼續遊玩。']);
     this.refresh();
   }
 
