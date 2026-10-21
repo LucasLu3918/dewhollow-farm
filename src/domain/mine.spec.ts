@@ -40,6 +40,41 @@ function find(map: MapDef, symbol: string): { x: number; y: number } | null {
   return null;
 }
 
+/**
+ * 從 from 到 to 最少要敲幾塊石頭：空地與樓梯免費，石頭與礦石各算 1，牆不能穿。
+ * 這是礦坑閘門的實際代價；不能走的路回傳 Infinity。
+ */
+function fewestDigs(map: MapDef, from: { x: number; y: number }, to: { x: number; y: number }): number {
+  const size = map.width * map.height;
+  const index = (x: number, y: number): number => y * map.width + x;
+  const dist = new Array<number>(size).fill(Number.POSITIVE_INFINITY);
+  const done = new Array<boolean>(size).fill(false);
+  dist[index(from.x, from.y)] = 0;
+  const target = index(to.x, to.y);
+  for (;;) {
+    let best = -1;
+    for (let i = 0; i < size; i += 1) {
+      const d = dist[i] ?? Number.POSITIVE_INFINITY;
+      if (!done[i] && Number.isFinite(d) && (best < 0 || d < (dist[best] ?? Number.POSITIVE_INFINITY))) best = i;
+    }
+    if (best < 0) return Number.POSITIVE_INFINITY;
+    if (best === target) return dist[best] ?? Number.POSITIVE_INFINITY;
+    done[best] = true;
+    const bx = best % map.width;
+    const by = Math.floor(best / map.width);
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      const nx = bx + dx;
+      const ny = by + dy;
+      const symbol = map.rows[ny]?.[nx];
+      if (symbol === undefined || symbol === '#') continue;
+      const step = symbol === 'r' || symbol === 'o' ? 1 : 0;
+      const ni = index(nx, ny);
+      const next = (dist[best] ?? 0) + step;
+      if (next < (dist[ni] ?? Number.POSITIVE_INFINITY)) dist[ni] = next;
+    }
+  }
+}
+
 function countOf(map: MapDef, symbol: string): number {
   return map.rows.join('').split(symbol).length - 1;
 }
@@ -97,10 +132,49 @@ describe('mine layers', () => {
     }
   });
 
-  it('the rocks across the way grow with depth, up to the cap', () => {
-    expect(blocksOn(1)).toBe(2);
-    expect(blocksOn(10)).toBe(7);
+  it('落石擋住的路不能被繞過：從 < 到 > 至少要敲 blocksOn(層) 塊石頭', () => {
+    for (const layer of [1, 2, 10, 20, 33, MINE_DEPTH - 1]) {
+      for (const seed of [1, 2, 3]) {
+        const map = generateMineLayer(layer, seed);
+        const { up, down } = stairsOf(map);
+        expect(fewestDigs(map, up, down), `layer ${layer} seed ${seed}`).toBeGreaterThanOrEqual(blocksOn(layer));
+      }
+    }
+  });
+
+  it('第 N 層的落石數量：整欄都是石頭的牆恰好有 blocksOn(N) 道', () => {
+    for (const layer of [1, 2, 10, 20, MINE_DEPTH]) {
+      for (const seed of [1, 2, 3]) {
+        const map = generateMineLayer(layer, seed);
+        // 走廊從右到左橫跨 2 到 MINE_WIDTH-3 的每一欄，所以只有落石牆會整欄都是石頭。
+        let walls = 0;
+        for (let x = 2; x <= MINE_WIDTH - 3; x += 1) {
+          let solid = true;
+          for (let y = 1; y < MINE_HEIGHT - 1; y += 1) {
+            const symbol = map.rows[y]?.[x];
+            if (symbol !== 'r' && symbol !== 'o') solid = false;
+          }
+          if (solid) walls += 1;
+        }
+        expect(walls, `layer ${layer} seed ${seed}`).toBe(blocksOn(layer));
+      }
+    }
+  });
+
+  it('the rock walls across the way grow with depth, up to the cap', () => {
+    expect(blocksOn(1)).toBe(4);
+    expect(blocksOn(10)).toBe(22);
     expect(blocksOn(MINE_DEPTH)).toBe(MAX_BLOCKS);
+    // 牆只能排在第 3 到 MINE_WIDTH-4 欄，上限不能超過可用的欄數。
+    expect(MAX_BLOCKS).toBe(MINE_WIDTH - 6);
+  });
+
+  it('the walls on floors 1 to 19 add up to the band that puts floor 20 near the end of summer', () => {
+    // 模擬（npm run sim）的校準：第 20 層約在第 38 天（夏末）。總數落在這個區間內才算接近目標。
+    let digs = 0;
+    for (let layer = 1; layer < 20; layer += 1) digs += blocksOn(layer);
+    expect(digs).toBeGreaterThanOrEqual(380);
+    expect(digs).toBeLessThanOrEqual(420);
   });
 
   it("neighbouring floors line up: a floor's down staircase is where the next floor's up staircase is", () => {
