@@ -50,6 +50,17 @@ body {
   font-weight: 600;
 }
 
+/* 技能列是按鈕（點了打開技能與天賦面板），看起來仍然是一行文字。 */
+.status #hud-skills {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
 .energy {
   display: inline-flex;
   align-items: center;

@@ -34,6 +34,7 @@ function makeContent(slots: number): ContentPack {
     animals: [],
     recipes: [],
     crafting: [],
+    talents: { unlockLevel: 5, defs: [] },
     processing: [
       { id: 'dried-mint', name: '烘乾薄荷', ingredients: { mint: 2 }, output: 'dried-mint', days: 1, level: 0 },
       { id: 'pickle-radish', name: '醃蘿蔔', ingredients: { 'crop.sweet-radish': 1 }, output: 'pickle-radish', days: 2, level: 2 },
@@ -80,7 +81,7 @@ function at(facing: 'up' | 'left' = 'up', overrides: Partial<GameState> = {}): G
     mapId: 'house',
     player: { x: 1, y: 2, facing },
     tool: 'hoe',
-    toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0 },
+    toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 },
     worldChanges: {},
     fishing: null,
     animals: [],

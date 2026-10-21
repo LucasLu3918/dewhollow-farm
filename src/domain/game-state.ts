@@ -15,8 +15,9 @@ import { cropItems, seedItemId } from './items';
 import { createEnergy, type Energy } from './energy';
 import type { PlotMap } from './farm';
 import { createShipBox, type ShipBox } from './shipping';
+import type { TalentChoices } from './talents';
 
-export const SAVE_SCHEMA_VERSION = 11;
+export const SAVE_SCHEMA_VERSION = 12;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -47,6 +48,8 @@ export interface GameState {
   worldChanges: WorldChanges;
   /** 五項技能的經驗（等級由經驗換算，見 skills.ts）。 */
   skills: SkillXp;
+  /** 每項技能已選的天賦 id（5 級才能選，每項只能選一次，見 talents.ts）。 */
+  talents: TalentChoices;
   /** 雞舍裡的動物（依座位排序）。 */
   animals: Animal[];
   /** 加工機裡的批次（醃漬、烘乾）；daysLeft 為 0 表示已完成、等玩家取回。 */
@@ -101,6 +104,7 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     toolTiers: Object.fromEntries(TOOL_IDS.map((tool) => [tool, 0])) as Record<ToolId, number>,
     worldChanges: {},
     skills: emptySkills(),
+    talents: {},
     fishing: null,
     animals: [],
     processing: [],

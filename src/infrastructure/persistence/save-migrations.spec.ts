@@ -27,7 +27,7 @@ function v1State(overrides: Record<string, unknown> = {}): Record<string, unknow
 describe('migrateState v1 → v2', () => {
   it('turns the bag into inventory stacks, seeds first then produce', () => {
     const migrated = migrateState(v1State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(11);
+    expect(migrated.schemaVersion).toBe(12);
     expect(migrated.inventory).toEqual({
       capacity: 24,
       stacks: [
@@ -84,13 +84,13 @@ describe('migrateState v1 → v2', () => {
 
 describe('migrateState version handling', () => {
   it('passes a current-version state through untouched', () => {
-    const current = { schemaVersion: 11, anything: 'goes' };
+    const current = { schemaVersion: 12, anything: 'goes' };
     expect(migrateState(current, context)).toBe(current);
   });
 
   it('refuses a save from a newer game version with a clear message', () => {
-    expect(() => migrateState({ schemaVersion: 12 }, context)).toThrow(SaveFormatError);
-    expect(() => migrateState({ schemaVersion: 12 }, context)).toThrow('更新版本');
+    expect(() => migrateState({ schemaVersion: 13 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState({ schemaVersion: 13 }, context)).toThrow('更新版本');
   });
 
   it('refuses a state without a usable version', () => {
@@ -134,7 +134,7 @@ function v2State(day: number): Record<string, unknown> {
 describe('v2 → v3 (seasons and weather)', () => {
   it('reads the old total day as a season position: day 25 is summer day 5 of year 1', () => {
     const migrated = migrateState(v2State(25), context) as { calendar: unknown; schemaVersion: number };
-    expect(migrated.schemaVersion).toBe(11);
+    expect(migrated.schemaVersion).toBe(12);
     expect(migrated.calendar).toEqual({ year: 1, season: 'summer', day: 5, minuteOfDay: 420 });
   });
 
@@ -163,8 +163,8 @@ function v3State(): Record<string, unknown> {
 describe('v3 → v4 (tool tiers and world changes)', () => {
   it('starts every tool at the basic tier and nothing has been changed in the world yet', () => {
     const migrated = migrateState(v3State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(11);
-    expect(migrated.toolTiers).toEqual({ hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0 });
+    expect(migrated.schemaVersion).toBe(12);
+    expect(migrated.toolTiers).toEqual({ hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 });
     expect(migrated.worldChanges).toEqual({});
   });
 
@@ -172,5 +172,46 @@ describe('v3 → v4 (tool tiers and world changes)', () => {
     const migrated = migrateState(v3State(), context) as Record<string, unknown>;
     expect(migrated.tool).toBe('seedbag');
     expect(migrated.weather).toBe('rain');
+  });
+});
+
+/** 一份合法的 v11 存檔內容（技能天賦與鐮刀之前）。 */
+function v11State(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    ...v2State(3),
+    schemaVersion: 11,
+    calendar: { year: 1, season: 'spring', day: 3, minuteOfDay: 420 },
+    weather: 'sunny',
+    forecast: 'sunny',
+    toolTiers: { hoe: 1, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0 },
+    worldChanges: {},
+    skills: { farming: 210, foraging: 0, fishing: 0, mining: 0, cooking: 0 },
+    fishing: null,
+    animals: [],
+    processing: [],
+    mineSeed: 9,
+    mineCheckpoint: 1,
+    ...overrides,
+  };
+}
+
+describe('v11 → v12 (skill talents and the sickle)', () => {
+  it('starts with no talent chosen for any skill, even for a skill already at level 5', () => {
+    const migrated = migrateState(v11State(), context) as Record<string, unknown>;
+    expect(migrated.schemaVersion).toBe(12);
+    expect(migrated.talents).toEqual({});
+  });
+
+  it('gives the sickle the basic tier and keeps every other tool tier as it was', () => {
+    const migrated = migrateState(v11State(), context) as { toolTiers: Record<string, number> };
+    expect(migrated.toolTiers).toEqual({ hoe: 1, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 });
+  });
+
+  it('keeps everything else, including the skills and the tool in hand', () => {
+    const before = v11State({ tool: 'can' });
+    const migrated = migrateState(before, context) as Record<string, unknown>;
+    for (const key of ['skills', 'worldChanges', 'tool', 'mineSeed', 'calendar']) {
+      expect(migrated[key]).toEqual(before[key]);
+    }
   });
 });

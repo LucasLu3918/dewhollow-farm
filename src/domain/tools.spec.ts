@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { energyCostFor, TOOL_IDS, TOOL_ORDER, toolForAction, type ToolTier } from './tools';
+import { energyCostFor, TOOL_IDS, TOOL_NAMES, TOOL_ORDER, toolForAction, type ToolTier } from './tools';
 
 const TIERS: ToolTier[] = [{ energyDiscount: 0 }, { energyDiscount: 1 }, { energyDiscount: 1 }, { energyDiscount: 2 }];
 
@@ -19,7 +19,13 @@ describe('toolForAction', () => {
 
   it('the Z key cycles the three farm tools; the axe has its own key and is not in the cycle', () => {
     expect(TOOL_ORDER).toEqual(['hoe', 'can', 'seedbag']);
-    expect(TOOL_IDS).toEqual(['hoe', 'can', 'seedbag', 'axe', 'pick', 'rod']);
+    expect(TOOL_IDS).toEqual(['hoe', 'can', 'seedbag', 'axe', 'pick', 'rod', 'sickle']);
+  });
+
+  it('the sickle is named, is not in the Z cycle, and does not take over any farm action', () => {
+    expect(TOOL_NAMES.sickle).toBe('鐮刀');
+    expect(TOOL_ORDER).not.toContain('sickle');
+    expect(toolForAction('forage')).toBeNull();
   });
 });
 

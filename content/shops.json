@@ -137,6 +137,32 @@
             "wood": 30,
             "copper-ore": 10
           }
+        },
+        {
+          "toolId": "sickle",
+          "tier": 1,
+          "gold": 2000,
+          "items": {
+            "wood": 10
+          }
+        },
+        {
+          "toolId": "sickle",
+          "tier": 2,
+          "gold": 5000,
+          "items": {
+            "wood": 20,
+            "copper-ore": 5
+          }
+        },
+        {
+          "toolId": "sickle",
+          "tier": 3,
+          "gold": 10000,
+          "items": {
+            "wood": 30,
+            "copper-ore": 10
+          }
         }
       ]
     }

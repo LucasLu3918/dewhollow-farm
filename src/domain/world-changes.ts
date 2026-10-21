@@ -1,10 +1,11 @@
 import type { TileKind } from './content';
 
 /**
- * 玩家造成的地圖變化：被砍掉的樹（永久）與被採過的野薄荷（隔日恢復）。
+ * 玩家造成的地圖變化：被砍掉的樹與被鐮刀割掉的草叢（永久）、被採過的野薄荷（隔日恢復）、
+ * 敲掉的石頭與礦石、清開的落石（永久）。
  * 鍵為 "地圖,x,y"，值為變化的種類。地圖本身（content/maps）不會被改動。
  */
-export type WorldChange = 'chopped' | 'picked' | 'mined' | 'cleared';
+export type WorldChange = 'chopped' | 'picked' | 'mined' | 'cleared' | 'cut';
 export type WorldChanges = Record<string, WorldChange>;
 
 const keyOf = (mapId: string, x: number, y: number): string => `${mapId},${x},${y}`;

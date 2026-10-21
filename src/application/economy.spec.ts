@@ -17,6 +17,7 @@ const content: ContentPack = {
   crops: [{ id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 20, growthDays: 2, seasons: ['spring'] }],
   npcs: [],
   crafting: [],
+  talents: { unlockLevel: 5, defs: [] },
   processing: [],
   recipes: [],
   animals: [],
@@ -102,7 +103,7 @@ function run(state: GameState, command: Command) {
 }
 
 function fresh(overrides: Partial<GameState> = {}): GameState {
-  return { ...createNewGame(content, 7), mapId: 'yard', toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0 }, worldChanges: {}, ...overrides };
+  return { ...createNewGame(content, 7), mapId: 'yard', toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 }, worldChanges: {}, ...overrides };
 }
 
 describe('chopping a tree with the axe', () => {
@@ -188,7 +189,7 @@ describe('the smithy', () => {
   });
 
   it('the next tier needs copper ore, which the player cannot have yet: refused, nothing changes', () => {
-    const state = at(withItems(fresh({ gold: 2000, toolTiers: { hoe: 1, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0 } }), { wood: 50 }), 4, 3, 'up', 'hoe');
+    const state = at(withItems(fresh({ gold: 2000, toolTiers: { hoe: 1, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 } }), { wood: 50 }), 4, 3, 'up', 'hoe');
     const out = run(state, { type: 'upgrade', shopId: 'smithy', toolId: 'hoe' });
     expect(out.state.toolTiers.hoe).toBe(1);
     expect(out.state.gold).toBe(2000);

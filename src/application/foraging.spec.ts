@@ -37,6 +37,7 @@ const content: ContentPack = {
   animals: [],
   recipes: [],
   crafting: [],
+  talents: { unlockLevel: 5, defs: [] },
   processing: [],
   shops: [],
   start: { mapId: 'grove', gold: 0, seeds: {} },

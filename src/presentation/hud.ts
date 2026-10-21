@@ -4,6 +4,7 @@ import type { GameState } from '../domain/game-state';
 import { TOOL_NAMES, type ToolId } from '../domain/tools';
 import { levelOf, SKILL_IDS, SKILL_NAMES } from '../domain/skills';
 import { WEATHER_NAMES } from '../domain/weather';
+import { pendingTalentSkills } from './skill-panel';
 
 const LOG_LIMIT = 6;
 
@@ -38,13 +39,20 @@ export class Hud {
     this.day.textContent = dateLabel(state.calendar);
     this.weather.textContent = `${WEATHER_NAMES[state.weather]}　明天：${WEATHER_NAMES[state.forecast]}`;
     this.gold.textContent = `${state.gold} 金`;
-    this.skills.textContent = SKILL_IDS.map((id) => `${SKILL_NAMES[id]} ${levelOf(state.skills[id], pack.tuning.skills.thresholds)}`).join('　');
+    const pending = pendingTalentSkills(state, pack.tuning.skills.thresholds, pack.talents).length;
+    const levels = SKILL_IDS.map((id) => `${SKILL_NAMES[id]} ${levelOf(state.skills[id], pack.tuning.skills.thresholds)}`).join('　');
+    this.skills.textContent = pending > 0 ? `${levels}　（有 ${pending} 項可選天賦）` : levels;
     const ratio = Math.max(0, Math.min(1, state.energy.current / (state.energy.max || 1)));
     this.energyFill.style.width = `${Math.round(ratio * 100)}%`;
     this.energyText.textContent = `${state.energy.current} / ${state.energy.max}`;
     this.tool.textContent = TOOL_NAMES[state.tool];
     const crop = pack.crops.find((c) => c.id === state.selectedSeed);
     this.seed.textContent = state.tool === 'seedbag' ? `種子：${crop?.name ?? state.selectedSeed}` : '';
+  }
+
+  /** 點技能列就打開技能與天賦面板（鍵盤的 K 也一樣）。 */
+  bindSkills(onOpen: () => void): void {
+    this.skills.addEventListener('click', onOpen);
   }
 
   messages(lines: readonly string[]): void {

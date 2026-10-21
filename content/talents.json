@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "note": "技能天賦：技能到 unlockLevel 級時，從該技能的兩個天賦裡選一個，每項技能只能選一次。天賦只改產出與售價，不改任何動作的體力成本（見 docs/PLAYTIME_PLAN.md 第 3 節 K）。effect.type：extraYield 多一件的機率（action 為 harvest、forage、chop 或 mine，item 可限定物品）；sellBonus 指定種類的出貨售價加成（百分比）；biteBonus 投竿上鉤機率加成（百分點）；dishEnergy 料理多回復的體力。",
+  "unlockLevel": 5,
+  "talents": [
+    {
+      "id": "bountiful",
+      "skill": "farming",
+      "name": "豐收手",
+      "description": "收成時多一件的機率 +25%",
+      "effect": { "type": "extraYield", "action": "harvest", "chance": 0.25 }
+    },
+    {
+      "id": "market-sense",
+      "skill": "farming",
+      "name": "行商眼",
+      "description": "作物出貨售價 +10%",
+      "effect": { "type": "sellBonus", "kinds": ["crop"], "percent": 10 }
+    },
+    {
+      "id": "wild-nose",
+      "skill": "foraging",
+      "name": "野地鼻",
+      "description": "採到野菜時多一份的機率 +25%",
+      "effect": { "type": "extraYield", "action": "forage", "chance": 0.25 }
+    },
+    {
+      "id": "timber-eye",
+      "skill": "foraging",
+      "name": "林間眼",
+      "description": "砍下木材時多一根的機率 +25%",
+      "effect": { "type": "extraYield", "action": "chop", "chance": 0.25 }
+    },
+    {
+      "id": "keen-bite",
+      "skill": "fishing",
+      "name": "好手氣",
+      "description": "投竿後魚上鉤的機率 +10 個百分點",
+      "effect": { "type": "biteBonus", "points": 10 }
+    },
+    {
+      "id": "fish-buyer",
+      "skill": "fishing",
+      "name": "魚販交情",
+      "description": "魚的出貨售價 +10%",
+      "effect": { "type": "sellBonus", "kinds": ["fish"], "percent": 10 }
+    },
+    {
+      "id": "ore-sense",
+      "skill": "mining",
+      "name": "礦脈眼",
+      "description": "敲礦石時多一個的機率 +25%",
+      "effect": { "type": "extraYield", "action": "mine", "item": "copper-ore", "chance": 0.25 }
+    },
+    {
+      "id": "stone-hand",
+      "skill": "mining",
+      "name": "碎石手",
+      "description": "敲石頭時多一個的機率 +25%",
+      "effect": { "type": "extraYield", "action": "mine", "item": "stone", "chance": 0.25 }
+    },
+    {
+      "id": "hearty-cook",
+      "skill": "cooking",
+      "name": "好食量",
+      "description": "吃料理時多回復 2 點體力",
+      "effect": { "type": "dishEnergy", "amount": 2 }
+    },
+    {
+      "id": "dish-trader",
+      "skill": "cooking",
+      "name": "料理行家",
+      "description": "料理與加工品的出貨售價 +10%",
+      "effect": { "type": "sellBonus", "kinds": ["dish", "processed"], "percent": 10 }
+    }
+  ]
+}

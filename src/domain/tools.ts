@@ -1,10 +1,10 @@
 import type { ActionKind } from './tuning';
 
 /** 所有工具。 */
-export const TOOL_IDS = ['hoe', 'can', 'seedbag', 'axe', 'pick', 'rod'] as const;
+export const TOOL_IDS = ['hoe', 'can', 'seedbag', 'axe', 'pick', 'rod', 'sickle'] as const;
 export type ToolId = (typeof TOOL_IDS)[number];
 
-/** 按 Z 循環的工具（三件農具）。斧頭用 A 鍵直接取出，不進循環，既有的按鍵次數不變。 */
+/** 按 Z 循環的工具（三件農具）。斧頭、鎬、釣竿、鐮刀用字母鍵直接取出，不進循環，既有的按鍵次數不變。 */
 export const TOOL_ORDER: readonly ToolId[] = ['hoe', 'can', 'seedbag'];
 
 export const TOOL_NAMES: Record<ToolId, string> = {
@@ -14,6 +14,7 @@ export const TOOL_NAMES: Record<ToolId, string> = {
   axe: '斧頭',
   pick: '鎬',
   rod: '釣竿',
+  sickle: '鐮刀',
 };
 
 /** 階級名稱：0 基礎、1 銅、2 銀、3 金。 */

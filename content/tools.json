@@ -84,6 +84,20 @@
         "y": 68
       },
       "swing": "pour"
+    },
+    {
+      "id": "sickle",
+      "action": "forage",
+      "asset": "tool.sickle",
+      "textureSize": {
+        "width": 96,
+        "height": 96
+      },
+      "grip": {
+        "x": 42,
+        "y": 68
+      },
+      "swing": "chop"
     }
   ]
 }

@@ -18,6 +18,7 @@ import animals from '../content/animals.json';
 import recipes from '../content/recipes.json';
 import processing from '../content/processing.json';
 import crafting from '../content/crafting.json';
+import talents from '../content/talents.json';
 import forest from '../content/maps/forest.json';
 import lake from '../content/maps/lake.json';
 import house from '../content/maps/house.json';
@@ -44,7 +45,7 @@ import { SoundPlayer } from './presentation/audio/sound-player';
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
-  const loaded = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
+  const loaded = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents });
   const index = createContentIndex(loaded.pack);
 
   let repository: SaveRepository;

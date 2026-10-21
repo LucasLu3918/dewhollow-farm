@@ -21,6 +21,7 @@ import type { Quality } from '../domain/items';
 import { energyCostFor, toolForAction, TIER_NAMES, TOOL_NAMES } from '../domain/tools';
 import { rollWeather, WEATHER_NAMES, waters } from '../domain/weather';
 import type { ActionKind } from '../domain/tuning';
+import { applySellBonus, biteBonusPoints, dishEnergyBonus, extraYieldChance, rollExtraYield, sellBonusPercent } from '../domain/talents';
 import type { ContentIndex } from './content-index';
 
 export type Command =
@@ -46,6 +47,8 @@ export type Command =
   | { type: 'collectProcessing' }
   /** 在工作台前面合成一項（配方在 crafting.json）。 */
   | { type: 'craft'; recipeId: string }
+  /** 技能到 5 級後，從該技能的兩個天賦裡選一個（每項技能只能選一次；不花體力與時間）。 */
+  | { type: 'chooseTalent'; talentId: string }
   | { type: 'manualSave' };
 
 export type GameEvent =
@@ -113,6 +116,10 @@ const FAILURE_MESSAGES: Record<string, string> = {
   BAG_MAX: '木箱已經放滿了，背包不能再加了',
   OUT_OF_SEASON: '這裡的野菜還沒長出來',
   ALREADY_FERTILIZED: '這塊田已經施過肥了',
+  NEED_SICKLE: '要先切到鐮刀才能割草',
+  TALENT_LOCKED: '技能要到 5 級才能選天賦',
+  TALENT_TAKEN: '這項技能已經選過天賦了',
+  NO_TALENT: '沒有這個天賦',
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
@@ -160,6 +167,8 @@ export function executeCommand(current: GameState, command: Command, index: Cont
       const i = ids.indexOf(state.selectedSeed);
       return reply({ ...state, selectedSeed: ids[(i + 1) % ids.length] ?? state.selectedSeed });
     }
+    case 'chooseTalent':
+      return chooseTalent(state, command.talentId, index);
     case 'manualSave':
       return reply(state, [], [{ type: 'saveRequested' }]);
   }
@@ -231,6 +240,7 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
   if (kind === 'shop') return reply(state, [], [{ type: 'shopOpened', shopId: tile.shop ?? '' }]);
   if (tile.kind === 'forage') return forage(state, target, index);
   if (kind === 'tree') return chopTree(state, target, index);
+  if (kind === 'tuft') return cutGrass(state, target, index);
 
   const key = plotKey(target.x, target.y);
   if (kind === 'field' || state.plots[key]) return workPlot(state, key, index);
@@ -250,15 +260,17 @@ function spendThen(
   action: ActionKind,
   index: ContentIndex,
   apply: (s: GameState) => Result<GameState, string>,
+  /** 體力與經驗預設依動作本身；鐮刀割草的體力沿用砍樹、經驗算採集。 */
+  options: { cost?: number; xp?: ActionKind } = {},
 ): Result<GameState, string> {
   const applied = apply(state);
   if (!applied.ok) return applied;
-  const energy = trySpend(state.energy, actionCost(state, action, index));
+  const energy = trySpend(state.energy, options.cost ?? actionCost(state, action, index));
   if (!energy.ok) return fail('NOT_ENOUGH_ENERGY');
   return ok({
     ...applied.value,
     energy: energy.value,
-    skills: gainXp(applied.value.skills, action, index),
+    skills: gainXp(applied.value.skills, options.xp ?? action, index),
     calendar: advanceMinutes(applied.value.calendar, index.tuning.time.minutesPerAction),
   });
 }
@@ -276,8 +288,9 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
       if (!harvested.ok) return fail(harvested.reason);
       const roll = rollInt(s.rng, index.tuning.harvest.min, index.tuning.harvest.max);
       const level = levelOf(s.skills.farming, index.tuning.skills.thresholds);
-      const count = roll.value + bonusYield(level, index.tuning.skills);
-      const q = rollInt(roll.rng, 0, 999);
+      const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'harvest'));
+      const count = roll.value + bonusYield(level, index.tuning.skills) + extra.value;
+      const q = rollInt(extra.rng, 0, 999);
       quality = qualityFor(level, q.value / 1000, fertilizedSkillTuning(index.tuning.skills, plot?.fertilizer, index.tuning.fertilizer));
       const stored = addItem(s.inventory, index.item(cropItemId(harvested.value.cropId)), count, quality);
       if (!stored.ok) return fail(stored.reason);
@@ -413,9 +426,12 @@ function sleep(state: GameState, index: ContentIndex): CommandOutcome {
   const laid = layEggs(state, index);
   const forecast = rollWeather(index.weather, calendar.season, laid.rng);
   const processing = passDays(state.processing);
-  const settled = settleShipBox(state.shipBox, (itemId, quality) =>
-    priceWithQuality(index.item(itemId).sellPrice ?? 0, quality),
-  );
+  // 售價：品質倍率之後，再加上已選天賦的售價加成（依物品種類，見 talents.ts）。
+  const settled = settleShipBox(state.shipBox, (itemId, quality) => {
+    const item = index.item(itemId);
+    const bonus = sellBonusPercent(state.talents, index.talents.defs, item.kind);
+    return applySellBonus(priceWithQuality(item.sellPrice ?? 0, quality), bonus);
+  });
   const next: GameState = {
     ...state,
     calendar,
@@ -481,7 +497,7 @@ function cast(state: GameState, target: Point, index: ContentIndex): CommandOutc
   const events: GameEvent[] = [{ type: 'acted', action: 'fish', x: target.x, y: target.y }];
   const baitInBag = countOf(state.inventory, 'bait') > 0;
   const baitLeft = baitInBag ? removeItem(state.inventory, 'bait', 1) : null;
-  const chance = biteChanceFor(index.tuning.fishing, { bobber: state.flags.bobber === true, bait: baitInBag });
+  const chance = Math.min(100, biteChanceFor(index.tuning.fishing, { bobber: state.flags.bobber === true, bait: baitInBag }) + biteBonusPoints(state.talents, index.talents.defs));
   if (bite.value < chance && available.length > 0) {
     const total = available.reduce((sum, f) => sum + f.weight, 0);
     const pick = rollInt(rng, 1, total);
@@ -526,12 +542,13 @@ function mineRock(state: GameState, target: Point, kind: 'rock' | 'ore', index: 
   const result = spendThen(state, 'mine', index, (s) => {
     const roll = rollInt(s.rng, range.min, range.max);
     const bonus = kind === 'ore' ? bonusYield(levelOf(s.skills.mining, index.tuning.skills.thresholds), index.tuning.skills) : 0;
-    const count = roll.value + bonus;
+    const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'mine', itemId));
+    const count = roll.value + bonus + extra.value;
     const stored = addItem(s.inventory, index.item(itemId), count);
     if (!stored.ok) return fail(stored.reason);
     yielded = count;
     const worldChanges = withChange(s.worldChanges, s.mapId, target.x, target.y, 'mined');
-    return ok({ ...s, inventory: stored.value, rng: roll.rng, worldChanges });
+    return ok({ ...s, inventory: stored.value, rng: extra.rng, worldChanges });
   });
   return finish(state, result, `敲下了 ${yielded} 個${index.item(itemId).name}`, { action: 'mine', key: plotKey(target.x, target.y) });
 }
@@ -550,12 +567,13 @@ function chopTree(state: GameState, target: Point, index: ContentIndex): Command
   let yielded = 0;
   const result = spendThen(state, 'chop', index, (s) => {
     const roll = rollInt(s.rng, index.tuning.gathering.wood.min, index.tuning.gathering.wood.max);
-    const count = roll.value + bonusYield(levelOf(s.skills.foraging, index.tuning.skills.thresholds), index.tuning.skills);
+    const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'chop'));
+    const count = roll.value + bonusYield(levelOf(s.skills.foraging, index.tuning.skills.thresholds), index.tuning.skills) + extra.value;
     const stored = addItem(s.inventory, index.item('wood'), count);
     if (!stored.ok) return fail(stored.reason);
     yielded = count;
     const worldChanges = withChange(s.worldChanges, s.mapId, target.x, target.y, 'chopped');
-    return ok({ ...s, inventory: stored.value, rng: roll.rng, worldChanges });
+    return ok({ ...s, inventory: stored.value, rng: extra.rng, worldChanges });
   });
   return finish(state, result, `砍下了 ${yielded} 根木材`, { action: 'chop', key: plotKey(target.x, target.y) });
 }
@@ -572,13 +590,52 @@ function forage(state: GameState, target: Point, index: ContentIndex): CommandOu
   let yielded = 0;
   const result = spendThen(state, 'forage', index, (s) => {
     const roll = rollInt(s.rng, index.tuning.gathering.forage.min, index.tuning.gathering.forage.max);
-    const stored = addItem(s.inventory, index.item(itemId), roll.value);
+    const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'forage', itemId));
+    const count = roll.value + extra.value;
+    const stored = addItem(s.inventory, index.item(itemId), count);
     if (!stored.ok) return fail(stored.reason);
-    yielded = roll.value;
+    yielded = count;
     const worldChanges = withChange(s.worldChanges, s.mapId, target.x, target.y, 'picked');
-    return ok({ ...s, inventory: stored.value, rng: roll.rng, worldChanges });
+    return ok({ ...s, inventory: stored.value, rng: extra.rng, worldChanges });
   });
   return finish(state, result, `採到了 ${yielded} 個${index.item(itemId).name}`, { action: 'forage', key: plotKey(target.x, target.y) });
+}
+
+/**
+ * 用鐮刀割草叢：得到乾草，草叢變成草地（永久，不像野薄荷隔日恢復）。
+ * 體力沿用砍樹的消耗（chop），由鐮刀的階級打折；經驗算在採集上。沒有鐮刀時不動作。
+ */
+function cutGrass(state: GameState, target: Point, index: ContentIndex): CommandOutcome {
+  if (state.tool !== 'sickle') return reply(state, [messageFor('NEED_SICKLE')], [refused('NEED_SICKLE')]);
+  const cost = energyCostFor(index.tuning.energy.costs.chop, state.toolTiers.sickle, index.tuning.tools.tiers);
+  let yielded = 0;
+  const result = spendThen(
+    state,
+    'forage',
+    index,
+    (s) => {
+      const roll = rollInt(s.rng, index.tuning.gathering.forage.min, index.tuning.gathering.forage.max);
+      const stored = addItem(s.inventory, index.item('hay'), roll.value);
+      if (!stored.ok) return fail(stored.reason);
+      yielded = roll.value;
+      const worldChanges = withChange(s.worldChanges, s.mapId, target.x, target.y, 'cut');
+      return ok({ ...s, inventory: stored.value, rng: roll.rng, worldChanges });
+    },
+    { cost, xp: 'forage' },
+  );
+  return finish(state, result, `割下了 ${yielded} 把乾草`, { action: 'forage', key: plotKey(target.x, target.y) });
+}
+
+/**
+ * 選天賦：技能要到解鎖等級、而且這項技能還沒選過才能選。失敗時只回傳原因，不改狀態、不花體力。
+ */
+function chooseTalent(state: GameState, talentId: string, index: ContentIndex): CommandOutcome {
+  const def = index.talents.defs.find((t) => t.id === talentId);
+  if (!def) return reply(state, [messageFor('NO_TALENT')], [refused('NO_TALENT')]);
+  const level = levelOf(state.skills[def.skill], index.tuning.skills.thresholds);
+  if (level < index.talents.unlockLevel) return reply(state, [messageFor('TALENT_LOCKED')], [refused('TALENT_LOCKED')]);
+  if (state.talents[def.skill] !== undefined) return reply(state, [messageFor('TALENT_TAKEN')], [refused('TALENT_TAKEN')]);
+  return reply({ ...state, talents: { ...state.talents, [def.skill]: def.id } }, [`選定了天賦「${def.name}」`]);
 }
 
 /** 玩家是否面向指定商店的櫃檯。 */
@@ -849,7 +906,7 @@ function eat(state: GameState, itemId: string, index: ContentIndex): CommandOutc
   const recipe = index.recipe(itemId.slice('dish.'.length));
   const taken = removeItem(state.inventory, itemId, 1);
   if (!taken.ok) return reply(state, [messageFor('NO_DISH')], [refused('NO_DISH')]);
-  const current = Math.min(state.energy.max, state.energy.current + recipe.energy);
+  const current = Math.min(state.energy.max, state.energy.current + recipe.energy + dishEnergyBonus(state.talents, index.talents.defs));
   const gained = current - state.energy.current;
   return reply(
     { ...state, inventory: taken.value, energy: { ...state.energy, current } },

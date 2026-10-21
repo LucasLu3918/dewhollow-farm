@@ -45,6 +45,7 @@ const content: ContentPack = {
   ],
   fish: [],
   crafting: [],
+  talents: { unlockLevel: 5, defs: [] },
   processing: [],
   recipes: [],
   animals: [{ id: 'chicken', name: '雞', eggItem: 'egg', eggQuality: 0.3 }],
@@ -87,7 +88,7 @@ function fresh(overrides: Partial<GameState> = {}): GameState {
   return {
     ...createNewGame(content, 7),
     mapId: 'yard',
-    toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0 },
+    toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 },
     worldChanges: {},
     fishing: null,
     animals: [],

@@ -33,6 +33,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   8: migrateV8ToV9,
   9: migrateV9ToV10,
   10: migrateV10ToV11,
+  11: migrateV11ToV12,
 };
 
 /**
@@ -194,6 +195,23 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v11 → v12：技能天賦（舊存檔的五項技能都還沒有選過天賦）與鐮刀（階級為基礎）。
+ * 天賦與鐮刀共用這一次升版，之後的新欄位要另外升版。
+ */
+function migrateV11ToV12(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(11), toolTiers: z.record(z.string(), z.number()) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v11 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 12,
+    toolTiers: { ...parsed.data.toolTiers, sickle: 0 },
+    talents: {},
+  };
 }
 
 /** v10 → v11：施肥（田的 fertilizer 是選填欄位，舊存檔的田都沒有肥料）；只升版本。 */
