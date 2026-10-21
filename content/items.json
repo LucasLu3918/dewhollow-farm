@@ -245,6 +245,12 @@
       "name": "牛舍改建",
       "kind": "building",
       "maxStack": 1
+    },
+    {
+      "id": "star-shard",
+      "name": "星河碎片",
+      "kind": "material",
+      "maxStack": 99
     }
   ]
 }

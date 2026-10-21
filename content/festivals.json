@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "note": "節慶（M5c）。日期、地點與開放時段由 src/domain/festival.ts 判斷；這裡只放活動的數值與文字。每項活動每年只算一次（紀錄用年份）。swaps 的居民要正好在鎮廣場才能交換（看他的行程）。stars 是夜市的釣星星：收網區間與星河碎片。playMinutes 為內容時數的估計。文字為本專案原創。",
+  "festivals": [
+    {
+      "id": "sprout",
+      "name": "萌芽祭",
+      "season": "spring",
+      "day": 12,
+      "mapId": "plaza",
+      "fromMinute": 0,
+      "playMinutes": 9,
+      "swaps": [
+        { "npcId": "maomao", "give": { "itemId": "crop.moon-bean", "count": 2 }, "receive": { "itemId": "seed.star-pepper", "count": 1 } },
+        { "npcId": "rong-bo", "give": { "itemId": "crop.sweet-radish", "count": 2 }, "receive": { "itemId": "seed.dusk-potato", "count": 1 } },
+        { "npcId": "zhi-lan", "give": { "itemId": "crop.dew-grass", "count": 3 }, "receive": { "itemId": "seed.silver-wheat", "count": 1 } },
+        { "npcId": "xiao-sui", "give": { "itemId": "crop.dew-grass", "count": 1 }, "receive": { "itemId": "seed.star-pepper", "count": 1 } }
+      ],
+      "crown": { "gold": 80 },
+      "contest": { "count": 3, "gold": 200 }
+    },
+    {
+      "id": "starmarket",
+      "name": "星河夜市",
+      "season": "summer",
+      "day": 14,
+      "mapId": "plaza",
+      "fromMinute": 1080,
+      "playMinutes": 10,
+      "shop": "night-market",
+      "stars": { "cycleMs": 1600, "zone": { "from": 0.6, "to": 0.7 }, "itemId": "star-shard" }
+    }
+  ]
+}

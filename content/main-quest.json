@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "note": "主線（M5c）第 1–3 章。每章的步驟只看旗標（talked:<居民>、done:till、done:ship、attended:<節慶>、lakeBridge）或委託紀錄（quest）；全部達成後發獎勵並推進到下一章。lakeBridge 由 M5d 的社區修復設定，所以第 3 章要等 M5d 才能完成。章節文字為本專案原創。playMinutes 為內容時數的估計。",
+  "chapters": [
+    {
+      "id": "prologue",
+      "number": 1,
+      "title": "序章：第一塊田",
+      "window": "春 1–3",
+      "phase": "spring",
+      "intro": "晨露農場的第一天。毛毛說你來得正好，這片田等了很久。",
+      "steps": [
+        { "hint": "到村子找毛毛說說話", "flag": "talked:maomao" },
+        { "hint": "用鋤頭開墾一塊田", "flag": "done:till" },
+        { "hint": "把作物放進出貨箱", "flag": "done:ship" }
+      ],
+      "complete": "第一批作物已經裝進出貨箱。毛毛說，明天的田會比今天更好看。",
+      "reward": { "gold": 200, "items": { "seed.moon-bean": 2 }, "flag": "main:1" },
+      "playMinutes": 6
+    },
+    {
+      "id": "townsfolk",
+      "number": 2,
+      "title": "鎮上的人",
+      "window": "春 4–15",
+      "phase": "spring",
+      "intro": "鎮上的人都還不太認得你。去打個招呼，順便看看佈告欄上有什麼事。",
+      "steps": [
+        { "hint": "和榕伯說過話", "flag": "talked:rong-bo" },
+        { "hint": "和阿柑說過話", "flag": "talked:a-gan" },
+        { "hint": "和石師傅說過話", "flag": "talked:shi-shifu" },
+        { "hint": "和芷蘭說過話", "flag": "talked:zhi-lan" },
+        { "hint": "和小穗說過話", "flag": "talked:xiao-sui" },
+        { "hint": "完成毛毛的第一件委託", "quest": "maomao-walk" }
+      ],
+      "complete": "大家都認得你了。榕伯把一張新的告示貼在佈告欄上，寫的是你的名字。",
+      "reward": { "gold": 300, "items": { "seed.sweet-radish": 3 }, "flag": "main:2" },
+      "playMinutes": 8
+    },
+    {
+      "id": "sprout-and-lake",
+      "number": 3,
+      "title": "萌芽祭與湖",
+      "window": "春末–夏中",
+      "phase": "summer",
+      "intro": "萌芽祭快到了。湖畔的橋被水沖壞一角，過去要繞很遠的路。",
+      "steps": [
+        { "hint": "在萌芽祭參加一項活動", "flag": "attended:sprout" },
+        { "hint": "修復湖畔的橋（M5d 開放）", "flag": "lakeBridge" }
+      ],
+      "complete": "橋修好了，湖的那一邊又連起來了。夏天真的來了。",
+      "reward": { "gold": 400, "flag": "main:3" },
+      "playMinutes": 8
+    }
+  ]
+}

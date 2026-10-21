@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "櫃檯放在地圖上（tile.kind 為 shop，tile.shop 指向這裡的 id）。鐵匠的升級需要銅礦石，礦坑完成前買不到，這是有意的。雜貨店的 building.cowbarn 是牛舍改建（花金幣、只能買一次），改建後才買得到牛（animal.cow）。",
+  "note": "櫃檯放在地圖上（tile.kind 為 shop，tile.shop 指向這裡的 id）。鐵匠的升級需要銅礦石，礦坑完成前買不到，這是有意的。雜貨店的 building.cowbarn 是牛舍改建（花金幣、只能買一次），改建後才買得到牛（animal.cow）。夜市攤位（night-market）只在節慶開放時買得到（festival 指向 festivals.json），每項有 limit 的數量限制，每年重算。",
   "shops": [
     {
       "id": "general",
@@ -34,6 +34,18 @@
           "itemId": "animal.cow",
           "price": 1200
         }
+      ],
+      "upgrades": []
+    },
+    {
+      "id": "night-market",
+      "name": "星河夜市攤位",
+      "festival": "starmarket",
+      "stock": [
+        { "itemId": "seed.star-pepper", "price": 60, "limit": 4 },
+        { "itemId": "fertilizer-fine", "price": 120, "limit": 2 },
+        { "itemId": "bait", "price": 30, "limit": 6 },
+        { "itemId": "lantern", "price": 150, "limit": 1 }
       ],
       "upgrades": []
     },
