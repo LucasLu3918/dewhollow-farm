@@ -93,12 +93,11 @@ async function pressAndRecordTool(page: Page, key: string, windowMs = 700): Prom
 
 /** 走到 (x,y)，最後一步朝 `last` 方向移動，讓角色面向那個方向。 */
 const toTilledEdge = {
-  /** 站在 (3,4)，剛往右走進來，面向右邊的田地 (4,4)。（(2,7) 是出貨箱，所以不能沿著第 2 欄走。） */
+  /** 站在 (4,5)，剛往右走進來，面向右邊的田地 (5,5)。（(2,7) 是出貨箱、(2,4) 是小屋的門，所以不走第 2 欄。） */
   right: async (page: Page) => {
     await press(page, 'ArrowLeft', 4); // (7,9) → (3,9)
-    await press(page, 'ArrowUp', 5); // → (3,4)
-    await press(page, 'ArrowLeft'); // → (2,4)
-    await press(page, 'ArrowRight'); // → (3,4)，面向右
+    await press(page, 'ArrowUp', 4); // → (3,5)
+    await press(page, 'ArrowRight'); // → (4,5)，面向右
   },
   /** 站在 (10,4)，剛往左走進來，面向左邊的田地 (9,4)。 */
   left: async (page: Page) => {
@@ -365,7 +364,7 @@ test.describe('emotes', () => {
 
   test('a villager shows love for the first gift and a happy note after that', async ({ page }) => {
     await waitForGame(page);
-    await press(page, 'ArrowDown', 14);
+    await press(page, 'ArrowDown', 20);
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
     await press(page, 'ArrowRight', 3);
     await press(page, 'ArrowUp', 4); // (10,6)，面向北邊的毛毛 (10,5)
@@ -382,9 +381,15 @@ test.describe('emotes', () => {
 
   test('going to bed shows a sleepy Z', async ({ page }) => {
     await waitForGame(page);
-    await press(page, 'ArrowUp', 8); // (7,9) → (7,1)
-    await press(page, 'ArrowLeft', 4); // → (3,1)，面向床 (2,1)
-    await expect.poll(async () => (await player(page)).tileX).toBe(3);
+    await press(page, 'ArrowUp', 4); // (7,9) → (7,5)
+    await press(page, 'ArrowLeft', 5); // → (2,5)，正下方是小屋的門 (2,4)
+    await press(page, 'ArrowUp'); // 進小屋，落在 (4,5)
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
+    await press(page, 'ArrowUp', 3); // → (4,2)（工作台在 (4,1)）
+    await press(page, 'ArrowLeft', 2); // → (2,2)
+    await press(page, 'ArrowUp'); // → (2,1)
+    await press(page, 'ArrowLeft'); // 床 (1,1) 擋住，只轉向，面向床
+    await expect.poll(async () => (await player(page)).tileX).toBe(2);
     await settle(page);
     await press(page, 'x');
     await expect.poll(async () => (await emotes(page)).map((e) => `${e.who}:${e.kind}`)).toContain('player:sleepy');

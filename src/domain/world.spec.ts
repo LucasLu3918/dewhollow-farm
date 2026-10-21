@@ -45,3 +45,14 @@ describe('world', () => {
     expect(neighbor({ x: 1, y: 1 }, 'left')).toEqual({ x: 0, y: 1 });
   });
 });
+
+describe('walkable tiles (M3 additions)', () => {
+  it('indoor floors are walkable; caves, rocks and furniture block the way', () => {
+    expect(isWalkable('floor')).toBe(true);
+    expect(isWalkable('cave')).toBe(false);
+    expect(isWalkable('rock')).toBe(false);
+    expect(isWalkable('furniture')).toBe(false);
+    expect(isWalkable('tree')).toBe(false);
+    expect(isWalkable('water')).toBe(false);
+  });
+});

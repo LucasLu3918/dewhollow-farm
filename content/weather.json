@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "note": "每個季節可能出現的天氣與權重（整數）。雨與暴風雨會替所有田地澆水；雪只在冬天出現。數值可調，程式不寫死。",
+  "seasons": {
+    "spring": [
+      {
+        "weather": "sunny",
+        "weight": 50
+      },
+      {
+        "weather": "rain",
+        "weight": 30
+      },
+      {
+        "weather": "wind",
+        "weight": 15
+      },
+      {
+        "weather": "storm",
+        "weight": 5
+      }
+    ],
+    "summer": [
+      {
+        "weather": "sunny",
+        "weight": 55
+      },
+      {
+        "weather": "rain",
+        "weight": 20
+      },
+      {
+        "weather": "wind",
+        "weight": 10
+      },
+      {
+        "weather": "storm",
+        "weight": 15
+      }
+    ],
+    "autumn": [
+      {
+        "weather": "sunny",
+        "weight": 45
+      },
+      {
+        "weather": "rain",
+        "weight": 25
+      },
+      {
+        "weather": "wind",
+        "weight": 25
+      },
+      {
+        "weather": "storm",
+        "weight": 5
+      }
+    ],
+    "winter": [
+      {
+        "weather": "sunny",
+        "weight": 40
+      },
+      {
+        "weather": "snow",
+        "weight": 45
+      },
+      {
+        "weather": "wind",
+        "weight": 15
+      }
+    ]
+  }
+}

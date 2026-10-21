@@ -25,7 +25,7 @@ async function waitForScene(page: Page): Promise<void> {
 async function waitForGame(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
-  await expect(page.locator('#hud-day')).toHaveText('第 1 天');
+  await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 1 天');
   await waitForScene(page);
 }
 
@@ -57,19 +57,23 @@ test('plays the vertical slice and resumes from a save', async ({ page }) => {
   await waitForScene(page);
   await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
   await expect(page.locator('#hud-energy-text')).toHaveText('96 / 100');
-  await expect(page.locator('#hud-day')).toHaveText('第 1 天');
+  await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 1 天');
 
-  // 走到床邊 (3,1) 面向床位後睡覺，進入第 2 天並恢復體力。
-  await press(page, ['ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp']);
-  await press(page, ['ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft']);
+  // 從田邊走進小屋，走到床邊 (2,1) 面向床位 (1,1) 後睡覺，進入第 2 天並恢復體力。
+  await press(page, ['ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft']);
+  await press(page, ['ArrowUp']);
+  // 工作台在 (4,1)，繞過它：(4,5) → (4,2) → (2,2) → (2,1)，最後往左轉向床。
+  await press(page, ['ArrowUp', 'ArrowUp', 'ArrowUp']);
+  await press(page, ['ArrowLeft', 'ArrowLeft']);
+  await press(page, ['ArrowUp', 'ArrowLeft']);
   await press(page, ['x']);
-  await expect(page.locator('#hud-day')).toHaveText('第 2 天');
+  await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 2 天');
   await expect(page.locator('#hud-energy-text')).toHaveText('100 / 100');
   await expect(page.locator('#hud-log')).toContainText('你睡了一覺');
 
   // 第 2 天重新整理，存檔應保留第 2 天。
   await page.reload();
   await waitForScene(page);
-  await expect(page.locator('#hud-day')).toHaveText('第 2 天');
+  await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 2 天');
   await expect(page.locator('#hud-gold')).toHaveText('100 金');
 });

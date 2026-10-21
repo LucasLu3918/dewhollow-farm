@@ -11,11 +11,19 @@ import {
   mapFileSchema,
   npcsFileSchema,
   rigsFileSchema,
+  itemsFileSchema,
+  shopsFileSchema,
+  fishFileSchema,
+  animalsFileSchema,
+  recipesFileSchema,
+  processingFileSchema,
+  craftingFileSchema,
   soundsFileSchema,
   startFileSchema,
   terrainFileSchema,
   toolsFileSchema,
   tuningFileSchema,
+  weatherFileSchema,
   type SoundsFile,
   type TerrainFile,
 } from './content-schema';
@@ -32,6 +40,14 @@ export interface RawContentFiles {
   tools: unknown;
   sounds: unknown;
   terrain: unknown;
+  weather: unknown;
+  items: unknown;
+  shops: unknown;
+  fish: unknown;
+  animals: unknown;
+  recipes: unknown;
+  processing: unknown;
+  crafting: unknown;
 }
 
 export interface LoadedContent {
@@ -67,14 +83,24 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const tools: ToolManifest = toolsFileSchema.parse(raw.tools);
   const sounds = soundsFileSchema.parse(raw.sounds);
   const terrain = terrainFileSchema.parse(raw.terrain);
+  const weather = weatherFileSchema.parse(raw.weather);
 
-  const pack: ContentPack = { crops, npcs, maps, start, tuning };
+  const items = itemsFileSchema.parse(raw.items);
+  const shops = shopsFileSchema.parse(raw.shops);
+  const fish = fishFileSchema.parse(raw.fish);
+  const animals = animalsFileSchema.parse(raw.animals);
+  const recipes = recipesFileSchema.parse(raw.recipes);
+  const processing = processingFileSchema.parse(raw.processing);
+  const crafting = craftingFileSchema.parse(raw.crafting);
+
+  const pack: ContentPack = { crops, npcs, maps, start, tuning, weather: weather.seasons, items: items.items, shops: shops.shops, fish: fish.fish, animals: animals.animals, recipes: recipes.recipes, processing: processing.recipes, crafting: crafting.recipes };
   const problems = [
     ...validateCrossReferences(pack, assets),
     ...rigProblems(rigs, assets),
     ...companionProblems(companions, rigs, pack),
     ...toolProblems(tools, assets),
     ...terrainProblems(terrain, sounds, maps),
+    ...economyProblems(pack),
   ];
   if (problems.length > 0) throw new ContentError(problems);
   return { pack, assets, rigs, companions, tools, sounds, terrain };
@@ -203,3 +229,57 @@ function duplicates(ids: string[], label: string, problems: string[]): void {
     seen.add(id);
   }
 }
+
+/** 商店與物品的交叉檢查：櫃檯指向的店要存在、賣的東西與升級的材料要存在、升級的階級要在範圍內。 */
+export function economyProblems(pack: ContentPack): string[] {
+  const problems: string[] = [];
+  const itemIds = new Set([
+    ...pack.items.map((i) => i.id),
+    ...pack.crops.flatMap((c) => [`seed.${c.id}`, `crop.${c.id}`]),
+    ...pack.fish.map((f) => `fish.${f.id}`),
+    ...pack.animals.map((a) => `animal.${a.id}`),
+  ]);
+  for (const animal of pack.animals) {
+    if (!pack.items.some((i) => i.id === animal.eggItem)) problems.push(`動物 ${animal.id} 下的蛋 ${animal.eggItem} 不存在`);
+  }
+  const shopIds = new Set(pack.shops.map((s) => s.id));
+  for (const recipe of pack.crafting) {
+    for (const itemId of Object.keys(recipe.ingredients)) {
+      if (!itemIds.has(itemId)) problems.push(`合成配方 ${recipe.id} 的材料 ${itemId} 不存在`);
+    }
+    if (recipe.output && !itemIds.has(recipe.output.item)) problems.push(`合成配方 ${recipe.id} 的產物 ${recipe.output.item} 不存在`);
+  }
+  for (const map of pack.maps) {
+    for (const [symbol, tile] of Object.entries(map.legend)) {
+      if (tile.item && !itemIds.has(tile.item)) problems.push(`地圖 ${map.id} 的採集點 ${symbol} 的物品 ${tile.item} 不存在`);
+    }
+  }
+  for (const recipe of pack.processing) {
+    for (const itemId of Object.keys(recipe.ingredients)) {
+      if (!itemIds.has(itemId)) problems.push(`加工配方 ${recipe.id} 的材料 ${itemId} 不存在`);
+    }
+    if (!itemIds.has(recipe.output)) problems.push(`加工配方 ${recipe.id} 的成品 ${recipe.output} 不存在`);
+  }
+  duplicates(pack.items.map((i) => i.id), 'item', problems);
+  duplicates(pack.shops.map((s) => s.id), 'shop', problems);
+  for (const shop of pack.shops) {
+    for (const line of shop.stock) {
+      if (!itemIds.has(line.itemId)) problems.push(`商店 ${shop.id} 賣的物品 ${line.itemId} 不存在`);
+    }
+    for (const upgrade of shop.upgrades) {
+      if (upgrade.tier >= pack.tuning.tools.tiers.length) problems.push(`商店 ${shop.id} 的升級階級 ${upgrade.tier} 超出工具階級範圍`);
+      for (const itemId of Object.keys(upgrade.items)) {
+        if (!itemIds.has(itemId)) problems.push(`商店 ${shop.id} 的升級材料 ${itemId} 不存在`);
+      }
+    }
+  }
+  for (const map of pack.maps) {
+    for (const tile of Object.values(map.legend)) {
+      if (tile.kind === 'shop' && (!tile.shop || !shopIds.has(tile.shop))) {
+        problems.push(`地圖 ${map.id} 的櫃檯指向不存在的商店 ${tile.shop ?? '(未填)'}`);
+      }
+    }
+  }
+  return problems;
+}
+

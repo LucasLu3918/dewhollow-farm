@@ -12,16 +12,35 @@ import { createContentIndex } from './content-index';
 /** 測試用的小型內容：農場與村莊各一張，足以覆蓋各種操作。 */
 const content: ContentPack = {
   crops: [
-    { id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 20, growthDays: 2 },
-    { id: 'moon-bean', name: '月光豆', seedPrice: 35, growthDays: 4 },
+    { id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 20, growthDays: 2, seasons: ['spring', 'summer'] },
+    { id: 'moon-bean', name: '月光豆', seedPrice: 35, growthDays: 4, seasons: ['spring'] },
   ],
   npcs: [{ id: 'mira', name: '米拉', lines: ['早安。', '今天也辛苦了。'], gift: { cropId: 'sweet-radish', count: 3 } }],
   start: { mapId: 'farm', gold: 100, seeds: { 'sweet-radish': 5 } },
   tuning: {
-    energy: { max: 20, costs: { till: 2, water: 1, plant: 1, harvest: 1, ship: 0 } },
+    energy: { max: 20, costs: { till: 2, water: 1, plant: 1, harvest: 1, ship: 0, chop: 3, forage: 1, mine: 2, fish: 2, cook: 1, process: 1 } },
     inventory: { capacity: 4 },
     harvest: { min: 1, max: 5 },
-    time: { wakeMinute: 360, minutesPerAction: 10 },
+    time: { wakeMinute: 360, minutesPerAction: 10, daysPerSeason: 20 },
+    tools: { tiers: [{ energyDiscount: 0 }, { energyDiscount: 1 }, { energyDiscount: 1 }, { energyDiscount: 2 }] },
+    fishing: { biteChance: 60, bobberBonus: 10, baitBonus: 20 },
+    fertilizer: { basic: { goodBonus: 20, fineBonus: 0 }, fine: { goodBonus: 30, fineBonus: 15 } },
+    processing: { slots: 3 },
+    skills: { thresholds: [0, 20, 50, 90, 140, 200, 270, 350, 440, 540, 650], xp: { till: 2, water: 1, plant: 2, harvest: 4, chop: 4, forage: 3, mine: 4 }, bonusFrom: 5, goodFrom: 4, goodChance: 0.2, fineFrom: 8, fineChance: 0.08 },
+    gathering: { wood: { min: 1, max: 3 }, forage: { min: 1, max: 2 }, stone: { min: 1, max: 2 }, ore: { min: 1, max: 2 } },
+  },
+  crafting: [],
+  processing: [],
+  recipes: [],
+  animals: [],
+  fish: [],
+  items: [],
+  shops: [],
+  weather: {
+    spring: [{ weather: 'sunny', weight: 1 }],
+    summer: [{ weather: 'sunny', weight: 1 }],
+    autumn: [{ weather: 'sunny', weight: 1 }],
+    winter: [{ weather: 'snow', weight: 1 }],
   },
   maps: [
     {
@@ -40,6 +59,16 @@ const content: ContentPack = {
         D: { kind: 'door', to: 'village', spawn: { x: 1, y: 1 } },
       },
       spawn: { x: 3, y: 1 },
+      npcs: [],
+    },
+    {
+      id: 'mine',
+      name: '礦坑入口',
+      width: 3,
+      height: 2,
+      rows: ['#C#', '...'],
+      legend: { '#': { kind: 'wall' }, C: { kind: 'cave' }, '.': { kind: 'path' } },
+      spawn: { x: 1, y: 1 },
       npcs: [],
     },
     {
@@ -394,3 +423,80 @@ describe('tools and seeds', () => {
     expect(state.selectedSeed).toBe('sweet-radish');
   });
 });
+
+describe('seasons and weather', () => {
+  const FIELD_SEED = (state: GameState): GameState => ({
+    ...state,
+    tool: 'seedbag',
+    plots: { [FIELD]: { watered: false, crop: null, dryDays: 0 } },
+  });
+
+  it('refuses to plant a crop out of its season and keeps the seed', () => {
+    const state = at(
+      FIELD_SEED(start({ calendar: { year: 1, season: 'winter', day: 1, minuteOfDay: 360 }, selectedSeed: 'sweet-radish' })),
+      FIELD_SIDE,
+    );
+    const out = executeCommand(state, { type: 'interact' }, index);
+    expect(out.state.plots[FIELD]?.crop).toBeNull();
+    expect(out.state.inventory).toEqual(state.inventory);
+    expect(out.messages).toContain('這個季節種不了這種作物');
+    expect(out.events).toContainEqual({ type: 'refused', reason: 'NOT_IN_SEASON' });
+  });
+
+  it('plants the same crop in its own season', () => {
+    const state = at(FIELD_SEED(start({ selectedSeed: 'sweet-radish' })), FIELD_SIDE);
+    expect(act(state).plots[FIELD]?.crop?.cropId).toBe('sweet-radish');
+  });
+
+  it('a rainy night waters every field, so an unwatered crop still grows', () => {
+    const planted = start({ weather: 'rain', plots: { [FIELD]: { watered: false, crop: { cropId: 'sweet-radish', growthDays: 0 }, dryDays: 0 } } });
+    const slept = sleep(planted);
+    expect(slept.plots[FIELD]?.crop?.growthDays).toBe(1);
+    expect(slept.plots[FIELD]?.dryDays).toBe(0);
+  });
+
+  it('a sunny night does not water: the unwatered crop goes a day without water', () => {
+    const planted = start({ weather: 'sunny', plots: { [FIELD]: { watered: false, crop: { cropId: 'sweet-radish', growthDays: 1 }, dryDays: 0 } } });
+    const slept = sleep(planted);
+    expect(slept.plots[FIELD]?.crop?.growthDays).toBe(0);
+    expect(slept.plots[FIELD]?.dryDays).toBe(1);
+  });
+
+  it('when the season changes, a crop that does not grow in the new season withers, with a message', () => {
+    const state = start({
+      calendar: { year: 1, season: 'spring', day: 20, minuteOfDay: 1200 },
+      plots: { [FIELD]: { watered: true, crop: { cropId: 'moon-bean', growthDays: 1 }, dryDays: 0 } },
+    });
+    const out = executeCommand(at(state, BED_SIDE), { type: 'interact' }, index);
+    expect(out.state.calendar).toMatchObject({ season: 'summer', day: 1 });
+    expect(out.state.plots[FIELD]?.crop).toBeNull();
+    expect(out.messages.join('\n')).toContain('月光豆');
+    expect(out.messages.join('\n')).toContain('換季');
+  });
+
+  it('a crop that grows in both seasons survives the change', () => {
+    const state = start({
+      calendar: { year: 1, season: 'spring', day: 20, minuteOfDay: 1200 },
+      plots: { [FIELD]: { watered: true, crop: { cropId: 'sweet-radish', growthDays: 1 }, dryDays: 0 } },
+    });
+    expect(sleep(state).plots[FIELD]?.crop?.cropId).toBe('sweet-radish');
+  });
+
+  it('tomorrow\'s forecast becomes today\'s weather, and a new forecast is drawn for the day after', () => {
+    const slept = sleep(start({ weather: 'sunny', forecast: 'rain' }));
+    expect(slept.weather).toBe('rain');
+    expect(slept.forecast).toBe('sunny');
+  });
+});
+
+describe('the mine entrance (M3: the mine is not open yet)', () => {
+  it('a fallen rock blocks the cave: interacting refuses without spending energy or time', () => {
+    const state = at(start({ mapId: 'mine' }), { x: 1, y: 1, facing: 'up' });
+    const out = executeCommand(state, { type: 'interact' }, index);
+    expect(out.messages).toContain('落石擋住了礦坑入口，要用鎬才清得開');
+    expect(out.events).toContainEqual({ type: 'refused', reason: 'MINE_LOCKED' });
+    expect(out.state.energy).toEqual(state.energy);
+    expect(out.state.calendar).toEqual(state.calendar);
+  });
+});
+

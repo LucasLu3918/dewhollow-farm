@@ -5,8 +5,8 @@ import type { ContentPack } from './content';
 
 const pack = {
   crops: [
-    { id: 'dew-grass', name: '晨露草', seedPrice: 10, growthDays: 1 },
-    { id: 'moon-bean', name: '月光豆', seedPrice: 15, growthDays: 2 },
+    { id: 'dew-grass', name: '晨露草', seedPrice: 10, growthDays: 1, seasons: ['spring' as const] },
+    { id: 'moon-bean', name: '月光豆', seedPrice: 15, growthDays: 2, seasons: ['spring' as const] },
   ],
   npcs: [],
   maps: [
@@ -22,6 +22,12 @@ const pack = {
     },
   ],
   start: { mapId: 'farm', gold: 100, seeds: { 'moon-bean': 2 } },
+  weather: {
+    spring: [{ weather: 'sunny' as const, weight: 1 }],
+    summer: [{ weather: 'sunny' as const, weight: 1 }],
+    autumn: [{ weather: 'sunny' as const, weight: 1 }],
+    winter: [{ weather: 'snow' as const, weight: 1 }],
+  },
   tuning: {
     energy: { max: 100, costs: { till: 2, water: 1, plant: 1, harvest: 1, ship: 0 } },
     inventory: { capacity: 12 },

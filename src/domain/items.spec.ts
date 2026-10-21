@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { cropItemId, cropItems, DEFAULT_MAX_STACK, seedItemId } from './items';
 
 const crops = [
-  { id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 25, growthDays: 3 },
-  { id: 'moon-bean', name: '月光豆', seedPrice: 15, growthDays: 2 },
+  { id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 25, growthDays: 3, seasons: ['spring' as const] },
+  { id: 'moon-bean', name: '月光豆', seedPrice: 15, growthDays: 2, seasons: ['spring' as const] },
 ];
 
 describe('items', () => {

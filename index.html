@@ -9,8 +9,10 @@
   <body>
     <main class="app">
       <header class="status" aria-label="遊戲狀態">
-        <span id="hud-day">第 1 天</span>
+        <span id="hud-day">第 1 年 春 第 1 天</span>
         <span id="hud-clock">06:00</span>
+        <span id="hud-weather" aria-label="天氣與明天的預報"></span>
+        <span id="hud-skills" class="skills" aria-label="技能等級"></span>
         <span id="hud-gold">0 金</span>
         <span class="energy" aria-label="體力">
           <span class="energy-track"><span id="hud-energy-fill"></span></span>
@@ -20,6 +22,38 @@
         <span id="hud-seed"></span>
       </header>
       <div id="game" class="stage"></div>
+      <section id="shop-panel" class="shop-panel" aria-labelledby="shop-title" hidden>
+        <header>
+          <h2 id="shop-title"></h2>
+          <p id="shop-funds"></p>
+        </header>
+        <ul id="shop-list" class="shop-list"></ul>
+        <button id="shop-close" type="button">離開櫃檯（Esc）</button>
+      </section>
+      <section id="kitchen-panel" class="shop-panel" aria-labelledby="kitchen-title" hidden>
+        <header>
+          <h2 id="kitchen-title">廚房</h2>
+          <p id="kitchen-funds"></p>
+        </header>
+        <ul id="kitchen-list" class="shop-list"></ul>
+        <button id="kitchen-close" type="button">離開廚房（Esc）</button>
+      </section>
+      <section id="workbench-panel" class="shop-panel" aria-labelledby="workbench-title" hidden>
+        <header>
+          <h2 id="workbench-title">工作台</h2>
+          <p id="workbench-funds"></p>
+        </header>
+        <ul id="workbench-list" class="shop-list"></ul>
+        <button id="workbench-close" type="button">離開工作台（Esc）</button>
+      </section>
+      <section id="workshop-panel" class="shop-panel" aria-labelledby="workshop-title" hidden>
+        <header>
+          <h2 id="workshop-title">加工台</h2>
+          <p id="workshop-funds"></p>
+        </header>
+        <ul id="workshop-list" class="shop-list"></ul>
+        <button id="workshop-close" type="button">離開加工台（Esc）</button>
+      </section>
       <section class="panel" aria-label="訊息">
         <ul id="hud-log" class="log" aria-live="polite"></ul>
         <p class="help">方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · S 存檔</p>

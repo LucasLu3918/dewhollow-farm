@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import { SEASONS } from '../../domain/calendar';
+import { WEATHERS } from '../../domain/weather';
+import { TOOL_IDS } from '../../domain/tools';
+import { SKILL_IDS } from '../../domain/skills';
 
 const point = z.object({ x: z.number().int().nonnegative(), y: z.number().int().nonnegative() });
 
@@ -7,6 +11,7 @@ const cropSchema = z.object({
   name: z.string().min(1),
   seedPrice: z.number().int().nonnegative(),
   growthDays: z.number().int().positive(),
+  seasons: z.array(z.enum(SEASONS)).min(1, '作物至少要有一個可種植的季節'),
 });
 
 const npcSchema = z.object({
@@ -17,8 +22,12 @@ const npcSchema = z.object({
 });
 
 const tileSchema = z.object({
-  kind: z.enum(['grass', 'field', 'path', 'wall', 'bed', 'shipbox', 'door']),
+  kind: z.enum(['grass', 'field', 'path', 'wall', 'bed', 'shipbox', 'door', 'tree', 'water', 'floor', 'furniture', 'cave', 'rock', 'shop', 'forage', 'ore', 'stairs', 'trough', 'kitchen', 'workshop', 'workbench']),
+  item: z.string().min(1).optional(),
+  seasons: z.array(z.enum(SEASONS)).min(1).optional(),
+  slot: z.boolean().optional(),
   to: z.string().min(1).optional(),
+  shop: z.string().min(1).optional(),
   spawn: point.optional(),
 });
 
@@ -92,7 +101,7 @@ const rigSchema = z.union([bipedRigSchema, wholeRigSchema]);
 
 const toolSchema = z.object({
   id: z.string().min(1),
-  action: z.enum(['till', 'water', 'plant', 'harvest', 'ship']),
+  action: z.enum(['till', 'water', 'plant', 'harvest', 'ship', 'chop', 'forage', 'mine', 'fish', 'cook']),
   asset: z.string().min(1),
   textureSize,
   grip: point,
@@ -118,7 +127,41 @@ const tuningSchema = z.object({
       plant: cost,
       harvest: cost,
       ship: cost,
+      chop: cost,
+      forage: cost,
+      mine: cost,
+      fish: cost,
+      cook: cost,
+      process: cost,
     }),
+  }),
+  tools: z.object({
+    tiers: z.array(z.object({ energyDiscount: z.number().int().nonnegative() })).length(4, '工具要有 4 個階級（基礎、銅、銀、金）'),
+  }),
+  fishing: z.object({
+    biteChance: z.number().int().min(0).max(100),
+    bobberBonus: z.number().int().min(0).max(100),
+    baitBonus: z.number().int().min(0).max(100),
+  }),
+  fertilizer: z.object({
+    basic: z.object({ goodBonus: z.number().int().min(0).max(100), fineBonus: z.number().int().min(0).max(100) }),
+    fine: z.object({ goodBonus: z.number().int().min(0).max(100), fineBonus: z.number().int().min(0).max(100) }),
+  }),
+  processing: z.object({ slots: z.number().int().positive() }),
+  skills: z.object({
+    thresholds: z.array(z.number().int().nonnegative()).min(2).max(11),
+    xp: z.record(z.string(), z.number().int().nonnegative()),
+    bonusFrom: z.number().int().min(1).max(10),
+    goodFrom: z.number().int().min(0).max(10),
+    goodChance: z.number().min(0).max(1),
+    fineFrom: z.number().int().min(0).max(10),
+    fineChance: z.number().min(0).max(1),
+  }),
+  gathering: z.object({
+    wood: z.object({ min: z.number().int().positive(), max: z.number().int().positive() }),
+    forage: z.object({ min: z.number().int().positive(), max: z.number().int().positive() }),
+    stone: z.object({ min: z.number().int().positive(), max: z.number().int().positive() }),
+    ore: z.object({ min: z.number().int().positive(), max: z.number().int().positive() }),
   }),
   inventory: z.object({ capacity: z.number().int().positive() }),
   harvest: z
@@ -127,10 +170,112 @@ const tuningSchema = z.object({
   time: z.object({
     wakeMinute: z.number().int().min(0).max(1439),
     minutesPerAction: z.number().int().positive(),
+    daysPerSeason: z.number().int().positive().max(60),
   }),
 });
 
 export const tuningFileSchema = tuningSchema;
+
+export const itemsFileSchema = z.object({
+  version: z.literal(1),
+  items: z.array(
+    z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      kind: z.enum(['material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft']),
+      maxStack: z.number().int().positive(),
+      sellPrice: z.number().int().nonnegative().optional(),
+    }),
+  ),
+});
+
+const shopStockSchema = z.object({ itemId: z.string().min(1), price: z.number().int().positive() });
+const toolUpgradeSchema = z.object({
+  toolId: z.enum(TOOL_IDS),
+  tier: z.number().int().min(1).max(3),
+  gold: z.number().int().positive(),
+  items: z.record(z.string().min(1), z.number().int().positive()),
+});
+export const recipesFileSchema = z.object({
+  version: z.literal(1),
+  recipes: z.array(
+    z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      ingredients: z.record(z.string().min(1), z.number().int().positive()),
+      energy: z.number().int().positive(),
+      level: z.number().int().min(0).max(10),
+      sellPrice: z.number().int().nonnegative(),
+    }),
+  ),
+});
+const craftEffectSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('flag'), flag: z.string().min(1) }),
+  z.object({ type: z.literal('bagSlots'), slots: z.number().int().positive(), max: z.number().int().positive() }),
+]);
+export const craftingFileSchema = z.object({
+  version: z.literal(1),
+  recipes: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        name: z.string().min(1),
+        ingredients: z.record(z.string().min(1), z.number().int().positive()),
+        output: z.object({ item: z.string().min(1), count: z.number().int().positive() }).optional(),
+        effect: craftEffectSchema.optional(),
+        unlock: z.object({ skill: z.enum(SKILL_IDS), level: z.number().int().min(0).max(10) }).optional(),
+        playMinutes: z.number().positive().max(60),
+      }),
+    )
+    .refine((list) => list.every((r) => r.output || r.effect), '合成配方要有產物或效果'),
+});
+export const processingFileSchema = z.object({
+  version: z.literal(1),
+  recipes: z.array(
+    z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      ingredients: z.record(z.string().min(1), z.number().int().positive()),
+      output: z.string().min(1),
+      days: z.number().int().positive().max(14),
+      level: z.number().int().min(0).max(10),
+    }),
+  ),
+});
+export const animalsFileSchema = z.object({
+  version: z.literal(1),
+  animals: z.array(
+    z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      eggItem: z.string().min(1),
+      eggQuality: z.number().min(0).max(1),
+    }),
+  ),
+});
+export const fishFileSchema = z.object({
+  version: z.literal(1),
+  fish: z.array(
+    z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      sellPrice: z.number().int().positive(),
+      seasons: z.array(z.enum(SEASONS)).min(1),
+      weight: z.number().int().positive(),
+    }),
+  ),
+});
+export const shopsFileSchema = z.object({
+  version: z.literal(1),
+  shops: z.array(
+    z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      stock: z.array(shopStockSchema),
+      upgrades: z.array(toolUpgradeSchema),
+    }),
+  ),
+});
 export const cropsFileSchema = z.array(cropSchema);
 export const npcsFileSchema = z.array(npcSchema);
 export const mapFileSchema = mapSchema;
@@ -171,3 +316,19 @@ const terrainSchema = z.object({
 export const terrainFileSchema = z.object({ version: z.literal(1), terrains: z.array(terrainSchema) });
 export type TerrainDef = z.infer<typeof terrainSchema>;
 export type TerrainFile = z.infer<typeof terrainFileSchema>;
+
+/** 天氣表：每個季節可能出現的天氣與權重（見 domain/weather.ts）。 */
+const weatherChanceSchema = z.object({
+  weather: z.enum(WEATHERS),
+  weight: z.number().int().positive(),
+});
+export const weatherFileSchema = z.object({
+  version: z.literal(1),
+  seasons: z.object({
+    spring: z.array(weatherChanceSchema).min(1),
+    summer: z.array(weatherChanceSchema).min(1),
+    autumn: z.array(weatherChanceSchema).min(1),
+    winter: z.array(weatherChanceSchema).min(1),
+  }),
+});
+export type WeatherFile = z.infer<typeof weatherFileSchema>;

@@ -1,4 +1,7 @@
 import { SAVE_SCHEMA_VERSION } from '../../domain/game-state';
+import { calendarOnDay } from '../../domain/calendar';
+import { advanceRng } from '../../domain/random';
+import { z } from 'zod';
 import { cropItemId, DEFAULT_MAX_STACK, seedItemId, type ItemStack } from '../../domain/items';
 import { describeIssue, SaveFormatError } from './save-errors';
 import { gameStateV1Schema, type GameStateV1 } from './save-schema-v1';
@@ -7,6 +10,10 @@ import { gameStateV1Schema, type GameStateV1 } from './save-schema-v1';
 export interface MigrationContext {
   /** 背包格數（來自 content/tuning.json）。 */
   inventoryCapacity: number;
+  /** 每個季節的天數（來自 content/tuning.json）。 */
+  daysPerSeason: number;
+  /** 睡醒時間（來自 content/tuning.json）。 */
+  wakeMinute: number;
 }
 
 type Migration = (state: unknown, context: MigrationContext) => unknown;
@@ -17,6 +24,15 @@ type Migration = (state: unknown, context: MigrationContext) => unknown;
  */
 const MIGRATIONS: Readonly<Record<number, Migration>> = {
   1: migrateV1ToV2,
+  2: migrateV2ToV3,
+  3: migrateV3ToV4,
+  4: migrateV4ToV5,
+  5: migrateV5ToV6,
+  6: migrateV6ToV7,
+  7: migrateV7ToV8,
+  8: migrateV8ToV9,
+  9: migrateV9ToV10,
+  10: migrateV10ToV11,
 };
 
 /**
@@ -86,3 +102,124 @@ function entriesOf(counts: Record<string, number>, toItemId: (cropId: string) =>
     .filter(([, count]) => count > 0)
     .map(([cropId, count]) => ({ itemId: toItemId(cropId), quality: 'normal' as const, count }));
 }
+
+/**
+ * v2 → v3：日曆改為四季（v2 的 day 是從開始算起的總天數，全部發生在春天）、新增今天與明天的天氣。
+ * 舊存檔沒有天氣紀錄，所以今天與明天都設為晴；之後的天氣照常抽。
+ */
+function migrateV2ToV3(raw: unknown, context: MigrationContext): unknown {
+  const parsed = z
+    .object({
+      calendar: z.object({
+        day: z.number().int().positive(),
+        minuteOfDay: z.number().int().nonnegative(),
+      }),
+    })
+    .safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v2 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  const state = raw as Record<string, unknown>;
+  const { day, minuteOfDay } = parsed.data.calendar;
+  return {
+    ...state,
+    schemaVersion: 3,
+    calendar: calendarOnDay(day, context.daysPerSeason, minuteOfDay),
+    weather: 'sunny',
+    forecast: 'sunny',
+  };
+}
+
+/**
+ * v3 → v4：新增工具階級（全部為基礎）與世界變化（砍樹、採野薄荷，還沒有任何紀錄）。
+ * 斧頭是新的工具，之後的循環順序排在最後，舊存檔的 tool 不需要改。
+ */
+function migrateV3ToV4(raw: unknown): unknown {
+  const parsed = z.object({ tool: z.enum(['hoe', 'can', 'seedbag']) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v3 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 4,
+    toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0 },
+    worldChanges: {},
+  };
+}
+
+/**
+ * v4 → v5：礦坑（種子與檢查點），工具新增鎬與釣竿（階級都是基礎）。
+ * 舊存檔的礦坑種子由舊的隨機數狀態推出，所以同一份舊存檔每次讀取都得到同一個礦坑。
+ */
+function migrateV4ToV5(raw: unknown): unknown {
+  const parsed = z.object({ rng: z.number().int().nonnegative().max(4294967295) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v4 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 5,
+    toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0 },
+    mineSeed: advanceRng(parsed.data.rng),
+    mineCheckpoint: 1,
+  };
+}
+
+/** v5 → v6：技能與經驗，舊存檔的五項技能都從 0 開始。 */
+function migrateV5ToV6(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(5) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v5 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 6,
+    skills: { farming: 0, foraging: 0, fishing: 0, mining: 0, cooking: 0 },
+  };
+}
+
+/** v6 → v7：釣魚（投竿後等待收線的魚，舊存檔沒有）。 */
+function migrateV6ToV7(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(6) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v6 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return { ...(raw as Record<string, unknown>), schemaVersion: 7, fishing: null };
+}
+
+/** v7 → v8：畜牧（雞舍的動物），舊存檔還沒有動物。 */
+function migrateV7ToV8(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(7) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/** v10 → v11：施肥（田的 fertilizer 是選填欄位，舊存檔的田都沒有肥料）；只升版本。 */
+function migrateV10ToV11(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(10) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v10 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return { ...(raw as Record<string, unknown>), schemaVersion: 11 };
+}
+
+/** v9 → v10：加工機；舊存檔還沒有加工，從空的開始。 */
+function migrateV9ToV10(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(9) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v9 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return { ...(raw as Record<string, unknown>), schemaVersion: 10, processing: [] };
+}
+
+/** v8 → v9：料理（食譜與料理的物品都是內容定義，存檔不需要新欄位）；只升版本。 */
+function migrateV8ToV9(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(8) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v8 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return { ...(raw as Record<string, unknown>), schemaVersion: 9 };
+}
+

@@ -6,7 +6,13 @@
       "water": 1,
       "plant": 1,
       "harvest": 1,
-      "ship": 0
+      "ship": 0,
+      "chop": 3,
+      "forage": 1,
+      "mine": 4,
+      "fish": 2,
+      "cook": 1,
+      "process": 1
     }
   },
   "inventory": {
@@ -14,10 +20,95 @@
   },
   "harvest": {
     "min": 1,
-    "max": 5
+    "max": 2
   },
   "time": {
     "wakeMinute": 360,
-    "minutesPerAction": 10
+    "minutesPerAction": 10,
+    "daysPerSeason": 20
+  },
+  "tools": {
+    "tiers": [
+      {
+        "energyDiscount": 0
+      },
+      {
+        "energyDiscount": 1
+      },
+      {
+        "energyDiscount": 1
+      },
+      {
+        "energyDiscount": 2
+      }
+    ]
+  },
+  "gathering": {
+    "wood": {
+      "min": 1,
+      "max": 3
+    },
+    "forage": {
+      "min": 1,
+      "max": 2
+    },
+    "stone": {
+      "min": 1,
+      "max": 2
+    },
+    "ore": {
+      "min": 1,
+      "max": 2
+    }
+  },
+  "skills": {
+    "thresholds": [
+      0,
+      20,
+      50,
+      90,
+      140,
+      200,
+      270,
+      350,
+      440,
+      540,
+      650
+    ],
+    "xp": {
+      "till": 2,
+      "water": 1,
+      "plant": 2,
+      "harvest": 4,
+      "chop": 4,
+      "forage": 3,
+      "mine": 4,
+      "fish": 6,
+      "cook": 5,
+      "process": 4
+    },
+    "bonusFrom": 5,
+    "goodFrom": 4,
+    "goodChance": 0.2,
+    "fineFrom": 8,
+    "fineChance": 0.08
+  },
+  "fishing": {
+    "biteChance": 60,
+    "baitBonus": 20,
+    "bobberBonus": 10
+  },
+  "processing": {
+    "slots": 3
+  },
+  "fertilizer": {
+    "basic": {
+      "goodBonus": 20,
+      "fineBonus": 0
+    },
+    "fine": {
+      "goodBonus": 30,
+      "fineBonus": 15
+    }
   }
 }

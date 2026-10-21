@@ -41,6 +41,20 @@ export function playActionEffect(scene: Phaser.Scene, action: ActionFeedback, x:
       puff(scene, cx, cy, 0xe0b25c, 8);
       floatText(scene, cx, cy - px(8), '出貨', '#ffe08a');
       break;
+    case 'chop':
+      // 木屑：砍中的那一刻才飛出；樹被砍掉後那一格變成草地（見 MapScene 的 syncWorldTiles）。
+      puff(scene, cx, cy, 0x8a5a3a, 7);
+      break;
+    case 'forage':
+      puff(scene, cx, cy, 0x7fcf6b, 5);
+      break;
+    case 'mine':
+      puff(scene, cx, cy, 0x9a9aa6, 6);
+      break;
+    case 'fish':
+      // 水波：投竿落水的那一圈。
+      puff(scene, cx, cy, 0x6fb6ff, 6);
+      break;
   }
 }
 

@@ -1,0 +1,54 @@
+{
+  "id": "house",
+  "name": "小屋",
+  "width": 10,
+  "height": 7,
+  "rows": [
+    "##########",
+    "#B..T..KW#",
+    "#........#",
+    "#........#",
+    "#.P....M.#",
+    "#........#",
+    "####D#####"
+  ],
+  "legend": {
+    "#": {
+      "kind": "wall"
+    },
+    ".": {
+      "kind": "floor"
+    },
+    "B": {
+      "kind": "bed"
+    },
+    "K": {
+      "kind": "kitchen"
+    },
+    "W": {
+      "kind": "workshop"
+    },
+    "M": {
+      "kind": "furniture"
+    },
+    "P": {
+      "kind": "furniture"
+    },
+    "D": {
+      "kind": "door",
+      "to": "farm",
+      "spawn": {
+        "x": 2,
+        "y": 5
+      }
+    },
+    "T": {
+      "kind": "workbench"
+    }
+  },
+  "spawn": {
+    "x": 4,
+    "y": 5
+  },
+  "npcs": []
+}

@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "note": "櫃檯放在地圖上（tile.kind 為 shop，tile.shop 指向這裡的 id）。鐵匠的升級需要銅礦石，礦坑完成前買不到，這是有意的。",
+  "shops": [
+    {
+      "id": "general",
+      "name": "雜貨店",
+      "stock": [
+        {
+          "itemId": "seed.dew-grass",
+          "price": 10
+        },
+        {
+          "itemId": "seed.moon-bean",
+          "price": 15
+        },
+        {
+          "itemId": "seed.sweet-radish",
+          "price": 25
+        },
+        {
+          "itemId": "hay",
+          "price": 5
+        },
+        {
+          "itemId": "animal.chicken",
+          "price": 300
+        }
+      ],
+      "upgrades": []
+    },
+    {
+      "id": "smithy",
+      "name": "鐵匠",
+      "stock": [],
+      "upgrades": [
+        {
+          "toolId": "hoe",
+          "tier": 1,
+          "gold": 2000,
+          "items": {
+            "wood": 10
+          }
+        },
+        {
+          "toolId": "hoe",
+          "tier": 2,
+          "gold": 5000,
+          "items": {
+            "wood": 20,
+            "copper-ore": 5
+          }
+        },
+        {
+          "toolId": "hoe",
+          "tier": 3,
+          "gold": 10000,
+          "items": {
+            "wood": 30,
+            "copper-ore": 10
+          }
+        },
+        {
+          "toolId": "can",
+          "tier": 1,
+          "gold": 2000,
+          "items": {
+            "wood": 10
+          }
+        },
+        {
+          "toolId": "can",
+          "tier": 2,
+          "gold": 5000,
+          "items": {
+            "wood": 20,
+            "copper-ore": 5
+          }
+        },
+        {
+          "toolId": "can",
+          "tier": 3,
+          "gold": 10000,
+          "items": {
+            "wood": 30,
+            "copper-ore": 10
+          }
+        },
+        {
+          "toolId": "axe",
+          "tier": 1,
+          "gold": 2000,
+          "items": {
+            "wood": 10
+          }
+        },
+        {
+          "toolId": "axe",
+          "tier": 2,
+          "gold": 5000,
+          "items": {
+            "wood": 20,
+            "copper-ore": 5
+          }
+        },
+        {
+          "toolId": "axe",
+          "tier": 3,
+          "gold": 10000,
+          "items": {
+            "wood": 30,
+            "copper-ore": 10
+          }
+        },
+        {
+          "toolId": "pick",
+          "tier": 1,
+          "gold": 2000,
+          "items": {
+            "wood": 10
+          }
+        },
+        {
+          "toolId": "pick",
+          "tier": 2,
+          "gold": 5000,
+          "items": {
+            "wood": 20,
+            "copper-ore": 5
+          }
+        },
+        {
+          "toolId": "pick",
+          "tier": 3,
+          "gold": 10000,
+          "items": {
+            "wood": 30,
+            "copper-ore": 10
+          }
+        }
+      ]
+    }
+  ]
+}

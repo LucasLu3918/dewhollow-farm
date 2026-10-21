@@ -14,7 +14,7 @@ describe('sound catalog', () => {
   });
 
   it('maps every farm action to a sound that exists', () => {
-    expect(Object.keys(ACTION_SOUND).sort()).toEqual(['harvest', 'plant', 'ship', 'till', 'water']);
+    expect(Object.keys(ACTION_SOUND).sort()).toEqual(['chop', 'fish', 'forage', 'harvest', 'mine', 'plant', 'ship', 'till', 'water']);
     for (const id of Object.values(ACTION_SOUND)) expect(SOUND_IDS).toContain(id);
   });
 

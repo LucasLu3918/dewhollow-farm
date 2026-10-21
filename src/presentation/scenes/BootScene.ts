@@ -10,6 +10,7 @@ import type { ContentPack, Direction } from '../../domain/content';
 import type { TerrainDef } from '../../infrastructure/content/content-schema';
 import type { SoundPlayer } from '../audio/sound-player';
 import { registerEmoteTextures } from '../emote';
+import { registerAnimalTextures } from '../animal-art';
 import { MapScene, type MapSceneDeps } from './MapScene';
 import { TILE_SIZE, UNIT } from '../constants';
 
@@ -54,6 +55,7 @@ export class BootScene extends Phaser.Scene {
     }
     // 表情氣泡不產圖：用 Graphics 畫成貼圖（顏色取自共用調色盤）。
     registerEmoteTextures(this);
+    registerAnimalTextures(this);
     // 入庫的圖片多半是縮小顯示的高解析母版；遊戲設定為像素風（最近鄰），縮小時會鋸齒，改用線性取樣。
     for (const entry of this.deps.assets.assets) {
       if (entry.file && this.textures.exists(entry.id)) {

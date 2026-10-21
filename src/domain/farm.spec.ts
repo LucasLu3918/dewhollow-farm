@@ -103,3 +103,18 @@ describe('farm plots', () => {
     });
   });
 });
+
+describe('fertilizer on a planted field (施肥的田)', () => {
+  it('keeps the fertilizer while the crop grows overnight', () => {
+    const plots = { '4,4': { watered: true, crop: { cropId: 'moon-bean', growthDays: 0 }, dryDays: 0, fertilizer: 'basic' as const } };
+    const grown = growCrops(plots, () => 2).plots['4,4'];
+    expect(grown?.crop?.growthDays).toBe(1);
+    expect(grown?.fertilizer).toBe('basic');
+  });
+
+  it('a harvested field loses its fertilizer with the crop', () => {
+    const plots = { '4,4': { watered: true, crop: { cropId: 'moon-bean', growthDays: 2 }, dryDays: 0, fertilizer: 'fine' as const } };
+    const result = harvestPlot(plots, '4,4', 2);
+    expect(result.ok && result.value.plots['4,4']).toEqual({ watered: true, crop: null, dryDays: 0 });
+  });
+});

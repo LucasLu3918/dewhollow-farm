@@ -1,8 +1,89 @@
 {
   "version": 1,
   "tools": [
-    {"id": "hoe", "action": "till", "asset": "tool.hoe", "textureSize": {"width": 96, "height": 96}, "grip": {"x": 42, "y": 68}, "swing": "chop"},
-    {"id": "can", "action": "water", "asset": "tool.can", "textureSize": {"width": 96, "height": 96}, "grip": {"x": 10, "y": 58}, "swing": "pour"},
-    {"id": "seedbag", "action": "plant", "asset": "tool.seedbag", "textureSize": {"width": 96, "height": 96}, "grip": {"x": 50, "y": 30}, "swing": "sow"}
+    {
+      "id": "hoe",
+      "action": "till",
+      "asset": "tool.hoe",
+      "textureSize": {
+        "width": 96,
+        "height": 96
+      },
+      "grip": {
+        "x": 42,
+        "y": 68
+      },
+      "swing": "chop"
+    },
+    {
+      "id": "can",
+      "action": "water",
+      "asset": "tool.can",
+      "textureSize": {
+        "width": 96,
+        "height": 96
+      },
+      "grip": {
+        "x": 10,
+        "y": 58
+      },
+      "swing": "pour"
+    },
+    {
+      "id": "seedbag",
+      "action": "plant",
+      "asset": "tool.seedbag",
+      "textureSize": {
+        "width": 96,
+        "height": 96
+      },
+      "grip": {
+        "x": 50,
+        "y": 30
+      },
+      "swing": "sow"
+    },
+    {
+      "id": "axe",
+      "action": "chop",
+      "asset": "tool.axe",
+      "textureSize": {
+        "width": 96,
+        "height": 96
+      },
+      "grip": {
+        "x": 42,
+        "y": 68
+      },
+      "swing": "chop"
+    },
+    {
+      "id": "pick",
+      "action": "mine",
+      "asset": "tool.pick",
+      "textureSize": {
+        "width": 96,
+        "height": 96
+      },
+      "grip": {
+        "x": 42,
+        "y": 68
+      },
+      "swing": "chop"
+    },
+    {
+      "id": "rod",
+      "action": "fish",
+      "asset": "tool.rod",
+      "textureSize": {
+        "width": 96,
+        "height": 96
+      },
+      "grip": {
+        "x": 42,
+        "y": 68
+      },
+      "swing": "pour"
+    }
   ]
 }

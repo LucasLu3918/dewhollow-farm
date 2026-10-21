@@ -33,7 +33,7 @@ async function textureSize(page: Page, key: string): Promise<{ width: number; he
 async function waitForGame(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
-  await expect(page.locator('#hud-day')).toHaveText('第 1 天');
+  await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 1 天');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 }
 
@@ -100,8 +100,8 @@ test('each direction has its own image, and facing right mirrors the side image'
 
 test('Maomao in the village uses the real image and stands on his tile', async ({ page }) => {
   await waitForGame(page);
-  // 從 (7,9) 往南走 14 格，穿過農場南門進入村莊。
-  for (let i = 0; i < 14; i += 1) await page.keyboard.press('ArrowDown');
+  // 從 (7,9) 往南走 20 格，穿過農場南門 (7,29) 進入村莊。
+  for (let i = 0; i < 20; i += 1) await page.keyboard.press('ArrowDown');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
 
   expect(await textureSize(page, 'npc.maomao')).toEqual({ width: 128, height: 160 });

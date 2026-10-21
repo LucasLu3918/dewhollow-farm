@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "note": "食譜：在廚房做（站在廚房前面）。level 是需要的烹飪等級；吃了回復 energy 點體力。",
+  "recipes": [
+    {
+      "id": "mint-tea",
+      "name": "薄荷茶",
+      "ingredients": {
+        "mint": 2
+      },
+      "energy": 20,
+      "level": 0,
+      "sellPrice": 40
+    },
+    {
+      "id": "fried-egg",
+      "name": "煎蛋",
+      "ingredients": {
+        "egg": 1
+      },
+      "energy": 15,
+      "level": 0,
+      "sellPrice": 30
+    },
+    {
+      "id": "fish-stew",
+      "name": "魚湯",
+      "ingredients": {
+        "fish.carp": 1,
+        "mint": 1
+      },
+      "energy": 40,
+      "level": 3,
+      "sellPrice": 120
+    }
+  ]
+}

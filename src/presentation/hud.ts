@@ -1,12 +1,9 @@
 import type { ContentPack } from '../domain/content';
-import { formatClock } from '../domain/calendar';
-import type { GameState, ToolId } from '../domain/game-state';
-
-const TOOL_LABEL: Record<ToolId, string> = {
-  hoe: '鋤頭',
-  can: '水壺',
-  seedbag: '種子袋',
-};
+import { dateLabel, formatClock } from '../domain/calendar';
+import type { GameState } from '../domain/game-state';
+import { TOOL_NAMES, type ToolId } from '../domain/tools';
+import { levelOf, SKILL_IDS, SKILL_NAMES } from '../domain/skills';
+import { WEATHER_NAMES } from '../domain/weather';
 
 const LOG_LIMIT = 6;
 
@@ -14,6 +11,8 @@ const LOG_LIMIT = 6;
 export class Hud {
   private readonly clock: HTMLElement;
   private readonly day: HTMLElement;
+  private readonly weather: HTMLElement;
+  private readonly skills: HTMLElement;
   private readonly gold: HTMLElement;
   private readonly energyFill: HTMLElement;
   private readonly energyText: HTMLElement;
@@ -24,6 +23,8 @@ export class Hud {
   constructor(doc: Document) {
     this.clock = required(doc, '#hud-clock');
     this.day = required(doc, '#hud-day');
+    this.weather = required(doc, '#hud-weather');
+    this.skills = required(doc, '#hud-skills');
     this.gold = required(doc, '#hud-gold');
     this.energyFill = required(doc, '#hud-energy-fill');
     this.energyText = required(doc, '#hud-energy-text');
@@ -34,12 +35,14 @@ export class Hud {
 
   update(state: GameState, pack: ContentPack): void {
     this.clock.textContent = formatClock(state.calendar);
-    this.day.textContent = `第 ${state.calendar.day} 天`;
+    this.day.textContent = dateLabel(state.calendar);
+    this.weather.textContent = `${WEATHER_NAMES[state.weather]}　明天：${WEATHER_NAMES[state.forecast]}`;
     this.gold.textContent = `${state.gold} 金`;
+    this.skills.textContent = SKILL_IDS.map((id) => `${SKILL_NAMES[id]} ${levelOf(state.skills[id], pack.tuning.skills.thresholds)}`).join('　');
     const ratio = Math.max(0, Math.min(1, state.energy.current / (state.energy.max || 1)));
     this.energyFill.style.width = `${Math.round(ratio * 100)}%`;
     this.energyText.textContent = `${state.energy.current} / ${state.energy.max}`;
-    this.tool.textContent = TOOL_LABEL[state.tool];
+    this.tool.textContent = TOOL_NAMES[state.tool];
     const crop = pack.crops.find((c) => c.id === state.selectedSeed);
     this.seed.textContent = state.tool === 'seedbag' ? `種子：${crop?.name ?? state.selectedSeed}` : '';
   }

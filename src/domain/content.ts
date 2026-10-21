@@ -1,5 +1,10 @@
 /** 內容的純型別定義。資料實體放在 content/*.json，由基礎設施層載入並驗證。 */
 
+import type { Season } from './calendar';
+import type { WeatherTable } from './weather';
+import type { ItemDef } from './items';
+import type { ToolId } from './tools';
+
 export interface Point {
   x: number;
   y: number;
@@ -12,6 +17,8 @@ export interface CropDef {
   name: string;
   seedPrice: number;
   growthDays: number;
+  /** 可以在哪些季節種植；換季時不在名單內的作物會枯死。 */
+  seasons: Season[];
 }
 
 export interface NpcDef {
@@ -22,13 +29,41 @@ export interface NpcDef {
   gift?: { cropId: string; count: number };
 }
 
-export type TileKind = 'grass' | 'field' | 'path' | 'wall' | 'bed' | 'shipbox' | 'door';
+export type TileKind =
+  | 'kitchen'
+  | 'workshop'
+  | 'trough'
+  | 'workbench'
+  | 'shop'
+  | 'forage'
+  | 'ore'
+  | 'stairs'
+  | 'grass'
+  | 'field'
+  | 'path'
+  | 'wall'
+  | 'bed'
+  | 'shipbox'
+  | 'door'
+  | 'tree'
+  | 'water'
+  | 'floor'
+  | 'furniture'
+  | 'cave'
+  | 'rock';
 
 export interface TileDef {
   kind: TileKind;
   /** 僅門會用到：通往的地圖與落點。 */
   to?: string;
   spawn?: Point;
+  /** 僅櫃檯會用到：屬於哪一家店（見 shops.json）。 */
+  shop?: string;
+  /** 雞舍的座位：動物坐在這裡。 */
+  slot?: boolean;
+  /** 採集點：採到的物品（省略為野薄荷）與能採的季節（省略為四季皆可）。 */
+  item?: string;
+  seasons?: Season[];
 }
 
 export interface MapNpcPlacement {
@@ -64,4 +99,95 @@ export interface ContentPack {
   maps: MapDef[];
   start: StartConfig;
   tuning: Tuning;
+  weather: WeatherTable;
+  /** 不是作物衍生的物品（木材、野薄荷、礦石）。 */
+  items: ItemDef[];
+  /** 魚的種類（釣到的魚會變成 fish.<id> 物品）。 */
+  fish: FishDef[];
+  /** 雞舍的動物種類。 */
+  animals: AnimalDef[];
+  /** 食譜（廚房做菜，吃了回復體力）。 */
+  recipes: RecipeDef[];
+  /** 合成配方（工作台）。 */
+  crafting: CraftingRecipeDef[];
+  /** 加工機的配方（醃漬、烘乾）。 */
+  processing: ProcessingDef[];
+  shops: ShopDef[];
+}
+
+export interface RecipeDef {
+  id: string;
+  name: string;
+  /** 物品 id → 數量。 */
+  ingredients: Record<string, number>;
+  /** 吃下去回復的體力。 */
+  energy: number;
+  /** 需要的烹飪等級。 */
+  level: number;
+  sellPrice: number;
+}
+
+/** 加工機的配方：材料放進去，過 days 天後取回一份成品（output 是物品 id）。 */
+export interface ProcessingDef {
+  id: string;
+  name: string;
+  /** 物品 id → 數量。 */
+  ingredients: Record<string, number>;
+  output: string;
+  days: number;
+  /** 需要的烹飪等級。 */
+  level: number;
+}
+
+/** 合成的效果：flag 只能做一次（例如灑水器）；bagSlots 增加背包格數，最多 max 次（木箱）。 */
+export type CraftEffect = { type: 'flag'; flag: string } | { type: 'bagSlots'; slots: number; max: number };
+
+/** 合成配方（工作台）。產物與效果至少要有一個；unlock 省略表示一開始就能做。 */
+export interface CraftingRecipeDef {
+  id: string;
+  name: string;
+  /** 物品 id → 數量。 */
+  ingredients: Record<string, number>;
+  output?: { item: string; count: number };
+  effect?: CraftEffect;
+  unlock?: { skill: string; level: number };
+  /** 內容時數的估計（分鐘），見 docs/PLAYTIME_PLAN.md。 */
+  playMinutes: number;
+}
+
+export interface AnimalDef {
+  id: string;
+  name: string;
+  eggItem: string;
+  eggQuality: number;
+}
+
+export interface FishDef {
+  id: string;
+  name: string;
+  sellPrice: number;
+  /** 哪些季節的湖裡有這種魚。 */
+  seasons: Season[];
+  /** 同一季節中被釣到的相對機率（正整數）。 */
+  weight: number;
+}
+
+export interface ShopStock {
+  itemId: string;
+  price: number;
+}
+
+/** 升級工具到某一階需要的金幣與材料（材料是 物品 id → 數量）。 */
+export interface ToolUpgrade {
+  toolId: ToolId;
+  tier: number;
+  gold: number;
+  items: Record<string, number>;
+}
+
+export interface ShopDef {
+  id: string;
+  name: string;
+  stock: ShopStock[];
+  upgrades: ToolUpgrade[];
 }

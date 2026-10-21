@@ -63,21 +63,23 @@ async function readRecord(page: Page): Promise<{ state: Record<string, unknown> 
   );
 }
 
-test('loads a v1 save and rewrites it as v2 on the next save', async ({ page }) => {
+test('loads a v1 save and rewrites it as the current version on the next save', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
   await putRecord(page, V1_RECORD);
 
   await page.reload();
   await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
-  await expect(page.locator('#hud-day')).toHaveText('第 4 天');
+  await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 4 天');
   await expect(page.locator('#hud-gold')).toHaveText('250 金');
 
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
 
   const saved = await readRecord(page);
-  expect(saved.state.schemaVersion).toBe(2);
+  expect(saved.state.schemaVersion).toBe(11);
+  expect(saved.state).toHaveProperty('weather');
+  expect(saved.state).toHaveProperty('toolTiers');
   expect(saved.state).not.toHaveProperty('bag');
   expect(saved.state.inventory).toMatchObject({
     stacks: [

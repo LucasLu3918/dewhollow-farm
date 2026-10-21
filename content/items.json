@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "note": "不是作物衍生的物品（作物與種子由 crops.json 產生）。kind processed 是加工機的成品（見 processing.json）；kind craft 是合成的成品（見 crafting.json）。木材、石頭、乾草、銅礦石沒有售價：是合成與升級的材料，不能出貨。",
+  "items": [
+    {
+      "id": "wood",
+      "name": "木材",
+      "kind": "material",
+      "maxStack": 99
+    },
+    {
+      "id": "mint",
+      "name": "野薄荷",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 14
+    },
+    {
+      "id": "copper-ore",
+      "name": "銅礦石",
+      "kind": "ore",
+      "maxStack": 99
+    },
+    {
+      "id": "stone",
+      "name": "石頭",
+      "kind": "material",
+      "maxStack": 99
+    },
+    {
+      "id": "hay",
+      "name": "乾草",
+      "kind": "material",
+      "maxStack": 99
+    },
+    {
+      "id": "egg",
+      "name": "雞蛋",
+      "kind": "animal",
+      "maxStack": 99,
+      "sellPrice": 25
+    },
+    {
+      "id": "pickle-bean",
+      "name": "醃豆",
+      "kind": "processed",
+      "maxStack": 99,
+      "sellPrice": 90
+    },
+    {
+      "id": "dried-mint",
+      "name": "乾薄荷",
+      "kind": "processed",
+      "maxStack": 99,
+      "sellPrice": 40
+    },
+    {
+      "id": "pickle-radish",
+      "name": "醃蘿蔔",
+      "kind": "processed",
+      "maxStack": 99,
+      "sellPrice": 150
+    },
+    {
+      "id": "dried-carp",
+      "name": "魚乾",
+      "kind": "processed",
+      "maxStack": 99,
+      "sellPrice": 60
+    },
+    {
+      "id": "dried-bass",
+      "name": "月光魚乾",
+      "kind": "processed",
+      "maxStack": 99,
+      "sellPrice": 180
+    },
+    {
+      "id": "mushroom",
+      "name": "野菇",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 10
+    },
+    {
+      "id": "berry",
+      "name": "野莓",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 6
+    },
+    {
+      "id": "flower-spring",
+      "name": "春花",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 5
+    },
+    {
+      "id": "flower-summer",
+      "name": "夏花",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 6
+    },
+    {
+      "id": "herb",
+      "name": "藥草",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 8
+    },
+    {
+      "id": "fertilizer-basic",
+      "name": "普通肥料",
+      "kind": "material",
+      "maxStack": 99
+    },
+    {
+      "id": "fertilizer-fine",
+      "name": "優良肥料",
+      "kind": "material",
+      "maxStack": 99
+    },
+    {
+      "id": "bait",
+      "name": "魚餌",
+      "kind": "material",
+      "maxStack": 99
+    },
+    {
+      "id": "vase",
+      "name": "花瓶",
+      "kind": "craft",
+      "maxStack": 99,
+      "sellPrice": 40
+    },
+    {
+      "id": "lantern",
+      "name": "小燈籠",
+      "kind": "craft",
+      "maxStack": 99,
+      "sellPrice": 60
+    },
+    {
+      "id": "flower-crown",
+      "name": "花冠",
+      "kind": "craft",
+      "maxStack": 99,
+      "sellPrice": 30
+    },
+    {
+      "id": "dried-bouquet",
+      "name": "乾燥花束",
+      "kind": "craft",
+      "maxStack": 99,
+      "sellPrice": 35
+    },
+    {
+      "id": "fence",
+      "name": "木柵欄",
+      "kind": "craft",
+      "maxStack": 99,
+      "sellPrice": 4
+    },
+    {
+      "id": "slate",
+      "name": "石板",
+      "kind": "craft",
+      "maxStack": 99,
+      "sellPrice": 8
+    }
+  ]
+}

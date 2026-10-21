@@ -1,0 +1,42 @@
+{
+  "id": "coop",
+  "name": "雞舍",
+  "width": 8,
+  "height": 6,
+  "rows": [
+    "########",
+    "#P..P..#",
+    "#......#",
+    "#..P..T#",
+    "#......#",
+    "###D####"
+  ],
+  "legend": {
+    "#": {
+      "kind": "wall"
+    },
+    ".": {
+      "kind": "floor"
+    },
+    "P": {
+      "kind": "floor",
+      "slot": true
+    },
+    "T": {
+      "kind": "trough"
+    },
+    "D": {
+      "kind": "door",
+      "to": "farm",
+      "spawn": {
+        "x": 34,
+        "y": 5
+      }
+    }
+  },
+  "spawn": {
+    "x": 3,
+    "y": 4
+  },
+  "npcs": []
+}

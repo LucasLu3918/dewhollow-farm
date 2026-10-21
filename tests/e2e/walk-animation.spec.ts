@@ -37,7 +37,7 @@ async function rigInfo(page: Page): Promise<{ view: string; mode: string; visibl
 async function waitForGame(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
-  await expect(page.locator('#hud-day')).toHaveText('第 1 天');
+  await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 1 天');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 }
 

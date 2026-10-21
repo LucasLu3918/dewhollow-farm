@@ -1,0 +1,99 @@
+{
+  "id": "forest",
+  "name": "山腳森林",
+  "width": 24,
+  "height": 16,
+  "rows": [
+    "TTTTTTTTTTTTNTTTTTTTTTTT",
+    "T..TT.........TTT......T",
+    "T..T.M.TT.M...T..B...B..",
+    "T.F...TTT....F....TTH..T",
+    "T....T...........TTT...T",
+    "T...G...G.=====.J...J..T",
+    "T.........=..........T.L",
+    "W=========.....TT.......",
+    "T..........=....TT.....T",
+    "T.H....TT...=..........T",
+    "T......TT...=..TT......T",
+    "T..........H.=..TTT....T",
+    "T.TT.........=.........T",
+    "T.TT......TT.=.........T",
+    "T.........TTT=....TT...T",
+    "TTTTTTTTTTTTTTTTTTTTTTTT"
+  ],
+  "legend": {
+    "T": {
+      "kind": "tree"
+    },
+    ".": {
+      "kind": "grass"
+    },
+    "=": {
+      "kind": "path"
+    },
+    "W": {
+      "kind": "door",
+      "to": "farm",
+      "spawn": {
+        "x": 30,
+        "y": 7
+      }
+    },
+    "L": {
+      "kind": "door",
+      "to": "lake",
+      "spawn": {
+        "x": 1,
+        "y": 7
+      }
+    },
+    "N": {
+      "kind": "door",
+      "to": "mine-entrance",
+      "spawn": {
+        "x": 8,
+        "y": 8
+      }
+    },
+    "H": {
+      "kind": "forage"
+    },
+    "M": {
+      "kind": "forage",
+      "item": "mushroom",
+      "seasons": [
+        "spring"
+      ]
+    },
+    "B": {
+      "kind": "forage",
+      "item": "berry",
+      "seasons": [
+        "summer"
+      ]
+    },
+    "F": {
+      "kind": "forage",
+      "item": "flower-spring",
+      "seasons": [
+        "spring"
+      ]
+    },
+    "G": {
+      "kind": "forage",
+      "item": "flower-summer",
+      "seasons": [
+        "summer"
+      ]
+    },
+    "J": {
+      "kind": "forage",
+      "item": "herb"
+    }
+  },
+  "spawn": {
+    "x": 2,
+    "y": 7
+  },
+  "npcs": []
+}

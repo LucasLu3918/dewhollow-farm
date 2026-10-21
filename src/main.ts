@@ -10,6 +10,19 @@ import companions from '../content/companions.json';
 import tools from '../content/tools.json';
 import sounds from '../content/sounds.json';
 import terrain from '../content/terrain.json';
+import weather from '../content/weather.json';
+import items from '../content/items.json';
+import shops from '../content/shops.json';
+import fish from '../content/fish.json';
+import animals from '../content/animals.json';
+import recipes from '../content/recipes.json';
+import processing from '../content/processing.json';
+import crafting from '../content/crafting.json';
+import forest from '../content/maps/forest.json';
+import lake from '../content/maps/lake.json';
+import house from '../content/maps/house.json';
+import mineEntrance from '../content/maps/mine-entrance.json';
+import coop from '../content/maps/coop.json';
 import farm from '../content/maps/farm.json';
 import village from '../content/maps/village.json';
 import { createContentIndex } from './application/content-index';
@@ -31,12 +44,16 @@ import { SoundPlayer } from './presentation/audio/sound-player';
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
-  const loaded = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, tools, sounds, terrain });
+  const loaded = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
   const index = createContentIndex(loaded.pack);
 
   let repository: SaveRepository;
   if (hasIndexedDb()) {
-    repository = new IndexedDbSaveRepository({ inventoryCapacity: loaded.pack.tuning.inventory.capacity });
+    repository = new IndexedDbSaveRepository({
+      inventoryCapacity: loaded.pack.tuning.inventory.capacity,
+      daysPerSeason: loaded.pack.tuning.time.daysPerSeason,
+      wakeMinute: loaded.pack.tuning.time.wakeMinute,
+    });
   } else {
     repository = new MemorySaveRepository();
     hud.error('這個瀏覽器無法使用 IndexedDB，存檔只會保留在本頁面，重新整理後會遺失。');

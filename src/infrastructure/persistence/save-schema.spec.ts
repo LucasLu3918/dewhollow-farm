@@ -5,19 +5,32 @@ import start from '../../../content/start.json';
 import tuning from '../../../content/tuning.json';
 import farm from '../../../content/maps/farm.json';
 import village from '../../../content/maps/village.json';
+import forest from '../../../content/maps/forest.json';
+import lake from '../../../content/maps/lake.json';
+import house from '../../../content/maps/house.json';
+import mineEntrance from '../../../content/maps/mine-entrance.json';
+import coop from '../../../content/maps/coop.json';
 import { createNewGame } from '../../domain/game-state';
 import { loadContent } from '../content/load-content';
 import assets from '../../../content/assets.json';
 import rigs from '../../../content/rigs.json';
 import companions from '../../../content/companions.json';
 import tools from '../../../content/tools.json';
+import weather from '../../../content/weather.json';
+import items from '../../../content/items.json';
+import shops from '../../../content/shops.json';
+import fish from '../../../content/fish.json';
+import animals from '../../../content/animals.json';
+import recipes from '../../../content/recipes.json';
+import processing from '../../../content/processing.json';
+import crafting from '../../../content/crafting.json';
 import sounds from '../../../content/sounds.json';
 import terrain from '../../../content/terrain.json';
 import { SaveFormatError } from './save-errors';
 import { parseSaveRecord } from './save-schema';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, tools, sounds, terrain });
-const context = { inventoryCapacity: pack.tuning.inventory.capacity };
+const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
+const context = { inventoryCapacity: pack.tuning.inventory.capacity, daysPerSeason: pack.tuning.time.daysPerSeason, wakeMinute: pack.tuning.time.wakeMinute };
 
 function record(state: unknown) {
   return { slot: 'slot-1', savedAt: '2026-10-21T00:00:00.000Z', state };
@@ -84,7 +97,7 @@ describe('save schema with an old save', () => {
 
   it('loads a v1 save as a current-version state', () => {
     const { state } = parseSaveRecord(record(v1), context);
-    expect(state.schemaVersion).toBe(2);
+    expect(state.schemaVersion).toBe(11);
     expect(state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
     expect(state.playtimeSeconds).toBe(0);
     expect(state.calendar.day).toBe(2);

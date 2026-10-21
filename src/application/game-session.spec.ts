@@ -9,8 +9,21 @@ import companions from '../../content/companions.json';
 import tools from '../../content/tools.json';
 import sounds from '../../content/sounds.json';
 import terrain from '../../content/terrain.json';
+import weather from '../../content/weather.json';
+import items from '../../content/items.json';
+import shops from '../../content/shops.json';
+import fish from '../../content/fish.json';
+import animals from '../../content/animals.json';
+import recipes from '../../content/recipes.json';
+import processing from '../../content/processing.json';
+import crafting from '../../content/crafting.json';
 import farm from '../../content/maps/farm.json';
 import village from '../../content/maps/village.json';
+import forest from '../../content/maps/forest.json';
+import lake from '../../content/maps/lake.json';
+import house from '../../content/maps/house.json';
+import mineEntrance from '../../content/maps/mine-entrance.json';
+import coop from '../../content/maps/coop.json';
 import { loadContent } from '../infrastructure/content/load-content';
 import { MemorySaveRepository } from '../infrastructure/persistence/memory-save-repository';
 import { createContentIndex } from './content-index';
@@ -18,12 +31,12 @@ import { GameSession } from './game-session';
 import type { SaveRecord, SaveRepository } from './ports';
 import { createNewGame, type GameState } from '../domain/game-state';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, tools, sounds, terrain });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
 const index = createContentIndex(pack);
 
 /** 測試輔助：把玩家放到指定位置後建立 session。 */
-function sessionAt(player: GameState['player'], repo: SaveRepository) {
-  const state = { ...createNewGame(pack, 1), player };
+function sessionAt(player: GameState['player'], repo: SaveRepository, mapId = 'farm') {
+  const state = { ...createNewGame(pack, 1), player, mapId };
   return new GameSession(state, index, repo);
 }
 
@@ -48,7 +61,7 @@ describe('GameSession', () => {
 
   it('autosaves when the player sleeps', async () => {
     const repo = new MemorySaveRepository();
-    const session = sessionAt({ x: 3, y: 1, facing: 'left' }, repo); // 床位 (2,1)
+    const session = sessionAt({ x: 2, y: 1, facing: 'left' }, repo, 'house'); // 小屋裡的床 (1,1)
     const outcome = await session.dispatch({ type: 'interact' });
     expect(outcome.events).toContainEqual({ type: 'slept' });
     expect((await repo.load('slot-1'))?.state.calendar.day).toBe(2);
@@ -72,7 +85,7 @@ describe('GameSession', () => {
         throw new Error('QuotaExceededError');
       },
     };
-    const session = sessionAt({ x: 3, y: 1, facing: 'left' }, failing);
+    const session = sessionAt({ x: 2, y: 1, facing: 'left' }, failing, 'house');
     const outcome = await session.dispatch({ type: 'interact' });
     expect(outcome.messages).toContain('自動存檔失敗：QuotaExceededError');
   });

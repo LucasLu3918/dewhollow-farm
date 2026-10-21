@@ -1,4 +1,5 @@
 import { fail, ok, type Result } from './result';
+import type { Fertilizer } from './fertilizer';
 
 export interface CropState {
   cropId: string;
@@ -7,6 +8,8 @@ export interface CropState {
 
 /** 已開墾的田地狀態。未開墾的格子不會出現在 PlotMap 中。 */
 export interface PlotState {
+  /** 施過的肥料（收成時的品質加成，收成後田就清空）。 */
+  fertilizer?: Fertilizer;
   watered: boolean;
   crop: CropState | null;
   /** 連續幾晚有作物卻沒有澆水；第 1 晚扣成長天數，第 2 晚枯死。 */
@@ -65,7 +68,8 @@ export function harvestPlot(
   if (!plot.crop) return fail('NO_CROP');
   if (!isRipe(plot.crop, maturityDays)) return fail('NOT_RIPE');
   const cropId = plot.crop.cropId;
-  return ok({ plots: { ...plots, [key]: { ...plot, crop: null } }, cropId });
+  const { fertilizer: _used, ...cleared } = plot;
+  return ok({ plots: { ...plots, [key]: { ...cleared, crop: null } }, cropId });
 }
 
 /**
@@ -85,6 +89,7 @@ export function growCrops(plots: PlotMap, maturityDaysFor: (cropId: string) => n
     } else if (plot.watered) {
       const cap = maturityDaysFor(crop.cropId);
       next[key] = {
+        ...keepFertilizer(plot),
         watered: false,
         crop: { ...crop, growthDays: Math.min(crop.growthDays + 1, cap) },
         dryDays: 0,
@@ -94,6 +99,7 @@ export function growCrops(plots: PlotMap, maturityDaysFor: (cropId: string) => n
       next[key] = { watered: false, crop: null, dryDays: 0 };
     } else {
       next[key] = {
+        ...keepFertilizer(plot),
         watered: false,
         crop: { ...crop, growthDays: Math.max(crop.growthDays - 1, 0) },
         dryDays: plot.dryDays + 1,
@@ -101,4 +107,16 @@ export function growCrops(plots: PlotMap, maturityDaysFor: (cropId: string) => n
     }
   }
   return { plots: next, withered };
+}
+
+/** 睡覺時作物還在，肥料也要留著。 */
+function keepFertilizer(plot: PlotState): Pick<PlotState, 'fertilizer'> {
+  return plot.fertilizer ? { fertilizer: plot.fertilizer } : {};
+}
+
+/** 下雨時替所有田地澆水（不論有沒有作物）。 */
+export function waterAllPlots(plots: PlotMap): PlotMap {
+  const next: PlotMap = {};
+  for (const [key, plot] of Object.entries(plots)) next[key] = { ...plot, watered: true };
+  return next;
 }

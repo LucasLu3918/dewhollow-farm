@@ -1,6 +1,6 @@
 import type { Direction, MapDef, Point, TileDef, TileKind } from './content';
 
-const WALKABLE: ReadonlySet<TileKind> = new Set<TileKind>(['grass', 'field', 'path', 'door']);
+const WALKABLE: ReadonlySet<TileKind> = new Set<TileKind>(['grass', 'field', 'path', 'door', 'floor', 'forage', 'stairs']);
 
 export function tileAt(map: MapDef, x: number, y: number): TileDef | null {
   if (x < 0 || y < 0 || x >= map.width || y >= map.height) return null;

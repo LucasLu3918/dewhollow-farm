@@ -2,8 +2,47 @@
   "version": 1,
   "note": "走在不同地面時的腳步：塵土顏色與腳步音效。每種可走的地形都必須有一筆（載入時檢查）。M3 加入水邊、雪地時在這裡新增。",
   "terrains": [
-    { "kind": "grass", "footstep": { "dust": "#7fcf6b", "sound": "step.soft" } },
-    { "kind": "field", "footstep": { "dust": "#8a6a48", "sound": "step.dirt" } },
-    { "kind": "path", "footstep": { "dust": "#d8c9a0", "sound": "step.stone" } }
+    {
+      "kind": "grass",
+      "footstep": {
+        "dust": "#7fcf6b",
+        "sound": "step.soft"
+      }
+    },
+    {
+      "kind": "field",
+      "footstep": {
+        "dust": "#8a6a48",
+        "sound": "step.dirt"
+      }
+    },
+    {
+      "kind": "path",
+      "footstep": {
+        "dust": "#d8c9a0",
+        "sound": "step.stone"
+      }
+    },
+    {
+      "kind": "floor",
+      "footstep": {
+        "dust": "#c9a06e",
+        "sound": "step.wood"
+      }
+    },
+    {
+      "kind": "forage",
+      "footstep": {
+        "dust": "#7fcf6b",
+        "sound": "step.soft"
+      }
+    },
+    {
+      "kind": "stairs",
+      "footstep": {
+        "dust": "#8c8a96",
+        "sound": "step.stone"
+      }
+    }
   ]
 }

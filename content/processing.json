@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "note": "加工機（house 的加工台）的配方。放入材料後機器開始加工，過 days 天（睡覺時推進）就完成，之後要站在加工台前取回成品。同時最多 tuning.processing.slots 批。level 是需要的烹飪等級。",
+  "recipes": [
+    {
+      "id": "pickle-bean",
+      "name": "醃月光豆",
+      "ingredients": {
+        "crop.moon-bean": 1
+      },
+      "output": "pickle-bean",
+      "days": 1,
+      "level": 0
+    },
+    {
+      "id": "dried-mint",
+      "name": "烘乾薄荷",
+      "ingredients": {
+        "mint": 2
+      },
+      "output": "dried-mint",
+      "days": 1,
+      "level": 0
+    },
+    {
+      "id": "pickle-radish",
+      "name": "醃蘿蔔",
+      "ingredients": {
+        "crop.sweet-radish": 1
+      },
+      "output": "pickle-radish",
+      "days": 2,
+      "level": 2
+    },
+    {
+      "id": "dried-carp",
+      "name": "烘乾鯉魚",
+      "ingredients": {
+        "fish.carp": 1
+      },
+      "output": "dried-carp",
+      "days": 1,
+      "level": 2
+    },
+    {
+      "id": "dried-bass",
+      "name": "烘乾月光鱸",
+      "ingredients": {
+        "fish.bass": 1
+      },
+      "output": "dried-bass",
+      "days": 2,
+      "level": 4
+    }
+  ]
+}

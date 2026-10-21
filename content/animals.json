@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "note": "雞舍裡的動物。購買在雜貨店（stock 的 itemId 為 animal.<id>）；座位由雞舍地圖的 slot 格決定。",
+  "animals": [
+    {
+      "id": "chicken",
+      "name": "雞",
+      "eggItem": "egg",
+      "eggQuality": 0.3
+    }
+  ]
+}

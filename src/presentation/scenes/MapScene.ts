@@ -12,7 +12,18 @@ import type { RigDef, RigManifest } from '../../infrastructure/assets/rig-manife
 import type { TerrainDef } from '../../infrastructure/content/content-schema';
 import type { Hud } from '../hud';
 import { cameraBounds, deadzoneOf } from '../camera';
-import { TILE_SIZE } from '../constants';
+import { TILE_SIZE, VIEW_SIZE } from '../constants';
+import { nightAlpha, particleKind, particlePosition, seasonGrassTint, weatherDim } from '../atmosphere';
+import type { Season } from '../../domain/calendar';
+import type { TileKind } from '../../domain/content';
+import { changeAt, effectiveKind } from '../../domain/world-changes';
+import { ShopPanel } from '../shop-panel';
+import { KitchenPanel } from '../kitchen-panel';
+import { WorkshopPanel } from '../workshop-panel';
+import { WorkbenchPanel } from '../workbench-panel';
+import { slotsOf } from '../../domain/animals';
+import { CHICKEN_TEXTURE } from '../animal-art';
+import type { Weather } from '../../domain/weather';
 import { RENDER_COMPAT_KEY } from '../apply-render-compat';
 import { CharacterRig, type RigDebugInfo } from '../character-rig';
 import { centerOf, footOf, standOf } from '../layout';
@@ -56,6 +67,9 @@ const COMMAND_KEYS: Record<string, Command> = {
   x: { type: 'interact' },
   z: { type: 'cycleTool' },
   c: { type: 'cycleSeed' },
+  a: { type: 'takeTool', tool: 'axe' },
+  p: { type: 'takeTool', tool: 'pick' },
+  r: { type: 'takeTool', tool: 'rod' },
   s: { type: 'manualSave' },
 };
 
@@ -71,6 +85,14 @@ const REACT_DURATION_MS = 320;
 const DEPTH_RESIDENT = 5;
 const DEPTH_FOLLOWER = 9;
 const DEPTH_PLAYER = 10;
+/** 天色與天氣的遮罩、粒子，在世界之上、HUD（DOM）之下。 */
+const DEPTH_SKY = 40;
+/** 收線的時限（毫秒）：魚上鉤後要在這段時間內按 x。 */
+const REEL_WINDOW_MS = 1100;
+/** 夜色遮罩的顏色（深藍，比純黑自然）。 */
+const NIGHT_COLOR = 0x0b1030;
+/** 下雨時的遮罩顏色（灰藍）。 */
+const WEATHER_COLOR = 0x30405a;
 
 /** 鏡頭跟隨的平滑度：越大越貼緊玩家，1 為完全貼緊。 */
 const FOLLOW_LERP = 0.15;
@@ -176,6 +198,20 @@ export class MapScene extends Phaser.Scene {
    * 遊戲狀態是立刻改變的，但畫面上鋤頭還在空中時，田地不該已經翻好。
    */
   private heldPlots = new Map<string, PlotState | null>();
+  /** 每一格地圖的圖片與它原本的地形：玩家造成的變化（砍樹、採野薄荷）會換成草地。 */
+  private tileSprites: { x: number; y: number; base: TileKind; image: Phaser.GameObjects.Image }[] = [];
+  private shopPanel!: ShopPanel;
+  private kitchenPanel!: KitchenPanel;
+  private workshopPanel!: WorkshopPanel;
+  private workbenchPanel!: WorkbenchPanel;
+  /** 雞舍裡的動物圖片，每次重畫時重建。 */
+  private animalSprites: Phaser.GameObjects.Image[] = [];
+  /** 魚上鉤後等待收線的計時器（時限內按 x 就釣到，逾時魚跑掉）。 */
+  private reelTimer: Phaser.Time.TimerEvent | null = null;
+  private shownSeason: Season | null = null;
+  private nightShade!: Phaser.GameObjects.Rectangle;
+  private weatherShade!: Phaser.GameObjects.Rectangle;
+  private weatherGfx!: Phaser.GameObjects.Graphics;
   private terrainByKind = new Map<string, TerrainDef>();
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
@@ -189,11 +225,16 @@ export class MapScene extends Phaser.Scene {
 
   init(deps: MapSceneDeps): void {
     this.deps = deps;
+    this.shopPanel = new ShopPanel(document, deps.index, (command) => void this.run(command));
+    this.kitchenPanel = new KitchenPanel(document, deps.index, (command) => void this.run(command));
+    this.workshopPanel = new WorkshopPanel(document, deps.index, (command) => void this.run(command));
+    this.workbenchPanel = new WorkbenchPanel(document, deps.index, (command) => void this.run(command));
     this.terrainByKind = new Map(deps.terrain.map((entry) => [entry.kind, entry]));
   }
 
   create(): void {
     this.world = this.add.container(0, 0);
+    this.createSky();
     // 玩家骨架：腳底中心站在格子底邊中央，上半身與腳分開動作。
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
     this.rig.root.setDepth(DEPTH_PLAYER);
@@ -204,6 +245,15 @@ export class MapScene extends Phaser.Scene {
       window.removeEventListener('keydown', this.onKeyDown);
     });
     this.refresh();
+  }
+
+  /** 天色與天氣的遮罩與粒子：固定在畫面上（不隨鏡頭移動）。 */
+  private createSky(): void {
+    const { width, height } = VIEW_SIZE;
+    // 填色不透明度為 1，明暗只由 setAlpha 控制（填色若為 0 會把 setAlpha 乘成 0，什麼也看不見）。
+    this.nightShade = this.add.rectangle(0, 0, width, height, NIGHT_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
+    this.weatherShade = this.add.rectangle(0, 0, width, height, WEATHER_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
+    this.weatherGfx = this.add.graphics().setScrollFactor(0).setDepth(DEPTH_SKY + 1);
   }
 
   /** 鏡頭跟隨玩家：中央留一塊死區，玩家走到邊緣才捲動；邊界在換地圖時重設。 */
@@ -258,7 +308,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   private async handleKey(event: KeyboardEvent): Promise<void> {
-    const { hud, session, sounds } = this.deps;
+    const { hud, sounds } = this.deps;
     if (event.key.toLowerCase() === 'm') {
       // 靜音是玩家的偏好，不是遊戲指令，所以不經過應用層。
       event.preventDefault();
@@ -266,11 +316,48 @@ export class MapScene extends Phaser.Scene {
       hud.messages([muted ? '已靜音（按 M 開啟音效）' : '已開啟音效（按 M 靜音）']);
       return;
     }
+    if (this.reelTimer) {
+      // 魚上鉤了：只有 x 有用（收線），其餘按鍵等時限過了再說。
+      if (event.key.toLowerCase() === 'x') {
+        event.preventDefault();
+        this.finishReel(true);
+      }
+      return;
+    }
+    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen()) {
+      // 櫃檯或廚房開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠完成。
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.shopPanel.close();
+        this.kitchenPanel.close();
+        this.workshopPanel.close();
+        this.workbenchPanel.close();
+      }
+      return;
+    }
     const direction = MOVE_KEYS[event.key];
     const command = direction ? ({ type: 'move', direction } as const) : COMMAND_KEYS[event.key.toLowerCase()];
     if (!command) return;
     event.preventDefault();
+    await this.run(command);
+  }
 
+  /** 魚上鉤：頭上冒出驚嘆號，開始計時。 */
+  private startReel(): void {
+    this.showEmote('player', 'surprise');
+    this.reelTimer = this.time.delayedCall(REEL_WINDOW_MS, () => this.finishReel(false));
+  }
+
+  /** 收線結束：按得到（hit）就釣到魚，否則魚跑掉了。 */
+  private finishReel(hit: boolean): void {
+    this.reelTimer?.remove(false);
+    this.reelTimer = null;
+    void this.run({ type: 'reel', hit });
+  }
+
+  /** 把一個指令交給應用層，顯示訊息與效果，然後重畫。鍵盤與商店面板共用這條路。 */
+  private async run(command: Command): Promise<void> {
+    const { hud, session, sounds } = this.deps;
     const before = { ...session.state.player };
     const plotsBefore = session.state.plots;
     try {
@@ -281,6 +368,10 @@ export class MapScene extends Phaser.Scene {
     } catch (error) {
       hud.error(`存檔失敗：${error instanceof Error ? error.message : String(error)}`);
     }
+    this.shopPanel.refresh(session.state);
+    this.kitchenPanel.refresh(session.state);
+    this.workshopPanel.refresh(session.state);
+    this.workbenchPanel.refresh(session.state);
     this.refresh();
   }
 
@@ -292,11 +383,22 @@ export class MapScene extends Phaser.Scene {
       } else if (event.type === 'slept') {
         sleepEffect(this, this.deps.session.state.player.x, this.deps.session.state.player.y);
         this.deps.sounds.play('sleep');
+        this.log('slept');
       } else if (event.type === 'talked') {
         this.reactToTalk(event.npcId);
         this.deps.sounds.play(event.gifted ? 'gift' : 'talk');
       } else if (event.type === 'refused') {
         this.deps.sounds.play('refuse');
+      } else if (event.type === 'bite') {
+        this.startReel();
+      } else if (event.type === 'shopOpened') {
+        this.shopPanel.open(event.shopId, this.deps.session.state);
+      } else if (event.type === 'kitchenOpened') {
+        this.kitchenPanel.open(this.deps.session.state);
+      } else if (event.type === 'workshopOpened') {
+        this.workshopPanel.open(this.deps.session.state);
+      } else if (event.type === 'workbenchOpened') {
+        this.workbenchPanel.open(this.deps.session.state);
       } else if (event.type === 'saveRequested') {
         this.deps.sounds.play('save');
       }
@@ -416,10 +518,51 @@ export class MapScene extends Phaser.Scene {
     }
 
     this.showFacing(state.player.facing);
+    this.applySeason(state.calendar.season);
+    this.syncWorldTiles();
+    this.syncAnimals(state.mapId);
     this.drawPlots();
     this.movePlayer(state.player.x, state.player.y);
     this.moveFollowers(map, state.player, mapChanged);
     this.playerTile = { x: state.player.x, y: state.player.y };
+  }
+
+  /** 換季時重新染色草地（只在季節變了的時候動作）。 */
+  private applySeason(season: Season): void {
+    if (this.shownSeason === season) return;
+    this.shownSeason = season;
+    const tint = seasonGrassTint(season);
+    for (const sprite of this.tileSprites) {
+      if (sprite.image.texture.key === 'tile.grass') sprite.image.setTint(tint);
+    }
+  }
+
+  /** 雞舍的動物：每隻坐在對應的座位上（座位順序見 slotsOf）。 */
+  private syncAnimals(mapId: string): void {
+    for (const sprite of this.animalSprites) sprite.destroy();
+    this.animalSprites = [];
+    const state = this.deps.session.state;
+    const seats = slotsOf(this.deps.index.map(mapId));
+    seats.forEach((seat, i) => {
+      if (!state.animals[i]) return;
+      const sprite = this.add
+        .image(seat.x * TILE_SIZE + TILE_SIZE / 2, seat.y * TILE_SIZE + TILE_SIZE / 2, CHICKEN_TEXTURE)
+        .setDepth(6);
+      this.animalSprites.push(sprite);
+    });
+  }
+
+  /** 玩家造成的地圖變化（砍樹、採野薄荷、隔日恢復）即時反映到每一格的圖片上。 */
+  private syncWorldTiles(): void {
+    const state = this.deps.session.state;
+    for (const sprite of this.tileSprites) {
+      const kind = effectiveKind(sprite.base, changeAt(state.worldChanges, state.mapId, sprite.x, sprite.y));
+      const key = `tile.${kind}`;
+      if (sprite.image.texture.key === key) continue;
+      sprite.image.setTexture(key);
+      if (kind === 'grass' && this.shownSeason) sprite.image.setTint(seasonGrassTint(this.shownSeason));
+      else sprite.image.clearTint();
+    }
   }
 
   /** 換成面向的那一張圖；原地轉身時只換圖，不移動。 */
@@ -432,13 +575,16 @@ export class MapScene extends Phaser.Scene {
   private drawMap(mapId: string): void {
     this.world.removeAll(true);
     this.heldPlots.clear();
+    this.tileSprites = [];
     const map = this.deps.index.map(mapId);
 
     for (let y = 0; y < map.height; y += 1) {
       for (let x = 0; x < map.width; x += 1) {
         const tile = tileAt(map, x, y);
         if (!tile) continue;
-        this.world.add(this.image(`tile.${tile.kind}`, x, y, 0));
+        const image = this.image(`tile.${tile.kind}`, x, y, 0);
+        this.tileSprites.push({ x, y, base: tile.kind, image });
+        this.world.add(image);
       }
     }
 
@@ -579,10 +725,38 @@ export class MapScene extends Phaser.Scene {
     this.rig.walkTo(stand.x, stand.y, MOVE_DURATION_MS);
   }
 
-  override update(_time: number, delta: number): void {
+  override update(time: number, delta: number): void {
+    this.updateSky(time);
     this.rig.update(delta);
     for (const rig of this.npcRigs.values()) rig.update(delta);
     for (const state of this.companions.values()) state.rig.update(delta);
+  }
+
+  /** 每一畫面更新：夜色依時間、變暗依天氣、粒子依天氣與時間。 */
+  private updateSky(time: number): void {
+    const state = this.deps.session.state;
+    this.nightShade.setAlpha(nightAlpha(state.calendar.minuteOfDay));
+    this.weatherShade.setAlpha(weatherDim(state.weather));
+    this.drawWeather(state.weather, time);
+  }
+
+  /** 雨、雪、落葉；減少動態時只畫四分之一的粒子。 */
+  private drawWeather(weather: Weather, time: number): void {
+    this.weatherGfx.clear();
+    const kind = particleKind(weather);
+    if (!kind) return;
+    const base = weather === 'storm' ? 70 : kind === 'streak' ? 46 : 30;
+    const count = prefersReducedMotion() ? Math.ceil(base / 4) : base;
+    for (let i = 0; i < count; i += 1) {
+      const p = particlePosition(i, time, VIEW_SIZE.width, VIEW_SIZE.height, kind);
+      if (kind === 'streak') {
+        this.weatherGfx.lineStyle(1, 0xcfe6ff, 0.55).lineBetween(p.x, p.y, p.x - 3, p.y + 8);
+      } else if (kind === 'flake') {
+        this.weatherGfx.fillStyle(0xffffff, 0.9).fillCircle(p.x, p.y, 1.6);
+      } else {
+        this.weatherGfx.fillStyle(0x7fae6b, 0.9).fillCircle(p.x, p.y, 2.4);
+      }
+    }
   }
 
   private resolveTexture(assetId: string): string {

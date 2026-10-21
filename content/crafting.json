@@ -1,0 +1,208 @@
+{
+  "version": 1,
+  "note": "合成配方（小屋的工作台 T）。材料不足或技能不夠就做不了。output 是產物（item 與數量）；effect 是效果：flag 只能做一次，bagSlots 增加背包格數（最多 max 次）。unlock 是解鎖條件（技能等級）。playMinutes 是內容時數的估計（見 docs/PLAYTIME_PLAN.md）。",
+  "recipes": [
+    {
+      "id": "sprinkler",
+      "name": "灑水器",
+      "ingredients": {
+        "wood": 20,
+        "stone": 10,
+        "copper-ore": 5
+      },
+      "effect": {
+        "type": "flag",
+        "flag": "sprinkler"
+      },
+      "unlock": {
+        "skill": "farming",
+        "level": 4
+      },
+      "playMinutes": 2
+    },
+    {
+      "id": "chest",
+      "name": "木箱",
+      "ingredients": {
+        "wood": 15
+      },
+      "effect": {
+        "type": "bagSlots",
+        "slots": 6,
+        "max": 3
+      },
+      "unlock": {
+        "skill": "foraging",
+        "level": 2
+      },
+      "playMinutes": 1.5
+    },
+    {
+      "id": "fertilizer-basic",
+      "name": "普通肥料",
+      "ingredients": {
+        "hay": 2,
+        "stone": 1
+      },
+      "output": {
+        "item": "fertilizer-basic",
+        "count": 2
+      },
+      "unlock": {
+        "skill": "farming",
+        "level": 2
+      },
+      "playMinutes": 1.5
+    },
+    {
+      "id": "fertilizer-fine",
+      "name": "優良肥料",
+      "ingredients": {
+        "hay": 3,
+        "stone": 2,
+        "dried-mint": 1
+      },
+      "output": {
+        "item": "fertilizer-fine",
+        "count": 2
+      },
+      "unlock": {
+        "skill": "farming",
+        "level": 6
+      },
+      "playMinutes": 1.5
+    },
+    {
+      "id": "bobber",
+      "name": "浮標",
+      "ingredients": {
+        "wood": 2,
+        "copper-ore": 1
+      },
+      "effect": {
+        "type": "flag",
+        "flag": "bobber"
+      },
+      "unlock": {
+        "skill": "fishing",
+        "level": 3
+      },
+      "playMinutes": 1.5
+    },
+    {
+      "id": "bait",
+      "name": "魚餌",
+      "ingredients": {
+        "mint": 2
+      },
+      "output": {
+        "item": "bait",
+        "count": 3
+      },
+      "unlock": {
+        "skill": "fishing",
+        "level": 1
+      },
+      "playMinutes": 1
+    },
+    {
+      "id": "vase",
+      "name": "花瓶",
+      "ingredients": {
+        "stone": 2,
+        "wood": 2
+      },
+      "output": {
+        "item": "vase",
+        "count": 1
+      },
+      "unlock": {
+        "skill": "foraging",
+        "level": 3
+      },
+      "playMinutes": 1.5
+    },
+    {
+      "id": "lantern",
+      "name": "小燈籠",
+      "ingredients": {
+        "copper-ore": 1,
+        "wood": 2
+      },
+      "output": {
+        "item": "lantern",
+        "count": 1
+      },
+      "unlock": {
+        "skill": "mining",
+        "level": 3
+      },
+      "playMinutes": 1.5
+    },
+    {
+      "id": "flower-crown",
+      "name": "花冠",
+      "ingredients": {
+        "flower-spring": 3
+      },
+      "output": {
+        "item": "flower-crown",
+        "count": 1
+      },
+      "unlock": {
+        "skill": "foraging",
+        "level": 1
+      },
+      "playMinutes": 1.5
+    },
+    {
+      "id": "dried-bouquet",
+      "name": "乾燥花束",
+      "ingredients": {
+        "flower-summer": 2,
+        "hay": 1
+      },
+      "output": {
+        "item": "dried-bouquet",
+        "count": 1
+      },
+      "unlock": {
+        "skill": "foraging",
+        "level": 4
+      },
+      "playMinutes": 1.5
+    },
+    {
+      "id": "fence",
+      "name": "木柵欄",
+      "ingredients": {
+        "wood": 2
+      },
+      "output": {
+        "item": "fence",
+        "count": 2
+      },
+      "unlock": {
+        "skill": "farming",
+        "level": 1
+      },
+      "playMinutes": 1
+    },
+    {
+      "id": "slate",
+      "name": "石板",
+      "ingredients": {
+        "stone": 4
+      },
+      "output": {
+        "item": "slate",
+        "count": 1
+      },
+      "unlock": {
+        "skill": "mining",
+        "level": 1
+      },
+      "playMinutes": 1
+    }
+  ]
+}

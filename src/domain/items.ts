@@ -1,7 +1,8 @@
 import type { CropDef } from './content';
 import { sellPriceOf } from './pricing';
 
-export type ItemKind = 'seed' | 'crop';
+/** 種子與作物由作物衍生；木材、野薄荷、礦石是獨立定義的（content/items.json）。 */
+export type ItemKind = 'seed' | 'crop' | 'material' | 'forage' | 'ore' | 'fish' | 'animal' | 'dish' | 'processed' | 'craft';
 
 export type Quality = 'normal' | 'good' | 'fine';
 

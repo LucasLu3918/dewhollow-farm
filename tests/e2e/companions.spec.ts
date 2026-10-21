@@ -79,7 +79,7 @@ const REST: Pose = { y: 0, rotation: 0, scaleX: 1, scaleY: 1, legA: 0, legB: 0, 
 
 /** 從農場出生點往南走進村莊（穿過南門）。 */
 async function enterVillage(page: Page): Promise<void> {
-  await press(page, 'ArrowDown', 14);
+  await press(page, 'ArrowDown', 20);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
   await expect.poll(async () => (await actor(page, 'maomao'))?.pose).toEqual(REST);
 }

@@ -1,3 +1,4 @@
+import { mineLayerOf } from '../domain/mine';
 import type { ContentPack } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { executeCommand, type Command, type CommandOutcome } from './game-commands';
@@ -39,6 +40,8 @@ export class GameSession {
     options: SessionOptions = {},
   ) {
     this.current = initial;
+    const layer = mineLayerOf(initial.mapId);
+    if (layer !== null) index.ensureMine(layer, initial.mineSeed);
     this.slot = options.slot ?? DEFAULT_SLOT;
     this.restored = options.restored ?? false;
     this.now = options.now ?? Date.now;

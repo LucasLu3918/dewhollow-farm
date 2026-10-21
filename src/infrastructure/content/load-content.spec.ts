@@ -9,12 +9,25 @@ import companions from '../../../content/companions.json';
 import tools from '../../../content/tools.json';
 import sounds from '../../../content/sounds.json';
 import terrain from '../../../content/terrain.json';
+import weather from '../../../content/weather.json';
+import items from '../../../content/items.json';
+import shops from '../../../content/shops.json';
+import fish from '../../../content/fish.json';
+import animals from '../../../content/animals.json';
+import recipes from '../../../content/recipes.json';
+import processing from '../../../content/processing.json';
+import crafting from '../../../content/crafting.json';
+import forest from '../../../content/maps/forest.json';
+import lake from '../../../content/maps/lake.json';
+import house from '../../../content/maps/house.json';
+import mineEntrance from '../../../content/maps/mine-entrance.json';
+import coop from '../../../content/maps/coop.json';
 import farm from '../../../content/maps/farm.json';
 import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, tools, sounds, terrain, ...overrides };
+  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, ...overrides };
 }
 
 describe('loadContent with shipped content', () => {
@@ -28,7 +41,7 @@ describe('loadContent with shipped content', () => {
       'dusk-potato',
       'silver-wheat',
     ]);
-    expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village']);
+    expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'forest', 'lake', 'house', 'mine-entrance', 'coop']);
     expect(pack.start.mapId).toBe('farm');
   });
 });
@@ -71,7 +84,7 @@ describe('loadContent with rigs', () => {
   });
 
   it('returns the tools beside the rigs', () => {
-    expect(loadContent(shipped()).tools.tools.map((t) => t.id)).toEqual(['hoe', 'can', 'seedbag']);
+    expect(loadContent(shipped()).tools.tools.map((t) => t.id)).toEqual(['hoe', 'can', 'seedbag', 'axe', 'pick', 'rod']);
   });
 
   it('reports a tool whose image is missing together with the other problems', () => {
@@ -152,11 +165,34 @@ describe('loadContent validation', () => {
   });
 });
 
+describe('loadContent with processing recipes', () => {
+  it('rejects a processing recipe whose ingredient or product does not exist', () => {
+    const bad = {
+      version: 1 as const,
+      recipes: [
+        { id: 'x', name: '壞掉的醃漬', ingredients: { 'crop.nope': 1 }, output: 'nope', days: 1, level: 0 },
+      ],
+    };
+    let problems: string[] = [];
+    try {
+      loadContent(shipped({ processing: bad }));
+    } catch (error) {
+      if (error instanceof ContentError) problems = error.problems;
+    }
+    expect(problems).toContain('加工配方 x 的材料 crop.nope 不存在');
+    expect(problems).toContain('加工配方 x 的成品 nope 不存在');
+  });
+
+  it('accepts the shipped processing recipes', () => {
+    expect(() => loadContent(shipped())).not.toThrow();
+  });
+});
+
 describe('loadContent with sounds and terrain', () => {
   it('returns the sound catalog and the footstep style of every walkable tile', () => {
     const loaded = loadContent(shipped());
     expect(loaded.sounds.master).toBeGreaterThan(0);
-    expect(loaded.terrain.terrains.map((t) => t.kind).sort()).toEqual(['field', 'grass', 'path']);
+    expect(loaded.terrain.terrains.map((t) => t.kind).sort()).toEqual(['field', 'floor', 'forage', 'grass', 'path', 'stairs']);
   });
 
   it('reports a footstep that points at a sound that does not exist', () => {

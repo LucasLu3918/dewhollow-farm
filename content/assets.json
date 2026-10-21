@@ -163,6 +163,114 @@
       "file": "assets/tools/seedbag-2x.png",
       "density": 2,
       "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 202，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定與挑選見 docs/art/tool-briefs.md"
+    },
+    {
+      "id": "tile.tree",
+      "kind": "tile",
+      "color": "#2f5a36",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.water",
+      "kind": "tile",
+      "color": "#3f7fb5",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.floor",
+      "kind": "tile",
+      "color": "#b98a5e",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.furniture",
+      "kind": "tile",
+      "color": "#7a5a3c",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.cave",
+      "kind": "tile",
+      "color": "#2a2630",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.rock",
+      "kind": "tile",
+      "color": "#6e6a66",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tool.axe",
+      "kind": "object",
+      "color": "#a0764e",
+      "file": "assets/tools/axe-2x.png",
+      "density": 2,
+      "source": "暫用鋤頭的圖（複製 hoe-2x.png，本機模型 Z-Image Turbo 文生圖 seed 202）。斧頭的正式圖待產圖後替換；日後替換時只改 file 與 source。"
+    },
+    {
+      "id": "tile.shop",
+      "kind": "tile",
+      "color": "#8a5a3a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.forage",
+      "kind": "tile",
+      "color": "#8fc46a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tool.pick",
+      "kind": "object",
+      "color": "#a0764e",
+      "file": "assets/tools/pick-2x.png",
+      "density": 2,
+      "source": "暫用鋤頭的圖（複製 hoe-2x.png，本機模型 Z-Image Turbo 文生圖 seed 202）。鎬的正式圖待產圖後替換。"
+    },
+    {
+      "id": "tile.ore",
+      "kind": "tile",
+      "color": "#9a6b3a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.stairs",
+      "kind": "tile",
+      "color": "#5c5a66",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tool.rod",
+      "kind": "object",
+      "color": "#a0764e",
+      "file": "assets/tools/rod-2x.png",
+      "density": 2,
+      "source": "暫用鋤頭的圖（複製 hoe-2x.png，本機模型 Z-Image Turbo 文生圖 seed 202）。釣竿的正式圖待產圖後替換。"
+    },
+    {
+      "id": "tile.trough",
+      "kind": "tile",
+      "color": "#7a6a4a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.kitchen",
+      "kind": "tile",
+      "color": "#5a4a3a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.workshop",
+      "kind": "tile",
+      "color": "#6a5a3c",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.workbench",
+      "kind": "tile",
+      "color": "#6b4f32",
+      "source": "占位（程式產生）"
     }
   ]
 }
