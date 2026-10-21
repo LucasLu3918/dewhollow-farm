@@ -21,6 +21,7 @@ import { ShopPanel } from '../shop-panel';
 import { KitchenPanel } from '../kitchen-panel';
 import { WorkshopPanel } from '../workshop-panel';
 import { WorkbenchPanel } from '../workbench-panel';
+import { SkillPanel } from '../skill-panel';
 import { slotsOf } from '../../domain/animals';
 import { CHICKEN_TEXTURE } from '../animal-art';
 import type { Weather } from '../../domain/weather';
@@ -76,6 +77,7 @@ const COMMAND_KEYS: Record<string, Command> = {
   a: { type: 'takeTool', tool: 'axe' },
   p: { type: 'takeTool', tool: 'pick' },
   r: { type: 'takeTool', tool: 'rod' },
+  g: { type: 'takeTool', tool: 'sickle' },
   s: { type: 'manualSave' },
 };
 
@@ -214,6 +216,7 @@ export class MapScene extends Phaser.Scene {
   private kitchenPanel!: KitchenPanel;
   private workshopPanel!: WorkshopPanel;
   private workbenchPanel!: WorkbenchPanel;
+  private skillPanel!: SkillPanel;
   /** 雞舍裡的動物圖片，每次重畫時重建。 */
   private animalSprites: Phaser.GameObjects.Image[] = [];
   /** 魚上鉤後等待收線的計時器（時限內按 x 就釣到，逾時魚跑掉）。 */
@@ -239,6 +242,8 @@ export class MapScene extends Phaser.Scene {
     this.kitchenPanel = new KitchenPanel(document, deps.index, (command) => void this.run(command));
     this.workshopPanel = new WorkshopPanel(document, deps.index, (command) => void this.run(command));
     this.workbenchPanel = new WorkbenchPanel(document, deps.index, (command) => void this.run(command));
+    this.skillPanel = new SkillPanel(document, deps.index, (command) => void this.run(command));
+    deps.hud.bindSkills(() => this.skillPanel.toggle(deps.session.state));
     this.terrainByKind = new Map(deps.terrain.map((entry) => [entry.kind, entry]));
   }
 
@@ -343,7 +348,7 @@ export class MapScene extends Phaser.Scene {
       }
       return;
     }
-    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen()) {
+    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen()) {
       // 櫃檯或廚房開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠完成。
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -351,7 +356,14 @@ export class MapScene extends Phaser.Scene {
         this.kitchenPanel.close();
         this.workshopPanel.close();
         this.workbenchPanel.close();
+        this.skillPanel.close();
       }
+      return;
+    }
+    if (event.key.toLowerCase() === 'k') {
+      // 技能與天賦面板：不花體力與時間，不經過應用層的指令。
+      event.preventDefault();
+      this.skillPanel.toggle(this.deps.session.state);
       return;
     }
     const direction = MOVE_KEYS[event.key];
@@ -392,6 +404,7 @@ export class MapScene extends Phaser.Scene {
     this.kitchenPanel.refresh(session.state);
     this.workshopPanel.refresh(session.state);
     this.workbenchPanel.refresh(session.state);
+    this.skillPanel.refresh(session.state);
     this.refresh();
   }
 

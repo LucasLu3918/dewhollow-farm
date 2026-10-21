@@ -24,13 +24,14 @@ import animals from '../../../content/animals.json';
 import recipes from '../../../content/recipes.json';
 import processing from '../../../content/processing.json';
 import crafting from '../../../content/crafting.json';
+import talents from '../../../content/talents.json';
 import sounds from '../../../content/sounds.json';
 import music from '../../../content/music.json';
 import terrain from '../../../content/terrain.json';
 import { SaveFormatError } from './save-errors';
 import { parseSaveRecord } from './save-schema';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents });
 const context = { inventoryCapacity: pack.tuning.inventory.capacity, daysPerSeason: pack.tuning.time.daysPerSeason, wakeMinute: pack.tuning.time.wakeMinute };
 
 function record(state: unknown) {
@@ -71,6 +72,25 @@ describe('save schema', () => {
     expect(() => parseSaveRecord(record(broken), context)).toThrow('inventory.stacks.0.quality');
   });
 
+  it('keeps every kind of world change the game can make, including the cut grass', () => {
+    const state = createNewGame(pack, 1);
+    const changes = { 'mine,1,1': 'mined', 'mine,2,2': 'cleared', 'forest,3,3': 'cut', 'forest,4,4': 'chopped', 'forest,5,5': 'picked' };
+    const parsed = parseSaveRecord(record({ ...state, worldChanges: changes }), context);
+    expect(parsed.state.worldChanges).toEqual(changes);
+  });
+
+  it('keeps the talent chosen for each skill and the sickle tier', () => {
+    const state = createNewGame(pack, 1);
+    const parsed = parseSaveRecord(record({ ...state, talents: { farming: 'market-sense' }, toolTiers: { ...state.toolTiers, sickle: 2 } }), context);
+    expect(parsed.state.talents).toEqual({ farming: 'market-sense' });
+    expect(parsed.state.toolTiers.sickle).toBe(2);
+  });
+
+  it('rejects a sickle tier outside the four tiers', () => {
+    const state = createNewGame(pack, 1);
+    expect(() => parseSaveRecord(record({ ...state, toolTiers: { ...state.toolTiers, sickle: 4 } }), context)).toThrow(SaveFormatError);
+  });
+
   it('rejects an inventory with more stacks than it has slots', () => {
     const state = createNewGame(pack, 1);
     const stack = { itemId: 'seed.moon-bean', quality: 'normal', count: 1 };
@@ -98,7 +118,7 @@ describe('save schema with an old save', () => {
 
   it('loads a v1 save as a current-version state', () => {
     const { state } = parseSaveRecord(record(v1), context);
-    expect(state.schemaVersion).toBe(11);
+    expect(state.schemaVersion).toBe(12);
     expect(state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
     expect(state.playtimeSeconds).toBe(0);
     expect(state.calendar.day).toBe(2);

@@ -12,7 +12,7 @@
         <span id="hud-day">第 1 年 春 第 1 天</span>
         <span id="hud-clock">06:00</span>
         <span id="hud-weather" aria-label="天氣與明天的預報"></span>
-        <span id="hud-skills" class="skills" aria-label="技能等級"></span>
+        <button id="hud-skills" class="skills" type="button" aria-label="技能等級，點一下打開技能與天賦（或按 K）"></button>
         <span id="hud-gold">0 金</span>
         <span class="energy" aria-label="體力">
           <span class="energy-track"><span id="hud-energy-fill"></span></span>
@@ -54,9 +54,17 @@
         <ul id="workshop-list" class="shop-list"></ul>
         <button id="workshop-close" type="button">離開加工台（Esc）</button>
       </section>
+      <section id="skill-panel" class="shop-panel" aria-labelledby="skill-title" hidden>
+        <header>
+          <h2 id="skill-title">技能與天賦</h2>
+          <p id="skill-summary"></p>
+        </header>
+        <ul id="skill-list" class="shop-list"></ul>
+        <button id="skill-close" type="button">離開（Esc）</button>
+      </section>
       <section class="panel" aria-label="訊息">
         <ul id="hud-log" class="log" aria-live="polite"></ul>
-        <p class="help">方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · S 存檔 · B 背景音樂 · M 靜音</p>
+        <p class="help">方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · A 斧頭 · P 鎬 · R 釣竿 · G 鐮刀 · K 技能與天賦 · S 存檔 · B 背景音樂 · M 靜音</p>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

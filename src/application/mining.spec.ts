@@ -35,6 +35,7 @@ const content: ContentPack = {
   crops: [{ id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 20, growthDays: 2, seasons: ['spring'] }],
   npcs: [],
   crafting: [],
+  talents: { unlockLevel: 5, defs: [] },
   processing: [],
   recipes: [],
   animals: [],
@@ -70,7 +71,7 @@ const content: ContentPack = {
 const index: ContentIndex = createContentIndex(content);
 
 function fresh(overrides: Partial<GameState> = {}): GameState {
-  return { ...createNewGame(content, 7), mapId: 'entrance', toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0 }, worldChanges: {}, ...overrides };
+  return { ...createNewGame(content, 7), mapId: 'entrance', toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 }, worldChanges: {}, ...overrides };
 }
 
 function at(state: GameState, x: number, y: number, facing: GameState['player']['facing'], tool: GameState['tool'] = 'pick'): GameState {
@@ -117,7 +118,7 @@ describe('mining rocks and ore with the pick', () => {
   });
 
   it('a pick better than the basic one costs less energy (tier discount)', () => {
-    const state = at(fresh({ toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 1, rod: 0 } }), 0, 3, 'up');
+    const state = at(fresh({ toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 1, rod: 0, sickle: 0 } }), 0, 3, 'up');
     const out = run(state, { type: 'interact' });
     expect(out.state.energy.current).toBe(state.energy.current - 1);
   });

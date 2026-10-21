@@ -18,6 +18,7 @@ import animals from '../../content/animals.json';
 import recipes from '../../content/recipes.json';
 import processing from '../../content/processing.json';
 import crafting from '../../content/crafting.json';
+import talents from '../../content/talents.json';
 import farm from '../../content/maps/farm.json';
 import village from '../../content/maps/village.json';
 import forest from '../../content/maps/forest.json';
@@ -32,7 +33,7 @@ import { GameSession } from './game-session';
 import type { SaveRecord, SaveRepository } from './ports';
 import { createNewGame, type GameState } from '../domain/game-state';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents });
 const index = createContentIndex(pack);
 
 /** 測試輔助：把玩家放到指定位置後建立 session。 */

@@ -4,6 +4,7 @@ import type { Tuning } from '../domain/tuning';
 import { generateMineLayer, mineId } from '../domain/mine';
 import type { AnimalDef } from '../domain/content';
 import type { WeatherTable } from '../domain/weather';
+import type { TalentSet } from '../domain/talents';
 
 /**
  * 以 id 快速查找內容。假設內容已由基礎設施層驗證過參照完整性；
@@ -36,6 +37,8 @@ export interface ContentIndex {
   ensureMine(layer: number, seed: number): MapDef;
   tuning: Tuning;
   weather: WeatherTable;
+  /** 技能天賦：解鎖等級與所有天賦（見 talents.ts）。 */
+  talents: TalentSet;
 }
 
 export function createContentIndex(pack: ContentPack): ContentIndex {
@@ -107,5 +110,6 @@ export function createContentIndex(pack: ContentPack): ContentIndex {
       return found;
     },
     weather: pack.weather,
+    talents: pack.talents,
   };
 }

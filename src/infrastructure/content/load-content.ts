@@ -20,6 +20,7 @@ import {
   processingFileSchema,
   craftingFileSchema,
   musicFileSchema,
+  talentsFileSchema,
   soundsFileSchema,
   startFileSchema,
   terrainFileSchema,
@@ -52,6 +53,7 @@ export interface RawContentFiles {
   recipes: unknown;
   processing: unknown;
   crafting: unknown;
+  talents: unknown;
 }
 
 export interface LoadedContent {
@@ -98,8 +100,9 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const recipes = recipesFileSchema.parse(raw.recipes);
   const processing = processingFileSchema.parse(raw.processing);
   const crafting = craftingFileSchema.parse(raw.crafting);
+  const talents = talentsFileSchema.parse(raw.talents);
 
-  const pack: ContentPack = { crops, npcs, maps, start, tuning, weather: weather.seasons, items: items.items, shops: shops.shops, fish: fish.fish, animals: animals.animals, recipes: recipes.recipes, processing: processing.recipes, crafting: crafting.recipes };
+  const pack: ContentPack = { crops, npcs, maps, start, tuning, weather: weather.seasons, items: items.items, shops: shops.shops, fish: fish.fish, animals: animals.animals, recipes: recipes.recipes, processing: processing.recipes, crafting: crafting.recipes, talents: { unlockLevel: talents.unlockLevel, defs: talents.talents } };
   const problems = [
     ...validateCrossReferences(pack, assets),
     ...rigProblems(rigs, assets),
@@ -108,6 +111,7 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     ...terrainProblems(terrain, sounds, maps),
     ...musicProblems(music),
     ...economyProblems(pack),
+    ...talentProblems(pack),
   ];
   if (problems.length > 0) throw new ContentError(problems);
   return { pack, assets, rigs, companions, tools, sounds, music, terrain };
@@ -257,6 +261,20 @@ function duplicates(ids: string[], label: string, problems: string[]): void {
     if (seen.has(id)) problems.push(`${label} id 重複：${id}`);
     seen.add(id);
   }
+}
+
+/** 天賦的交叉檢查：id 不重複、指定的物品要存在。技能 id 已由 schema 的列舉檢查。 */
+export function talentProblems(pack: ContentPack): string[] {
+  const problems: string[] = [];
+  duplicates(pack.talents.defs.map((t) => t.id), 'talent', problems);
+  const itemIds = new Set(pack.items.map((i) => i.id));
+  for (const talent of pack.talents.defs) {
+    const effect = talent.effect;
+    if (effect.type === 'extraYield' && effect.item !== undefined && !itemIds.has(effect.item)) {
+      problems.push(`天賦 ${talent.id} 指定的物品 ${effect.item} 不存在`);
+    }
+  }
+  return problems;
 }
 
 /** 商店與物品的交叉檢查：櫃檯指向的店要存在、賣的東西與升級的材料要存在、升級的階級要在範圍內。 */

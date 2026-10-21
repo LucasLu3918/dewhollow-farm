@@ -22,7 +22,7 @@ const npcSchema = z.object({
 });
 
 const tileSchema = z.object({
-  kind: z.enum(['grass', 'field', 'path', 'wall', 'bed', 'shipbox', 'door', 'tree', 'water', 'floor', 'furniture', 'cave', 'rock', 'shop', 'forage', 'ore', 'stairs', 'trough', 'kitchen', 'workshop', 'workbench']),
+  kind: z.enum(['grass', 'field', 'path', 'wall', 'bed', 'shipbox', 'door', 'tree', 'water', 'floor', 'furniture', 'cave', 'rock', 'shop', 'forage', 'ore', 'stairs', 'trough', 'kitchen', 'workshop', 'workbench', 'tuft']),
   item: z.string().min(1).optional(),
   seasons: z.array(z.enum(SEASONS)).min(1).optional(),
   slot: z.boolean().optional(),
@@ -276,6 +276,36 @@ export const shopsFileSchema = z.object({
     }),
   ),
 });
+/** 技能天賦（見 domain/talents.ts 與 content/talents.json）。 */
+const talentEffectSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('extraYield'),
+    action: z.enum(['harvest', 'forage', 'chop', 'mine']),
+    chance: z.number().gt(0).max(1),
+    item: z.string().min(1).optional(),
+  }),
+  z.object({
+    type: z.literal('sellBonus'),
+    kinds: z.array(z.enum(['seed', 'crop', 'material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft'])).min(1),
+    percent: z.number().int().positive().max(100),
+  }),
+  z.object({ type: z.literal('biteBonus'), points: z.number().int().positive().max(100) }),
+  z.object({ type: z.literal('dishEnergy'), amount: z.number().int().positive().max(50) }),
+]);
+export const talentsFileSchema = z.object({
+  version: z.literal(1),
+  unlockLevel: z.number().int().min(1).max(10),
+  talents: z.array(
+    z.object({
+      id: z.string().min(1),
+      skill: z.enum(SKILL_IDS),
+      name: z.string().min(1),
+      description: z.string().min(1),
+      effect: talentEffectSchema,
+    }),
+  ),
+});
+
 export const cropsFileSchema = z.array(cropSchema);
 export const npcsFileSchema = z.array(npcSchema);
 export const mapFileSchema = mapSchema;

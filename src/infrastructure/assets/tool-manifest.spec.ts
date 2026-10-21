@@ -114,6 +114,10 @@ describe('shipped tools', () => {
     expect(byAction.get('plant')).toMatchObject({ id: 'seedbag', asset: 'tool.seedbag', swing: 'sow' });
   });
 
+  it('show the sickle when a plant is gathered or a tuft is cut', () => {
+    expect(shipped.tools.find((t) => t.id === 'sickle')).toMatchObject({ action: 'forage', asset: 'tool.sickle', swing: 'chop' });
+  });
+
   it('are sized like their 2x images', () => {
     for (const tool of shipped.tools) expect(tool.textureSize, tool.id).toEqual({ width: 96, height: 96 });
   });

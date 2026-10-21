@@ -18,6 +18,7 @@ import animals from '../../../content/animals.json';
 import recipes from '../../../content/recipes.json';
 import processing from '../../../content/processing.json';
 import crafting from '../../../content/crafting.json';
+import talents from '../../../content/talents.json';
 import forest from '../../../content/maps/forest.json';
 import lake from '../../../content/maps/lake.json';
 import house from '../../../content/maps/house.json';
@@ -28,7 +29,7 @@ import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, ...overrides };
+  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, ...overrides };
 }
 
 describe('loadContent with shipped content', () => {
@@ -85,7 +86,7 @@ describe('loadContent with rigs', () => {
   });
 
   it('returns the tools beside the rigs', () => {
-    expect(loadContent(shipped()).tools.tools.map((t) => t.id)).toEqual(['hoe', 'can', 'seedbag', 'axe', 'pick', 'rod']);
+    expect(loadContent(shipped()).tools.tools.map((t) => t.id)).toEqual(['hoe', 'can', 'seedbag', 'axe', 'pick', 'rod', 'sickle']);
   });
 
   it('reports a tool whose image is missing together with the other problems', () => {

@@ -29,6 +29,7 @@ const content: ContentPack = {
   fish: [{ id: 'carp', name: '鯉魚', sellPrice: 30, seasons: ['spring'], weight: 1 }],
   animals: [],
   crafting: [],
+  talents: { unlockLevel: 5, defs: [] },
   processing: [],
   recipes: [
     { id: 'mint-tea', name: '薄荷茶', ingredients: { mint: 2 }, energy: 20, level: 0, sellPrice: 40 },
@@ -74,7 +75,7 @@ function at(overrides: Partial<GameState> = {}): GameState {
     mapId: 'kitchen',
     player: { x: 1, y: 2, facing: 'up' },
     tool: 'hoe',
-    toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0 },
+    toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 },
     worldChanges: {},
     fishing: null,
     animals: [],

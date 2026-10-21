@@ -4,6 +4,7 @@ import type { Season } from './calendar';
 import type { WeatherTable } from './weather';
 import type { ItemDef } from './items';
 import type { ToolId } from './tools';
+import type { TalentSet } from './talents';
 
 export interface Point {
   x: number;
@@ -30,6 +31,7 @@ export interface NpcDef {
 }
 
 export type TileKind =
+  | 'tuft'
   | 'kitchen'
   | 'workshop'
   | 'trough'
@@ -113,6 +115,8 @@ export interface ContentPack {
   /** 加工機的配方（醃漬、烘乾）。 */
   processing: ProcessingDef[];
   shops: ShopDef[];
+  /** 技能天賦（見 talents.ts 與 content/talents.json）。 */
+  talents: TalentSet;
 }
 
 export interface RecipeDef {

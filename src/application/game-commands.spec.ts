@@ -30,6 +30,7 @@ const content: ContentPack = {
     gathering: { wood: { min: 1, max: 3 }, forage: { min: 1, max: 2 }, stone: { min: 1, max: 2 }, ore: { min: 1, max: 2 } },
   },
   crafting: [],
+  talents: { unlockLevel: 5, defs: [] },
   processing: [],
   recipes: [],
   animals: [],

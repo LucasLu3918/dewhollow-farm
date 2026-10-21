@@ -18,6 +18,7 @@ import animals from '../../content/animals.json';
 import recipes from '../../content/recipes.json';
 import processing from '../../content/processing.json';
 import crafting from '../../content/crafting.json';
+import talents from '../../content/talents.json';
 import farm from '../../content/maps/farm.json';
 import village from '../../content/maps/village.json';
 import forest from '../../content/maps/forest.json';
@@ -55,6 +56,7 @@ const raw: RawContentFiles = {
   recipes,
   processing,
   crafting,
+  talents,
 };
 
 const FIELD = plotKey(4, 4);
