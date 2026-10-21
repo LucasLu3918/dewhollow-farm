@@ -23,12 +23,14 @@ const grove: MapDef = {
     H: { kind: 'forage' },
   },
   spawn: { x: 1, y: 2 },
-  npcs: [],
 };
 
 const content: ContentPack = {
   crops: [{ id: 'dew-grass', name: '晨露草', seedPrice: 10, growthDays: 1, seasons: ['spring'] }],
   npcs: [],
+  schedule: { periods: { noon: 720, evening: 1020 }, entries: [] },
+  heartEvents: [],
+  friendship: { pointsPerHeart: 100, maxHearts: 10, earlyCap: { hearts: 4, untilSeason: 'summer' }, talkPoints: 10, gift: { love: 80, neutral: 30, hate: -40 }, cropQuality: { minHearts: 2, perResident: 0.05, cap: 0.15 } },
   items: [
     { id: 'mint', name: '野薄荷', kind: 'forage', maxStack: 99, sellPrice: 14 },
     { id: 'mushroom', name: '野菇', kind: 'forage', maxStack: 99, sellPrice: 20 },

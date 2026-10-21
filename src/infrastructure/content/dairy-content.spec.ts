@@ -32,12 +32,19 @@ import mine from '../../../content/mine.json';
 import { loadContent } from './load-content';
 import type { ContentPack, MapDef } from '../../domain/content';
 import { slotsOf } from '../../domain/animals';
+import plaza from '../../../content/maps/plaza.json';
+import schedules from '../../../content/schedules.json';
+import events from '../../../content/events.json';
+import friendship from '../../../content/friendship.json';
 
 /** M4c 的內容：牛、牛舍、牧草地、乳製品。內容錯誤由 loadContent 一次列出。 */
 const { pack } = loadContent({
   crops,
   npcs,
-  maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+  schedules,
+  events,
+  friendship,
+  maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,

@@ -16,7 +16,25 @@ const content: ContentPack = {
     { id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 20, growthDays: 2, seasons: ['spring', 'summer'] },
     { id: 'moon-bean', name: '月光豆', seedPrice: 35, growthDays: 4, seasons: ['spring'] },
   ],
-  npcs: [{ id: 'mira', name: '米拉', lines: ['早安。', '今天也辛苦了。'], gift: { cropId: 'sweet-radish', count: 3 } }],
+  npcs: [{ id: 'mira', name: '米拉', lines: ['早安。', '今天也辛苦了。'], gift: { cropId: 'sweet-radish', count: 3 }, loves: [], hates: [], playMinutes: 2 }],
+  /** 米拉住在村莊的 (1,0)，整天都在那裡（行程取代了舊的地圖上的居民位置）。 */
+  schedule: {
+    periods: { noon: 720, evening: 1020 },
+    entries: [
+      { npcId: 'mira', period: 'morning', mapId: 'village', x: 1, y: 0 },
+      { npcId: 'mira', period: 'noon', mapId: 'village', x: 1, y: 0 },
+      { npcId: 'mira', period: 'evening', mapId: 'village', x: 1, y: 0 },
+    ],
+  },
+  heartEvents: [],
+  friendship: {
+    pointsPerHeart: 100,
+    maxHearts: 10,
+    earlyCap: { hearts: 4, untilSeason: 'summer' },
+    talkPoints: 10,
+    gift: { love: 80, neutral: 30, hate: -40 },
+    cropQuality: { minHearts: 2, perResident: 0.05, cap: 0.15 },
+  },
   start: { mapId: 'farm', gold: 100, seeds: { 'sweet-radish': 5 } },
   tuning: {
     energy: { max: 20, costs: { till: 2, water: 1, plant: 1, harvest: 1, ship: 0, chop: 3, forage: 1, mine: 2, fish: 2, cook: 1, process: 1 } },
@@ -62,7 +80,6 @@ const content: ContentPack = {
         D: { kind: 'door', to: 'village', spawn: { x: 1, y: 1 } },
       },
       spawn: { x: 3, y: 1 },
-      npcs: [],
     },
     {
       id: 'mine',
@@ -72,7 +89,6 @@ const content: ContentPack = {
       rows: ['#C#', '...'],
       legend: { '#': { kind: 'wall' }, C: { kind: 'cave' }, '.': { kind: 'path' } },
       spawn: { x: 1, y: 1 },
-      npcs: [],
     },
     {
       id: 'village',
@@ -87,7 +103,6 @@ const content: ContentPack = {
         D: { kind: 'door', to: 'farm', spawn: { x: 3, y: 1 } },
       },
       spawn: { x: 1, y: 1 },
-      npcs: [{ npcId: 'mira', x: 1, y: 0 }],
     },
   ],
 };

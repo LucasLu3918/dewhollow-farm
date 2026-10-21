@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "note": "好感規則（M5a）。每 pointsPerHeart 點一顆心；春夏（第 1 年 春、夏）上限 earlyCap.hearts 顆心，秋天起到 maxHearts。送禮與對話的數值見下方。數值待試玩校準。",
+  "pointsPerHeart": 100,
+  "maxHearts": 10,
+  "earlyCap": { "hearts": 4, "untilSeason": "summer" },
+  "talkPoints": 10,
+  "gift": { "love": 80, "neutral": 30, "hate": -40 },
+  "cropQuality": { "minHearts": 2, "perResident": 0.05, "cap": 0.15 }
+}

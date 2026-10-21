@@ -1,5 +1,8 @@
-import { advanceMinutes, dateLabel, formatClock, nextMorning } from '../domain/calendar';
-import type { Direction, MapDef, MapNpcPlacement, Point, TileDef, TileKind } from '../domain/content';
+import { advanceMinutes, dateLabel, formatClock, nextMorning, totalDay } from '../domain/calendar';
+import type { Direction, MapDef, Point, TileDef, TileKind } from '../domain/content';
+import { addPoints, favorQualityBonus, giftPoints, giftReaction, heartCapPoints, heartsOf, NO_FRIENDSHIP, type Friendship, type GiftReaction } from '../domain/friendship';
+import { readyHeartEvent, type HeartEmote } from '../domain/heart-events';
+import { currentPeriod, residentAt } from './residents';
 import { trySpend, restore } from '../domain/energy';
 import { growCrops, harvestPlot, isRipe, plantCrop, plotKey, tillPlot, waterAllPlots, waterPlot, type PlotMap } from '../domain/farm';
 import { TOOL_ORDER, type GameState, type ToolId } from '../domain/game-state';
@@ -50,6 +53,10 @@ export type Command =
   | { type: 'craft'; recipeId: string }
   /** 技能到 5 級後，從該技能的兩個天賦裡選一個（每項技能只能選一次；不花體力與時間）。 */
   | { type: 'chooseTalent'; talentId: string }
+  /** 站在居民面前（面向他）送一件東西：每天對同一人只能送一次，不花體力與時間。 */
+  | { type: 'giveGift'; npcId: string; itemId: string }
+  /** 心形事件的選項（事件進行中才有效）。 */
+  | { type: 'chooseHeartOption'; optionId: string }
   | { type: 'manualSave' };
 
 export type GameEvent =
@@ -58,6 +65,10 @@ export type GameEvent =
   | { type: 'saveRequested' }
   /** 玩家跟某位居民說話（不論是否領到禮物）；供畫面讓該居民與他的夥伴做出反應。 */
   | { type: 'talked'; npcId: string; /** 第一次說話。 */ first: boolean; /** 這次真的收下了禮物。 */ gifted: boolean }
+  /** 送禮的結果（喜歡、中立、討厭）；供畫面顯示表情。 */
+  | { type: 'gifted'; npcId: string; reaction: GiftReaction }
+  /** 心形事件開始：畫面打開事件面板（頁面與選項由內容定義，見 pendingHeartEvent）。 */
+  | { type: 'heartEvent'; npcId: string; eventId: string; emote: HeartEmote }
   /** 動作被拒絕（體力不足、沒有東西可互動…）；供畫面顯示表情，狀態與時間都沒有改變。reason 是失敗代碼。 */
   | { type: 'refused'; reason: string }
   /** 成功的農務或出貨動作，供畫面播放效果；失敗的動作不會發出。 */
@@ -126,6 +137,12 @@ const FAILURE_MESSAGES: Record<string, string> = {
   TALENT_LOCKED: '技能要到 5 級才能選天賦',
   TALENT_TAKEN: '這項技能已經選過天賦了',
   NO_TALENT: '沒有這個天賦',
+  EVENT_PENDING: '先把眼前的對話看完',
+  NOT_AT_RESIDENT: '要站在居民面前（面向他）才能送禮',
+  ALREADY_GIFTED: '今天已經送過禮了，明天再來',
+  NO_GIFT_ITEM: '背包裡沒有這樣東西',
+  NO_OPTION: '沒有這個選項',
+  NO_EVENT: '現在沒有進行中的對話',
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
@@ -139,9 +156,17 @@ function reply(state: GameState, messages: string[] = [], events: GameEvent[] = 
 }
 
 export function executeCommand(current: GameState, command: Command, index: ContentIndex): CommandOutcome {
+  // 心形事件還沒選完：只有選項能送出，其餘指令都擋下（畫面也會先顯示事件面板）。
+  if (current.pendingHeartEvent && command.type !== 'chooseHeartOption') {
+    return reply(current, [messageFor('EVENT_PENDING')], [refused('EVENT_PENDING')]);
+  }
   // 魚只等一下：收線以外的任何動作都會把它放掉。
   const state = command.type === 'reel' || !current.fishing ? current : { ...current, fishing: null };
   switch (command.type) {
+    case 'giveGift':
+      return giveGift(state, command.npcId, command.itemId, index);
+    case 'chooseHeartOption':
+      return chooseHeartOption(state, command.optionId, index);
     case 'reel':
       return reel(state, command.hit, index);
     case 'cook':
@@ -187,7 +212,7 @@ function move(state: GameState, direction: Direction, index: ContentIndex): Comm
   const tile = tileAt(map, target.x, target.y);
   const kind = kindAt(state, map, target.x, target.y);
 
-  if (!tile || !kind || npcAt(map, target.x, target.y) || !isWalkable(kind)) {
+  if (!tile || !kind || residentAt(state, index, target.x, target.y) || !isWalkable(kind)) {
     return reply({ ...state, player: facing });
   }
 
@@ -227,8 +252,8 @@ function enter(state: GameState, tile: TileDef, direction: Direction, index: Con
 function interact(state: GameState, index: ContentIndex): CommandOutcome {
   const map = index.map(state.mapId);
   const target = neighbor(state.player, state.player.facing);
-  const npc = npcAt(map, target.x, target.y);
-  if (npc) return talk(state, npc, index);
+  const resident = residentAt(state, index, target.x, target.y);
+  if (resident) return talk(state, resident.npcId, index);
 
   const tile = tileAt(map, target.x, target.y);
   if (!tile) return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
@@ -255,10 +280,6 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
   const key = plotKey(target.x, target.y);
   if (kind === 'field' || state.plots[key]) return workPlot(state, key, index);
   return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
-}
-
-function npcAt(map: MapDef, x: number, y: number): MapNpcPlacement | undefined {
-  return map.npcs.find((n) => n.x === x && n.y === y);
 }
 
 /**
@@ -301,7 +322,9 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
       const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'harvest'));
       const count = roll.value + bonusYield(level, index.tuning.skills) + extra.value;
       const q = rollInt(extra.rng, 0, 999);
-      quality = qualityFor(level, q.value / 1000, fertilizedSkillTuning(index.tuning.skills, plot?.fertilizer, index.tuning.fertilizer));
+      // 居民喜歡這種作物、而且好感夠：品質的隨機數往好的方向移（見 friendship.ts 的 favorQualityBonus）。
+      const favor = favorQualityBonus(cropItemId(cropDef.id), index.npcs, s.friendship, index.friendship);
+      quality = qualityFor(level, Math.max(0, q.value / 1000 - favor), fertilizedSkillTuning(index.tuning.skills, plot?.fertilizer, index.tuning.fertilizer));
       const stored = addItem(s.inventory, index.item(cropItemId(harvested.value.cropId)), count, quality);
       if (!stored.ok) return fail(stored.reason);
       yielded = count;
@@ -394,23 +417,101 @@ function shipAll(state: GameState, index: ContentIndex): CommandOutcome {
   return finish(state, result, '把作物放進了出貨箱', { action: 'ship', key: `${box.x},${box.y}` });
 }
 
-function talk(state: GameState, placement: MapNpcPlacement, index: ContentIndex): CommandOutcome {
-  const npc = index.npc(placement.npcId);
+/**
+ * 說話：每天第一次說話加好感；第一次說話會說完全部台詞並領禮物；好感條件符合時開始心形事件（見 heart-events.ts）。
+ * 背包放不下禮物時不標記「已對話」，也不加好感，讓玩家整理後還能領到禮物。
+ */
+function talk(state: GameState, npcId: string, index: ContentIndex): CommandOutcome {
+  const npc = index.npc(npcId);
   const firstTime = !state.flags[`talked:${npc.id}`];
-  const talked = (gifted: boolean): GameEvent[] => [{ type: 'talked', npcId: npc.id, first: firstTime, gifted }];
-  if (!firstTime) return reply(state, [npc.lines.at(-1) ?? ''], talked(false));
+  const talkedEvent = (gifted: boolean): GameEvent[] => [{ type: 'talked', npcId: npc.id, first: firstTime, gifted }];
 
-  const messages = [...npc.lines];
-  let next: GameState = { ...state, flags: { ...state.flags, [`talked:${npc.id}`]: true } };
-  if (npc.gift) {
-    const seed = index.item(seedItemId(npc.gift.cropId));
-    const stored = addItem(next.inventory, seed, npc.gift.count);
-    // 背包放不下時不標記「已對話」，讓玩家整理後還能領到禮物。
-    if (!stored.ok) return reply(state, [...messages, '背包已滿，先整理一下再來領禮物'], talked(false));
-    next = { ...next, inventory: stored.value };
-    messages.push(`獲得 ${seed.name} × ${npc.gift.count}`);
+  let next: GameState = dailyTalkPoints(state, npc.id, index);
+  const messages = firstTime ? [...npc.lines] : [npc.lines.at(-1) ?? ''];
+  let gifted = false;
+  if (firstTime) {
+    next = { ...next, flags: { ...next.flags, [`talked:${npc.id}`]: true } };
+    if (npc.gift) {
+      const seed = index.item(seedItemId(npc.gift.cropId));
+      const stored = addItem(next.inventory, seed, npc.gift.count);
+      if (!stored.ok) return reply(state, [...messages, '背包已滿，先整理一下再來領禮物'], talkedEvent(false));
+      next = { ...next, inventory: stored.value };
+      messages.push(`獲得 ${seed.name} × ${npc.gift.count}`);
+      gifted = true;
+    }
   }
-  return reply(next, messages, talked(npc.gift !== undefined));
+
+  const hearts = heartsOf(next.friendship[npc.id]?.points ?? 0, index.friendship);
+  const event = readyHeartEvent(index.heartEvents, npc.id, {
+    hearts,
+    mapId: next.mapId,
+    period: currentPeriod(next, index),
+    triggered: next.heartEvents,
+  });
+  if (!event) return reply(next, messages, talkedEvent(gifted));
+  const pending: GameState = { ...next, heartEvents: [...next.heartEvents, event.id], pendingHeartEvent: event.id };
+  return reply(pending, messages, [...talkedEvent(gifted), { type: 'heartEvent', npcId: npc.id, eventId: event.id, emote: event.emote }]);
+}
+
+/** 每天第一次說話加好感（今天已經說過就不加）。 */
+function dailyTalkPoints(state: GameState, npcId: string, index: ContentIndex): GameState {
+  const today = totalDay(state.calendar, index.tuning.time.daysPerSeason);
+  const current = state.friendship[npcId] ?? NO_FRIENDSHIP;
+  if (current.talkedDay === today) return state;
+  const points = addPoints(current.points, index.friendship.talkPoints, capPointsOf(state, index));
+  return withFriendship(state, npcId, { ...current, points, talkedDay: today });
+}
+
+/** 目前日子的好感上限（點數）；春夏是 4 顆心，之後開放（見 friendship.ts）。 */
+function capPointsOf(state: GameState, index: ContentIndex): number {
+  return heartCapPoints(index.friendship, index.tuning.time.daysPerSeason, totalDay(state.calendar, index.tuning.time.daysPerSeason));
+}
+
+function withFriendship(state: GameState, npcId: string, record: Friendship): GameState {
+  return { ...state, friendship: { ...state.friendship, [npcId]: record } };
+}
+
+const REACTION_LINE: Record<GiftReaction, (who: string, item: string) => string> = {
+  love: (who, item) => `${who}眼睛一亮，很喜歡${item}。`,
+  neutral: (who, item) => `${who}收下了${item}。`,
+  hate: (who, item) => `${who}皺了皺眉，勉強收下了${item}。`,
+};
+
+/**
+ * 送禮：要站在居民面前（面向他）；每天對同一人只能送一次；送出的東西從背包拿走。
+ * 喜歡的東西好感加得多，討厭的東西會扣好感（不低於 0）。不花體力與時間。
+ */
+function giveGift(state: GameState, npcId: string, itemId: string, index: ContentIndex): CommandOutcome {
+  const target = neighbor(state.player, state.player.facing);
+  if (residentAt(state, index, target.x, target.y)?.npcId !== npcId) {
+    return reply(state, [messageFor('NOT_AT_RESIDENT')], [refused('NOT_AT_RESIDENT')]);
+  }
+  const npc = index.npc(npcId);
+  const today = totalDay(state.calendar, index.tuning.time.daysPerSeason);
+  const current = state.friendship[npcId] ?? NO_FRIENDSHIP;
+  if (current.giftedDay === today) return reply(state, [messageFor('ALREADY_GIFTED')], [refused('ALREADY_GIFTED')]);
+  const taken = removeItem(state.inventory, itemId, 1);
+  if (!taken.ok) return reply(state, [messageFor('NO_GIFT_ITEM')], [refused('NO_GIFT_ITEM')]);
+
+  const reaction = giftReaction(itemId, npc.loves, npc.hates);
+  const delta = giftPoints(reaction, index.friendship);
+  const points = addPoints(current.points, delta, capPointsOf(state, index));
+  const next = withFriendship({ ...state, inventory: taken.value }, npcId, { ...current, points, giftedDay: today });
+  const line = `${REACTION_LINE[reaction](npc.name, index.item(itemId).name)}（好感 ${delta > 0 ? '+' : ''}${delta}）`;
+  return reply(next, [line], [{ type: 'gifted', npcId, reaction }]);
+}
+
+/** 心形事件的選項：好感依選項變化，事件結束（之後的指令恢復正常）。 */
+function chooseHeartOption(state: GameState, optionId: string, index: ContentIndex): CommandOutcome {
+  const eventId = state.pendingHeartEvent;
+  if (!eventId) return reply(state, [messageFor('NO_EVENT')], [refused('NO_EVENT')]);
+  const event = index.heartEvent(eventId);
+  const option = event.options.find((o) => o.id === optionId);
+  if (!option) return reply(state, [messageFor('NO_OPTION')], [refused('NO_OPTION')]);
+  const current = state.friendship[event.npcId] ?? NO_FRIENDSHIP;
+  const points = addPoints(current.points, option.points, capPointsOf(state, index));
+  const next = withFriendship({ ...state, pendingHeartEvent: null }, event.npcId, { ...current, points });
+  return reply(next, [option.reply]);
 }
 
 function sleep(state: GameState, index: ContentIndex): CommandOutcome {

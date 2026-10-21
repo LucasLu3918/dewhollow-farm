@@ -22,12 +22,16 @@ import { KitchenPanel } from '../kitchen-panel';
 import { WorkshopPanel } from '../workshop-panel';
 import { WorkbenchPanel } from '../workbench-panel';
 import { SkillPanel } from '../skill-panel';
+import { ResidentPanel } from '../resident-panel';
+import { HeartEventPanel } from '../heart-event-panel';
+import { PlaceholderResident, type ResidentView } from '../placeholder-resident';
+import { residentsOn } from '../../application/residents';
 import { slotsOf } from '../../domain/animals';
 import { animalTextureOf } from '../animal-art';
 import type { Weather } from '../../domain/weather';
 import { RENDER_COMPAT_KEY } from '../apply-render-compat';
 import { CharacterRig, type RigDebugInfo } from '../character-rig';
-import { centerOf, footOf, standOf } from '../layout';
+import { centerOf, standOf } from '../layout';
 import { emotesForEvent, type EmoteKind } from '../emote-defs';
 import { playEmote, type EmoteHandle } from '../emote';
 import { footstepDust, pickupFlight, playActionEffect, shipFlight, sleepEffect, type ShipIcon } from '../effects';
@@ -197,13 +201,13 @@ export class MapScene extends Phaser.Scene {
   private deps!: MapSceneDeps;
   private world!: Phaser.GameObjects.Container;
   private rig!: CharacterRig;
-  /** 目前地圖上有骨架的居民（例如毛毛），隨地圖重建。 */
-  private npcRigs = new Map<string, CharacterRig>();
+  /** 目前地圖上的居民（依行程站位），見 syncResidents。毛毛有骨架，其他人是占位。 */
+  private npcRigs = new Map<string, ResidentView>();
   private companions = new Map<string, CompanionState>();
   /** 玩家上一次畫面更新時站的格子，用來算出「剛離開的格子」給跟隨的寵物。 */
   private playerTile: Point | null = null;
   /** 頭上的表情氣泡，每個角色最多一個（鍵是 'player' 或居民 id）。 */
-  private activeEmotes = new Map<string, { handle: EmoteHandle; rig: CharacterRig }>();
+  private activeEmotes = new Map<string, { handle: EmoteHandle; rig: ResidentView }>();
   private effectEntries: { name: string; at: number }[] = [];
   /**
    * 揮工具時，被作用的那一格先維持「動作前」的樣子，等工具命中的那一刻才更新（null 表示動作前沒有這一格）。
@@ -217,6 +221,8 @@ export class MapScene extends Phaser.Scene {
   private workshopPanel!: WorkshopPanel;
   private workbenchPanel!: WorkbenchPanel;
   private skillPanel!: SkillPanel;
+  private residentPanel!: ResidentPanel;
+  private heartEventPanel!: HeartEventPanel;
   /** 雞舍裡的動物圖片，每次重畫時重建。 */
   private animalSprites: Phaser.GameObjects.Image[] = [];
   /** 魚上鉤後等待收線的計時器（時限內按 x 就釣到，逾時魚跑掉）。 */
@@ -243,6 +249,8 @@ export class MapScene extends Phaser.Scene {
     this.workshopPanel = new WorkshopPanel(document, deps.index, (command) => void this.run(command));
     this.workbenchPanel = new WorkbenchPanel(document, deps.index, (command) => void this.run(command));
     this.skillPanel = new SkillPanel(document, deps.index, (command) => void this.run(command));
+    this.residentPanel = new ResidentPanel(document, deps.index, (command) => void this.run(command));
+    this.heartEventPanel = new HeartEventPanel(document, deps.index, (command) => void this.run(command));
     deps.hud.bindSkills(() => this.skillPanel.toggle(deps.session.state));
     this.terrainByKind = new Map(deps.terrain.map((entry) => [entry.kind, entry]));
   }
@@ -340,6 +348,10 @@ export class MapScene extends Phaser.Scene {
       hud.messages([playing ? '背景音樂開始播放（按 B 暫停）' : '背景音樂已暫停（按 B 播放）']);
       return;
     }
+    if (this.heartEventPanel.isOpen()) {
+      // 心形事件進行中：只能用面板上的按鈕（頁面與選項），鍵盤不作用。
+      return;
+    }
     if (this.reelTimer) {
       // 魚上鉤了：只有 x 有用（收線），其餘按鍵等時限過了再說。
       if (event.key.toLowerCase() === 'x') {
@@ -348,8 +360,8 @@ export class MapScene extends Phaser.Scene {
       }
       return;
     }
-    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen()) {
-      // 櫃檯或廚房開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠完成。
+    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen() || this.residentPanel.isOpen()) {
+      // 櫃檯、廚房或面板開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠完成。
       if (event.key === 'Escape') {
         event.preventDefault();
         this.shopPanel.close();
@@ -357,6 +369,7 @@ export class MapScene extends Phaser.Scene {
         this.workshopPanel.close();
         this.workbenchPanel.close();
         this.skillPanel.close();
+        this.residentPanel.close();
       }
       return;
     }
@@ -364,6 +377,12 @@ export class MapScene extends Phaser.Scene {
       // 技能與天賦面板：不花體力與時間，不經過應用層的指令。
       event.preventDefault();
       this.skillPanel.toggle(this.deps.session.state);
+      return;
+    }
+    if (event.key.toLowerCase() === 'f') {
+      // 居民與好感面板：不花體力與時間，不經過應用層的指令。
+      event.preventDefault();
+      this.residentPanel.toggle(this.deps.session.state);
       return;
     }
     const direction = MOVE_KEYS[event.key];
@@ -606,10 +625,54 @@ export class MapScene extends Phaser.Scene {
     this.deps.music.update(state.calendar.season, state.calendar.minuteOfDay, state.weather);
     this.syncWorldTiles();
     this.syncAnimals(state.mapId);
+    this.syncResidents();
     this.drawPlots();
     this.movePlayer(state.player.x, state.player.y);
     this.moveFollowers(map, state.player, mapChanged);
     this.playerTile = { x: state.player.x, y: state.player.y };
+    this.residentPanel.refresh(state);
+    this.heartEventPanel.sync(state);
+  }
+
+  /**
+   * 居民依目前的行程站位（時段與天氣決定，見 application/residents.ts）。第一次出現時直接站上去；
+   * 位置變了就走過去，所以村子看得到人在動；不在這張地圖或這個時段沒有行程的居民，從畫面上移開。
+   */
+  private syncResidents(): void {
+    const state = this.deps.session.state;
+    const present = new Set<string>();
+    for (const placement of residentsOn(state, this.deps.index)) {
+      present.add(placement.npcId);
+      const stand = standOf(placement.x, placement.y);
+      const view = this.npcRigs.get(placement.npcId);
+      if (!view) {
+        const created = this.createResidentView(placement.npcId);
+        created.root.setDepth(DEPTH_RESIDENT);
+        created.teleport(stand.x, stand.y);
+        this.npcRigs.set(placement.npcId, created);
+        continue;
+      }
+      const dx = Math.abs(view.root.x - stand.x);
+      const dy = Math.abs(view.root.y - stand.y);
+      if (dx === 0 && dy === 0) continue;
+      // 走過去的時間依距離：每格一步的時間，至少一步。
+      const steps = Math.max(1, Math.round(Math.max(dx, dy) / TILE_SIZE));
+      view.walkTo(stand.x, stand.y, MOVE_DURATION_MS * steps);
+    }
+    for (const [id, view] of [...this.npcRigs]) {
+      if (present.has(id)) continue;
+      this.activeEmotes.get(id)?.handle.destroy();
+      this.activeEmotes.delete(id);
+      view.destroy();
+      this.npcRigs.delete(id);
+    }
+  }
+
+  /** 有骨架的居民（目前是毛毛）用骨架；其餘是占位色塊。 */
+  private createResidentView(npcId: string): ResidentView {
+    const def = this.deps.rigs.rigs.find((r) => r.id === npcId);
+    if (def) return new CharacterRig(this, def, this.deps.assets);
+    return new PlaceholderResident(this, `npc.${npcId}`, this.deps.assets);
   }
 
   /** 換季時重新染色草地（只在季節變了的時候動作）。 */
@@ -678,20 +741,6 @@ export class MapScene extends Phaser.Scene {
     }
 
     this.clearActors();
-    for (const placement of map.npcs) {
-      const npc = this.deps.index.npc(placement.npcId);
-      const def = this.deps.rigs.rigs.find((r) => r.id === npc.id);
-      if (def) {
-        // 有骨架的居民（毛毛）：腳底中心站在格子底邊中央，能搖擺。
-        const rig = new CharacterRig(this, def, this.deps.assets);
-        const stand = standOf(placement.x, placement.y);
-        rig.root.setDepth(DEPTH_RESIDENT);
-        rig.teleport(stand.x, stand.y);
-        this.npcRigs.set(npc.id, rig);
-      } else {
-        this.world.add(this.character(`npc.${npc.id}`, placement.x, placement.y, DEPTH_RESIDENT));
-      }
-    }
     this.createResidents(map);
   }
 
@@ -741,6 +790,8 @@ export class MapScene extends Phaser.Scene {
    */
   private moveFollowers(map: MapDef, player: { x: number; y: number; facing: Direction }, mapChanged: boolean): void {
     const taken = new Set<string>();
+    // 居民站的格子（依行程）與住在這裡的夥伴的格子，寵物都不能站。
+    for (const placement of residentsOn(this.deps.session.state, this.deps.index)) taken.add(`${placement.x},${placement.y}`);
     for (const state of this.companions.values()) {
       if (state.def.home && state.tile) taken.add(`${state.tile.x},${state.tile.y}`);
     }
@@ -848,10 +899,6 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  private resolveTexture(assetId: string): string {
-    return resolveAsset(this.deps.assets, assetId).textureId;
-  }
-
   /**
    * 把素材套到圖片上：換成實際的貼圖（翻轉素材用原圖）、水平翻轉、顯示縮放（例如 2x 母版 0.5 倍），
    * 並記下基準縮放，讓壓扁伸展等效果以它為準。
@@ -862,14 +909,6 @@ export class MapScene extends Phaser.Scene {
     image.setFlipX(flipX);
     image.setScale(scale);
     image.setData('baseScale', scale);
-  }
-
-  /** 站立的角色（玩家以外，例如 NPC）：腳底貼齊格子底部。 */
-  private character(key: string, x: number, y: number, depth: number): Phaser.GameObjects.Image {
-    const foot = footOf(x, y);
-    const image = this.add.image(foot.x, foot.y, this.resolveTexture(key)).setOrigin(0, 1).setDepth(depth);
-    this.applyAsset(image, key);
-    return image;
   }
 
   private debugSprites(): SpriteDebugInfo[] {
@@ -907,7 +946,7 @@ export class MapScene extends Phaser.Scene {
   /** 看得見的居民與夥伴骨架（不含玩家）。 */
   private visibleRigs(): { id: string; rig: CharacterRig }[] {
     const list: { id: string; rig: CharacterRig }[] = [];
-    for (const [id, rig] of this.npcRigs) list.push({ id, rig });
+    for (const [id, rig] of this.npcRigs) if (rig instanceof CharacterRig) list.push({ id, rig });
     for (const [id, state] of this.companions) if (state.rig.root.visible) list.push({ id, rig: state.rig });
     return list;
   }

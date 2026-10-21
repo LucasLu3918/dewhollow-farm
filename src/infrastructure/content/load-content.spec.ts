@@ -30,9 +30,40 @@ import cowbarn from '../../../content/maps/cowbarn.json';
 import farm from '../../../content/maps/farm.json';
 import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
+import plaza from '../../../content/maps/plaza.json';
+import schedules from '../../../content/schedules.json';
+import events from '../../../content/events.json';
+import friendship from '../../../content/friendship.json';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine, ...overrides };
+  return {
+    crops,
+    npcs,
+    schedules,
+    events,
+    friendship,
+    maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+    start,
+    tuning,
+    assets,
+    rigs,
+    companions,
+    tools,
+    sounds,
+    music,
+    terrain,
+    weather,
+    items,
+    shops,
+    fish,
+    animals,
+    recipes,
+    processing,
+    crafting,
+    talents,
+    mine,
+    ...overrides,
+  };
 }
 
 describe('loadContent with shipped content', () => {
@@ -46,7 +77,7 @@ describe('loadContent with shipped content', () => {
       'dusk-potato',
       'silver-wheat',
     ]);
-    expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'forest', 'lake', 'house', 'mine-entrance', 'coop', 'pasture', 'cowbarn']);
+    expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'plaza', 'forest', 'lake', 'house', 'mine-entrance', 'coop', 'pasture', 'cowbarn']);
     expect(pack.start.mapId).toBe('farm');
   });
 
@@ -152,14 +183,14 @@ describe('loadContent validation', () => {
     }
   });
 
-  it('rejects an NPC placed on a blocked tile', () => {
-    const blocked = { ...village, npcs: [{ npcId: 'maomao', x: 0, y: 0 }] };
+  it('rejects a resident whose schedule puts him on a blocked tile', () => {
+    const blocked = { ...schedules, entries: [...schedules.entries, { npcId: 'maomao', period: 'evening', mapId: 'village', x: 0, y: 0 }] };
     try {
-      loadContent(shipped({ maps: [farm, blocked] }));
+      loadContent(shipped({ schedules: blocked }));
       throw new Error('should have thrown');
     } catch (error) {
       expect(error).toBeInstanceOf(ContentError);
-      expect((error as ContentError).problems.join('\n')).toContain('不可行走的格子 (0,0)');
+      expect((error as ContentError).problems.join('\n')).toContain('village (0,0) 不可行走');
     }
   });
 

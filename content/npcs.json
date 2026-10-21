@@ -7,6 +7,69 @@
       "村子裡有什麼事，都可以來找我。",
       "等你的田裡有收成，記得分一點給我嚐嚐。"
     ],
-    "gift": { "cropId": "sweet-radish", "count": 3 }
+    "gift": { "cropId": "sweet-radish", "count": 3 },
+    "loves": ["crop.sweet-radish", "fish.carp"],
+    "hates": ["mint"],
+    "playMinutes": 2
+  },
+  {
+    "id": "rong-bo",
+    "name": "榕伯",
+    "lines": [
+      "我是這個鎮的鎮長，大家都叫我榕伯。",
+      "鎮公所的佈告欄每天都會更新，有空去看看。",
+      "農場的事如果有需要幫忙，儘管開口。"
+    ],
+    "loves": ["crop.silver-wheat", "vase"],
+    "hates": ["bait"],
+    "playMinutes": 2
+  },
+  {
+    "id": "a-gan",
+    "name": "阿柑",
+    "lines": [
+      "歡迎光臨雜貨店，種子和日用品都在這裡。",
+      "進貨的時候我都會先看看天氣，雨天的東西比較好賣。",
+      "要買東西記得先站到櫃檯前面。"
+    ],
+    "loves": ["crop.star-pepper", "berry"],
+    "hates": ["stone"],
+    "playMinutes": 2
+  },
+  {
+    "id": "shi-shifu",
+    "name": "石師傅",
+    "lines": [
+      "我是鐵匠，工具壞了就拿來給我看看。",
+      "好的工具省體力，這是我一輩子的體會。",
+      "銅礦石要是找到了，記得先拿來給我。"
+    ],
+    "loves": ["copper-ore", "slate"],
+    "hates": ["flower-spring"],
+    "playMinutes": 2
+  },
+  {
+    "id": "zhi-lan",
+    "name": "芷蘭",
+    "lines": [
+      "我在森林邊上懂一點草藥，大家都叫我藥草師。",
+      "春天的嫩芽和藥草最好用，採的時候別連根拔起。",
+      "下次進森林，順便幫我看看有沒有野菇。"
+    ],
+    "loves": ["herb", "fern-shoot", "mushroom"],
+    "hates": ["copper-ore"],
+    "playMinutes": 2
+  },
+  {
+    "id": "xiao-sui",
+    "name": "小穗",
+    "lines": [
+      "早安，我是麵包師小穗。剛出爐的麵包要不要來一個？",
+      "我最喜歡用新鮮的雞蛋和牛奶做點心。",
+      "下次有節慶，我會做很大一個的麵包。"
+    ],
+    "loves": ["crop.sweet-radish", "milk", "egg"],
+    "hates": ["dried-carp"],
+    "playMinutes": 2
   }
 ]

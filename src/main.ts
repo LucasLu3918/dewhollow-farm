@@ -3,6 +3,9 @@ import Phaser from 'phaser';
 import crops from '../content/crops.json';
 import mine from '../content/mine.json';
 import npcs from '../content/npcs.json';
+import schedules from '../content/schedules.json';
+import events from '../content/events.json';
+import friendship from '../content/friendship.json';
 import start from '../content/start.json';
 import tuning from '../content/tuning.json';
 import assets from '../content/assets.json';
@@ -30,6 +33,7 @@ import pasture from '../content/maps/pasture.json';
 import cowbarn from '../content/maps/cowbarn.json';
 import farm from '../content/maps/farm.json';
 import village from '../content/maps/village.json';
+import plaza from '../content/maps/plaza.json';
 import { createContentIndex } from './application/content-index';
 import { GameSession } from './application/game-session';
 import type { SaveRepository } from './application/ports';
@@ -51,7 +55,7 @@ import { AudioOutput } from './presentation/audio/audio-output';
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
-  const loaded = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+  const loaded = loadContent({ crops, npcs, schedules, events, friendship, maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
   const index = createContentIndex(loaded.pack);
   // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
   const audio = new AudioOutput();

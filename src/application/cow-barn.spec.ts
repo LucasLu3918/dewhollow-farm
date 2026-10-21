@@ -31,7 +31,6 @@ const yard: MapDef = {
     },
   },
   spawn: { x: 1, y: 1 },
-  npcs: [],
 };
 
 const pasture: MapDef = {
@@ -42,7 +41,6 @@ const pasture: MapDef = {
   rows: ['#####', '.....', '#####'],
   legend: { '#': { kind: 'fence' }, '.': { kind: 'grass' } },
   spawn: { x: 1, y: 1 },
-  npcs: [],
 };
 
 const cowbarn: MapDef = {
@@ -59,13 +57,15 @@ const cowbarn: MapDef = {
     D: { kind: 'door', to: 'yard', spawn: { x: 4, y: 3 } },
   },
   spawn: { x: 2, y: 3 },
-  npcs: [],
   flock: 'cows',
 };
 
 const content: ContentPack = {
   crops: [{ id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 20, growthDays: 2, seasons: ['spring'] }],
   npcs: [],
+  schedule: { periods: { noon: 720, evening: 1020 }, entries: [] },
+  heartEvents: [],
+  friendship: { pointsPerHeart: 100, maxHearts: 10, earlyCap: { hearts: 4, untilSeason: 'summer' }, talkPoints: 10, gift: { love: 80, neutral: 30, hate: -40 }, cropQuality: { minHearts: 2, perResident: 0.05, cap: 0.15 } },
   items: [
     { id: 'hay', name: '乾草', kind: 'material', maxStack: 99, sellPrice: 2 },
     { id: 'egg', name: '雞蛋', kind: 'animal', maxStack: 99, sellPrice: 25 },

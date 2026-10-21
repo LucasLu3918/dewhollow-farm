@@ -194,6 +194,5 @@ export function generateMineLayer(layer: number, seed: number, rules: MineRules)
     rows: grid.map((row) => row.join('')),
     legend,
     spawn: { x: width - 3, y: upRow },
-    npcs: [],
   };
 }

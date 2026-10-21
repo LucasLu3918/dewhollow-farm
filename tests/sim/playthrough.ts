@@ -373,7 +373,7 @@ function mineWork(bot: Bot, index: ContentIndex): void {
     const map = index.map(bot.state.mapId);
     const down = tilesWhere(bot.state, map, (_k, t) => t.kind === 'stairs' && t.to === below)[0];
     if (!down) return;
-    const next = nextDig(bot.state, map, down);
+    const next = nextDig(bot.state, index, map, down);
     if (!next) return;
     bot.useTool('pick');
     if (!bot.actOn([next], { type: 'interact' })) return;
@@ -384,7 +384,7 @@ function mineWork(bot: Bot, index: ContentIndex): void {
  * 從玩家到 goal 敲最少石頭的路（Dijkstra，走路 0、石頭與礦石 1）：回傳路上最先遇到的那一塊石頭。
  * 沒有石頭擋路、或走得到，回傳 null。
  */
-function nextDig(state: GameState, map: MapDef, goal: Pos): Pos | null {
+function nextDig(state: GameState, index: ContentIndex, map: MapDef, goal: Pos): Pos | null {
   const size = map.width * map.height;
   const cost = new Array<number>(size).fill(Number.POSITIVE_INFINITY);
   const prev = new Array<number>(size).fill(-1);
@@ -400,7 +400,7 @@ function nextDig(state: GameState, map: MapDef, goal: Pos): Pos | null {
         isRock[i] = true;
         open[i] = true;
       } else {
-        open[i] = passable(state, map, x, y) || (kind === 'stairs');
+        open[i] = passable(state, index, map, x, y) || (kind === 'stairs');
       }
     }
   }

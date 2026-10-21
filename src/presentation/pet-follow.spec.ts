@@ -50,7 +50,6 @@ describe('placeBeside', () => {
     rows: ['#####', '#...#', '#...#', '##D##'],
     legend: { '#': { kind: 'wall' }, '.': { kind: 'grass' }, D: { kind: 'door', to: 'farm', spawn: { x: 1, y: 1 } } },
     spawn: { x: 2, y: 1 },
-    npcs: [],
   };
 
   it('prefers the tile behind the player', () => {
@@ -74,8 +73,8 @@ describe('placeBeside', () => {
   it('never picks a wall, a door, the player, a villager, or a blocked tile', () => {
     // 玩家在 (2,2)，面向上：後面 (2,3) 是門，不能站；旁邊 (3,2)、(1,2)；
     expect(placeBeside(map, { x: 2, y: 2 }, 'up')).not.toEqual({ x: 2, y: 3 });
-    const withVillager: MapDef = { ...map, npcs: [{ npcId: 'mira', x: 1, y: 2 }] };
-    const spot = placeBeside(withVillager, { x: 2, y: 2 }, 'up');
+    // 居民站在 (1,2)：由呼叫端（依行程算出的居民位置）當作 blocked 傳入。
+    const spot = placeBeside(map, { x: 2, y: 2 }, 'up', new Set(['1,2']));
     expect(spot).not.toEqual({ x: 1, y: 2 });
     expect(spot).not.toEqual({ x: 2, y: 2 });
   });

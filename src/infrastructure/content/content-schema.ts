@@ -3,6 +3,8 @@ import { SEASONS } from '../../domain/calendar';
 import { WEATHERS } from '../../domain/weather';
 import { TOOL_IDS } from '../../domain/tools';
 import { SKILL_IDS } from '../../domain/skills';
+import { PERIODS } from '../../domain/schedule';
+import { HEART_EMOTES } from '../../domain/heart-events';
 
 const point = z.object({ x: z.number().int().nonnegative(), y: z.number().int().nonnegative() });
 
@@ -19,6 +21,10 @@ const npcSchema = z.object({
   name: z.string().min(1),
   lines: z.array(z.string().min(1)).min(1),
   gift: z.object({ cropId: z.string().min(1), count: z.number().int().positive() }).optional(),
+  /** 喜歡與討厭的物品 id（送禮與作物品質，見 domain/friendship.ts）。 */
+  loves: z.array(z.string().min(1)),
+  hates: z.array(z.string().min(1)),
+  playMinutes: z.number().positive().max(60),
 });
 
 /** 解鎖條件：日期（從某季某天起開放）或旗標；hint 是條件不符時給玩家看的話。 */
@@ -57,7 +63,6 @@ const mapSchema = z.object({
   rows: z.array(z.string()),
   legend: z.record(z.string().length(1), tileSchema),
   spawn: point,
-  npcs: z.array(z.object({ npcId: z.string().min(1), x: z.number().int(), y: z.number().int() })),
   flock: z.enum(['animals', 'cows']).optional(),
 });
 
@@ -359,6 +364,65 @@ export const talentsFileSchema = z.object({
       effect: talentEffectSchema,
     }),
   ),
+});
+
+/** 居民行程（見 domain/schedule.ts 與 content/schedules.json）。 */
+const scheduleEntrySchema = z.object({
+  npcId: z.string().min(1),
+  period: z.enum(PERIODS),
+  weather: z.array(z.enum(WEATHERS)).min(1).optional(),
+  mapId: z.string().min(1),
+  x: z.number().int().nonnegative(),
+  y: z.number().int().nonnegative(),
+});
+export const scheduleFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  periods: z
+    .object({ noon: z.number().int().min(0).max(1439), evening: z.number().int().min(0).max(1439) })
+    .refine((p) => p.noon < p.evening, '中午的分界要早於傍晚的分界'),
+  entries: z.array(scheduleEntrySchema),
+});
+
+/** 心形事件（見 domain/heart-events.ts 與 content/events.json）。 */
+const heartEventOptionSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  reply: z.string().min(1),
+  points: z.number().int().min(-100).max(100),
+});
+const heartEventSchema = z.object({
+  id: z.string().min(1),
+  npcId: z.string().min(1),
+  hearts: z.number().int().min(1).max(10),
+  phase: z.enum(SEASONS),
+  mapId: z.string().min(1),
+  periods: z.array(z.enum(PERIODS)).min(1),
+  emote: z.enum(HEART_EMOTES),
+  pages: z.array(z.string().min(1)).min(2).max(3),
+  options: z.array(heartEventOptionSchema).min(1).max(2),
+  playMinutes: z.number().positive().max(60),
+});
+export const heartEventsFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  events: z.array(heartEventSchema),
+});
+
+/** 好感規則（見 domain/friendship.ts 與 content/friendship.json）。 */
+export const friendshipFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  pointsPerHeart: z.number().int().positive(),
+  maxHearts: z.number().int().min(1).max(10),
+  earlyCap: z.object({ hearts: z.number().int().min(0).max(10), untilSeason: z.enum(SEASONS) }),
+  talkPoints: z.number().int().nonnegative(),
+  gift: z.object({ love: z.number().int(), neutral: z.number().int(), hate: z.number().int() }),
+  cropQuality: z.object({
+    minHearts: z.number().int().min(0).max(10),
+    perResident: z.number().min(0).max(1),
+    cap: z.number().min(0).max(1),
+  }),
 });
 
 export const cropsFileSchema = z.array(cropSchema);

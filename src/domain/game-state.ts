@@ -16,8 +16,9 @@ import { createEnergy, type Energy } from './energy';
 import type { PlotMap } from './farm';
 import { createShipBox, type ShipBox } from './shipping';
 import type { TalentChoices } from './talents';
+import type { Friendship } from './friendship';
 
-export const SAVE_SCHEMA_VERSION = 13;
+export const SAVE_SCHEMA_VERSION = 14;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -58,6 +59,12 @@ export interface GameState {
   processing: ProcessingJob[];
   /** 投竿後等待收線的魚（魚上鉤後才有；任何其他動作都會放掉它）。 */
   fishing: { fishId: string } | null;
+  /** 每位居民的好感與今日紀錄（對話、送禮）；沒有紀錄的居民視為 0 顆心。見 friendship.ts。 */
+  friendship: Record<string, Friendship>;
+  /** 已經觸發過的心形事件 id（每個事件只會觸發一次）。 */
+  heartEvents: string[];
+  /** 正在進行、還沒選完選項的心形事件 id；有值時畫面要先讓玩家選完（其他指令會被擋下）。 */
+  pendingHeartEvent: string | null;
   /** 礦坑的種子：同一個種子每一層的樣子都一樣。 */
   mineSeed: number;
   /** 最深到過的檢查點層數（從入口下來會直接到這裡）；至少是第 1 層。 */
@@ -111,6 +118,9 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     animals: [],
     cows: [],
     processing: [],
+    friendship: {},
+    heartEvents: [],
+    pendingHeartEvent: null,
     mineSeed: advanceRng(seed >>> 0),
     mineCheckpoint: 1,
     selectedSeed: selectedSeed.id,

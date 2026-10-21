@@ -21,7 +21,7 @@ const COUNTER_CLOCKWISE: Record<Direction, Direction> = { up: 'left', left: 'dow
 
 /**
  * 玩家剛進入一張地圖（或剛讀檔）時，寵物該站的格子：優先站在玩家後面，
- * 其次是順時針的旁邊、逆時針的旁邊，最後才是前面。牆、門、居民、玩家自己與 `blocked`（"x,y"）都不能站。
+ * 其次是順時針的旁邊、逆時針的旁邊，最後才是前面。牆、門、`blocked`（"x,y"，居民與其他夥伴站的格子）都不能站。
  * 沒有任何格子可站時回傳 null。結果是確定的，同樣的情況永遠得到同一格。
  */
 export function placeBeside(
@@ -35,7 +35,6 @@ export function placeBeside(
     const spot = neighbor(player, direction);
     const tile = tileAt(map, spot.x, spot.y);
     if (!tile || !isWalkable(tile.kind) || tile.kind === 'door') continue;
-    if (map.npcs.some((n) => n.x === spot.x && n.y === spot.y)) continue;
     if (blocked.has(`${spot.x},${spot.y}`)) continue;
     return spot;
   }

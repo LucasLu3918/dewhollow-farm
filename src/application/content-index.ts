@@ -5,6 +5,9 @@ import { generateMineLayer, mineId, type MineRules } from '../domain/mine';
 import type { AnimalDef } from '../domain/content';
 import type { WeatherTable } from '../domain/weather';
 import type { TalentSet } from '../domain/talents';
+import type { ScheduleDef } from '../domain/schedule';
+import type { HeartEventDef } from '../domain/heart-events';
+import type { FriendshipRules } from '../domain/friendship';
 
 /**
  * 以 id 快速查找內容。假設內容已由基礎設施層驗證過參照完整性；
@@ -41,6 +44,15 @@ export interface ContentIndex {
   weather: WeatherTable;
   /** 技能天賦：解鎖等級與所有天賦（見 talents.ts）。 */
   talents: TalentSet;
+  /** 所有居民（順序與內容檔相同）。 */
+  npcs: NpcDef[];
+  /** 居民行程（見 schedule.ts）。 */
+  schedule: ScheduleDef;
+  /** 所有心形事件（順序與內容檔相同）。 */
+  heartEvents: HeartEventDef[];
+  heartEvent(id: string): HeartEventDef;
+  /** 好感規則（見 friendship.ts）。 */
+  friendship: FriendshipRules;
 }
 
 export function createContentIndex(pack: ContentPack): ContentIndex {
@@ -114,5 +126,14 @@ export function createContentIndex(pack: ContentPack): ContentIndex {
     },
     weather: pack.weather,
     talents: pack.talents,
+    npcs: pack.npcs,
+    schedule: pack.schedule,
+    heartEvents: pack.heartEvents,
+    heartEvent(id) {
+      const found = pack.heartEvents.find((e) => e.id === id);
+      if (!found) throw new Error(`找不到心形事件：${id}`);
+      return found;
+    },
+    friendship: pack.friendship,
   };
 }

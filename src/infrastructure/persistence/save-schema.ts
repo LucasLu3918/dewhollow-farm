@@ -98,6 +98,17 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   animals: z.array(animal),
   cows: z.array(animal),
   processing: z.array(z.object({ recipeId: z.string().min(1), daysLeft: z.number().int().nonnegative() })),
+  /** 居民好感：點數與今日紀錄（對話、送禮的總天數；沒有紀錄是 null）。 */
+  friendship: z.record(
+    z.string().min(1),
+    z.object({
+      points: z.number().int().nonnegative(),
+      talkedDay: z.number().int().positive().nullable(),
+      giftedDay: z.number().int().positive().nullable(),
+    }),
+  ),
+  heartEvents: z.array(z.string().min(1)),
+  pendingHeartEvent: z.string().min(1).nullable(),
   mineSeed: z.number().int().nonnegative().max(4294967295),
   /** 礦坑沒有底，檢查點可以是任何正整數層（見 domain/mine.ts）。 */
   mineCheckpoint: z.number().int().min(1),

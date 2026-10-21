@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "note": "居民行程（M5a）。時段：早上（到 noon 前）、中午（noon 到 evening 前）、傍晚（evening 起）。有 weather 的行程只在那些天氣使用，否則用沒有 weather 的預設。雨、暴風雨、雪天，大多數人留在村子裡。",
+  "periods": { "noon": 720, "evening": 1020 },
+  "entries": [
+    { "npcId": "maomao", "period": "morning", "mapId": "village", "x": 10, "y": 5 },
+    { "npcId": "maomao", "period": "noon", "mapId": "plaza", "x": 9, "y": 4 },
+    { "npcId": "maomao", "period": "noon", "weather": ["rain", "storm", "snow"], "mapId": "village", "x": 10, "y": 6 },
+    { "npcId": "maomao", "period": "evening", "mapId": "plaza", "x": 9, "y": 9 },
+    { "npcId": "maomao", "period": "evening", "weather": ["rain", "storm", "snow"], "mapId": "village", "x": 10, "y": 6 },
+
+    { "npcId": "rong-bo", "period": "morning", "mapId": "village", "x": 2, "y": 5 },
+    { "npcId": "rong-bo", "period": "noon", "mapId": "plaza", "x": 6, "y": 1 },
+    { "npcId": "rong-bo", "period": "noon", "weather": ["rain", "storm", "snow"], "mapId": "village", "x": 2, "y": 6 },
+    { "npcId": "rong-bo", "period": "evening", "mapId": "village", "x": 1, "y": 2 },
+
+    { "npcId": "a-gan", "period": "morning", "mapId": "village", "x": 2, "y": 4 },
+    { "npcId": "a-gan", "period": "noon", "mapId": "village", "x": 2, "y": 4 },
+    { "npcId": "a-gan", "period": "evening", "mapId": "village", "x": 2, "y": 4 },
+
+    { "npcId": "shi-shifu", "period": "morning", "mapId": "village", "x": 11, "y": 4 },
+    { "npcId": "shi-shifu", "period": "noon", "mapId": "village", "x": 11, "y": 4 },
+    { "npcId": "shi-shifu", "period": "evening", "mapId": "village", "x": 11, "y": 4 },
+
+    { "npcId": "zhi-lan", "period": "morning", "mapId": "village", "x": 6, "y": 1 },
+    { "npcId": "zhi-lan", "period": "noon", "mapId": "plaza", "x": 13, "y": 8 },
+    { "npcId": "zhi-lan", "period": "noon", "weather": ["rain", "storm", "snow"], "mapId": "village", "x": 6, "y": 1 },
+    { "npcId": "zhi-lan", "period": "evening", "mapId": "plaza", "x": 12, "y": 5 },
+    { "npcId": "zhi-lan", "period": "evening", "weather": ["rain", "storm", "snow"], "mapId": "village", "x": 6, "y": 1 },
+
+    { "npcId": "xiao-sui", "period": "morning", "mapId": "village", "x": 13, "y": 8 },
+    { "npcId": "xiao-sui", "period": "noon", "mapId": "plaza", "x": 4, "y": 9 },
+    { "npcId": "xiao-sui", "period": "noon", "weather": ["rain", "storm", "snow"], "mapId": "village", "x": 13, "y": 8 },
+    { "npcId": "xiao-sui", "period": "evening", "mapId": "village", "x": 13, "y": 8 }
+  ]
+}

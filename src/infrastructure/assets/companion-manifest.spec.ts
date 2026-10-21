@@ -4,6 +4,7 @@ import rigs from '../../../content/rigs.json';
 import farm from '../../../content/maps/farm.json';
 import village from '../../../content/maps/village.json';
 import npcs from '../../../content/npcs.json';
+import schedules from '../../../content/schedules.json';
 import type { ContentPack, MapDef } from '../../domain/content';
 import { companionsFileSchema } from '../content/content-schema';
 import { companionProblems, type CompanionDef, type CompanionManifest } from './companion-manifest';
@@ -23,9 +24,13 @@ const map: MapDef = {
     D: { kind: 'door', to: 'farm', spawn: { x: 1, y: 1 } },
   },
   spawn: { x: 2, y: 1 },
-  npcs: [{ npcId: 'mira', x: 1, y: 1 }],
 };
-const pack = { maps: [map], npcs: [{ id: 'mira', name: '米拉', lines: ['你好'] }] } as unknown as Pick<ContentPack, 'maps' | 'npcs'>;
+/** 米拉的行程：早上站在 (1,1)（NPC 不再寫在地圖上，而是在行程裡）。 */
+const pack = {
+  maps: [map],
+  npcs: [{ id: 'mira', name: '米拉', lines: ['你好'] }],
+  schedule: { periods: { noon: 720, evening: 1020 }, entries: [{ npcId: 'mira', period: 'morning', mapId: 'village', x: 1, y: 1 }] },
+} as unknown as Pick<ContentPack, 'maps' | 'npcs' | 'schedule'>;
 
 const rigList: RigManifest = {
   version: 1,
@@ -120,7 +125,7 @@ describe('companionProblems', () => {
 
 describe('shipped companions', () => {
   const shipped = companions as CompanionManifest;
-  const realPack = { maps: [farm, village], npcs } as unknown as Pick<ContentPack, 'maps' | 'npcs'>;
+  const realPack = { maps: [farm, village], npcs, schedule: schedules } as unknown as Pick<ContentPack, 'maps' | 'npcs' | 'schedule'>;
 
   it('pass the schema and cross-reference the shipped rigs, maps and villagers without problems', () => {
     expect(companionsFileSchema.safeParse(companions).success).toBe(true);

@@ -5,6 +5,7 @@ import { changeAt, effectiveKind } from '../../src/domain/world-changes';
 import { mineId, mineLayerOf } from '../../src/domain/mine';
 import type { ContentIndex } from '../../src/application/content-index';
 import { requirementMet } from '../../src/domain/unlock';
+import { residentAt } from '../../src/application/residents';
 
 /** 模擬用的地圖座標：地圖 id 加上格子。 */
 export interface Pos extends Point {
@@ -26,11 +27,11 @@ export function kindAt(state: GameState, mapId: string, x: number, y: number, ti
   return effectiveKind(tile.kind, changeAt(state.worldChanges, mapId, x, y));
 }
 
-/** 同 game-commands.ts 的 move：能不能踏上這一格（礦坑的洞口清開後也能走）。 */
-export function passable(state: GameState, map: MapDef, x: number, y: number): boolean {
+/** 同 game-commands.ts 的 move：能不能踏上這一格（礦坑的洞口清開後也能走；居民依行程站的格子擋路）。 */
+export function passable(state: GameState, index: ContentIndex, map: MapDef, x: number, y: number): boolean {
   const tile = tileAt(map, x, y);
   if (!tile) return false;
-  if (map.npcs.some((n) => n.x === x && n.y === y)) return false;
+  if (map.id === state.mapId && residentAt(state, index, x, y)) return false;
   if (tile.kind === 'cave') return changeAt(state.worldChanges, map.id, x, y) === 'cleared';
   return isWalkable(kindAt(state, map.id, x, y, tile));
 }
