@@ -4,6 +4,7 @@ import { isWalkable, tileAt } from '../../src/domain/world';
 import { changeAt, effectiveKind } from '../../src/domain/world-changes';
 import { mineId, mineLayerOf } from '../../src/domain/mine';
 import type { ContentIndex } from '../../src/application/content-index';
+import { requirementMet } from '../../src/domain/unlock';
 
 /** 模擬用的地圖座標：地圖 id 加上格子。 */
 export interface Pos extends Point {
@@ -32,6 +33,13 @@ export function passable(state: GameState, map: MapDef, x: number, y: number): b
   if (map.npcs.some((n) => n.x === x && n.y === y)) return false;
   if (tile.kind === 'cave') return changeAt(state.worldChanges, map.id, x, y) === 'cleared';
   return isWalkable(kindAt(state, map.id, x, y, tile));
+}
+
+/** 門的解鎖條件還沒符合（門是鎖著的）：走不進去，與 game-commands.ts 的 enter 相同的規則。 */
+export function lockedDoor(state: GameState, index: ContentIndex, map: MapDef, x: number, y: number): boolean {
+  const tile = tileAt(map, x, y);
+  if (!tile?.requires) return false;
+  return !requirementMet(tile.requires, state.calendar, state.flags, index.tuning.time.daysPerSeason);
 }
 
 /** 踏上門、樓梯或清開的洞口之後會到哪裡（與 game-commands.ts 的 enter 相同的規則）。 */

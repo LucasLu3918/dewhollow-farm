@@ -34,6 +34,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   9: migrateV9ToV10,
   10: migrateV10ToV11,
   11: migrateV11ToV12,
+  12: migrateV12ToV13,
 };
 
 /**
@@ -195,6 +196,28 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v12 → v13：牛舍與牛奶。舊存檔的雞都還沒有擠奶的紀錄（milked 為 false），牛舍還沒有牛。
+ * 牛舍是否改建記在旗標裡（flags），舊存檔沒有這個旗標，也就是還沒改建。
+ */
+function migrateV12ToV13(raw: unknown): unknown {
+  const parsed = z
+    .object({
+      schemaVersion: z.literal(12),
+      animals: z.array(z.object({ kind: z.string().min(1), fed: z.boolean(), petted: z.boolean(), mood: z.number() })),
+    })
+    .safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v12 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 13,
+    animals: parsed.data.animals.map((animal) => ({ ...animal, milked: false })),
+    cows: [],
+  };
 }
 
 /**

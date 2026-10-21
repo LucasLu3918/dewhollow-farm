@@ -287,7 +287,17 @@ export function economyProblems(pack: ContentPack): string[] {
     ...pack.animals.map((a) => `animal.${a.id}`),
   ]);
   for (const animal of pack.animals) {
-    if (!pack.items.some((i) => i.id === animal.eggItem)) problems.push(`動物 ${animal.id} 下的蛋 ${animal.eggItem} 不存在`);
+    if (animal.eggItem !== undefined && !pack.items.some((i) => i.id === animal.eggItem)) {
+      problems.push(`動物 ${animal.id} 下的蛋 ${animal.eggItem} 不存在`);
+    }
+    if (animal.milk !== undefined && !pack.items.some((i) => i.id === animal.milk?.item)) {
+      problems.push(`動物 ${animal.id} 產的奶 ${animal.milk.item} 不存在`);
+    }
+  }
+  for (const map of pack.maps) {
+    if (map.flock !== undefined && !Object.values(map.legend).some((tile) => tile.slot)) {
+      problems.push(`地圖 ${map.id} 住著 ${map.flock}，卻沒有座位（slot）`);
+    }
   }
   const shopIds = new Set(pack.shops.map((s) => s.id));
   for (const recipe of pack.crafting) {

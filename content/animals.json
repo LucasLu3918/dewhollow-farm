@@ -1,12 +1,21 @@
 {
   "version": 1,
-  "note": "雞舍裡的動物。購買在雜貨店（stock 的 itemId 為 animal.<id>）；座位由雞舍地圖的 slot 格決定。",
+  "note": "農場的動物。雞住在雞舍（座位由雞舍地圖的 slot 格決定），睡醒時餵飽的雞各下一顆蛋。牛住在牛舍（需先改建，座位數見 cowbarn.json），每天要餵乾草、摸一次、擠一次奶（需已餵飽）。購買在雜貨店（stock 的 itemId 為 animal.<id>）。eggItem／eggQuality 與 milk 二選一；milk 的 goodChance 是心情 5 以上的優良奶機率，fineChance 是心情 9 以上的精良奶機率（不大於 goodChance）。",
   "animals": [
     {
       "id": "chicken",
       "name": "雞",
       "eggItem": "egg",
       "eggQuality": 0.3
+    },
+    {
+      "id": "cow",
+      "name": "牛",
+      "milk": {
+        "item": "milk",
+        "goodChance": 0.3,
+        "fineChance": 0.1
+      }
     }
   ]
 }

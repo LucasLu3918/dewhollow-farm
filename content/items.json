@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "不是作物衍生的物品（作物與種子由 crops.json 產生）。kind processed 是加工機的成品（見 processing.json）；kind craft 是合成的成品（見 crafting.json）。木材、石頭、乾草、銅礦石沒有售價：是合成與升級的材料，不能出貨。",
+  "note": "不是作物衍生的物品（作物與種子由 crops.json 產生）。kind processed 是加工機的成品（見 processing.json）；kind craft 是合成的成品（見 crafting.json）。木材、石頭、乾草、銅礦石沒有售價：是合成與升級的材料，不能出貨。kind building（building.<旗標>）是店家賣的建築改建（見 shops.json），只出現在貨架上，不進背包。",
   "items": [
     {
       "id": "wood",
@@ -39,6 +39,27 @@
       "kind": "animal",
       "maxStack": 99,
       "sellPrice": 25
+    },
+    {
+      "id": "milk",
+      "name": "牛奶",
+      "kind": "animal",
+      "maxStack": 99,
+      "sellPrice": 60
+    },
+    {
+      "id": "cheese",
+      "name": "起司",
+      "kind": "processed",
+      "maxStack": 99,
+      "sellPrice": 170
+    },
+    {
+      "id": "butter",
+      "name": "奶油",
+      "kind": "processed",
+      "maxStack": 99,
+      "sellPrice": 90
     },
     {
       "id": "pickle-bean",
@@ -204,6 +225,12 @@
       "kind": "craft",
       "maxStack": 99,
       "sellPrice": 8
+    },
+    {
+      "id": "building.cowbarn",
+      "name": "牛舍改建",
+      "kind": "building",
+      "maxStack": 1
     }
   ]
 }

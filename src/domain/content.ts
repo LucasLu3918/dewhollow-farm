@@ -5,6 +5,10 @@ import type { WeatherTable } from './weather';
 import type { ItemDef } from './items';
 import type { ToolId } from './tools';
 import type { TalentSet } from './talents';
+import type { AnimalDef, FlockId } from './animals';
+import type { Requirement } from './unlock';
+
+export type { AnimalDef, MilkDef } from './animals';
 
 export interface Point {
   x: number;
@@ -52,16 +56,19 @@ export type TileKind =
   | 'floor'
   | 'furniture'
   | 'cave'
-  | 'rock';
+  | 'rock'
+  | 'fence';
 
 export interface TileDef {
   kind: TileKind;
   /** 僅門會用到：通往的地圖與落點。 */
   to?: string;
   spawn?: Point;
+  /** 僅門會用到：進門前要符合的條件（日期或旗標），不符合時門是鎖著的，並顯示 hint。 */
+  requires?: Requirement;
   /** 僅櫃檯會用到：屬於哪一家店（見 shops.json）。 */
   shop?: string;
-  /** 雞舍的座位：動物坐在這裡。 */
+  /** 雞舍或牛舍的座位：動物坐在這裡。 */
   slot?: boolean;
   /** 採集點：採到的物品（省略為野薄荷）與能採的季節（省略為四季皆可）。 */
   item?: string;
@@ -84,6 +91,8 @@ export interface MapDef {
   legend: Record<string, TileDef>;
   spawn: Point;
   npcs: MapNpcPlacement[];
+  /** 這棟建築裡住的動物（雞舍住雞，牛舍住牛）；座位數就是能養的數量。 */
+  flock?: FlockId;
 }
 
 import type { Tuning } from './tuning';
@@ -106,7 +115,7 @@ export interface ContentPack {
   items: ItemDef[];
   /** 魚的種類（釣到的魚會變成 fish.<id> 物品）。 */
   fish: FishDef[];
-  /** 雞舍的動物種類。 */
+  /** 動物的種類（雞舍的雞、牛舍的牛）。 */
   animals: AnimalDef[];
   /** 食譜（廚房做菜，吃了回復體力）。 */
   recipes: RecipeDef[];
@@ -157,13 +166,6 @@ export interface CraftingRecipeDef {
   unlock?: { skill: string; level: number };
   /** 內容時數的估計（分鐘），見 docs/PLAYTIME_PLAN.md。 */
   playMinutes: number;
-}
-
-export interface AnimalDef {
-  id: string;
-  name: string;
-  eggItem: string;
-  eggQuality: number;
 }
 
 export interface FishDef {

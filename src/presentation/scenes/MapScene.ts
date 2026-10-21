@@ -23,7 +23,7 @@ import { WorkshopPanel } from '../workshop-panel';
 import { WorkbenchPanel } from '../workbench-panel';
 import { SkillPanel } from '../skill-panel';
 import { slotsOf } from '../../domain/animals';
-import { CHICKEN_TEXTURE } from '../animal-art';
+import { animalTextureOf } from '../animal-art';
 import type { Weather } from '../../domain/weather';
 import { RENDER_COMPAT_KEY } from '../apply-render-compat';
 import { CharacterRig, type RigDebugInfo } from '../character-rig';
@@ -622,16 +622,20 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  /** 雞舍的動物：每隻坐在對應的座位上（座位順序見 slotsOf）。 */
+  /** 雞舍的雞、牛舍的牛：每隻坐在對應的座位上（座位順序見 slotsOf；住哪一群看地圖的 flock）。 */
   private syncAnimals(mapId: string): void {
     for (const sprite of this.animalSprites) sprite.destroy();
     this.animalSprites = [];
     const state = this.deps.session.state;
-    const seats = slotsOf(this.deps.index.map(mapId));
+    const map = this.deps.index.map(mapId);
+    if (!map.flock) return;
+    const herd = map.flock === 'cows' ? state.cows : state.animals;
+    const seats = slotsOf(map);
     seats.forEach((seat, i) => {
-      if (!state.animals[i]) return;
+      const animal = herd[i];
+      if (!animal) return;
       const sprite = this.add
-        .image(seat.x * TILE_SIZE + TILE_SIZE / 2, seat.y * TILE_SIZE + TILE_SIZE / 2, CHICKEN_TEXTURE)
+        .image(seat.x * TILE_SIZE + TILE_SIZE / 2, seat.y * TILE_SIZE + TILE_SIZE / 2, animalTextureOf(animal.kind))
         .setDepth(6);
       this.animalSprites.push(sprite);
     });

@@ -1,8 +1,11 @@
 import type { CropDef } from './content';
 import { sellPriceOf } from './pricing';
 
-/** 種子與作物由作物衍生；木材、野薄荷、礦石是獨立定義的（content/items.json）。 */
-export type ItemKind = 'seed' | 'crop' | 'material' | 'forage' | 'ore' | 'fish' | 'animal' | 'dish' | 'processed' | 'craft';
+/**
+ * 種子與作物由作物衍生；木材、野薄荷、礦石是獨立定義的（content/items.json）。
+ * building 是店家賣的建築改建（例如牛舍），只出現在貨架上，不會進背包。
+ */
+export type ItemKind = 'seed' | 'crop' | 'material' | 'forage' | 'ore' | 'fish' | 'animal' | 'dish' | 'processed' | 'craft' | 'building';
 
 export type Quality = 'normal' | 'good' | 'fine';
 

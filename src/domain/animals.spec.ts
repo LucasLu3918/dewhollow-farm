@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { dailyCare, feedAll, newAnimal, petAnimal, produceEggs, type Animal } from './animals';
+import { dailyCare, feedAll, milkQuality, newAnimal, petAnimal, produceEggs, type Animal } from './animals';
 
 const CHICKEN = { id: 'chicken', name: '雞', eggItem: 'egg', eggQuality: 0.3 };
+const MILK = { item: 'milk', goodChance: 0.3, fineChance: 0.1 };
 
 describe('animal care', () => {
-  it('a new animal is hungry and not yet petted, with a neutral mood', () => {
-    expect(newAnimal('chicken')).toEqual({ kind: 'chicken', fed: false, petted: false, mood: 5 });
+  it('a new animal is hungry, not yet petted or milked, with a neutral mood', () => {
+    expect(newAnimal('chicken')).toEqual({ kind: 'chicken', fed: false, petted: false, milked: false, mood: 5 });
   });
 
   it('feeding fills every animal, and petting raises the mood by one, up to 10', () => {
@@ -43,18 +44,35 @@ describe('the new day', () => {
     expect(goodFor(low, 0.1)).toBe('normal');
   });
 
-  it('after the day, care is used up: fed and petted reset, a petted animal gains mood, an unfed one loses it', () => {
+  it('after the day, care is used up: fed, petted and milked reset, a petted animal gains mood, an unfed one loses it', () => {
     const flock: Animal[] = [
-      { kind: 'chicken', fed: true, petted: true, mood: 5 },
-      { kind: 'chicken', fed: false, petted: false, mood: 5 },
-      { kind: 'chicken', fed: false, petted: false, mood: 0 },
+      { kind: 'chicken', fed: true, petted: true, milked: true, mood: 5 },
+      { kind: 'chicken', fed: false, petted: false, milked: false, mood: 5 },
+      { kind: 'chicken', fed: false, petted: false, milked: false, mood: 0 },
     ];
     const next = dailyCare(flock);
-    expect(next.map((a) => [a.fed, a.petted])).toEqual([
-      [false, false],
-      [false, false],
-      [false, false],
+    expect(next.map((a) => [a.fed, a.petted, a.milked])).toEqual([
+      [false, false, false],
+      [false, false, false],
+      [false, false, false],
     ]);
     expect(next.map((a) => a.mood)).toEqual([6, 4, 0]);
+  });
+});
+
+describe('milk quality (cows)', () => {
+  it('a cow with mood below 5 always gives normal milk', () => {
+    expect(milkQuality(4, 0, MILK)).toBe('normal');
+  });
+
+  it('mood 5 or more gives good milk on a lucky roll, and the roll decides which', () => {
+    expect(milkQuality(5, 0.1, MILK)).toBe('good');
+    expect(milkQuality(5, 0.5, MILK)).toBe('normal');
+  });
+
+  it('mood 9 or more can give fine milk, the best grade, on a rarer roll', () => {
+    expect(milkQuality(9, 0.05, MILK)).toBe('fine');
+    expect(milkQuality(9, 0.2, MILK)).toBe('good');
+    expect(milkQuality(8, 0.05, MILK)).toBe('good');
   });
 });

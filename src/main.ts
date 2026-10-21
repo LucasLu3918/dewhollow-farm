@@ -25,6 +25,8 @@ import lake from '../content/maps/lake.json';
 import house from '../content/maps/house.json';
 import mineEntrance from '../content/maps/mine-entrance.json';
 import coop from '../content/maps/coop.json';
+import pasture from '../content/maps/pasture.json';
+import cowbarn from '../content/maps/cowbarn.json';
 import farm from '../content/maps/farm.json';
 import village from '../content/maps/village.json';
 import { createContentIndex } from './application/content-index';
@@ -48,7 +50,7 @@ import { AudioOutput } from './presentation/audio/audio-output';
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
-  const loaded = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents });
+  const loaded = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents });
   const index = createContentIndex(loaded.pack);
   // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
   const audio = new AudioOutput();

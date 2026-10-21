@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "櫃檯放在地圖上（tile.kind 為 shop，tile.shop 指向這裡的 id）。鐵匠的升級需要銅礦石，礦坑完成前買不到，這是有意的。",
+  "note": "櫃檯放在地圖上（tile.kind 為 shop，tile.shop 指向這裡的 id）。鐵匠的升級需要銅礦石，礦坑完成前買不到，這是有意的。雜貨店的 building.cowbarn 是牛舍改建（花金幣、只能買一次），改建後才買得到牛（animal.cow）。",
   "shops": [
     {
       "id": "general",
@@ -25,6 +25,14 @@
         {
           "itemId": "animal.chicken",
           "price": 300
+        },
+        {
+          "itemId": "building.cowbarn",
+          "price": 5000
+        },
+        {
+          "itemId": "animal.cow",
+          "price": 1200
         }
       ],
       "upgrades": []

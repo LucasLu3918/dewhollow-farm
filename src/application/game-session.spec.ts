@@ -26,6 +26,8 @@ import lake from '../../content/maps/lake.json';
 import house from '../../content/maps/house.json';
 import mineEntrance from '../../content/maps/mine-entrance.json';
 import coop from '../../content/maps/coop.json';
+import pasture from '../../content/maps/pasture.json';
+import cowbarn from '../../content/maps/cowbarn.json';
 import { loadContent } from '../infrastructure/content/load-content';
 import { MemorySaveRepository } from '../infrastructure/persistence/memory-save-repository';
 import { createContentIndex } from './content-index';
@@ -33,7 +35,7 @@ import { GameSession } from './game-session';
 import type { SaveRecord, SaveRepository } from './ports';
 import { createNewGame, type GameState } from '../domain/game-state';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents });
 const index = createContentIndex(pack);
 
 /** 測試輔助：把玩家放到指定位置後建立 session。 */

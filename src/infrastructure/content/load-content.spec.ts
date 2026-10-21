@@ -24,12 +24,14 @@ import lake from '../../../content/maps/lake.json';
 import house from '../../../content/maps/house.json';
 import mineEntrance from '../../../content/maps/mine-entrance.json';
 import coop from '../../../content/maps/coop.json';
+import pasture from '../../../content/maps/pasture.json';
+import cowbarn from '../../../content/maps/cowbarn.json';
 import farm from '../../../content/maps/farm.json';
 import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, ...overrides };
+  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, ...overrides };
 }
 
 describe('loadContent with shipped content', () => {
@@ -43,7 +45,7 @@ describe('loadContent with shipped content', () => {
       'dusk-potato',
       'silver-wheat',
     ]);
-    expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'forest', 'lake', 'house', 'mine-entrance', 'coop']);
+    expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'forest', 'lake', 'house', 'mine-entrance', 'coop', 'pasture', 'cowbarn']);
     expect(pack.start.mapId).toBe('farm');
   });
 });

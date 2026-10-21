@@ -4,7 +4,7 @@ import { executeCommand, type Command, type CommandOutcome } from '../../src/app
 import type { ContentIndex } from '../../src/application/content-index';
 import { neighbor } from '../../src/domain/world';
 import { mineLayerOf } from '../../src/domain/mine';
-import { DIRECTIONS, landingOf, mapOrNull, passable, type Pos } from './world';
+import { DIRECTIONS, landingOf, lockedDoor, mapOrNull, passable, type Pos } from './world';
 
 /**
  * 無頭機器人的基礎動作：用與遊戲相同的指令（executeCommand）走路、互動，並統計動作數與走路步數。
@@ -154,7 +154,7 @@ export class Bot {
     if (!map) return out;
     for (const d of DIRECTIONS) {
       const t = neighbor(current, d);
-      if (passable(this.state, map, t.x, t.y)) {
+      if (passable(this.state, map, t.x, t.y) && !lockedDoor(this.state, this.index, map, t.x, t.y)) {
         const land = landingOf(this.state, this.index, map, t.x, t.y);
         const node = land ? { mapId: land.mapId, x: land.x, y: land.y, f: d } : { mapId: current.mapId, x: t.x, y: t.y, f: d };
         out.push({ ...node, parent, step: d });

@@ -25,6 +25,8 @@ import lake from '../../content/maps/lake.json';
 import house from '../../content/maps/house.json';
 import mineEntrance from '../../content/maps/mine-entrance.json';
 import coop from '../../content/maps/coop.json';
+import pasture from '../../content/maps/pasture.json';
+import cowbarn from '../../content/maps/cowbarn.json';
 import { loadContent } from '../../src/infrastructure/content/load-content';
 import { createContentIndex } from '../../src/application/content-index';
 
@@ -32,7 +34,7 @@ import { createContentIndex } from '../../src/application/content-index';
 const { pack } = loadContent({
   crops,
   npcs,
-  maps: [farm, village, forest, lake, house, mineEntrance, coop],
+  maps: [farm, village, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,

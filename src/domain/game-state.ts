@@ -17,7 +17,7 @@ import type { PlotMap } from './farm';
 import { createShipBox, type ShipBox } from './shipping';
 import type { TalentChoices } from './talents';
 
-export const SAVE_SCHEMA_VERSION = 12;
+export const SAVE_SCHEMA_VERSION = 13;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -50,8 +50,10 @@ export interface GameState {
   skills: SkillXp;
   /** 每項技能已選的天賦 id（5 級才能選，每項只能選一次，見 talents.ts）。 */
   talents: TalentChoices;
-  /** 雞舍裡的動物（依座位排序）。 */
+  /** 雞舍裡的雞（依座位排序）。 */
   animals: Animal[];
+  /** 牛舍裡的牛（依座位排序）。牛舍要先改建（flags.cowbarn），見 game-commands.ts。 */
+  cows: Animal[];
   /** 加工機裡的批次（醃漬、烘乾）；daysLeft 為 0 表示已完成、等玩家取回。 */
   processing: ProcessingJob[];
   /** 投竿後等待收線的魚（魚上鉤後才有；任何其他動作都會放掉它）。 */
@@ -107,6 +109,7 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     talents: {},
     fishing: null,
     animals: [],
+    cows: [],
     processing: [],
     mineSeed: advanceRng(seed >>> 0),
     mineCheckpoint: 1,
