@@ -33,7 +33,7 @@ tests/e2e/         Playwright 端到端測試
 
 ## 文件
 
-- 上線規劃：[ROADMAP](docs/ROADMAP.md)（總綱）· [GAME_DESIGN](docs/GAME_DESIGN.md) · [CONTENT_PLAN](docs/CONTENT_PLAN.md) · [ART_PIPELINE](docs/ART_PIPELINE.md) · [TECH_PLAN](docs/TECH_PLAN.md) · [DECISIONS](docs/DECISIONS.md)（待決定）
+- 上線規劃：[ROADMAP](docs/ROADMAP.md)（總綱）· [GAME_DESIGN](docs/GAME_DESIGN.md) · [CONTENT_PLAN](docs/CONTENT_PLAN.md) · [ART_PIPELINE](docs/ART_PIPELINE.md) · [ANIMATION_DESIGN](docs/ANIMATION_DESIGN.md) · [TECH_PLAN](docs/TECH_PLAN.md) · [DECISIONS](docs/DECISIONS.md)（待決定）
 - 既有：[MVP_SPEC](docs/MVP_SPEC.md) · [ORIGINALITY](docs/ORIGINALITY.md) · [CHARACTERS](docs/CHARACTERS.md) · [ART_STYLE](docs/ART_STYLE.md) · [TUNING](docs/TUNING.md)
 
 ## 替換素材

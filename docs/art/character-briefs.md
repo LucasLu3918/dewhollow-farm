@@ -88,6 +88,21 @@ Bright saturated hand-painted cartoon style, thick dark brown outline, soft high
 - 已入庫（2026-10-21）：四個 2x 母版放在 `public/assets/characters/`，`content/assets.json` 以 `file`、`density: 2` 與 `source`（模型、授權、seed、處理方式）登錄；`player.up/down/left/right` 暫用同一張小涵正面圖，`npc.maomao` 用毛毛，`pet.cat`、`pet.marsupial` 先登錄、尚未接進畫面。引擎以線性取樣、0.5 倍顯示，角色以腳底對齊格子。瀏覽器實測臉部與服裝清楚，縮小沒有鋸齒。
 - 四方向暫用同一張，所以左右走動時角色不會轉頭，這是已知的暫時限制。
 
+### 四方向試驗（2026-10-21）
+
+目的：評估文生圖能否產出與正面一致的背面與側面。Z-Image Turbo，同一模板與風格後綴，背面與側面各 3 個 seed（101、202、303），768×1024、9 步；提示詞在 `private/art-trials/prompts/xiaohan-back-v1.txt`、`xiaohan-side-v1.txt`，`manifest.json` 記錄每張的模型、seed 與雜湊。
+
+| 項目 | 結果 |
+| --- | --- |
+| 一致性 | **良好**：長直髮、漸層髮尾、棕外套、黑短裙、白鞋、斜背包肩帶都對得上；側面確實朝左；背面沒有臉。三個方向處理成 64×80 畫格後，外框高度為 152–154（2x 母版像素），腳底在同一條線上 |
+| 背面三張 | 都可用。seed 303 的肩背包變成藍色，不採用；seed 202 髮色略淺；**暫定 seed 101**（包色與正面最接近） |
+| 側面三張 | 都朝左、都清楚。seed 303 髮尾有雜點，不採用；**暫定 seed 101**（與正面比例最接近） |
+| 姿勢差異 | 正面平板抱在胸前，側面平板舉在身前，背面沒有平板；可接受 |
+| 朝右 | 以側面水平翻轉，肩背包與平板會左右對調，可接受 |
+| 色彩 | 背面與側面量化到共用調色盤後用色 43–44 色，沒有新增顏色 |
+
+結論：四方向可行，不需要圖生圖。這兩張尚未入庫；走路動畫的做法與原型結果見 [../ANIMATION_DESIGN.md](../ANIMATION_DESIGN.md)。
+
 ## 毛毛（NPC）
 
 - 身體比例：Q 版，約 2.5 頭身。
