@@ -1,6 +1,6 @@
 import type { ContentPack, MapDef, Point } from '../../domain/content';
 import { isWalkable, tileAt } from '../../domain/world';
-import { missingAssetIds, requiredAssetIds, type AssetManifest } from '../assets/asset-manifest';
+import { assetProblems, missingAssetIds, requiredAssetIds, type AssetManifest } from '../assets/asset-manifest';
 import {
   assetsFileSchema,
   cropsFileSchema,
@@ -115,6 +115,7 @@ export function validateCrossReferences(pack: ContentPack, assets: AssetManifest
   for (const id of missingAssetIds(assets, required)) {
     problems.push(`素材清單缺少 ${id}`);
   }
+  problems.push(...assetProblems(assets));
 
   return problems;
 }

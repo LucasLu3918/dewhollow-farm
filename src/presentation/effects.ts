@@ -51,10 +51,15 @@ export function footstepDust(scene: Phaser.Scene, x: number, y: number): void {
 
 /** 角色動作的壓扁伸展回饋，例如開墾、澆水時的一下下壓。 */
 export function squashSprite(scene: Phaser.Scene, target: Phaser.GameObjects.Image): void {
+  // 以顯示縮放（例如 2x 母版的 0.5）為基準相對變化，不能直接寫死 1.12。
+  const base = (target.getData('baseScale') as number | undefined) ?? 1;
+  // 連按時上一個壓扁可能還沒結束；先回到基準縮放，避免每次都從歪掉的大小開始。
+  scene.tweens.killTweensOf(target);
+  target.setScale(base);
   scene.tweens.add({
     targets: target,
-    scaleX: 1.12,
-    scaleY: 0.88,
+    scaleX: base * 1.12,
+    scaleY: base * 0.88,
     duration: 90,
     yoyo: true,
     ease: 'Quad.easeOut',

@@ -75,7 +75,7 @@
 1. **提示詞**：`風格前綴 + 單一主體 + 純色背景（洋紅 #ff00ff）+ 負面詞`。每張只描述一個主體；數量與位置交給程式，不寫在提示詞（本機已知：指定數量會出錯）。
 2. **產圖**：同一模板、固定 seed 為基準，每件 2–3 個 seed 候選，一次只跑一個 MLX 任務；每張都寫入 `manifest.json`（模型、seed、提示詞、SHA-256）。
 3. **去背**：模型沒有 alpha，改用**綠幕**（`#00ff00`，實際產出為淡綠）並以 `tools/art/key_out.py` 去背（背景色取自四角中位數、只移除與邊界相連的背景、壓掉綠色溢色）。環境：專案根目錄的 `.venv`（Pillow 11.3.0，版本記在 `tools/art/requirements.txt`），建立方式 `python3 -m venv .venv` 後 `.venv/bin/pip install -r tools/art/requirements.txt`。`tools/art/contact_sheet.py` 產生接觸表。洋紅背景實測會偏粉且帶深色落影，已不採用。
-4. **縮放與統一**：`tools/art/finalize.py` 縮到畫格（輸出 `@2x` 母版與 1x 兩個尺寸）、外圍補一圈輪廓、量化到 `content/palette.json` 的 48 色（不抖色）並驗證輸出顏色都在調色盤內；落影由遊戲內另外畫橢圓，不烤進素材。實測 1x 的臉部細節會糊掉，建議引擎使用 `@2x` 並以 0.5 倍顯示。共用調色盤由 `tools/art/build_palette.py` 從已核准素材產生，格式有測試（`content/palette.spec.ts`）。
+4. **縮放與統一**：`tools/art/finalize.py` 縮到畫格（輸出 `-2x` 母版與 1x 兩個尺寸）、外圍補一圈輪廓、量化到 `content/palette.json` 的 48 色（不抖色）並驗證輸出顏色都在調色盤內；落影由遊戲內另外畫橢圓，不烤進素材。實測 1x 的臉部細節會糊掉，建議引擎使用 `-2x` 並以 0.5 倍顯示。共用調色盤由 `tools/art/build_palette.py` 從已核准素材產生，格式有測試（`content/palette.spec.ts`）。
 5. **審核**：用接觸表（contact sheet）看同組素材是否一致；不合格的重跑。
 6. **入庫**：放入 `public/assets/<類別>/`，在 `content/assets.json` 補 `file` 與 `source`（寫明模型 id、seed、manifest 路徑）。
 7. **驗證**：`npm run check`、`npm run test:e2e`；BootScene 載入失敗會顯示真實錯誤並退回占位圖。

@@ -71,31 +71,41 @@
       "id": "player.up",
       "kind": "character",
       "color": "#4a7fd0",
-      "source": "占位（程式產生）"
+      "file": "assets/characters/xiaohan-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md；四方向暫用同一張正面圖"
     },
     {
       "id": "player.down",
       "kind": "character",
       "color": "#4a7fd0",
-      "source": "占位（程式產生）"
+      "file": "assets/characters/xiaohan-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md；四方向暫用同一張正面圖"
     },
     {
       "id": "player.left",
       "kind": "character",
       "color": "#4a7fd0",
-      "source": "占位（程式產生）"
+      "file": "assets/characters/xiaohan-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md；四方向暫用同一張正面圖"
     },
     {
       "id": "player.right",
       "kind": "character",
       "color": "#4a7fd0",
-      "source": "占位（程式產生）"
+      "file": "assets/characters/xiaohan-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md；四方向暫用同一張正面圖"
     },
     {
       "id": "npc.maomao",
       "kind": "character",
       "color": "#b07ad0",
-      "source": "占位（程式產生）"
+      "file": "assets/characters/maomao-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md"
     },
     {
       "id": "crop.dew-grass",
@@ -114,6 +124,22 @@
       "kind": "crop",
       "color": "#d9d4c0",
       "source": "占位（程式產生）"
+    },
+    {
+      "id": "pet.cat",
+      "kind": "character",
+      "color": "#1d1d1f",
+      "file": "assets/characters/cat-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md"
+    },
+    {
+      "id": "pet.marsupial",
+      "kind": "character",
+      "color": "#8c6a4f",
+      "file": "assets/characters/marsupial-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 202，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md"
     }
   ]
 }

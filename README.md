@@ -38,7 +38,7 @@ tests/e2e/         Playwright 端到端測試
 
 ## 替換素材
 
-在 `content/assets.json` 為素材加上 `file`（相對於 `public/` 的路徑），並填寫 `source`。沒有 `file` 時使用 `color` 的占位圖。若檔案載入失敗，畫面會列出錯誤並改用占位圖。
+在 `content/assets.json` 為素材加上 `file`（相對於 `public/`、必須在 `assets/` 底下），並填寫實際的 `source`（有檔案卻寫「占位」會被內容驗證擋下）。圖檔若是設計尺寸的兩倍（2x 母版），加上 `"density": 2`，引擎會以 0.5 倍顯示；角色圖以腳底貼齊格子底部。沒有 `file` 時使用 `color` 的占位圖。若檔案載入失敗，畫面會列出錯誤並改用占位圖。
 
 ## 存檔
 

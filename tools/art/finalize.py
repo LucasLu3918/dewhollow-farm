@@ -1,7 +1,7 @@
 """把去背後的大圖處理成遊戲用素材：縮到指定畫格、量化到共用調色盤、補強外輪廓。
 
 每個素材輸出兩個尺寸：
-    <輸出前綴>@2x.png   母版，畫格為 1x 的兩倍（遊戲在高解析度螢幕上用它）
+    <輸出前綴>-2x.png   母版，畫格為 1x 的兩倍（遊戲在高解析度螢幕上用它）
     <輸出前綴>.png      1x，由母版縮小後再量化，畫格就是設計尺寸
 
 流程：縮放（保持比例、腳底置中貼齊畫格底部）→ 在外圍補一圈輪廓色 → 所有像素量化到
@@ -81,7 +81,7 @@ def process(src: Path, prefix: Path, frame: tuple[int, int], palette_path: Path)
     small = quantize(small, colors)
 
     allowed = set(colors)
-    for name, img in (("@2x", master), ("", small)):
+    for name, img in (("-2x", master), ("", small)):
         used = {px[:3] for px in img.getdata() if px[3] > 0}
         stray = used - allowed
         if stray:

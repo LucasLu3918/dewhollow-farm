@@ -7,6 +7,8 @@ export interface AssetEntry {
   color?: string;
   /** 正式素材的路徑（相對於 public/）。替換素材時只需改這裡。 */
   file?: string;
+  /** 圖檔是設計尺寸的幾倍（2 代表 2x 母版）；顯示時自動縮小。只有 file 存在時才有意義。 */
+  density?: number;
   /** 素材來源，用於授權紀錄。 */
   source: string;
 }
@@ -33,4 +35,39 @@ export function requiredAssetIds(tileKinds: readonly string[], cropIds: readonly
 export function missingAssetIds(manifest: AssetManifest, required: readonly string[]): string[] {
   const known = new Set(manifest.assets.map((a) => a.id));
   return required.filter((id) => !known.has(id));
+}
+
+/** 顯示縮放：2x 母版以 0.5 倍顯示，才會是設計尺寸（64 px 格子的 64×80 角色）。 */
+export function displayScale(entry: AssetEntry): number {
+  return 1 / (entry.density ?? 1);
+}
+
+/**
+ * 素材清單自身的問題（不含地圖與作物的交叉參照）：
+ * 有檔案的素材必須填實際來源（ORIGINALITY.md）、density 只能搭配檔案、路徑必須在 assets/ 底下、id 不可重複。
+ */
+export function assetProblems(manifest: AssetManifest): string[] {
+  const problems: string[] = [];
+  const seen = new Set<string>();
+  for (const entry of manifest.assets) {
+    if (seen.has(entry.id)) problems.push(`素材 id 重複：${entry.id}`);
+    seen.add(entry.id);
+
+    if (!entry.file) {
+      if (entry.density !== undefined) problems.push(`素材 ${entry.id} 設了 density 卻沒有 file`);
+      continue;
+    }
+    if (entry.source.startsWith('占位')) {
+      problems.push(`素材 ${entry.id} 有檔案但來源仍是占位，請填寫實際來源與授權`);
+    }
+    if (!entry.file.startsWith('assets/') || entry.file.includes('..')) {
+      problems.push(`素材 ${entry.id} 的檔案路徑必須在 assets/ 底下：${entry.file}`);
+    }
+  }
+  return problems;
+}
+
+/** 宣告了檔案但 public/ 裡找不到的素材。`existing` 是 public/ 底下存在的檔案路徑。 */
+export function missingFiles(manifest: AssetManifest, existing: ReadonlySet<string>): AssetEntry[] {
+  return manifest.assets.filter((entry) => entry.file !== undefined && !existing.has(entry.file));
 }

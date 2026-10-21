@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
 import type { ContentPack, Direction, MapDef } from '../../domain/content';
 import { tileAt } from '../../domain/world';
+import { displayScale, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
 import type { Command, GameEvent } from '../../application/game-commands';
 import type { Hud } from '../hud';
 import { cameraBounds, deadzoneOf } from '../camera';
 import { TILE_SIZE } from '../constants';
+import { centerOf, footOf } from '../layout';
 import { footstepDust, playActionEffect, sleepEffect, squashSprite, walkBob } from '../effects';
 
 export interface MapSceneDeps {
@@ -14,6 +16,8 @@ export interface MapSceneDeps {
   index: ContentIndex;
   pack: ContentPack;
   hud: Hud;
+  /** 素材清單：用來決定每張圖的顯示縮放（density）。 */
+  assets: AssetManifest;
 }
 
 const MOVE_KEYS: Record<string, Direction> = {
@@ -35,10 +39,25 @@ const MOVE_DURATION_MS = 110;
 /** 鏡頭跟隨的平滑度：越大越貼緊玩家，1 為完全貼緊。 */
 const FOLLOW_LERP = 0.15;
 
-/** 開發模式下讓端對端測試讀取鏡頭位置；正式建置會被移除。 */
+/** 開發模式下供端對端測試讀取的畫面資訊；正式建置會被移除。 */
+interface SpriteDebugInfo {
+  key: string;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
 declare global {
   interface Window {
-    __dewhollow?: { cameraScroll(): { x: number; y: number }; mapId(): string };
+    __dewhollow?: {
+      cameraScroll(): { x: number; y: number };
+      mapId(): string;
+      /** 玩家與地圖上所有圖片的貼圖名稱與畫面範圍（世界座標）。 */
+      sprites(): SpriteDebugInfo[];
+      /** 貼圖的原始圖片大小；占位圖與入庫圖片可以由此分辨。 */
+      textureSize(key: string): { width: number; height: number } | null;
+    };
   }
 }
 
@@ -52,6 +71,7 @@ export class MapScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Image;
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
+  private scales = new Map<string, number>();
   private onKeyDown = (event: KeyboardEvent): void => {
     void this.handleKey(event);
   };
@@ -62,11 +82,14 @@ export class MapScene extends Phaser.Scene {
 
   init(deps: MapSceneDeps): void {
     this.deps = deps;
+    this.scales = new Map(deps.assets.assets.map((a) => [a.id, displayScale(a)]));
   }
 
   create(): void {
     this.world = this.add.container(0, 0);
-    this.player = this.add.image(0, 0, 'player.down').setOrigin(0).setDepth(10);
+    // 角色圖比格子高：原點放在左下，腳底貼齊格子底部。
+    this.player = this.add.image(0, 0, 'player.down').setOrigin(0, 1).setDepth(10);
+    this.applyScale(this.player, 'player.down');
     this.setupCamera();
     window.addEventListener('keydown', this.onKeyDown);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -80,25 +103,32 @@ export class MapScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const zone = deadzoneOf({ width: camera.width, height: camera.height });
     camera.setDeadzone(zone.width, zone.height);
-    // 玩家圖以左上角為原點，位移量把跟隨點移到格子中心。
-    camera.startFollow(this.player, true, FOLLOW_LERP, FOLLOW_LERP, -TILE_SIZE / 2, -TILE_SIZE / 2);
+    // 玩家圖以左下角（腳底）為原點，位移量把跟隨點移到格子中心。
+    camera.startFollow(this.player, true, FOLLOW_LERP, FOLLOW_LERP, -TILE_SIZE / 2, TILE_SIZE / 2);
     if (import.meta.env.DEV) {
       window.__dewhollow = {
         cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
         mapId: () => this.deps.session.state.mapId,
+        sprites: () => this.debugSprites(),
+        textureSize: (key) => {
+          if (!this.textures.exists(key)) return null;
+          const source = this.textures.get(key).getSourceImage();
+          return { width: source.width, height: source.height };
+        },
       };
     }
   }
 
   /** 換地圖時：重設邊界並直接把鏡頭放到玩家身上，避免從上一張圖的位置慢慢滑過來。 */
-  private frameCamera(map: MapDef): void {
+  private frameCamera(map: MapDef, tile: { x: number; y: number }): void {
     const camera = this.cameras.main;
     const bounds = cameraBounds(
       { width: map.width * TILE_SIZE, height: map.height * TILE_SIZE },
       { width: camera.width, height: camera.height },
     );
     camera.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
-    camera.centerOn(this.player.x + TILE_SIZE / 2, this.player.y + TILE_SIZE / 2);
+    const center = centerOf(tile.x, tile.y);
+    camera.centerOn(center.x, center.y);
   }
 
   private async handleKey(event: KeyboardEvent): Promise<void> {
@@ -144,8 +174,9 @@ export class MapScene extends Phaser.Scene {
     if (this.renderedMapId !== map.id) {
       this.renderedMapId = map.id;
       this.drawMap(map.id);
-      this.player.setPosition(state.player.x * TILE_SIZE, state.player.y * TILE_SIZE);
-      this.frameCamera(map);
+      const foot = footOf(state.player.x, state.player.y);
+      this.player.setPosition(foot.x, foot.y);
+      this.frameCamera(map, state.player);
     }
 
     this.showFacing(state.player.facing);
@@ -158,6 +189,7 @@ export class MapScene extends Phaser.Scene {
     if (facing === this.shownFacing) return;
     this.shownFacing = facing;
     this.player.setTexture(`player.${facing}`);
+    this.applyScale(this.player, `player.${facing}`);
   }
 
   private drawMap(mapId: string): void {
@@ -174,7 +206,7 @@ export class MapScene extends Phaser.Scene {
 
     for (const placement of map.npcs) {
       const npc = this.deps.index.npc(placement.npcId);
-      this.world.add(this.image(`npc.${npc.id}`, placement.x, placement.y, 5));
+      this.world.add(this.character(`npc.${npc.id}`, placement.x, placement.y, 5));
     }
   }
 
@@ -208,10 +240,41 @@ export class MapScene extends Phaser.Scene {
   }
 
   private movePlayer(x: number, y: number): void {
-    const targetX = x * TILE_SIZE;
-    const targetY = y * TILE_SIZE;
-    if (this.player.x === targetX && this.player.y === targetY) return;
-    walkBob(this, this.player, targetX, targetY, MOVE_DURATION_MS);
+    const foot = footOf(x, y);
+    if (this.player.x === foot.x && this.player.y === foot.y) return;
+    walkBob(this, this.player, foot.x, foot.y, MOVE_DURATION_MS);
+  }
+
+  /** 設定顯示縮放（例如 2x 母版 0.5 倍），並記下基準縮放，讓壓扁伸展等效果以它為準。 */
+  private applyScale(image: Phaser.GameObjects.Image, key: string): void {
+    const scale = this.scales.get(key) ?? 1;
+    image.setScale(scale);
+    image.setData('baseScale', scale);
+  }
+
+  /** 站立的角色（玩家以外，例如 NPC）：腳底貼齊格子底部。 */
+  private character(key: string, x: number, y: number, depth: number): Phaser.GameObjects.Image {
+    const foot = footOf(x, y);
+    const image = this.add.image(foot.x, foot.y, key).setOrigin(0, 1).setDepth(depth);
+    this.applyScale(image, key);
+    return image;
+  }
+
+  private debugSprites(): SpriteDebugInfo[] {
+    const images = [
+      this.player,
+      ...this.world.getAll().filter((c): c is Phaser.GameObjects.Image => c instanceof Phaser.GameObjects.Image),
+    ];
+    return images.map((image) => {
+      const bounds = image.getBounds();
+      return {
+        key: image.texture.key,
+        left: Math.round(bounds.x),
+        top: Math.round(bounds.y),
+        width: Math.round(bounds.width),
+        height: Math.round(bounds.height),
+      };
+    });
   }
 
   private image(key: string, x: number, y: number, depth: number): Phaser.GameObjects.Image {

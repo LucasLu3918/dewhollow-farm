@@ -39,11 +39,18 @@ export class BootScene extends Phaser.Scene {
       if (entry.file) this.deps.hud.error(`素材載入失敗：${entry.id}（${entry.file}），已改用占位圖`);
       this.makePlaceholder(entry);
     }
+    // 入庫的圖片多半是縮小顯示的高解析母版；遊戲設定為像素風（最近鄰），縮小時會鋸齒，改用線性取樣。
+    for (const entry of this.deps.assets.assets) {
+      if (entry.file && this.textures.exists(entry.id)) {
+        this.textures.get(entry.id).setFilter(Phaser.Textures.FilterMode.LINEAR);
+      }
+    }
     const sceneDeps: MapSceneDeps = {
       session: this.deps.session,
       index: this.deps.index,
       pack: this.deps.pack,
       hud: this.deps.hud,
+      assets: this.deps.assets,
     };
     this.scene.start('map', sceneDeps);
   }

@@ -44,6 +44,7 @@ const assetSchema = z.object({
   kind: z.enum(['tile', 'object', 'overlay', 'crop', 'character']),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
   file: z.string().min(1).optional(),
+  density: z.number().int().min(1).max(4).optional(),
   source: z.string().min(1),
 });
 
