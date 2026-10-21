@@ -139,6 +139,30 @@
       "file": "assets/characters/marsupial-2x.png",
       "density": 2,
       "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 202，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md"
+    },
+    {
+      "id": "tool.hoe",
+      "kind": "object",
+      "color": "#a0764e",
+      "file": "assets/tools/hoe-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 202，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定與挑選見 docs/art/tool-briefs.md"
+    },
+    {
+      "id": "tool.can",
+      "kind": "object",
+      "color": "#6fa8dc",
+      "file": "assets/tools/can-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定與挑選見 docs/art/tool-briefs.md"
+    },
+    {
+      "id": "tool.seedbag",
+      "kind": "object",
+      "color": "#d9c08a",
+      "file": "assets/tools/seedbag-2x.png",
+      "density": 2,
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 202，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定與挑選見 docs/art/tool-briefs.md"
     }
   ]
 }

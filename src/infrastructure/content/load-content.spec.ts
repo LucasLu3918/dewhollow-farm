@@ -6,12 +6,13 @@ import tuning from '../../../content/tuning.json';
 import assets from '../../../content/assets.json';
 import rigs from '../../../content/rigs.json';
 import companions from '../../../content/companions.json';
+import tools from '../../../content/tools.json';
 import farm from '../../../content/maps/farm.json';
 import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, ...overrides };
+  return { crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, tools, ...overrides };
 }
 
 describe('loadContent with shipped content', () => {
@@ -65,6 +66,25 @@ describe('loadContent with rigs', () => {
       expect(problems).toContain('夥伴 cat 的 rig dog 不存在');
       expect(problems).toContain('夥伴 marsupial 的 home 地圖 nowhere 不存在');
     }
+  });
+
+  it('returns the tools beside the rigs', () => {
+    expect(loadContent(shipped()).tools.tools.map((t) => t.id)).toEqual(['hoe', 'can', 'seedbag']);
+  });
+
+  it('reports a tool whose image is missing together with the other problems', () => {
+    const broken = { ...tools, tools: [{ ...tools.tools[0], asset: 'tool.nope' }, ...tools.tools.slice(1)] };
+    try {
+      loadContent(shipped({ tools: broken }));
+      throw new Error('should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ContentError);
+      expect((error as ContentError).problems).toContain('工具 hoe 的素材 tool.nope 不存在');
+    }
+  });
+
+  it('rejects a malformed tools file', () => {
+    expect(() => loadContent(shipped({ tools: { version: 1, tools: [{ id: 'x' }] } }))).toThrow();
   });
 
   it('rejects a malformed companions file', () => {

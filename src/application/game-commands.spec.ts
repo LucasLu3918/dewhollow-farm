@@ -184,7 +184,7 @@ describe('farming actions', () => {
     const out = executeCommand(state, { type: 'interact' }, index);
     expect(out.messages).toEqual(['背包已滿']);
     expect(out.state).toEqual(state);
-    expect(out.events).toEqual([]);
+    expect(out.events).toEqual([{ type: 'refused', reason: 'BAG_FULL' }]); // 只有「被拒絕」的提示，沒有任何動作回饋
   });
 
   it('yields between 1 and 5 crops and advances the random state', () => {
@@ -289,19 +289,73 @@ describe('villagers', () => {
   });
 });
 
+describe('refused actions emit an event, so the player can see why nothing happened', () => {
+  const reasonOf = (state: GameState): string | undefined => {
+    const out = executeCommand(state, { type: 'interact' }, index);
+    return out.events.find((e): e is Extract<typeof e, { type: 'refused' }> => e.type === 'refused')?.reason;
+  };
+
+  it('says there is no energy left', () => {
+    expect(reasonOf(at(start({ energy: { current: 0, max: 20 } }), FIELD_SIDE))).toBe('NOT_ENOUGH_ENERGY');
+  });
+
+  it('says there is nothing to interact with', () => {
+    const wall = at(start(), { x: 1, y: 1, facing: 'up' });
+    expect(reasonOf(wall)).toBe('NOTHING_HERE');
+  });
+
+  it('says the soil has not been tilled when watering bare ground', () => {
+    expect(reasonOf(at(start({ tool: 'can' }), FIELD_SIDE))).toBe('NO_SOIL');
+  });
+
+  it('says the plot is already planted', () => {
+    const planted = start({
+      tool: 'seedbag',
+      plots: { [FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 } } },
+    });
+    expect(reasonOf(at(planted, FIELD_SIDE))).toBe('ALREADY_PLANTED');
+  });
+
+  it('says there is nothing to ship', () => {
+    expect(reasonOf(at(start(), SHIP_SIDE))).toBe('NO_SHIPPABLE');
+  });
+
+  it('says the bag is full when a harvest does not fit', () => {
+    const ripe = start({
+      inventory: bagOf([{ itemId: 'seed.moon-bean', quality: 'normal', count: 1 }], 1),
+      plots: { [FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 2 } } },
+    });
+    expect(reasonOf(at(ripe, FIELD_SIDE))).toBe('BAG_FULL');
+  });
+
+  it('does not say anything when the action worked', () => {
+    expect(executeCommand(at(start(), FIELD_SIDE), { type: 'interact' }, index).events.some((e) => e.type === 'refused')).toBe(false);
+  });
+
+  it('never refuses and acts at the same time', () => {
+    const out = executeCommand(at(start({ energy: { current: 0, max: 20 } }), FIELD_SIDE), { type: 'interact' }, index);
+    expect(out.events.some((e) => e.type === 'acted')).toBe(false);
+  });
+});
+
 describe('talking emits an event for the presentation', () => {
   it('says which villager was talked to, on the first and on later talks', () => {
     const village = at({ ...start(), mapId: 'village' }, { x: 1, y: 1, facing: 'up' });
     const first = executeCommand(village, { type: 'interact' }, index);
-    expect(first.events).toContainEqual({ type: 'talked', npcId: 'mira' });
+    expect(first.events).toContainEqual({ type: 'talked', npcId: 'mira', first: true, gifted: true });
     const second = executeCommand(first.state, { type: 'interact' }, index);
-    expect(second.events).toContainEqual({ type: 'talked', npcId: 'mira' });
+    expect(second.events).toContainEqual({ type: 'talked', npcId: 'mira', first: false, gifted: false });
   });
 
   it('still says so when the gift did not fit in the bag', () => {
     const full = bagOf([{ itemId: 'crop.moon-bean', quality: 'normal', count: 1 }], 1);
     const village = at({ ...start({ inventory: full }), mapId: 'village' }, { x: 1, y: 1, facing: 'up' });
-    expect(executeCommand(village, { type: 'interact' }, index).events).toContainEqual({ type: 'talked', npcId: 'mira' });
+    expect(executeCommand(village, { type: 'interact' }, index).events).toContainEqual({
+      type: 'talked',
+      npcId: 'mira',
+      first: true,
+      gifted: false,
+    });
   });
 
   it('does not emit it when nothing was talked to', () => {

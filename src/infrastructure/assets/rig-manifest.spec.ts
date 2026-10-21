@@ -177,6 +177,47 @@ describe('rigProblems: biped', () => {
   });
 });
 
+describe('rigsFileSchema: hands (where a tool is held)', () => {
+  const parse = (value: unknown) => rigsFileSchema.safeParse({ version: 1, rigs: [value] });
+  const hands = { down: { x: 58, y: 104 }, up: { x: 96, y: 104 }, left: { x: 50, y: 96 } };
+
+  it('accepts hands for the three measured views, and leaves them optional', () => {
+    expect(parse(rigOf({ hands })).success).toBe(true);
+    expect(parse(rigOf()).success).toBe(true);
+  });
+
+  it('rejects a missing view or a position that is not a whole-number point', () => {
+    expect(parse({ ...rigOf(), hands: { down: hands.down, up: hands.up } }).success).toBe(false);
+    expect(parse({ ...rigOf(), hands: { ...hands, left: { x: 50.5, y: 96 } } }).success).toBe(false);
+  });
+});
+
+describe('rigProblems: hands', () => {
+  const hands = { down: { x: 58, y: 104 }, up: { x: 96, y: 104 }, left: { x: 50, y: 96 } };
+
+  it('accepts hands inside the picture, with right flipped from left', () => {
+    expect(rigProblems(manifestOf(rigOf({ hands })), assetsOf())).toEqual([]);
+  });
+
+  it('keeps every hand inside the picture', () => {
+    expect(rigProblems(manifestOf(rigOf({ hands: { ...hands, up: { x: 200, y: 104 } } })), assetsOf())).toEqual([
+      'rig player 的 hands.up (200,104) 必須在圖片 128×160 之內',
+    ]);
+    expect(rigProblems(manifestOf(rigOf({ hands: { ...hands, down: { x: 58, y: -3 } } })), assetsOf())).toEqual([
+      'rig player 的 hands.down (58,-3) 必須在圖片 128×160 之內',
+    ]);
+  });
+
+  it('refuses a right hand when right is a mirror, and requires it when right has its own image', () => {
+    expect(rigProblems(manifestOf(rigOf({ hands: { ...hands, right: { x: 70, y: 96 } } })), assetsOf())).toEqual([
+      'rig player 的 hands.right 由翻轉得到，不可設定',
+    ]);
+    expect(
+      rigProblems(manifestOf(rigOf({ splits: { down: 60, up: 60, left: 62, right: 66 }, hands })), assetsOf(character('player.right'))),
+    ).toEqual(['rig player 的 right 不是 left 的翻轉，必須設定 hands.right']);
+  });
+});
+
 describe('rigProblems: single-picture and hopping rigs', () => {
   it('accepts a rig that points at a real character image', () => {
     expect(rigProblems(manifestOf(wholeOf()), assetsOf())).toEqual([]);
@@ -221,6 +262,11 @@ describe('shipped rigs', () => {
       splits: { down: 60, up: 60, left: 62 },
     });
     expect((player as BipedRig).splits.right).toBeUndefined();
+  });
+
+  it('give the player the hand positions the tools are drawn from, measured on the 2x masters', () => {
+    const player = manifest.rigs.find((r) => r.id === 'player') as BipedRig;
+    expect(player.hands).toEqual({ down: { x: 58, y: 104 }, up: { x: 96, y: 104 }, left: { x: 50, y: 96 } });
   });
 
   it('give Maomao a single-picture rig and each pet a hopping rig, sized like their images', () => {

@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
 import type { AssetEntry, AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { CompanionManifest } from '../../infrastructure/assets/companion-manifest';
+import type { ToolManifest } from '../../infrastructure/assets/tool-manifest';
 import type { RigManifest } from '../../infrastructure/assets/rig-manifest';
 import type { Hud } from '../hud';
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
 import type { ContentPack, Direction } from '../../domain/content';
+import { registerEmoteTextures } from '../emote';
 import { MapScene, type MapSceneDeps } from './MapScene';
 import { TILE_SIZE, UNIT } from '../constants';
 
@@ -14,6 +16,7 @@ export interface BootDeps {
   assets: AssetManifest;
   rigs: RigManifest;
   companions: CompanionManifest;
+  tools: ToolManifest;
   session: GameSession;
   index: ContentIndex;
   pack: ContentPack;
@@ -45,6 +48,8 @@ export class BootScene extends Phaser.Scene {
       if (entry.file) this.deps.hud.error(`素材載入失敗：${entry.id}（${entry.file}），已改用占位圖`);
       this.makePlaceholder(entry);
     }
+    // 表情氣泡不產圖：用 Graphics 畫成貼圖（顏色取自共用調色盤）。
+    registerEmoteTextures(this);
     // 入庫的圖片多半是縮小顯示的高解析母版；遊戲設定為像素風（最近鄰），縮小時會鋸齒，改用線性取樣。
     for (const entry of this.deps.assets.assets) {
       if (entry.file && this.textures.exists(entry.id)) {
@@ -59,6 +64,7 @@ export class BootScene extends Phaser.Scene {
       assets: this.deps.assets,
       rigs: this.deps.rigs,
       companions: this.deps.companions,
+      tools: this.deps.tools,
     };
     this.scene.start('map', sceneDeps);
   }

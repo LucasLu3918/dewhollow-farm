@@ -90,11 +90,11 @@ test('each direction has its own image, and facing right mirrors the side image'
   // 往下：回到正面，不翻轉。
   await page.keyboard.press('ArrowDown');
   await expect.poll(async () => (await current())?.key).toBe('player.down');
-  // 貼圖一換就變了，但人還在走這一步（傾斜、拉長會讓外框變大）；等走完回到靜止姿勢再量大小。
-  await expect.poll(async () => {
-    const c = await current();
-    return [c?.width, c?.height];
-  }).toEqual([64, 80]);
+  // 貼圖一換就變了，但人還在走這一步（傾斜、拉長會讓外框變大）。完成的條件是「角色不忙了」；
+  // 不能用「外框剛好是 64×80」判斷——一步剛開始的瞬間外框也恰好是 64×80。
+  await expect
+    .poll(() => page.evaluate(() => window.__dewhollow?.actors().find((a) => a.id === 'player')?.busy ?? true))
+    .toBe(false);
   expect(await current()).toMatchObject({ flipX: false, width: 64, height: 80 });
 });
 

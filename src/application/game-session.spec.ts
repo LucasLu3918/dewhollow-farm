@@ -6,6 +6,7 @@ import tuning from '../../content/tuning.json';
 import assets from '../../content/assets.json';
 import rigs from '../../content/rigs.json';
 import companions from '../../content/companions.json';
+import tools from '../../content/tools.json';
 import farm from '../../content/maps/farm.json';
 import village from '../../content/maps/village.json';
 import { loadContent } from '../infrastructure/content/load-content';
@@ -15,7 +16,7 @@ import { GameSession } from './game-session';
 import type { SaveRecord, SaveRepository } from './ports';
 import { createNewGame, type GameState } from '../domain/game-state';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, tools });
 const index = createContentIndex(pack);
 
 /** 測試輔助：把玩家放到指定位置後建立 session。 */

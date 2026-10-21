@@ -25,7 +25,9 @@ export type GameEvent =
   | { type: 'enteredMap'; mapId: string }
   | { type: 'saveRequested' }
   /** 玩家跟某位居民說話（不論是否領到禮物）；供畫面讓該居民與他的夥伴做出反應。 */
-  | { type: 'talked'; npcId: string }
+  | { type: 'talked'; npcId: string; /** 第一次說話。 */ first: boolean; /** 這次真的收下了禮物。 */ gifted: boolean }
+  /** 動作被拒絕（體力不足、沒有東西可互動…）；供畫面顯示表情，狀態與時間都沒有改變。reason 是失敗代碼。 */
+  | { type: 'refused'; reason: string }
   /** 成功的農務或出貨動作，供畫面播放效果；失敗的動作不會發出。 */
   | { type: 'acted'; action: ActionFeedback; x: number; y: number };
 
@@ -50,6 +52,10 @@ const FAILURE_MESSAGES: Record<string, string> = {
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
+
+function refused(reason: string): GameEvent {
+  return { type: 'refused', reason };
+}
 
 function reply(state: GameState, messages: string[] = [], events: GameEvent[] = []): CommandOutcome {
   return { state, messages, events };
@@ -105,14 +111,14 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
   if (npc) return talk(state, npc, index);
 
   const tile = tileAt(map, target.x, target.y);
-  if (!tile) return reply(state, [NOTHING_HERE]);
+  if (!tile) return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
 
   if (tile.kind === 'bed') return sleep(state, index);
   if (tile.kind === 'shipbox') return shipAll(state, index);
 
   const key = plotKey(target.x, target.y);
   if (tile.kind === 'field' || state.plots[key]) return workPlot(state, key, index);
-  return reply(state, [NOTHING_HERE]);
+  return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
 }
 
 function npcAt(map: MapDef, x: number, y: number): MapNpcPlacement | undefined {
@@ -167,7 +173,7 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
     return finish(state, result, '開墾了一塊田', { action: 'till', key });
   }
 
-  if (!plot) return reply(state, [messageFor('NO_SOIL')]);
+  if (!plot) return reply(state, [messageFor('NO_SOIL')], [refused('NO_SOIL')]);
 
   if (state.tool === 'can') {
     const result = spendThen(state, 'water', index, (s) => {
@@ -195,7 +201,7 @@ function finish(
   successMessage: string,
   feedback?: { action: ActionFeedback; key: string },
 ): CommandOutcome {
-  if (!result.ok) return reply(state, [messageFor(result.reason)]);
+  if (!result.ok) return reply(state, [messageFor(result.reason)], [refused(result.reason)]);
   const events: GameEvent[] = [];
   if (feedback) {
     const [x, y] = feedback.key.split(',').map(Number);
@@ -210,7 +216,7 @@ function messageFor(reason: string): string {
 
 function shipAll(state: GameState, index: ContentIndex): CommandOutcome {
   const { inventory, taken } = takeMatching(state.inventory, (stack) => index.item(stack.itemId).sellPrice !== undefined);
-  if (taken.length === 0) return reply(state, ['背包裡沒有可出貨的作物']);
+  if (taken.length === 0) return reply(state, ['背包裡沒有可出貨的作物'], [refused('NO_SHIPPABLE')]);
 
   const result = spendThen(state, 'ship', index, (s) => {
     let box = s.shipBox;
@@ -224,8 +230,8 @@ function shipAll(state: GameState, index: ContentIndex): CommandOutcome {
 function talk(state: GameState, placement: MapNpcPlacement, index: ContentIndex): CommandOutcome {
   const npc = index.npc(placement.npcId);
   const firstTime = !state.flags[`talked:${npc.id}`];
-  const talked: GameEvent[] = [{ type: 'talked', npcId: npc.id }];
-  if (!firstTime) return reply(state, [npc.lines.at(-1) ?? ''], talked);
+  const talked = (gifted: boolean): GameEvent[] => [{ type: 'talked', npcId: npc.id, first: firstTime, gifted }];
+  if (!firstTime) return reply(state, [npc.lines.at(-1) ?? ''], talked(false));
 
   const messages = [...npc.lines];
   let next: GameState = { ...state, flags: { ...state.flags, [`talked:${npc.id}`]: true } };
@@ -233,11 +239,11 @@ function talk(state: GameState, placement: MapNpcPlacement, index: ContentIndex)
     const seed = index.item(seedItemId(npc.gift.cropId));
     const stored = addItem(next.inventory, seed, npc.gift.count);
     // 背包放不下時不標記「已對話」，讓玩家整理後還能領到禮物。
-    if (!stored.ok) return reply(state, [...messages, '背包已滿，先整理一下再來領禮物'], talked);
+    if (!stored.ok) return reply(state, [...messages, '背包已滿，先整理一下再來領禮物'], talked(false));
     next = { ...next, inventory: stored.value };
     messages.push(`獲得 ${seed.name} × ${npc.gift.count}`);
   }
-  return reply(next, messages, talked);
+  return reply(next, messages, talked(npc.gift !== undefined));
 }
 
 function sleep(state: GameState, index: ContentIndex): CommandOutcome {

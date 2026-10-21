@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
 import type { ContentPack, Direction, MapDef, Point } from '../../domain/content';
+import { plotKey, type PlotMap, type PlotState } from '../../domain/farm';
 import { tileAt } from '../../domain/world';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
 import type { Command, GameEvent } from '../../application/game-commands';
 import type { CompanionDef, CompanionManifest } from '../../infrastructure/assets/companion-manifest';
+import type { ToolDef, ToolManifest } from '../../infrastructure/assets/tool-manifest';
 import type { RigDef, RigManifest } from '../../infrastructure/assets/rig-manifest';
 import type { Hud } from '../hud';
 import { cameraBounds, deadzoneOf } from '../camera';
@@ -13,7 +15,10 @@ import { TILE_SIZE } from '../constants';
 import { RENDER_COMPAT_KEY } from '../apply-render-compat';
 import { CharacterRig, type RigDebugInfo } from '../character-rig';
 import { centerOf, footOf, standOf } from '../layout';
+import { emotesForEvent, type EmoteKind } from '../emote-defs';
+import { playEmote, type EmoteHandle } from '../emote';
 import { footstepDust, playActionEffect, sleepEffect } from '../effects';
+import { prefersReducedMotion } from '../motion';
 import { nextPetTile, placeBeside } from '../pet-follow';
 import type { RenderCompatInfo } from '../render-compat';
 import type { View } from '../walk-pose';
@@ -29,6 +34,8 @@ export interface MapSceneDeps {
   rigs: RigManifest;
   /** 夥伴（寵物）：跟隨玩家，或住在某張地圖。 */
   companions: CompanionManifest;
+  /** 工具：農務動作時握在手上揮動。 */
+  tools: ToolManifest;
 }
 
 const MOVE_KEYS: Record<string, Direction> = {
@@ -46,6 +53,9 @@ const COMMAND_KEYS: Record<string, Command> = {
 };
 
 const MOVE_DURATION_MS = 110;
+
+/** 揮一次工具的時間；命中的那一刻由 tool-swing.ts 的 impactAt 決定。 */
+const SWING_DURATION_MS = 420;
 
 /** 居民與夥伴被搭話時，原地做一步的時間（比走一格慢，才看得清楚）。 */
 const REACT_DURATION_MS = 320;
@@ -79,6 +89,20 @@ interface ActorDebugInfo {
   width: number;
   height: number;
   pose: { y: number; rotation: number; scaleX: number; scaleY: number; legA: number; legB: number; stretch: number };
+  /** 正在揮的工具（沒有在揮就是 null）。 */
+  tool: { id: string; rotation: number; scale: number } | null;
+  /** 正在走路、揮工具，或有排隊的動作。 */
+  busy: boolean;
+}
+
+/** 開發模式下的表情氣泡資訊：誰、什麼表情、世界座標與目前的大小與透明度。 */
+interface EmoteDebugInfo {
+  who: string;
+  kind: string;
+  x: number;
+  y: number;
+  scale: number;
+  alpha: number;
 }
 
 /** 夥伴在場景裡的狀態。跟隨者跨地圖保留；常駐者隨地圖建立與銷毀。 */
@@ -112,6 +136,10 @@ declare global {
       actors(): ActorDebugInfo[];
       /** 藏起（或恢復）玩家以外的所有角色，讓像素量測只看玩家自己，不受旁邊的寵物遮擋影響。 */
       setOthersHidden(hidden: boolean): void;
+      /** 目前還在畫面上的表情氣泡。 */
+      emotes(): EmoteDebugInfo[];
+      /** 效果發生的紀錄（揮動開始、命中時的粒子、鏡頭微震），用來驗證效果落在命中那一刻。 */
+      effectLog(): { name: string; at: number }[];
     };
   }
 }
@@ -129,6 +157,14 @@ export class MapScene extends Phaser.Scene {
   private companions = new Map<string, CompanionState>();
   /** 玩家上一次畫面更新時站的格子，用來算出「剛離開的格子」給跟隨的寵物。 */
   private playerTile: Point | null = null;
+  /** 頭上的表情氣泡，每個角色最多一個（鍵是 'player' 或居民 id）。 */
+  private activeEmotes = new Map<string, { handle: EmoteHandle; rig: CharacterRig }>();
+  private effectEntries: { name: string; at: number }[] = [];
+  /**
+   * 揮工具時，被作用的那一格先維持「動作前」的樣子，等工具命中的那一刻才更新（null 表示動作前沒有這一格）。
+   * 遊戲狀態是立刻改變的，但畫面上鋤頭還在空中時，田地不該已經翻好。
+   */
+  private heldPlots = new Map<string, PlotState | null>();
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
   private onKeyDown = (event: KeyboardEvent): void => {
@@ -178,6 +214,8 @@ export class MapScene extends Phaser.Scene {
         renderCompat: () => this.registry.get(RENDER_COMPAT_KEY) as RenderCompatInfo,
         actors: () => this.debugActors(),
         setOthersHidden: (hidden) => this.setOthersHidden(hidden),
+        emotes: () => this.debugEmotes(),
+        effectLog: () => this.effectEntries.map((e) => ({ ...e })),
         snapshot: () =>
           new Promise((resolve, reject) => {
             if (!('snapshot' in this.game.renderer)) return reject(new Error('目前的繪圖器不支援 snapshot'));
@@ -212,10 +250,11 @@ export class MapScene extends Phaser.Scene {
 
     const { hud, session } = this.deps;
     const before = { ...session.state.player };
+    const plotsBefore = session.state.plots;
     try {
       const outcome = await session.dispatch(command);
       hud.messages(outcome.messages);
-      this.playEvents(outcome.events, before);
+      this.playEvents(outcome.events, before, plotsBefore);
     } catch (error) {
       hud.error(`存檔失敗：${error instanceof Error ? error.message : String(error)}`);
     }
@@ -223,21 +262,81 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 把應用層的事件轉成視覺效果。效果只在這裡播放，規則不受影響。 */
-  private playEvents(events: readonly GameEvent[], before: { x: number; y: number }): void {
+  private playEvents(events: readonly GameEvent[], before: { x: number; y: number }, plotsBefore: PlotMap): void {
     for (const event of events) {
       if (event.type === 'acted') {
-        this.rig.squash();
-        playActionEffect(this, event.action, event.x, event.y);
+        this.playAction(event, plotsBefore);
       } else if (event.type === 'slept') {
         sleepEffect(this, this.deps.session.state.player.x, this.deps.session.state.player.y);
       } else if (event.type === 'talked') {
         this.reactToTalk(event.npcId);
+      }
+      for (const emote of emotesForEvent(event)) {
+        this.showEmote(emote.who === 'player' ? 'player' : emote.who.npc, emote.kind);
       }
     }
     const after = this.deps.session.state.player;
     const moved = before.x !== after.x || before.y !== after.y;
     const sameMap = this.renderedMapId === this.deps.session.state.mapId;
     if (moved && sameMap) footstepDust(this, before.x, before.y);
+  }
+
+  /**
+   * 農務動作的回饋：有工具的動作（開墾、澆水、播種）揮工具，粒子與鏡頭微震等到「命中」那一刻才出現；
+   * 沒有工具的動作（收成、出貨）維持原本的壓扁伸展，效果立刻出現。
+   */
+  private playAction(event: Extract<GameEvent, { type: 'acted' }>, plotsBefore: PlotMap): void {
+    const reduced = prefersReducedMotion();
+    const key = plotKey(event.x, event.y);
+    const impact = (): void => {
+      if (this.heldPlots.delete(key)) this.drawPlots(); // 命中：這一格才更新成動作後的樣子
+      this.log(`effect:${event.action}`);
+      playActionEffect(this, event.action, event.x, event.y);
+      if (event.action === 'till' && !reduced) {
+        this.cameras.main.shake(90, 0.003);
+        this.log('shake');
+      }
+    };
+    const tool = this.deps.tools.tools.find((t) => t.action === event.action);
+    if (tool && this.rig.canSwing()) {
+      this.rig.swing(tool, SWING_DURATION_MS, reduced, impact, () => this.log(`swing:${event.action}`));
+      // swing() 可能已經補播了上一個被打斷的動作的命中，所以在它之後才凍結這一格。
+      this.heldPlots.set(key, plotsBefore[key] ?? null);
+      this.drawPlots();
+    } else {
+      this.rig.squash();
+      impact();
+    }
+  }
+
+  /** 在某個角色頭上彈出表情氣泡；同一個角色已有氣泡時先換掉。找不到那個角色（沒有骨架的居民）就略過。 */
+  private showEmote(key: string, kind: EmoteKind): void {
+    const rig = key === 'player' ? this.rig : this.npcRigs.get(key);
+    if (!rig) return;
+    this.activeEmotes.get(key)?.handle.destroy();
+    const entry = {
+      rig,
+      handle: playEmote(this, rig.root, kind, rig.displayHeight(), prefersReducedMotion(), () => {
+        if (this.activeEmotes.get(key) === entry) this.activeEmotes.delete(key);
+      }),
+    };
+    this.activeEmotes.set(key, entry);
+  }
+
+  private log(name: string): void {
+    this.effectEntries.push({ name, at: performance.now() });
+    if (this.effectEntries.length > 200) this.effectEntries.shift();
+  }
+
+  private debugEmotes(): EmoteDebugInfo[] {
+    return [...this.activeEmotes.entries()].map(([who, { handle, rig }]) => ({
+      who,
+      kind: handle.kind,
+      x: rig.root.x + handle.container.x,
+      y: rig.root.y + handle.container.y,
+      scale: handle.scaleNow(),
+      alpha: handle.container.alpha,
+    }));
   }
 
   /** 依目前狀態重畫。地圖切換時整張重建，其餘情況只更新田地、方向與玩家位置。 */
@@ -271,6 +370,7 @@ export class MapScene extends Phaser.Scene {
 
   private drawMap(mapId: string): void {
     this.world.removeAll(true);
+    this.heldPlots.clear();
     const map = this.deps.index.map(mapId);
 
     for (let y = 0; y < map.height; y += 1) {
@@ -307,6 +407,7 @@ export class MapScene extends Phaser.Scene {
 
   /** 換地圖前清掉上一張圖的居民骨架與常駐夥伴（跟隨的寵物保留）。 */
   private clearActors(): void {
+    for (const [key, entry] of this.activeEmotes) if (key !== 'player') entry.handle.destroy();
     for (const rig of this.npcRigs.values()) rig.destroy();
     this.npcRigs.clear();
     for (const [id, state] of this.companions) {
@@ -383,7 +484,14 @@ export class MapScene extends Phaser.Scene {
       if (child.getData('plot')) child.destroy();
     });
 
-    for (const [key, plot] of Object.entries(state.plots)) {
+    // 工具還沒命中的格子維持動作前的樣子（見 heldPlots）。
+    const shown: PlotMap = { ...state.plots };
+    for (const [key, held] of this.heldPlots) {
+      if (held) shown[key] = held;
+      else delete shown[key];
+    }
+
+    for (const [key, plot] of Object.entries(shown)) {
       const [x, y] = key.split(',').map(Number);
       if (x === undefined || y === undefined) continue;
       if (x < 0 || y < 0 || x >= map.width || y >= map.height) continue;
@@ -494,6 +602,8 @@ export class MapScene extends Phaser.Scene {
         width: info.width,
         height: info.height,
         pose: { ...rig.currentPose() },
+        tool: rig.currentTool(),
+        busy: rig.isBusy(),
       };
     };
     return [describe('player', this.rig), ...this.visibleRigs().map(({ id, rig }) => describe(id, rig))];

@@ -10,10 +10,11 @@ import { loadContent } from '../content/load-content';
 import assets from '../../../content/assets.json';
 import rigs from '../../../content/rigs.json';
 import companions from '../../../content/companions.json';
+import tools from '../../../content/tools.json';
 import { SaveFormatError } from './save-errors';
 import { parseSaveRecord } from './save-schema';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, tools });
 const context = { inventoryCapacity: pack.tuning.inventory.capacity };
 
 function record(state: unknown) {

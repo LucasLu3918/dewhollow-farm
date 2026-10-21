@@ -44,6 +44,16 @@ export interface BipedRig extends RigBase {
    * 兩隻腳的分界 x（圖片 x）。朝右若是朝左的翻轉，就不要設定 right，由程式從 left 翻過來。
    */
   splits: { down: number; up: number; left: number; right?: number };
+  /**
+   * 握工具的位置（圖片像素）。沒有設定的角色不能揮工具。
+   * 規則與 splits 相同：朝右若是朝左的翻轉，就不要設定 right，由程式翻過來。
+   */
+  hands?: { down: Point; up: Point; left: Point; right?: Point };
+}
+
+export interface Point {
+  x: number;
+  y: number;
 }
 
 /**
@@ -138,6 +148,20 @@ function bipedProblems(rig: BipedRig, byId: ReadonlyMap<string, AssetEntry>): st
     }
     if (right.mirrorOf === undefined && rig.splits.right === undefined) {
       problems.push(`rig ${rig.id} 的 right 不是 left 的翻轉，必須設定 splits.right`);
+    }
+    if (rig.hands) {
+      if (mirrored && rig.hands.right !== undefined) problems.push(`rig ${rig.id} 的 hands.right 由翻轉得到，不可設定`);
+      if (right.mirrorOf === undefined && rig.hands.right === undefined) {
+        problems.push(`rig ${rig.id} 的 right 不是 left 的翻轉，必須設定 hands.right`);
+      }
+    }
+  }
+  if (rig.hands) {
+    for (const view of RIG_VIEWS) {
+      const hand = rig.hands[view];
+      if (hand && !(hand.x >= 0 && hand.x <= width && hand.y >= 0 && hand.y <= height)) {
+        problems.push(`rig ${rig.id} 的 hands.${view} (${hand.x},${hand.y}) 必須在圖片 ${width}×${height} 之內`);
+      }
     }
   }
   return problems;

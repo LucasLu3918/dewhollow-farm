@@ -76,6 +76,7 @@ const bipedRigSchema = z.object({
   views: z.object({ down: z.string().min(1), up: z.string().min(1), left: z.string().min(1), right: z.string().min(1) }),
   // 範圍（落在圖片內）由 rigProblems 檢查，這裡只管型別，才能回報「哪一個 split 錯在哪」。
   splits: z.object({ down: z.number().int(), up: z.number().int(), left: z.number().int(), right: z.number().int().optional() }),
+  hands: z.object({ down: point, up: point, left: point, right: point.optional() }).optional(),
   params: walkParams,
 });
 
@@ -88,6 +89,15 @@ const wholeRigSchema = z.object({
 });
 
 const rigSchema = z.union([bipedRigSchema, wholeRigSchema]);
+
+const toolSchema = z.object({
+  id: z.string().min(1),
+  action: z.enum(['till', 'water', 'plant', 'harvest', 'ship']),
+  asset: z.string().min(1),
+  textureSize,
+  grip: point,
+  swing: z.enum(['chop', 'pour', 'sow']),
+});
 
 const companionSchema = z.object({
   id: z.string().min(1),
@@ -126,5 +136,6 @@ export const npcsFileSchema = z.array(npcSchema);
 export const mapFileSchema = mapSchema;
 export const startFileSchema = startSchema;
 export const rigsFileSchema = z.object({ version: z.literal(1), rigs: z.array(rigSchema) });
+export const toolsFileSchema = z.object({ version: z.literal(1), tools: z.array(toolSchema) });
 export const companionsFileSchema = z.object({ version: z.literal(1), companions: z.array(companionSchema) });
 export const assetsFileSchema = z.object({ version: z.literal(1), assets: z.array(assetSchema) });

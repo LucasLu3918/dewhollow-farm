@@ -3,6 +3,7 @@ import { isWalkable, tileAt } from '../../domain/world';
 import { assetProblems, missingAssetIds, requiredAssetIds, type AssetManifest } from '../assets/asset-manifest';
 import { companionProblems, type CompanionManifest } from '../assets/companion-manifest';
 import { rigProblems, type RigManifest } from '../assets/rig-manifest';
+import { toolProblems, type ToolManifest } from '../assets/tool-manifest';
 import {
   assetsFileSchema,
   companionsFileSchema,
@@ -11,6 +12,7 @@ import {
   npcsFileSchema,
   rigsFileSchema,
   startFileSchema,
+  toolsFileSchema,
   tuningFileSchema,
 } from './content-schema';
 
@@ -23,6 +25,7 @@ export interface RawContentFiles {
   assets: unknown;
   rigs: unknown;
   companions: unknown;
+  tools: unknown;
 }
 
 export interface LoadedContent {
@@ -30,6 +33,7 @@ export interface LoadedContent {
   assets: AssetManifest;
   rigs: RigManifest;
   companions: CompanionManifest;
+  tools: ToolManifest;
 }
 
 /** 內容錯誤會一次列出所有問題，方便一次修正。 */
@@ -52,15 +56,17 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const assets = assetsFileSchema.parse(raw.assets);
   const rigs: RigManifest = rigsFileSchema.parse(raw.rigs);
   const companions: CompanionManifest = companionsFileSchema.parse(raw.companions);
+  const tools: ToolManifest = toolsFileSchema.parse(raw.tools);
 
   const pack: ContentPack = { crops, npcs, maps, start, tuning };
   const problems = [
     ...validateCrossReferences(pack, assets),
     ...rigProblems(rigs, assets),
     ...companionProblems(companions, rigs, pack),
+    ...toolProblems(tools, assets),
   ];
   if (problems.length > 0) throw new ContentError(problems);
-  return { pack, assets, rigs, companions };
+  return { pack, assets, rigs, companions, tools };
 }
 
 export function validateCrossReferences(pack: ContentPack, assets: AssetManifest): string[] {
