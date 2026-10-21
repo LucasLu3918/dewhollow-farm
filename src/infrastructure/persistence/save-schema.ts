@@ -127,6 +127,16 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   /** 信箱：信件的已讀狀態（沒有紀錄代表還沒送到）。 */
   mail: z.record(z.string().min(1), z.enum(['unread', 'read'])),
   dexFragments: z.number().int().nonnegative(),
+  /** 主線進度：目前要完成的章節號（全部完成後是章節數加一）。 */
+  story: z.object({ chapter: z.number().int().positive() }),
+  /** 節慶紀錄：每項活動最後一次參與的年份、釣魚比賽（哪一年、幾條）、夜市攤位（哪一年、各項售出數）。 */
+  festival: z.object({
+    done: z.record(z.string().min(1), z.number().int().positive()),
+    contest: z.object({ year: z.number().int().nonnegative(), caught: z.number().int().nonnegative() }),
+    sold: z.object({ year: z.number().int().nonnegative(), counts: z.record(z.string().min(1), z.number().int().positive()) }),
+  }),
+  /** 夜釣星星是否正在等收網（甩竿後為真）。 */
+  starLine: z.boolean(),
   mineSeed: z.number().int().nonnegative().max(4294967295),
   /** 礦坑沒有底，檢查點可以是任何正整數層（見 domain/mine.ts）。 */
   mineCheckpoint: z.number().int().min(1),

@@ -20,8 +20,10 @@ import type { Friendship } from './friendship';
 import { EMPTY_BOARD, type BoardState } from './bulletin';
 import type { QuestRecord } from './quests';
 import type { LetterStatus } from './mail';
+import { emptyFestivalState, type FestivalState } from './festival';
+import { emptyStory, type StoryState } from './story';
 
-export const SAVE_SCHEMA_VERSION = 15;
+export const SAVE_SCHEMA_VERSION = 16;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -76,6 +78,12 @@ export interface GameState {
   mail: Record<string, LetterStatus>;
   /** 圖鑑碎片的數量（委託獎勵；圖鑑本身在之後的里程碑）。 */
   dexFragments: number;
+  /** 主線進度：目前要完成的章節號（見 story.ts）。 */
+  story: StoryState;
+  /** 節慶紀錄：每項活動每年一次、釣魚比賽、夜市攤位的售出數（見 festival.ts）。 */
+  festival: FestivalState;
+  /** 夜釣星星：已經甩竿、等玩家在時機到的時候按 X（任何其他動作都會放掉它）。 */
+  starLine: boolean;
   /** 礦坑的種子：同一個種子每一層的樣子都一樣。 */
   mineSeed: number;
   /** 最深到過的檢查點層數（從入口下來會直接到這裡）；至少是第 1 層。 */
@@ -136,6 +144,9 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     board: { ...EMPTY_BOARD },
     mail: {},
     dexFragments: 0,
+    story: emptyStory(),
+    festival: emptyFestivalState(),
+    starLine: false,
     mineSeed: advanceRng(seed >>> 0),
     mineCheckpoint: 1,
     selectedSeed: selectedSeed.id,

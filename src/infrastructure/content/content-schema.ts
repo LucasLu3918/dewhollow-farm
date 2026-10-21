@@ -53,7 +53,8 @@ const tileSchema = z.object({
   shop: z.string().min(1).optional(),
   spawn: point.optional(),
   requires: requirementSchema.optional(),
-  notice: z.enum(['bulletin', 'mailbox']).optional(),
+  notice: z.enum(['bulletin', 'mailbox', 'festival']).optional(),
+  festival: z.enum(['stars']).optional(),
 });
 
 const mapSchema = z.object({
@@ -239,7 +240,11 @@ export const itemsFileSchema = z.object({
   ),
 });
 
-const shopStockSchema = z.object({ itemId: z.string().min(1), price: z.number().int().positive() });
+const shopStockSchema = z.object({
+  itemId: z.string().min(1),
+  price: z.number().int().positive(),
+  limit: z.number().int().positive().optional(),
+});
 const toolUpgradeSchema = z.object({
   toolId: z.enum(TOOL_IDS),
   tier: z.number().int().min(1).max(3),
@@ -332,6 +337,7 @@ export const shopsFileSchema = z.object({
     z.object({
       id: z.string().min(1),
       name: z.string().min(1),
+      festival: z.string().min(1).optional(),
       stock: z.array(shopStockSchema),
       upgrades: z.array(toolUpgradeSchema),
     }),
@@ -473,6 +479,70 @@ export const questsFileSchema = z.object({
     weekly: z.array(z.string().min(1)),
   }),
   quests: z.array(questSchema),
+});
+
+/** 節慶（見 domain/festival.ts 與 content/festivals.json）。 */
+const festivalSwapSchema = z.object({
+  npcId: z.string().min(1),
+  give: z.object({ itemId: z.string().min(1), count: z.number().int().positive() }),
+  receive: z.object({ itemId: z.string().min(1), count: z.number().int().positive() }),
+});
+const festivalSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  season: z.enum(SEASONS),
+  day: z.number().int().positive().max(60),
+  mapId: z.string().min(1),
+  fromMinute: z.number().int().min(0).max(1439),
+  playMinutes: z.number().positive().max(60),
+  shop: z.string().min(1).optional(),
+  swaps: z.array(festivalSwapSchema).optional(),
+  crown: z.object({ gold: z.number().int().nonnegative() }).optional(),
+  contest: z.object({ count: z.number().int().positive().max(99), gold: z.number().int().nonnegative() }).optional(),
+  stars: z
+    .object({
+      cycleMs: z.number().int().positive(),
+      zone: z
+        .object({ from: z.number().min(0).max(1), to: z.number().min(0).max(1) })
+        .refine((zone) => zone.from <= zone.to, '收網區間的起點不可大於終點'),
+      itemId: z.string().min(1),
+    })
+    .optional(),
+});
+export const festivalsFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  festivals: z.array(festivalSchema),
+});
+
+/** 主線章節（見 domain/story.ts 與 content/main-quest.json）。每個步驟恰好一個旗標或一件委託。 */
+const storyStepSchema = z
+  .object({
+    hint: z.string().min(1),
+    flag: z.string().min(1).optional(),
+    quest: z.string().min(1).optional(),
+  })
+  .refine((step) => (step.flag !== undefined) !== (step.quest !== undefined), '步驟要恰好有旗標（flag）或委託（quest）其中之一');
+const storyChapterSchema = z.object({
+  id: z.string().min(1),
+  number: z.number().int().positive(),
+  title: z.string().min(1),
+  window: z.string().min(1),
+  phase: z.enum(SEASONS),
+  intro: z.string().min(1),
+  complete: z.string().min(1),
+  steps: z.array(storyStepSchema).min(1),
+  reward: z.object({
+    gold: z.number().int().nonnegative().optional(),
+    items: z.record(z.string().min(1), z.number().int().positive()).optional(),
+    flag: z.string().min(1).optional(),
+  }),
+  playMinutes: z.number().positive().max(60),
+});
+export const mainQuestFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  chapters: z.array(storyChapterSchema),
 });
 
 /** 信件（見 domain/mail.ts 與 content/letters.json）。 */

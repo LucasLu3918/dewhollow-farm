@@ -39,8 +39,10 @@ import events from '../../../content/events.json';
 import friendship from '../../../content/friendship.json';
 import quests from '../../../content/quests.json';
 import letters from '../../../content/letters.json';
+import festivals from '../../../content/festivals.json';
+import mainQuest from '../../../content/main-quest.json';
 
-const { pack } = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+const { pack } = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
 const context = { inventoryCapacity: pack.tuning.inventory.capacity, daysPerSeason: pack.tuning.time.daysPerSeason, wakeMinute: pack.tuning.time.wakeMinute };
 
 function record(state: unknown) {
@@ -133,7 +135,7 @@ describe('save schema with an old save', () => {
 
   it('loads a v1 save as a current-version state', () => {
     const { state } = parseSaveRecord(record(v1), context);
-    expect(state.schemaVersion).toBe(15);
+    expect(state.schemaVersion).toBe(16);
     expect(state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
     expect(state.playtimeSeconds).toBe(0);
     expect(state.calendar.day).toBe(2);

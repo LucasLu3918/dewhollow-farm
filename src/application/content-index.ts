@@ -11,6 +11,8 @@ import type { FriendshipRules } from '../domain/friendship';
 import type { BulletinRules } from '../domain/bulletin';
 import type { QuestDef } from '../domain/quests';
 import type { LetterDef } from '../domain/mail';
+import type { FestivalDef } from '../domain/festival';
+import type { StoryChapter } from '../domain/story';
 
 /**
  * 以 id 快速查找內容。假設內容已由基礎設施層驗證過參照完整性；
@@ -64,6 +66,10 @@ export interface ContentIndex {
   /** 所有信件（順序與內容檔相同）。 */
   letters: LetterDef[];
   letter(id: string): LetterDef;
+  /** 所有節慶（順序與內容檔相同）。 */
+  festivals: FestivalDef[];
+  /** 主線章節（依章節號排序）。 */
+  chapters: StoryChapter[];
 }
 
 const NO_BULLETIN: BulletinRules = { postedBy: '鎮公所', dailyCount: 0, daily: [], weekly: [] };
@@ -161,5 +167,7 @@ export function createContentIndex(pack: ContentPack): ContentIndex {
       if (!found) throw new Error(`找不到信件：${id}`);
       return found;
     },
+    festivals: pack.festivals ?? [],
+    chapters: [...(pack.chapters ?? [])].sort((a, b) => a.number - b.number),
   };
 }

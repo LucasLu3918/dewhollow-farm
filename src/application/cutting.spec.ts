@@ -43,6 +43,8 @@ import events from '../../content/events.json';
 import friendship from '../../content/friendship.json';
 import quests from '../../content/quests.json';
 import letters from '../../content/letters.json';
+import festivals from '../../content/festivals.json';
+import mainQuest from '../../content/main-quest.json';
 
 /**
  * 鐮刀（M4 P1）：割除草叢（tuft）得到乾草；體力沿用砍樹的消耗，由鐮刀階級打折；沒有鐮刀時說明原因。
@@ -183,6 +185,8 @@ describe('the shipped forest has tufts a player can reach', () => {
     friendship,
     quests,
     letters,
+    festivals,
+    mainQuest,
     maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
     start,
     tuning,

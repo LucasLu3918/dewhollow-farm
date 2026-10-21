@@ -28,6 +28,10 @@ import type { ActionKind } from '../domain/tuning';
 import { applySellBonus, biteBonusPoints, dishEnergyBonus, extraYieldChance, rollExtraYield, sellBonusPercent } from '../domain/talents';
 import type { ContentIndex } from './content-index';
 import { acceptQuest, collectMail, currentBoard, deliverLetters, recordQuestEvent, refreshBoard, settleQuests, shortfallOf, submitQuest } from './quests';
+import { festivalCrown, festivalHere, festivalSwap, recordContestCatch, recordStallSale, stallRefusal, type FestivalOutcome } from './festival';
+import { settleStory, storyObjective } from './story';
+import { festivalOnDay } from '../domain/festival';
+import { starCatchHit } from '../domain/star-fishing';
 
 export type Command =
   | { type: 'move'; direction: Direction }
@@ -62,6 +66,14 @@ export type Command =
   | { type: 'acceptQuest'; questId: string }
   /** 交付委託要的物品（交付型委託；東西從背包拿走）。不花體力與時間。 */
   | { type: 'submitQuest'; questId: string }
+  /** 節慶的種子交換：節慶當天在鎮廣場，居民此刻也在廣場，每人每年一次（不花體力與時間）。 */
+  | { type: 'festivalSwap'; npcId: string }
+  /** 節慶的花冠製作：節慶當天在鎮廣場，用合成配方的材料（不花體力與時間）。 */
+  | { type: 'festivalCrown' }
+  /** 夜釣星星：站在節慶水池前甩竿（耗釣魚的體力與時間），之後等 catchStar。 */
+  | { type: 'castStar' }
+  /** 星星收網：elapsedMs 是甩竿後到按下的毫秒數；null 表示時限內沒按。只有甩竿後才有效。 */
+  | { type: 'catchStar'; elapsedMs: number | null }
   | { type: 'manualSave' };
 
 export type GameEvent =
@@ -87,7 +99,11 @@ export type GameEvent =
   | { type: 'workshopOpened' }
   | { type: 'workbenchOpened' }
   /** 站在佈告欄前按互動：畫面打開委託面板（狀態裡的今日佈告欄已經更新）。 */
-  | { type: 'bulletinOpened' };
+  | { type: 'bulletinOpened' }
+  /** 站在節慶告示前按互動：畫面打開節慶面板（不花體力與時間）。 */
+  | { type: 'festivalOpened' }
+  /** 夜釣星星甩竿成功：畫面開始星星的時機小遊戲，按 X 時送出 catchStar。 */
+  | { type: 'starLine' };
 
 export type ActionFeedback = 'till' | 'water' | 'plant' | 'harvest' | 'ship' | 'chop' | 'forage' | 'mine' | 'fish';
 
@@ -157,6 +173,15 @@ const FAILURE_MESSAGES: Record<string, string> = {
   NOT_ON_BOARD: '佈告欄上已經沒有這件委託了',
   NOT_ACTIVE: '這個委託還沒接',
   NOT_DELIVERY: '這個委託不用交付東西',
+  NOT_FESTIVAL: '現在沒有這個節慶活動（要在節慶當天的鎮廣場）',
+  NO_SWAP: '這位居民今天不跟你交換種子',
+  NOT_PRESENT: '他現在不在廣場上',
+  ALREADY_THIS_YEAR: '今年已經做過這件事了',
+  STALL_CLOSED: '這個攤位只在節慶的夜晚開放',
+  SOLD_OUT: '這項今年已經賣完了',
+  NOT_STAR_TIME: '星星要等夜市開始、晚上才會出現在水池裡',
+  NOT_AT_POOL: '要站在星星水池前面才能釣星星',
+  NO_STAR_LINE: '還沒有甩竿，不能收網',
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
@@ -175,8 +200,11 @@ function reply(state: GameState, messages: string[] = [], events: GameEvent[] = 
 export function executeCommand(current: GameState, command: Command, index: ContentIndex): CommandOutcome {
   const outcome = executeCore(current, command, index);
   const settled = settleQuests(outcome.state, index);
-  if (settled.messages.length === 0) return outcome;
-  return { ...outcome, state: settled.state, messages: [...outcome.messages, ...settled.messages] };
+  // 主線：步驟達成就發獎勵、推進章節（見 story.ts）。
+  const story = settleStory(settled.state, index);
+  const extra = [...settled.messages, ...story.messages];
+  if (extra.length === 0) return outcome;
+  return { ...outcome, state: story.state, messages: [...outcome.messages, ...extra] };
 }
 
 function executeCore(current: GameState, command: Command, index: ContentIndex): CommandOutcome {
@@ -184,9 +212,18 @@ function executeCore(current: GameState, command: Command, index: ContentIndex):
   if (current.pendingHeartEvent && command.type !== 'chooseHeartOption') {
     return reply(current, [messageFor('EVENT_PENDING')], [refused('EVENT_PENDING')]);
   }
-  // 魚只等一下：收線以外的任何動作都會把它放掉。
-  const state = command.type === 'reel' || !current.fishing ? current : { ...current, fishing: null };
+  // 魚只等一下：收線以外的任何動作都會把它放掉；星星同樣（收網以外的動作放掉）。
+  const unhooked = command.type === 'reel' || !current.fishing ? current : { ...current, fishing: null };
+  const state = command.type === 'catchStar' || !current.starLine ? unhooked : { ...unhooked, starLine: false };
   switch (command.type) {
+    case 'festivalSwap':
+      return festivalCommand(state, festivalSwap(state, command.npcId, index));
+    case 'festivalCrown':
+      return festivalCommand(state, festivalCrown(state, index));
+    case 'castStar':
+      return castStar(state, index);
+    case 'catchStar':
+      return catchStar(state, command.elapsedMs, index);
     case 'giveGift':
       return giveGift(state, command.npcId, command.itemId, index);
     case 'chooseHeartOption':
@@ -289,9 +326,11 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
 
   if (tile.notice === 'bulletin') return openBulletin(state, index);
   if (tile.notice === 'mailbox') return collectMailbox(state, index);
+  if (tile.notice === 'festival') return reply(state, [], [{ type: 'festivalOpened' }]);
   if (tile.kind === 'rock' || tile.kind === 'ore') {
     if (kind === tile.kind) return mineRock(state, target, tile, index);
   }
+  if (tile.festival === 'stars') return castStar(state, index);
   if (tile.kind === 'water') return cast(state, target, index);
   if (tile.kind === 'trough') return feedAnimals(state, index);
   if (kind === 'kitchen') return reply(state, [], [{ type: 'kitchenOpened' }]);
@@ -368,7 +407,8 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
   if (state.tool === 'hoe') {
     const result = spendThen(state, 'till', index, (s) => {
       const tilled = tillPlot(s.plots, key);
-      return tilled.ok ? ok({ ...s, plots: tilled.value }) : fail(tilled.reason);
+      // 主線的步驟「開墾一塊田」看這個旗標（見 content/main-quest.json）。
+      return tilled.ok ? ok({ ...s, plots: tilled.value, flags: { ...s.flags, 'done:till': true } }) : fail(tilled.reason);
     });
     return finish(state, result, '開墾了一塊田', { action: 'till', key });
   }
@@ -442,7 +482,8 @@ function shipAll(state: GameState, index: ContentIndex): CommandOutcome {
   const result = spendThen(state, 'ship', index, (s) => {
     let box = s.shipBox;
     for (const stack of taken) box = shipStack(box, stack);
-    let next: GameState = { ...s, inventory, shipBox: box };
+    // 主線的步驟「把作物放進出貨箱」看這個旗標。
+    let next: GameState = { ...s, inventory, shipBox: box, flags: { ...s.flags, 'done:ship': true } };
     for (const stack of taken) next = recordQuestEvent(next, { type: 'ship', itemId: stack.itemId, count: stack.count }, index);
     return ok(next);
   });
@@ -596,6 +637,8 @@ function sleep(state: GameState, index: ContentIndex): CommandOutcome {
   const delivered = deliverLetters(wakeUp, index);
   const next = refreshBoard(delivered.state, index);
   const messages = [`你睡了一覺。${dateLabel(calendar)} ${formatClock(calendar)}`];
+  const today = festivalOnDay(index.festivals, calendar);
+  if (today) messages.push(`今天是${today.name}！到${index.map(today.mapId).name}看看吧。`);
   if (morning.seasonChanged) messages.push(`季節換了，現在是${SEASON_LABEL[calendar.season]}天`);
   if (delivered.arrived.length > 0) messages.push(`信箱收到 ${delivered.arrived.length} 封信，到信箱取信`);
   if (settled.gold > 0) messages.push(`出貨箱結算 +${settled.gold} 金`);
@@ -608,6 +651,8 @@ function sleep(state: GameState, index: ContentIndex): CommandOutcome {
     messages.push(`缺水，${names} 枯死了`);
   }
   if (outOfSeason.length > 0) messages.push(`換季了，${outOfSeason.join('、')} 不適合這個季節，枯死了`);
+  const objective = storyObjective(next, index);
+  if (objective) messages.push(objective);
   messages.push(`明天天氣：${WEATHER_NAMES[next.forecast]}`);
   return reply(next, messages, [{ type: 'slept' }]);
 }
@@ -671,7 +716,7 @@ function cast(state: GameState, target: Point, index: ContentIndex): CommandOutc
   return reply(next, messages, events);
 }
 
-/** 收線：有魚上鉤才有效；在時限內按到（hit）就釣到魚，否則魚跑掉了。 */
+/** 收線：有魚上鉤才有效；在時限內按到（hit）就釣到魚，否則魚跑掉了。節慶的釣魚比賽在這裡計數。 */
 function reel(state: GameState, hit: boolean, index: ContentIndex): CommandOutcome {
   if (!state.fishing) return reply(state, [messageFor('NO_BITE')], [refused('NO_BITE')]);
   const fishId = state.fishing.fishId;
@@ -680,7 +725,50 @@ function reel(state: GameState, hit: boolean, index: ContentIndex): CommandOutco
   const stored = addItem(cleared.inventory, index.item(`fish.${fishId}`), 1);
   if (!stored.ok) return reply(cleared, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
   const caught = recordQuestEvent({ ...cleared, inventory: stored.value }, { type: 'fish', fishId }, index);
-  return reply(caught, [`釣到了${index.item(`fish.${fishId}`).name}`]);
+  const contest = recordContestCatch(caught, index);
+  return reply(contest.state, [`釣到了${index.item(`fish.${fishId}`).name}`, ...contest.messages]);
+}
+
+/** 節慶的指令結果：失敗只回傳原因（狀態不變），成功套用新狀態與訊息。 */
+function festivalCommand(state: GameState, result: Result<FestivalOutcome, string>): CommandOutcome {
+  if (!result.ok) return reply(state, [messageFor(result.reason)], [refused(result.reason)]);
+  return reply(result.value.state, result.value.messages);
+}
+
+/**
+ * 夜釣星星甩竿：站在節慶水池前（tile.festival 為 stars）、星河夜市正在鎮廣場開著。
+ * 耗的體力與時間與釣魚相同（沒有額外成本）。甩竿後畫面等玩家按 X，再送出 catchStar。
+ */
+function castStar(state: GameState, index: ContentIndex): CommandOutcome {
+  const target = neighbor(state.player, state.player.facing);
+  const tile = tileAt(index.map(state.mapId), target.x, target.y);
+  if (tile?.festival !== 'stars') return reply(state, [messageFor('NOT_AT_POOL')], [refused('NOT_AT_POOL')]);
+  if (!festivalHere(state, index)?.stars) return reply(state, [messageFor('NOT_STAR_TIME')], [refused('NOT_STAR_TIME')]);
+  const energy = trySpend(state.energy, actionCost(state, 'fish', index));
+  if (!energy.ok) return reply(state, [messageFor('NOT_ENOUGH_ENERGY')], [refused('NOT_ENOUGH_ENERGY')]);
+  const next: GameState = {
+    ...state,
+    energy: energy.value,
+    calendar: advanceMinutes(state.calendar, index.tuning.time.minutesPerAction),
+    skills: gainXp(state.skills, 'fish', index),
+    starLine: true,
+  };
+  return reply(next, ['星星在水面上閃了一下，等它經過時按 X 收網'], [{ type: 'starLine' }]);
+}
+
+/**
+ * 星星收網：時機由 star-fishing.ts 的純函式判斷（elapsedMs 為 null 表示沒按，沒接到）。
+ * 接到的星河碎片放進背包；不論接到與否，收網後這條線就結束了。
+ */
+function catchStar(state: GameState, elapsedMs: number | null, index: ContentIndex): CommandOutcome {
+  if (!state.starLine) return reply(state, [messageFor('NO_STAR_LINE')], [refused('NO_STAR_LINE')]);
+  const cleared: GameState = { ...state, starLine: false };
+  const rules = index.festivals.find((f) => f.stars)?.stars;
+  if (!rules) return reply(cleared, [messageFor('NOT_STAR_TIME')], [refused('NOT_STAR_TIME')]);
+  if (!starCatchHit(elapsedMs, { cycleMs: rules.cycleMs, zone: rules.zone })) return reply(cleared, ['星星溜走了']);
+  const stored = addItem(cleared.inventory, index.item(rules.itemId), 1);
+  if (!stored.ok) return reply(cleared, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
+  return reply({ ...cleared, inventory: stored.value }, [`接到了一顆${index.item(rules.itemId).name}！`]);
 }
 
 /**
@@ -804,6 +892,9 @@ function buy(state: GameState, command: Extract<Command, { type: 'buy' }>, index
   if (!facingShop(state, index, command.shopId)) return reply(state, [messageFor('NOT_AT_SHOP')], [refused('NOT_AT_SHOP')]);
   const line = index.shop(command.shopId).stock.find((s) => s.itemId === command.itemId);
   if (!line) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
+  // 節慶攤位：只在節慶開著時能買，有限量的物品不能超過今年的數量（見 festival.ts）。
+  const closed = stallRefusal(state, index, command.shopId, command.itemId, command.count);
+  if (closed) return reply(state, [messageFor(closed)], [refused(closed)]);
   const cost = line.price * command.count;
   if (state.gold < cost) return reply(state, [messageFor('NO_GOLD')], [refused('NO_GOLD')]);
   if (command.itemId.startsWith('animal.')) return buyAnimal(state, command.itemId.slice('animal.'.length), cost, command.count, index);
@@ -811,7 +902,8 @@ function buy(state: GameState, command: Extract<Command, { type: 'buy' }>, index
   const stored = addItem(state.inventory, index.item(command.itemId), command.count);
   if (!stored.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
   const name = index.item(command.itemId).name;
-  return reply({ ...state, gold: state.gold - cost, inventory: stored.value }, [`買了 ${name} × ${command.count}，花了 ${cost} 金`]);
+  const sold = recordStallSale(state, index, command.shopId, command.itemId, command.count);
+  return reply({ ...sold, gold: state.gold - cost, inventory: stored.value }, [`買了 ${name} × ${command.count}，花了 ${cost} 金`]);
 }
 
 function upgrade(state: GameState, command: Extract<Command, { type: 'upgrade' }>, index: ContentIndex): CommandOutcome {

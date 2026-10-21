@@ -1,0 +1,117 @@
+import { describe, expect, it } from 'vitest';
+import type { Calendar } from './calendar';
+import {
+  doneThisYear,
+  emptyFestivalState,
+  festivalKey,
+  festivalOnDay,
+  markDone,
+  isOpen,
+  openFestival,
+  recordCatch,
+  contestReached,
+  recordSale,
+  soldThisYear,
+  type FestivalDef,
+} from './festival';
+
+const sprout: FestivalDef = {
+  id: 'sprout',
+  name: '萌芽祭',
+  season: 'spring',
+  day: 12,
+  mapId: 'plaza',
+  fromMinute: 0,
+  playMinutes: 9,
+};
+
+const starMarket: FestivalDef = {
+  id: 'starmarket',
+  name: '星河夜市',
+  season: 'summer',
+  day: 14,
+  mapId: 'plaza',
+  fromMinute: 1080,
+  playMinutes: 10,
+  shop: 'night-market',
+};
+
+function at(season: Calendar['season'], day: number, minuteOfDay: number, year = 1): Calendar {
+  return { year, season, day, minuteOfDay };
+}
+
+describe('festival open window (節慶只在當天開放)', () => {
+  it('a daytime festival is open all day on its date and nowhere else', () => {
+    expect(isOpen(sprout, at('spring', 12, 360))).toBe(true);
+    expect(isOpen(sprout, at('spring', 12, 1439))).toBe(true);
+    expect(isOpen(sprout, at('spring', 11, 720))).toBe(false);
+    expect(isOpen(sprout, at('spring', 13, 720))).toBe(false);
+    expect(isOpen(sprout, at('summer', 12, 720))).toBe(false);
+    expect(isOpen(sprout, at('spring', 12, 720, 2))).toBe(true);
+  });
+
+  it('a night festival opens at its start minute and stays open past midnight', () => {
+    expect(isOpen(starMarket, at('summer', 14, 1079))).toBe(false);
+    expect(isOpen(starMarket, at('summer', 14, 1080))).toBe(true);
+    expect(isOpen(starMarket, at('summer', 14, 1500))).toBe(true);
+    expect(isOpen(starMarket, at('summer', 15, 1200))).toBe(false);
+  });
+
+  it('festivalOnDay names the festival of the day regardless of the hour', () => {
+    expect(festivalOnDay([sprout, starMarket], at('summer', 14, 0))?.id).toBe('starmarket');
+    expect(festivalOnDay([sprout, starMarket], at('summer', 13, 0))).toBeNull();
+  });
+
+  it('openFestival returns the festival running right now, or null', () => {
+    const defs = [sprout, starMarket];
+    expect(openFestival(defs, at('spring', 12, 600))?.id).toBe('sprout');
+    expect(openFestival(defs, at('summer', 14, 1200))?.id).toBe('starmarket');
+    expect(openFestival(defs, at('summer', 14, 600))).toBeNull();
+    expect(openFestival(defs, at('autumn', 1, 600))).toBeNull();
+  });
+});
+
+describe('once per year per activity (每年每項活動一次)', () => {
+  it('a key is marked done for its year only', () => {
+    const key = festivalKey('sprout', 'swap', 'maomao');
+    const state = markDone(emptyFestivalState(), key, 1);
+    expect(doneThisYear(state, key, 1)).toBe(true);
+    expect(doneThisYear(state, key, 2)).toBe(false);
+    expect(doneThisYear(state, festivalKey('sprout', 'swap', 'rong-bo'), 1)).toBe(false);
+  });
+
+  it('the key names the festival, the activity and the subject', () => {
+    expect(festivalKey('sprout', 'crown')).toBe('sprout:crown');
+    expect(festivalKey('sprout', 'swap', 'maomao')).toBe('sprout:swap:maomao');
+  });
+});
+
+describe('fishing contest (釣魚比賽計數)', () => {
+  it('counts catches within a year and reports when the target is reached', () => {
+    const rule = { count: 3, gold: 200 };
+    let contest = emptyFestivalState().contest;
+    contest = recordCatch(contest, 1);
+    contest = recordCatch(contest, 1);
+    expect(contestReached(contest, rule)).toBe(false);
+    contest = recordCatch(contest, 1);
+    expect(contest).toEqual({ year: 1, caught: 3 });
+    expect(contestReached(contest, rule)).toBe(true);
+  });
+
+  it('starts over when the year changes', () => {
+    const contest = recordCatch({ year: 1, caught: 2 }, 2);
+    expect(contest).toEqual({ year: 2, caught: 1 });
+  });
+});
+
+describe('night market stock (夜市攤位的數量限制)', () => {
+  it('sales are counted per item and reset in a new year', () => {
+    let sold = emptyFestivalState().sold;
+    sold = recordSale(sold, 1, 'bait', 2);
+    sold = recordSale(sold, 1, 'bait', 1);
+    expect(soldThisYear(sold, 1, 'bait')).toBe(3);
+    expect(soldThisYear(sold, 1, 'lantern')).toBe(0);
+    expect(soldThisYear(sold, 2, 'bait')).toBe(0);
+    expect(recordSale(sold, 2, 'bait', 1)).toEqual({ year: 2, counts: { bait: 1 } });
+  });
+});

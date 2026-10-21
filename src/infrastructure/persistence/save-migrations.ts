@@ -37,6 +37,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   12: migrateV12ToV13,
   13: migrateV13ToV14,
   14: migrateV14ToV15,
+  15: migrateV15ToV16,
 };
 
 /**
@@ -198,6 +199,24 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v15 → v16：主線（從序章開始，第 1 章）、節慶紀錄（每項活動都還沒參與）、夜釣星星（沒有甩竿）。
+ * 舊存檔的田開墾過、作物出過貨也不會補記到主線步驟上，主線的步驟之後照常達成。
+ */
+function migrateV15ToV16(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(15) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v15 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 16,
+    story: { chapter: 1 },
+    festival: { done: {}, contest: { year: 0, caught: 0 }, sold: { year: 0, counts: {} } },
+    starLine: false,
+  };
 }
 
 /**

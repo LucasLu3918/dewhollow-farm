@@ -25,6 +25,10 @@ import { SkillPanel } from '../skill-panel';
 import { ResidentPanel } from '../resident-panel';
 import { QuestPanel } from '../quest-panel';
 import { HeartEventPanel } from '../heart-event-panel';
+import { FestivalPanel } from '../festival-panel';
+import { playFirework } from '../fireworks';
+import { openFestival } from '../../domain/festival';
+import { starPhase } from '../../domain/star-fishing';
 import { PlaceholderResident, type ResidentView } from '../placeholder-resident';
 import { residentsOn } from '../../application/residents';
 import { slotsOf } from '../../domain/animals';
@@ -102,6 +106,10 @@ const DEPTH_PLAYER = 10;
 const DEPTH_SKY = 40;
 /** 收線的時限（毫秒）：魚上鉤後要在這段時間內按 x。 */
 const REEL_WINDOW_MS = 1100;
+/** 星星收網的計量條（畫面上方）寬度（像素）。 */
+const STAR_METER_WIDTH = 160;
+/** 夜市時每隔多久在廣場上空放一朵煙火。 */
+const FIREWORK_INTERVAL_MS = 2400;
 /** 夜色遮罩的顏色（深藍，比純黑自然）。 */
 const NIGHT_COLOR = 0x0b1030;
 /** 下雨時的遮罩顏色（灰藍）。 */
@@ -225,6 +233,12 @@ export class MapScene extends Phaser.Scene {
   private residentPanel!: ResidentPanel;
   private questPanel!: QuestPanel;
   private heartEventPanel!: HeartEventPanel;
+  private festivalPanel!: FestivalPanel;
+  /** 夜釣星星進行中的計時器與甩竿的時刻（一圈的時限，見 star-fishing.ts）。 */
+  private starTimer: Phaser.Time.TimerEvent | null = null;
+  private starStartedAt = 0;
+  private starMeter!: Phaser.GameObjects.Graphics;
+  private fireworkCount = 0;
   /** 雞舍裡的動物圖片，每次重畫時重建。 */
   private animalSprites: Phaser.GameObjects.Image[] = [];
   /** 魚上鉤後等待收線的計時器（時限內按 x 就釣到，逾時魚跑掉）。 */
@@ -254,6 +268,7 @@ export class MapScene extends Phaser.Scene {
     this.residentPanel = new ResidentPanel(document, deps.index, (command) => void this.run(command));
     this.questPanel = new QuestPanel(document, deps.index, (command) => void this.run(command));
     this.heartEventPanel = new HeartEventPanel(document, deps.index, (command) => void this.run(command));
+    this.festivalPanel = new FestivalPanel(document, deps.index, (command) => void this.run(command));
     deps.hud.bindSkills(() => this.skillPanel.toggle(deps.session.state));
     this.terrainByKind = new Map(deps.terrain.map((entry) => [entry.kind, entry]));
   }
@@ -261,6 +276,9 @@ export class MapScene extends Phaser.Scene {
   create(): void {
     this.world = this.add.container(0, 0);
     this.createSky();
+    this.starMeter = this.add.graphics().setScrollFactor(0).setDepth(DEPTH_SKY + 2);
+    // 夜市的煙火：每隔一陣子看看要不要放（只有節慶的夜晚、在廣場才放，見 maybeFirework）。
+    this.time.addEvent({ delay: FIREWORK_INTERVAL_MS, loop: true, callback: () => this.maybeFirework() });
     // 玩家骨架：腳底中心站在格子底邊中央，上半身與腳分開動作。
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
     this.rig.root.setDepth(DEPTH_PLAYER);
@@ -363,7 +381,15 @@ export class MapScene extends Phaser.Scene {
       }
       return;
     }
-    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen() || this.residentPanel.isOpen() || this.questPanel.isOpen()) {
+    if (this.starTimer) {
+      // 星星在水面上走：只有 x 有用（收網，量時機），其餘按鍵等時限過了再說。
+      if (event.key.toLowerCase() === 'x') {
+        event.preventDefault();
+        this.finishStar(performance.now() - this.starStartedAt);
+      }
+      return;
+    }
+    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen() || this.residentPanel.isOpen() || this.questPanel.isOpen() || this.festivalPanel.isOpen()) {
       // 櫃檯、廚房或面板開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠完成。
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -374,6 +400,7 @@ export class MapScene extends Phaser.Scene {
         this.skillPanel.close();
         this.residentPanel.close();
         this.questPanel.close();
+        this.festivalPanel.close();
       }
       return;
     }
@@ -415,6 +442,49 @@ export class MapScene extends Phaser.Scene {
     void this.run({ type: 'reel', hit });
   }
 
+  /** 夜釣星星甩竿成功：頭上冒出驚嘆號，畫面上方出現計量條，一圈之內按 x 收網。 */
+  private startStarGame(): void {
+    const rules = this.deps.index.festivals.find((f) => f.stars)?.stars;
+    if (!rules) return;
+    this.showEmote('player', 'surprise');
+    this.starStartedAt = performance.now();
+    this.starTimer = this.time.delayedCall(rules.cycleMs, () => this.finishStar(null));
+  }
+
+  /** 收網：elapsedMs 為按下的時刻（null 表示時限內沒按）；由應用層判斷有沒有接到。 */
+  private finishStar(elapsedMs: number | null): void {
+    this.starTimer?.remove(false);
+    this.starTimer = null;
+    this.starMeter.clear();
+    void this.run({ type: 'catchStar', elapsedMs });
+  }
+
+  /** 計量條：時機區間用亮色標出，星星的位置是一條白線，每一畫面更新。 */
+  private drawStarMeter(): void {
+    this.starMeter.clear();
+    const rules = this.deps.index.festivals.find((f) => f.stars)?.stars;
+    if (!this.starTimer || !rules) return;
+    const elapsed = performance.now() - this.starStartedAt;
+    const x = (VIEW_SIZE.width - STAR_METER_WIDTH) / 2;
+    const y = 40;
+    this.starMeter.fillStyle(0x000000, 0.5).fillRect(x - 4, y - 4, STAR_METER_WIDTH + 8, 16);
+    const zone = rules.zone;
+    this.starMeter.fillStyle(0xffe38a, 0.9).fillRect(x + STAR_METER_WIDTH * zone.from, y, STAR_METER_WIDTH * (zone.to - zone.from), 8);
+    this.starMeter.fillStyle(0xffffff, 1).fillRect(x + STAR_METER_WIDTH * starPhase(elapsed, rules.cycleMs) - 1, y - 3, 3, 14);
+  }
+
+  /** 夜市的晚上在廣場上空放煙火（只是演出；位置隨機，減少動態時由 fireworks.ts 改成靜態光點）。 */
+  private maybeFirework(): void {
+    const { session, index } = this.deps;
+    const state = session.state;
+    const open = openFestival(index.festivals, state.calendar);
+    if (!open?.stars || state.mapId !== open.mapId) return;
+    this.fireworkCount += 1;
+    const x = (2 + Math.random() * 12) * TILE_SIZE;
+    const y = (1 + Math.random() * 3) * TILE_SIZE;
+    playFirework(this, x, y, this.fireworkCount);
+  }
+
   /** 把一個指令交給應用層，顯示訊息與效果，然後重畫。鍵盤與商店面板共用這條路。 */
   private async run(command: Command): Promise<void> {
     const { hud, session, sounds } = this.deps;
@@ -435,6 +505,7 @@ export class MapScene extends Phaser.Scene {
     this.workbenchPanel.refresh(session.state);
     this.skillPanel.refresh(session.state);
     this.questPanel.refresh(session.state);
+    this.festivalPanel.refresh(session.state);
     this.refresh();
   }
 
@@ -469,6 +540,10 @@ export class MapScene extends Phaser.Scene {
         this.workbenchPanel.open(this.deps.session.state);
       } else if (event.type === 'bulletinOpened') {
         this.questPanel.open(this.deps.session.state);
+      } else if (event.type === 'festivalOpened') {
+        this.festivalPanel.open(this.deps.session.state);
+      } else if (event.type === 'starLine') {
+        this.startStarGame();
       } else if (event.type === 'saveRequested') {
         this.deps.sounds.play('save');
       }
@@ -884,6 +959,7 @@ export class MapScene extends Phaser.Scene {
     this.rig.update(delta);
     for (const rig of this.npcRigs.values()) rig.update(delta);
     for (const state of this.companions.values()) state.rig.update(delta);
+    this.drawStarMeter();
   }
 
   /** 每一畫面更新：夜色依時間、變暗依天氣、粒子依天氣與時間。 */

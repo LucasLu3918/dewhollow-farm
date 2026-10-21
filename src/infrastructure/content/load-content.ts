@@ -37,12 +37,20 @@ import {
   friendshipFileSchema,
   questsFileSchema,
   lettersFileSchema,
+  festivalsFileSchema,
+  mainQuestFileSchema,
   type MusicFile,
   type SoundsFile,
   type TerrainFile,
 } from './content-schema';
+import { festivalProblems, storyProblems } from './festival-content';
+import type { StoryChapter } from '../../domain/story';
 
 export interface RawContentFiles {
+  /** 節慶（content/festivals.json）。測試用的最小內容可以省略（視為沒有節慶）。 */
+  festivals?: unknown;
+  /** 主線章節（content/main-quest.json）。測試用的最小內容可以省略（視為沒有章節）。 */
+  mainQuest?: unknown;
   crops: unknown;
   npcs: unknown;
   /** 居民行程（content/schedules.json）。 */
@@ -128,6 +136,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const friendship = friendshipFileSchema.parse(raw.friendship);
   const quests = questsFileSchema.parse(raw.quests);
   const letters = lettersFileSchema.parse(raw.letters);
+  const festivals = festivalsFileSchema.parse(raw.festivals ?? { version: 1, festivals: [] });
+  const mainQuest = mainQuestFileSchema.parse(raw.mainQuest ?? { version: 1, chapters: [] });
 
   const pack: ContentPack = {
     crops,
@@ -150,11 +160,16 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     friendship,
     quests: { defs: quests.quests, bulletin: quests.bulletin },
     letters: letters.letters,
+    festivals: festivals.festivals,
+    // 步驟的「恰好一個旗標或委託」已由 schema 檢查；型別上 zod 的輸出較寬，這裡收窄回 StoryStep。
+    chapters: mainQuest.chapters as StoryChapter[],
   };
   const problems = [
     ...validateCrossReferences(pack, assets),
     ...residentProblems(pack),
     ...questProblems(pack),
+    ...festivalProblems(pack),
+    ...storyProblems(pack),
     ...rigProblems(rigs, assets),
     ...companionProblems(companions, rigs, pack),
     ...toolProblems(tools, assets),

@@ -42,6 +42,8 @@ import events from '../../content/events.json';
 import friendship from '../../content/friendship.json';
 import quests from '../../content/quests.json';
 import letters from '../../content/letters.json';
+import festivals from '../../content/festivals.json';
+import mainQuest from '../../content/main-quest.json';
 
 /** 一整年（80 天）連續遊玩：每天種植當季作物、睡醒，不應出現任何錯誤或不合規則的狀態。 */
 const raw: RawContentFiles = {
@@ -52,6 +54,8 @@ const raw: RawContentFiles = {
   friendship,
     quests,
     letters,
+    festivals,
+    mainQuest,
   maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,

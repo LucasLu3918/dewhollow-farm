@@ -80,8 +80,10 @@ export interface TileDef {
   /** 採集點：採到的物品（省略為野薄荷）與能採的季節（省略為四季皆可）。 */
   item?: string;
   seasons?: Season[];
-  /** 站在它前面按 X 的用途：佈告欄（看今日委託並接取）或信箱（取信）。 */
-  notice?: 'bulletin' | 'mailbox';
+  /** 站在它前面按 X 的用途：佈告欄（看今日委託並接取）、信箱（取信）或節慶告示（見 festival.ts）。 */
+  notice?: 'bulletin' | 'mailbox' | 'festival';
+  /** 節慶的水池（只在節慶開放時有作用，見 star-fishing.ts）。 */
+  festival?: 'stars';
 }
 
 export interface MapDef {
@@ -103,6 +105,8 @@ import type { HeartEventDef } from './heart-events';
 import type { FriendshipRules } from './friendship';
 import type { QuestSet } from './quests';
 import type { LetterDef } from './mail';
+import type { FestivalDef } from './festival';
+import type { StoryChapter } from './story';
 
 export type { ScheduleDef, ScheduleEntry, PeriodRules, Period } from './schedule';
 export type { HeartEventDef, HeartEventOption, HeartEmote } from './heart-events';
@@ -149,6 +153,10 @@ export interface ContentPack {
   quests?: QuestSet;
   /** 信件（見 mail.ts 與 content/letters.json）。測試用的最小內容可以省略。 */
   letters?: LetterDef[];
+  /** 節慶（見 festival.ts 與 content/festivals.json）。測試用的最小內容可以省略。 */
+  festivals?: FestivalDef[];
+  /** 主線章節（見 story.ts 與 content/main-quest.json）。測試用的最小內容可以省略。 */
+  chapters?: StoryChapter[];
 }
 
 export interface RecipeDef {
@@ -204,6 +212,8 @@ export interface FishDef {
 export interface ShopStock {
   itemId: string;
   price: number;
+  /** 節慶攤位才有：每年（每次節慶）最多賣幾個。 */
+  limit?: number;
 }
 
 /** 升級工具到某一階需要的金幣與材料（材料是 物品 id → 數量）。 */
@@ -219,4 +229,6 @@ export interface ShopDef {
   name: string;
   stock: ShopStock[];
   upgrades: ToolUpgrade[];
+  /** 只在這個節慶開放時能買（省略為隨時開放）。 */
+  festival?: string;
 }

@@ -8,6 +8,8 @@ import events from '../content/events.json';
 import friendship from '../content/friendship.json';
 import quests from '../content/quests.json';
 import letters from '../content/letters.json';
+import festivals from '../content/festivals.json';
+import mainQuest from '../content/main-quest.json';
 import start from '../content/start.json';
 import tuning from '../content/tuning.json';
 import assets from '../content/assets.json';
@@ -57,7 +59,7 @@ import { AudioOutput } from './presentation/audio/audio-output';
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
-  const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+  const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
   const index = createContentIndex(loaded.pack);
   // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
   const audio = new AudioOutput();
