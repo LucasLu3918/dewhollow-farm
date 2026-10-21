@@ -308,6 +308,45 @@ export const soundsFileSchema = z.object({
 export type SoundRecipe = z.infer<typeof soundRecipeSchema>;
 export type SoundsFile = z.infer<typeof soundsFileSchema>;
 
+/**
+ * 背景音樂：程式合成的循環曲（見 src/presentation/audio/music-track.ts 與 music-player.ts）。
+ * 音符是 [度數, 拍數]；度數 null 為休止符，度數 0 為主音，負數為低音。
+ */
+const musicNoteSchema = z.tuple([z.number().int().nullable(), z.number().positive().max(16)]);
+const musicScaleSchema = z
+  .array(z.number().int().min(0).max(11))
+  .min(2, '音階至少要有兩個音')
+  .refine((steps) => steps[0] === 0 && steps.every((step, i) => i === 0 || step > (steps[i - 1] ?? -1)), '音階要從 0 開始，由低到高排列');
+const musicVoiceSchema = z.object({
+  wave: z.enum(['sine', 'triangle', 'square', 'sawtooth']),
+  gain: z.number().min(0).max(1),
+  octaves: z.number().int().min(-3).max(3),
+  notes: z.array(musicNoteSchema).min(1),
+});
+const musicTrackSchema = z.object({
+  id: z.string().min(1),
+  season: z.enum(SEASONS),
+  period: z.enum(['day', 'night']),
+  tonic: z.number().int().min(24).max(96),
+  scale: z.string().min(1),
+  bpm: z.number().min(30).max(240),
+  melody: musicVoiceSchema,
+  bass: musicVoiceSchema,
+});
+export const musicFileSchema = z.object({
+  version: z.literal(1),
+  master: z.number().min(0).max(1),
+  fadeSeconds: z.number().positive().max(10),
+  rainKeepsTrack: z.boolean(),
+  source: z.string().min(1),
+  note: z.string().optional(),
+  scales: z.record(z.string().min(1), musicScaleSchema),
+  tracks: z.array(musicTrackSchema).min(1),
+});
+export type MusicFile = z.infer<typeof musicFileSchema>;
+export type MusicTrackDef = MusicFile['tracks'][number];
+export type MusicVoiceDef = MusicTrackDef['melody'];
+
 /** 地形：走在上面的腳步（塵土顏色與音效）。 */
 const terrainSchema = z.object({
   kind: z.string().min(1),

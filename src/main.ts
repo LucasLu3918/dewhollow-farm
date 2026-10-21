@@ -9,6 +9,7 @@ import rigs from '../content/rigs.json';
 import companions from '../content/companions.json';
 import tools from '../content/tools.json';
 import sounds from '../content/sounds.json';
+import music from '../content/music.json';
 import terrain from '../content/terrain.json';
 import weather from '../content/weather.json';
 import items from '../content/items.json';
@@ -37,6 +38,8 @@ import { MapScene } from './presentation/scenes/MapScene';
 import { applyRenderCompat } from './presentation/apply-render-compat';
 import { VIEW_SIZE } from './presentation/constants';
 import { SoundPlayer } from './presentation/audio/sound-player';
+import { MusicPlayer } from './presentation/audio/music-player';
+import { AudioOutput } from './presentation/audio/audio-output';
 
 /**
  * 組裝點（composition root）：這裡是唯一知道具體實作的地方。
@@ -44,8 +47,10 @@ import { SoundPlayer } from './presentation/audio/sound-player';
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
-  const loaded = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
+  const loaded = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
   const index = createContentIndex(loaded.pack);
+  // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
+  const audio = new AudioOutput();
 
   let repository: SaveRepository;
   if (hasIndexedDb()) {
@@ -82,7 +87,8 @@ async function bootstrap(): Promise<void> {
         rigs: loaded.rigs,
         companions: loaded.companions,
         tools: loaded.tools,
-        sounds: new SoundPlayer(loaded.sounds),
+        sounds: new SoundPlayer(loaded.sounds, audio),
+        music: new MusicPlayer(loaded.music, audio),
         terrain: loaded.terrain.terrains,
         session,
         index,

@@ -8,6 +8,7 @@ import rigs from '../../content/rigs.json';
 import companions from '../../content/companions.json';
 import tools from '../../content/tools.json';
 import sounds from '../../content/sounds.json';
+import music from '../../content/music.json';
 import terrain from '../../content/terrain.json';
 import weather from '../../content/weather.json';
 import items from '../../content/items.json';
@@ -31,7 +32,7 @@ import { GameSession } from './game-session';
 import type { SaveRecord, SaveRepository } from './ports';
 import { createNewGame, type GameState } from '../domain/game-state';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting });
 const index = createContentIndex(pack);
 
 /** 測試輔助：把玩家放到指定位置後建立 session。 */

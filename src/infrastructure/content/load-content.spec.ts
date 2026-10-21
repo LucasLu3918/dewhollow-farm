@@ -8,6 +8,7 @@ import rigs from '../../../content/rigs.json';
 import companions from '../../../content/companions.json';
 import tools from '../../../content/tools.json';
 import sounds from '../../../content/sounds.json';
+import music from '../../../content/music.json';
 import terrain from '../../../content/terrain.json';
 import weather from '../../../content/weather.json';
 import items from '../../../content/items.json';
@@ -27,7 +28,7 @@ import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, ...overrides };
+  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, ...overrides };
 }
 
 describe('loadContent with shipped content', () => {
