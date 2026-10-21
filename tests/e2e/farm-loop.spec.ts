@@ -13,10 +13,20 @@ async function press(page: Page, keys: string[]): Promise<void> {
   }
 }
 
+/**
+ * 等場景真的建立好、鍵盤監聽器掛上才開始按鍵。不能只看 HUD 文字：index.html 一開始就寫著「第 1 天」，
+ * 讀檔訊息也是在 Phaser 場景建立之前就寫進 HUD，太早按鍵會被丟掉。
+ * 開發模式的 window.__dewhollow 在場景的 create() 裡與鍵盤監聽器同一個同步段落建立，所以它出現就代表可以按鍵了。
+ */
+async function waitForScene(page: Page): Promise<void> {
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).not.toBe('');
+}
+
 async function waitForGame(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
   await expect(page.locator('#hud-day')).toHaveText('第 1 天');
+  await waitForScene(page);
 }
 
 // 每個測試使用獨立的瀏覽器情境（context），因此 IndexedDB 是乾淨的。
@@ -44,6 +54,7 @@ test('plays the vertical slice and resumes from a save', async ({ page }) => {
   await expect(page.locator('#hud-log')).toContainText('已存檔');
 
   await page.reload();
+  await waitForScene(page);
   await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
   await expect(page.locator('#hud-energy-text')).toHaveText('96 / 100');
   await expect(page.locator('#hud-day')).toHaveText('第 1 天');
@@ -58,6 +69,7 @@ test('plays the vertical slice and resumes from a save', async ({ page }) => {
 
   // 第 2 天重新整理，存檔應保留第 2 天。
   await page.reload();
+  await waitForScene(page);
   await expect(page.locator('#hud-day')).toHaveText('第 2 天');
   await expect(page.locator('#hud-gold')).toHaveText('100 金');
 });

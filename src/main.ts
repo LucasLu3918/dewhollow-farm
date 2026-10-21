@@ -17,6 +17,7 @@ import { IndexedDbSaveRepository, hasIndexedDb } from './infrastructure/persiste
 import { Hud } from './presentation/hud';
 import { BootScene } from './presentation/scenes/BootScene';
 import { MapScene } from './presentation/scenes/MapScene';
+import { applyRenderCompat } from './presentation/apply-render-compat';
 import { VIEW_SIZE } from './presentation/constants';
 
 /**
@@ -45,7 +46,7 @@ async function bootstrap(): Promise<void> {
   }
   if (session.restored) hud.messages(['已讀取存檔，繼續遊玩。']);
 
-  new Phaser.Game({
+  const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
     width: VIEW_SIZE.width,
@@ -55,6 +56,8 @@ async function bootstrap(): Promise<void> {
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
     scene: [new BootScene({ assets: loaded.assets, rigs: loaded.rigs, session, index, pack: loaded.pack, hud }), new MapScene()],
   });
+  // 軟體繪圖器會把旋轉的角色畫壞（見 render-compat.ts）；繪圖器建立好後偵測並套用保底。
+  game.events.once(Phaser.Core.Events.READY, () => applyRenderCompat(game));
 }
 
 bootstrap().catch((error: unknown) => {

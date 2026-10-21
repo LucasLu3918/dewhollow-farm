@@ -9,9 +9,11 @@ import type { RigManifest } from '../../infrastructure/assets/rig-manifest';
 import type { Hud } from '../hud';
 import { cameraBounds, deadzoneOf } from '../camera';
 import { TILE_SIZE } from '../constants';
+import { RENDER_COMPAT_KEY } from '../apply-render-compat';
 import { CharacterRig } from '../character-rig';
 import { centerOf, footOf, standOf } from '../layout';
 import { footstepDust, playActionEffect, sleepEffect } from '../effects';
+import type { RenderCompatInfo } from '../render-compat';
 import type { View } from '../walk-pose';
 
 export interface MapSceneDeps {
@@ -71,6 +73,8 @@ declare global {
       setPose(view: View, step: number, u: number): void;
       /** 直接讀取 WebGL 畫面（原始像素，不經瀏覽器合成）；回傳 PNG 的 data URL。供逐格視覺檢查用。 */
       snapshot(): Promise<string>;
+      /** 軟體繪圖器保底的偵測與套用結果（見 render-compat.ts）。 */
+      renderCompat(): RenderCompatInfo;
     };
   }
 }
@@ -130,6 +134,7 @@ export class MapScene extends Phaser.Scene {
           return { view, mode, visible: [...visible] };
         },
         setPose: (view, step, u) => this.rig.preview(view, step, u),
+        renderCompat: () => this.registry.get(RENDER_COMPAT_KEY) as RenderCompatInfo,
         snapshot: () =>
           new Promise((resolve, reject) => {
             if (!('snapshot' in this.game.renderer)) return reject(new Error('目前的繪圖器不支援 snapshot'));
