@@ -1,4 +1,4 @@
-import type { RigDef } from '../infrastructure/assets/rig-manifest';
+import type { BipedRig } from '../infrastructure/assets/rig-manifest';
 import { effectiveSplit, footModeOf, type FootMode, type View } from './walk-pose';
 
 /**
@@ -36,7 +36,7 @@ export interface RigLayout {
   };
 }
 
-export function rigLayout(rig: RigDef, view: View): RigLayout {
+export function rigLayout(rig: BipedRig, view: View): RigLayout {
   const { width, height } = rig.textureSize;
   const { legTop } = rig;
   const lowerHeight = height - legTop;

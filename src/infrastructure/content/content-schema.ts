@@ -49,27 +49,52 @@ const assetSchema = z.object({
   source: z.string().min(1),
 });
 
-const rigSchema = z.object({
+const textureSize = z.object({ width: z.number().int().positive(), height: z.number().int().positive() });
+
+// 嚴格：未知的參數名稱直接拒絕，避免打錯字卻沒有任何效果。
+const walkParams = z
+  .strictObject({
+    bob: z.number(),
+    swayDegrees: z.number(),
+    airStretch: z.number(),
+    lift: z.number(),
+    footStretch: z.number(),
+    hopHeight: z.number(),
+    hopStretch: z.number(),
+    breatheDelayMs: z.number(),
+    breathePeriodMs: z.number(),
+    breatheAmount: z.number(),
+  })
+  .partial()
+  .optional();
+
+const bipedRigSchema = z.object({
   id: z.string().min(1),
-  textureSize: z.object({ width: z.number().int().positive(), height: z.number().int().positive() }),
+  kind: z.literal('biped'),
+  textureSize,
   legTop: z.number().int().positive(),
   views: z.object({ down: z.string().min(1), up: z.string().min(1), left: z.string().min(1), right: z.string().min(1) }),
   // 範圍（落在圖片內）由 rigProblems 檢查，這裡只管型別，才能回報「哪一個 split 錯在哪」。
   splits: z.object({ down: z.number().int(), up: z.number().int(), left: z.number().int(), right: z.number().int().optional() }),
-  // 嚴格：未知的參數名稱直接拒絕，避免打錯字卻沒有任何效果。
-  params: z
-    .strictObject({
-      bob: z.number(),
-      swayDegrees: z.number(),
-      airStretch: z.number(),
-      lift: z.number(),
-      footStretch: z.number(),
-      breatheDelayMs: z.number(),
-      breathePeriodMs: z.number(),
-      breatheAmount: z.number(),
-    })
-    .partial()
-    .optional(),
+  params: walkParams,
+});
+
+const wholeRigSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(['single', 'hop']),
+  textureSize,
+  asset: z.string().min(1),
+  params: walkParams,
+});
+
+const rigSchema = z.union([bipedRigSchema, wholeRigSchema]);
+
+const companionSchema = z.object({
+  id: z.string().min(1),
+  rig: z.string().min(1),
+  follows: z.literal('player').optional(),
+  home: z.object({ mapId: z.string().min(1), x: z.number().int(), y: z.number().int() }).optional(),
+  reactsTo: z.string().min(1).optional(),
 });
 
 const cost = z.number().int().nonnegative();
@@ -101,4 +126,5 @@ export const npcsFileSchema = z.array(npcSchema);
 export const mapFileSchema = mapSchema;
 export const startFileSchema = startSchema;
 export const rigsFileSchema = z.object({ version: z.literal(1), rigs: z.array(rigSchema) });
+export const companionsFileSchema = z.object({ version: z.literal(1), companions: z.array(companionSchema) });
 export const assetsFileSchema = z.object({ version: z.literal(1), assets: z.array(assetSchema) });

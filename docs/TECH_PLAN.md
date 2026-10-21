@@ -44,6 +44,7 @@ domain 負責判斷「可否觸發」與「效果結算」；presentation 的事
 ### presentation 擴充
 
 - **鏡頭**（M0 已完成）：跟隨主角，中央留死區、平滑、邊界夾限；地圖比視窗小時邊界擴張讓地圖置中（純函式在 `presentation/camera.ts`，有單元測試）。格子 64 px，視窗固定 16×12 格；效果與占位圖的像素值以 32 px 設計稿為基準，乘上 `UNIT`。開發模式下 `window.__dewhollow` 提供鏡頭位置、地圖 id、玩家姿勢與骨架資訊、`setPose`（擺出走路循環任一相位）與 `snapshot`（讀 WebGL 畫面）、`renderCompat`（軟體繪圖器保底的偵測結果）給 e2e 與逐格檢查，正式建置不含。
+- **夥伴與骨架資料**：`content/rigs.json`（`biped`／`single`／`hop`）與 `content/companions.json`（跟隨或常駐），由 `loadContent` 驗證並交叉檢查；寵物只在畫面上，不進存檔。應用層新增 `talked` 事件。
 - **軟體繪圖器保底**：`presentation/render-compat.ts`（判斷，純函式）與 `apply-render-compat.ts`（套用）。偵測到軟體繪圖器時把每批貼圖數限制為 1，避開 Phaser 4.2.1 多貼圖著色器的精確浮點比較；實際 GPU 不受影響。`?compat=1`／`?compat=0` 可強制開關。M7 的效能預算要記得：此模式下 draw call 較多；升級 Phaser 時留意 e2e 的金絲雀。
 - **地圖**：沿用 ASCII 格式為底，擴充多圖層（地表、物件、遮擋）；碰撞與互動點由 domain 讀取。是否改用 Tiled 見「工具」。
 - **精靈動畫**：以貼圖集（texture atlas）載入，動畫由 `content/animations.json` 描述。

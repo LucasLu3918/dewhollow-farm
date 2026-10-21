@@ -24,6 +24,10 @@ export interface WalkParams {
   lift: number;
   /** 側面腳部水平伸縮的最大比例。 */
   footStretch: number;
+  /** 寵物小跳步跳起的高度（比人走路的起伏高，才看得出是跳）。 */
+  hopHeight: number;
+  /** 寵物離地最高點 Y 方向拉長的比例。 */
+  hopStretch: number;
   /** 站定多久後開始呼吸（毫秒）。 */
   breatheDelayMs: number;
   /** 呼吸一個來回的時間（毫秒）。 */
@@ -38,6 +42,8 @@ export const DEFAULT_WALK_PARAMS: Readonly<WalkParams> = Object.freeze({
   airStretch: 0.045,
   lift: 7,
   footStretch: 0.14,
+  hopHeight: 12,
+  hopStretch: 0.08,
   breatheDelayMs: 3000,
   breathePeriodMs: 2000,
   breatheAmount: 0.015,
@@ -85,38 +91,70 @@ export function effectiveSplit(view: View, split: number, textureWidth: number):
 }
 
 /**
+ * 只有一張圖、沒有腳的角色（例如毛毛）走一步的姿勢：起伏、傾斜、離地拉長，腳的欄位全為 0。
+ * 與 walkPose 的身體部分完全相同，落地時等於靜止姿勢。
+ *
+ * @param step 累計步數；奇偶決定這一步往哪一側傾斜。
+ * @param u 這一步的進度，0（腳剛落地）到 1（下一腳落地）。
+ */
+export function bodyPose(step: number, u: number, params: Readonly<WalkParams> = DEFAULT_WALK_PARAMS): WalkPose {
+  if (!Number.isInteger(step)) throw new RangeError(`步數必須是整數：${step}`);
+  if (!(u >= 0 && u <= 1)) throw new RangeError(`步伐進度必須在 0 到 1 之間：${u}`);
+
+  // 兩步一個循環：phase = (step + u) / 2，s = sin(2π·phase) = (-1)^step · sin(πu)。
+  const sign = stepSign(step);
+  const bounce = sinPi(u); // 每一步一個半圓弧：落地 0 → 最高 1 → 落地 0
+  return {
+    y: clean(-params.bob * bounce),
+    rotation: clean(sign * bounce * ((params.swayDegrees * Math.PI) / 180)),
+    scaleX: clean(1 - (params.airStretch * bounce) / 2),
+    scaleY: clean(1 + params.airStretch * bounce),
+    legA: 0,
+    legB: 0,
+    stretch: 0,
+  };
+}
+
+/**
+ * 寵物的小跳步：整隻往上跳一下再落地，不傾斜、沒有腳，也不分左右步。
+ * @param u 這一跳的進度，0（起跳）到 1（落地）。
+ */
+export function hopPose(u: number, params: Readonly<WalkParams> = DEFAULT_WALK_PARAMS): WalkPose {
+  if (!(u >= 0 && u <= 1)) throw new RangeError(`跳躍進度必須在 0 到 1 之間：${u}`);
+  const bounce = sinPi(u);
+  return {
+    y: clean(-params.hopHeight * bounce),
+    rotation: 0,
+    scaleX: clean(1 - (params.hopStretch * bounce) / 2),
+    scaleY: clean(1 + params.hopStretch * bounce),
+    legA: 0,
+    legB: 0,
+    stretch: 0,
+  };
+}
+
+/**
  * 走一步的姿勢。
  *
  * @param step 累計步數；奇偶決定這一步是哪隻腳（偶數步抬腳 A、奇數步抬腳 B）。
  * @param u 這一步的進度，0（腳剛落地）到 1（下一腳落地）。
  */
 export function walkPose(step: number, u: number, view: View, params: Readonly<WalkParams> = DEFAULT_WALK_PARAMS): WalkPose {
-  if (!Number.isInteger(step)) throw new RangeError(`步數必須是整數：${step}`);
-  if (!(u >= 0 && u <= 1)) throw new RangeError(`步伐進度必須在 0 到 1 之間：${u}`);
-
-  // 兩步一個循環：phase = (step + u) / 2，s = sin(2π·phase) = (-1)^step · sin(πu)。
-  const parity = ((step % 2) + 2) % 2;
-  const sign = parity === 0 ? 1 : -1;
-  const bounce = sinPi(u); // 每一步一個半圓弧：落地 0 → 最高 1 → 落地 0
+  const body = bodyPose(step, u, params);
+  const sign = stepSign(step);
+  const bounce = sinPi(u);
   const s = sign * bounce;
-
-  const base = {
-    y: clean(-params.bob * bounce),
-    rotation: clean(sign * bounce * ((params.swayDegrees * Math.PI) / 180)),
-    scaleX: clean(1 - (params.airStretch * bounce) / 2),
-    scaleY: clean(1 + params.airStretch * bounce),
-  };
 
   if (footModeOf(view) === 'stretch-feet') {
     return {
-      ...base,
+      ...body,
       legA: clean(-params.lift * SIDE_LIFT_RATIO * bounce),
       legB: 0,
       stretch: clean(params.footStretch * s),
     };
   }
   return {
-    ...base,
+    ...body,
     legA: clean(-params.lift * Math.max(0, s)),
     legB: clean(-params.lift * Math.max(0, -s)),
     stretch: 0,
@@ -132,6 +170,11 @@ export function idlePose(stillMs: number, params: Readonly<WalkParams> = DEFAULT
   if (stillMs <= params.breatheDelayMs) return REST_POSE;
   const t = (stillMs - params.breatheDelayMs) / params.breathePeriodMs;
   return { ...REST_POSE, scaleY: 1 + params.breatheAmount * Math.sin(2 * Math.PI * t) };
+}
+
+/** 偶數步為 +1、奇數步為 -1（負數步照奇偶算）。 */
+function stepSign(step: number): 1 | -1 {
+  return ((step % 2) + 2) % 2 === 0 ? 1 : -1;
 }
 
 /** sin(π·u)，但兩端精確為 0（浮點的 sin(π) 是 1.2e-16，會讓落地姿勢不等於靜止姿勢）。 */

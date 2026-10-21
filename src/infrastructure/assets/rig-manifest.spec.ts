@@ -3,7 +3,7 @@ import assets from '../../../content/assets.json';
 import rigs from '../../../content/rigs.json';
 import { rigsFileSchema } from '../content/content-schema';
 import type { AssetEntry, AssetManifest } from './asset-manifest';
-import { rigProblems, WALK_PARAM_KEYS, type RigDef, type RigManifest } from './rig-manifest';
+import { rigProblems, WALK_PARAM_KEYS, type BipedRig, type RigDef, type RigManifest, type WholeRig } from './rig-manifest';
 
 const character = (id: string, extra: Partial<AssetEntry> = {}): AssetEntry => ({
   id,
@@ -15,25 +15,36 @@ const character = (id: string, extra: Partial<AssetEntry> = {}): AssetEntry => (
   ...extra,
 });
 
-/** 四方向都有正式圖片，朝右是朝左的翻轉。 */
+/** 四方向都有正式圖片，朝右是朝左的翻轉；另有單張圖的毛毛與寵物。 */
 const assetsOf = (...overrides: AssetEntry[]): AssetManifest => {
   const base: AssetEntry[] = [
     character('player.down'),
     character('player.up'),
     character('player.left'),
     { id: 'player.right', kind: 'character', mirrorOf: 'player.left', source: '水平翻轉 player.left' },
+    character('npc.maomao'),
+    character('pet.cat'),
   ];
   const byId = new Map(base.map((a) => [a.id, a]));
   for (const entry of overrides) byId.set(entry.id, entry);
   return { version: 1, assets: [...byId.values()] };
 };
 
-const rigOf = (overrides: Partial<RigDef> = {}): RigDef => ({
+const rigOf = (overrides: Partial<BipedRig> = {}): BipedRig => ({
   id: 'player',
+  kind: 'biped',
   textureSize: { width: 128, height: 160 },
   legTop: 130,
   views: { down: 'player.down', up: 'player.up', left: 'player.left', right: 'player.right' },
   splits: { down: 60, up: 60, left: 62 },
+  ...overrides,
+});
+
+const wholeOf = (overrides: Partial<WholeRig> = {}): WholeRig => ({
+  id: 'cat',
+  kind: 'hop',
+  textureSize: { width: 96, height: 96 },
+  asset: 'pet.cat',
   ...overrides,
 });
 
@@ -42,12 +53,26 @@ const manifestOf = (...list: RigDef[]): RigManifest => ({ version: 1, rigs: list
 describe('rigsFileSchema', () => {
   const parse = (value: unknown) => rigsFileSchema.safeParse({ version: 1, rigs: [value] });
 
-  it('accepts a complete rig', () => {
+  it('accepts a complete biped rig', () => {
     expect(parse(rigOf()).success).toBe(true);
+  });
+
+  it('accepts a single-picture rig and a hopping rig', () => {
+    expect(parse(wholeOf()).success).toBe(true);
+    expect(parse(wholeOf({ id: 'maomao', kind: 'single', asset: 'npc.maomao', textureSize: { width: 128, height: 160 } })).success).toBe(true);
+  });
+
+  it('rejects an unknown kind and a rig without the fields its kind needs', () => {
+    expect(parse({ ...wholeOf(), kind: 'fly' }).success).toBe(false);
+    expect(parse({ ...wholeOf(), asset: undefined }).success).toBe(false);
+    expect(parse({ id: 'x', kind: 'biped', textureSize: { width: 1, height: 1 }, asset: 'a' }).success).toBe(false);
+    const { kind: _kind, ...noKind } = rigOf();
+    expect(parse(noKind).success).toBe(false);
   });
 
   it('accepts parameter overrides for known parameters only', () => {
     expect(parse(rigOf({ params: { bob: 5, lift: 3 } })).success).toBe(true);
+    expect(parse(wholeOf({ params: { hopHeight: 20 } })).success).toBe(true);
     expect(parse({ ...rigOf(), params: { bogus: 1 } }).success).toBe(false);
     expect(parse({ ...rigOf(), params: { bob: '5' } }).success).toBe(false);
   });
@@ -66,12 +91,23 @@ describe('rigsFileSchema', () => {
 
   it('lists exactly the parameters the walk animation has', () => {
     expect([...WALK_PARAM_KEYS].sort()).toEqual(
-      ['airStretch', 'bob', 'breatheAmount', 'breatheDelayMs', 'breathePeriodMs', 'footStretch', 'lift', 'swayDegrees'].sort(),
+      [
+        'airStretch',
+        'bob',
+        'breatheAmount',
+        'breatheDelayMs',
+        'breathePeriodMs',
+        'footStretch',
+        'hopHeight',
+        'hopStretch',
+        'lift',
+        'swayDegrees',
+      ].sort(),
     );
   });
 });
 
-describe('rigProblems', () => {
+describe('rigProblems: biped', () => {
   it('accepts a rig whose four views are real images, with right mirroring left', () => {
     expect(rigProblems(manifestOf(rigOf()), assetsOf())).toEqual([]);
   });
@@ -141,6 +177,32 @@ describe('rigProblems', () => {
   });
 });
 
+describe('rigProblems: single-picture and hopping rigs', () => {
+  it('accepts a rig that points at a real character image', () => {
+    expect(rigProblems(manifestOf(wholeOf()), assetsOf())).toEqual([]);
+    expect(rigProblems(manifestOf(wholeOf({ id: 'maomao', kind: 'single', asset: 'npc.maomao' })), assetsOf())).toEqual([]);
+  });
+
+  it('rejects an asset that does not exist', () => {
+    expect(rigProblems(manifestOf(wholeOf({ asset: 'pet.nope' })), assetsOf())).toEqual(['rig cat 的素材 pet.nope 不存在']);
+  });
+
+  it('rejects an asset that is still a placeholder', () => {
+    const placeholder: AssetEntry = { id: 'pet.cat', kind: 'character', color: '#1d1d1f', source: '占位（程式產生）' };
+    expect(rigProblems(manifestOf(wholeOf()), assetsOf(placeholder))).toEqual(['rig cat 的素材 pet.cat 沒有檔案，rig 只能用正式素材']);
+  });
+
+  it('rejects an asset that is not a character', () => {
+    expect(rigProblems(manifestOf(wholeOf()), assetsOf(character('pet.cat', { kind: 'object' })))).toEqual([
+      'rig cat 的素材 pet.cat 必須是 character',
+    ]);
+  });
+
+  it('keeps ids unique across kinds', () => {
+    expect(rigProblems(manifestOf(wholeOf(), wholeOf()), assetsOf())).toEqual(['rig id 重複：cat']);
+  });
+});
+
 describe('shipped rigs', () => {
   const manifest = rigs as RigManifest;
 
@@ -152,11 +214,19 @@ describe('shipped rigs', () => {
   it('describe the player as measured on the approved 2x masters', () => {
     const player = manifest.rigs.find((r) => r.id === 'player');
     expect(player).toMatchObject({
+      kind: 'biped',
       textureSize: { width: 128, height: 160 },
       legTop: 130,
       views: { down: 'player.down', up: 'player.up', left: 'player.left', right: 'player.right' },
       splits: { down: 60, up: 60, left: 62 },
     });
-    expect(player?.splits.right).toBeUndefined();
+    expect((player as BipedRig).splits.right).toBeUndefined();
+  });
+
+  it('give Maomao a single-picture rig and each pet a hopping rig, sized like their images', () => {
+    const byId = new Map(manifest.rigs.map((r) => [r.id, r]));
+    expect(byId.get('maomao')).toMatchObject({ kind: 'single', asset: 'npc.maomao', textureSize: { width: 128, height: 160 } });
+    expect(byId.get('cat')).toMatchObject({ kind: 'hop', asset: 'pet.cat', textureSize: { width: 96, height: 96 } });
+    expect(byId.get('marsupial')).toMatchObject({ kind: 'hop', asset: 'pet.marsupial', textureSize: { width: 96, height: 96 } });
   });
 });

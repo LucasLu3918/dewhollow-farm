@@ -37,6 +37,8 @@ async function areaRatios(page: Page, view: 'down' | 'left'): Promise<number[]> 
   return page.evaluate(async (v) => {
     const debug = window.__dewhollow;
     if (!debug) throw new Error('缺少 window.__dewhollow');
+    // 只量玩家自己：旁邊的寵物會被起伏的身體遮住不同的面積，混進量測。
+    debug.setOthersHidden(true);
     const phases: [number, number][] = [[0, 0], [0, 0.1], [0, 0.2], [0, 0.3], [0, 0.4], [0, 0.5], [0, 0.7], [0, 0.8], [1, 0.25], [1, 0.5], [1, 0.75], [0, 1]];
     async function area(dataUrl: string): Promise<number> {
       const img = new Image();

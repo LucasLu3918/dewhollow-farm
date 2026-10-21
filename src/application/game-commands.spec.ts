@@ -289,6 +289,27 @@ describe('villagers', () => {
   });
 });
 
+describe('talking emits an event for the presentation', () => {
+  it('says which villager was talked to, on the first and on later talks', () => {
+    const village = at({ ...start(), mapId: 'village' }, { x: 1, y: 1, facing: 'up' });
+    const first = executeCommand(village, { type: 'interact' }, index);
+    expect(first.events).toContainEqual({ type: 'talked', npcId: 'mira' });
+    const second = executeCommand(first.state, { type: 'interact' }, index);
+    expect(second.events).toContainEqual({ type: 'talked', npcId: 'mira' });
+  });
+
+  it('still says so when the gift did not fit in the bag', () => {
+    const full = bagOf([{ itemId: 'crop.moon-bean', quality: 'normal', count: 1 }], 1);
+    const village = at({ ...start({ inventory: full }), mapId: 'village' }, { x: 1, y: 1, facing: 'up' });
+    expect(executeCommand(village, { type: 'interact' }, index).events).toContainEqual({ type: 'talked', npcId: 'mira' });
+  });
+
+  it('does not emit it when nothing was talked to', () => {
+    const out = executeCommand(at(start(), FIELD_SIDE), { type: 'interact' }, index);
+    expect(out.events.some((e) => e.type === 'talked')).toBe(false);
+  });
+});
+
 describe('villager gift with a full bag', () => {
   it('keeps the gift for later instead of losing it', () => {
     const full = bagOf([{ itemId: 'crop.moon-bean', quality: 'normal', count: 1 }], 1);

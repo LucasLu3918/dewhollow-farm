@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { RigDef } from '../infrastructure/assets/rig-manifest';
+import type { BipedRig as RigDef } from '../infrastructure/assets/rig-manifest';
 import { rigLayout } from './rig-layout';
 import type { View } from './walk-pose';
 
 const rig: RigDef = {
   id: 'player',
+  kind: 'biped',
   textureSize: { width: 128, height: 160 },
   legTop: 130,
   views: { down: 'player.down', up: 'player.up', left: 'player.left', right: 'player.right' },

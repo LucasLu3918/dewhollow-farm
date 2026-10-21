@@ -5,12 +5,13 @@ import start from '../../../content/start.json';
 import tuning from '../../../content/tuning.json';
 import assets from '../../../content/assets.json';
 import rigs from '../../../content/rigs.json';
+import companions from '../../../content/companions.json';
 import farm from '../../../content/maps/farm.json';
 import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village], start, tuning, assets, rigs, ...overrides };
+  return { crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, ...overrides };
 }
 
 describe('loadContent with shipped content', () => {
@@ -32,11 +33,12 @@ describe('loadContent with shipped content', () => {
 describe('loadContent with rigs', () => {
   it('returns the rigs beside the assets', () => {
     const loaded = loadContent(shipped());
-    expect(loaded.rigs.rigs.map((r) => r.id)).toEqual(['player']);
+    expect(loaded.rigs.rigs.map((r) => r.id)).toEqual(['player', 'maomao', 'cat', 'marsupial']);
+    expect(loaded.companions.companions.map((c) => c.id)).toEqual(['cat', 'marsupial']);
   });
 
   it('reports a rig that points at a missing asset together with the other problems', () => {
-    const broken = { ...rigs, rigs: [{ ...rigs.rigs[0], views: { ...rigs.rigs[0]?.views, up: 'player.nope' } }] };
+    const broken = { ...rigs, rigs: [{ ...rigs.rigs[0], views: { ...(rigs.rigs[0] as { views: object }).views, up: 'player.nope' } }, ...rigs.rigs.slice(1)] };
     try {
       loadContent(shipped({ rigs: broken }));
       throw new Error('should have thrown');
@@ -44,6 +46,29 @@ describe('loadContent with rigs', () => {
       expect(error).toBeInstanceOf(ContentError);
       expect((error as ContentError).problems).toContain('rig player 的 up 素材 player.nope 不存在');
     }
+  });
+
+  it('reports a companion that points at a rig or a map that does not exist', () => {
+    const broken = {
+      ...companions,
+      companions: [
+        { id: 'cat', rig: 'dog', follows: 'player' },
+        { id: 'marsupial', rig: 'marsupial', home: { mapId: 'nowhere', x: 1, y: 1 } },
+      ],
+    };
+    try {
+      loadContent(shipped({ companions: broken }));
+      throw new Error('should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ContentError);
+      const problems = (error as ContentError).problems;
+      expect(problems).toContain('夥伴 cat 的 rig dog 不存在');
+      expect(problems).toContain('夥伴 marsupial 的 home 地圖 nowhere 不存在');
+    }
+  });
+
+  it('rejects a malformed companions file', () => {
+    expect(() => loadContent(shipped({ companions: { version: 1, companions: [{ id: 'x' }] } }))).toThrow();
   });
 
   it('rejects a malformed rigs file', () => {

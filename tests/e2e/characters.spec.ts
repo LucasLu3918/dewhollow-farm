@@ -90,6 +90,11 @@ test('each direction has its own image, and facing right mirrors the side image'
   // 往下：回到正面，不翻轉。
   await page.keyboard.press('ArrowDown');
   await expect.poll(async () => (await current())?.key).toBe('player.down');
+  // 貼圖一換就變了，但人還在走這一步（傾斜、拉長會讓外框變大）；等走完回到靜止姿勢再量大小。
+  await expect.poll(async () => {
+    const c = await current();
+    return [c?.width, c?.height];
+  }).toEqual([64, 80]);
   expect(await current()).toMatchObject({ flipX: false, width: 64, height: 80 });
 });
 

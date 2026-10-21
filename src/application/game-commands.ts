@@ -24,6 +24,8 @@ export type GameEvent =
   | { type: 'slept' }
   | { type: 'enteredMap'; mapId: string }
   | { type: 'saveRequested' }
+  /** 玩家跟某位居民說話（不論是否領到禮物）；供畫面讓該居民與他的夥伴做出反應。 */
+  | { type: 'talked'; npcId: string }
   /** 成功的農務或出貨動作，供畫面播放效果；失敗的動作不會發出。 */
   | { type: 'acted'; action: ActionFeedback; x: number; y: number };
 
@@ -222,7 +224,8 @@ function shipAll(state: GameState, index: ContentIndex): CommandOutcome {
 function talk(state: GameState, placement: MapNpcPlacement, index: ContentIndex): CommandOutcome {
   const npc = index.npc(placement.npcId);
   const firstTime = !state.flags[`talked:${npc.id}`];
-  if (!firstTime) return reply(state, [npc.lines.at(-1) ?? '']);
+  const talked: GameEvent[] = [{ type: 'talked', npcId: npc.id }];
+  if (!firstTime) return reply(state, [npc.lines.at(-1) ?? ''], talked);
 
   const messages = [...npc.lines];
   let next: GameState = { ...state, flags: { ...state.flags, [`talked:${npc.id}`]: true } };
@@ -230,11 +233,11 @@ function talk(state: GameState, placement: MapNpcPlacement, index: ContentIndex)
     const seed = index.item(seedItemId(npc.gift.cropId));
     const stored = addItem(next.inventory, seed, npc.gift.count);
     // 背包放不下時不標記「已對話」，讓玩家整理後還能領到禮物。
-    if (!stored.ok) return reply(state, [...messages, '背包已滿，先整理一下再來領禮物']);
+    if (!stored.ok) return reply(state, [...messages, '背包已滿，先整理一下再來領禮物'], talked);
     next = { ...next, inventory: stored.value };
     messages.push(`獲得 ${seed.name} × ${npc.gift.count}`);
   }
-  return reply(next, messages);
+  return reply(next, messages, talked);
 }
 
 function sleep(state: GameState, index: ContentIndex): CommandOutcome {

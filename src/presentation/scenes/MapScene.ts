@@ -1,18 +1,20 @@
 import Phaser from 'phaser';
-import type { ContentPack, Direction, MapDef } from '../../domain/content';
+import type { ContentPack, Direction, MapDef, Point } from '../../domain/content';
 import { tileAt } from '../../domain/world';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
 import type { Command, GameEvent } from '../../application/game-commands';
-import type { RigManifest } from '../../infrastructure/assets/rig-manifest';
+import type { CompanionDef, CompanionManifest } from '../../infrastructure/assets/companion-manifest';
+import type { RigDef, RigManifest } from '../../infrastructure/assets/rig-manifest';
 import type { Hud } from '../hud';
 import { cameraBounds, deadzoneOf } from '../camera';
 import { TILE_SIZE } from '../constants';
 import { RENDER_COMPAT_KEY } from '../apply-render-compat';
-import { CharacterRig } from '../character-rig';
+import { CharacterRig, type RigDebugInfo } from '../character-rig';
 import { centerOf, footOf, standOf } from '../layout';
 import { footstepDust, playActionEffect, sleepEffect } from '../effects';
+import { nextPetTile, placeBeside } from '../pet-follow';
 import type { RenderCompatInfo } from '../render-compat';
 import type { View } from '../walk-pose';
 
@@ -23,8 +25,10 @@ export interface MapSceneDeps {
   hud: Hud;
   /** 素材清單：用來決定每張圖的顯示縮放（density）。 */
   assets: AssetManifest;
-  /** 角色骨架資料：玩家的走路動畫用。 */
+  /** 角色骨架資料：玩家、毛毛與寵物的動畫用。 */
   rigs: RigManifest;
+  /** 夥伴（寵物）：跟隨玩家，或住在某張地圖。 */
+  companions: CompanionManifest;
 }
 
 const MOVE_KEYS: Record<string, Direction> = {
@@ -43,6 +47,14 @@ const COMMAND_KEYS: Record<string, Command> = {
 
 const MOVE_DURATION_MS = 110;
 
+/** 居民與夥伴被搭話時，原地做一步的時間（比走一格慢，才看得清楚）。 */
+const REACT_DURATION_MS = 320;
+
+/** 圖層深度：居民 5、跟隨的寵物 9（在玩家後面）、玩家 10。 */
+const DEPTH_RESIDENT = 5;
+const DEPTH_FOLLOWER = 9;
+const DEPTH_PLAYER = 10;
+
 /** 鏡頭跟隨的平滑度：越大越貼緊玩家，1 為完全貼緊。 */
 const FOLLOW_LERP = 0.15;
 
@@ -54,6 +66,27 @@ interface SpriteDebugInfo {
   width: number;
   height: number;
   flipX: boolean;
+}
+
+/** 開發模式下的角色資訊：站的格子、外框與姿勢。 */
+interface ActorDebugInfo {
+  id: string;
+  kind: string;
+  tileX: number;
+  tileY: number;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  pose: { y: number; rotation: number; scaleX: number; scaleY: number; legA: number; legB: number; stretch: number };
+}
+
+/** 夥伴在場景裡的狀態。跟隨者跨地圖保留；常駐者隨地圖建立與銷毀。 */
+interface CompanionState {
+  def: CompanionDef;
+  rig: CharacterRig;
+  /** 目前站的格子；null 表示這張地圖沒有地方可站（暫時隱藏）。 */
+  tile: Point | null;
 }
 
 declare global {
@@ -75,6 +108,10 @@ declare global {
       snapshot(): Promise<string>;
       /** 軟體繪圖器保底的偵測與套用結果（見 render-compat.ts）。 */
       renderCompat(): RenderCompatInfo;
+      /** 畫面上所有看得見的角色（玩家、居民、夥伴）：站的格子、外框與目前姿勢。 */
+      actors(): ActorDebugInfo[];
+      /** 藏起（或恢復）玩家以外的所有角色，讓像素量測只看玩家自己，不受旁邊的寵物遮擋影響。 */
+      setOthersHidden(hidden: boolean): void;
     };
   }
 }
@@ -87,6 +124,11 @@ export class MapScene extends Phaser.Scene {
   private deps!: MapSceneDeps;
   private world!: Phaser.GameObjects.Container;
   private rig!: CharacterRig;
+  /** 目前地圖上有骨架的居民（例如毛毛），隨地圖重建。 */
+  private npcRigs = new Map<string, CharacterRig>();
+  private companions = new Map<string, CompanionState>();
+  /** 玩家上一次畫面更新時站的格子，用來算出「剛離開的格子」給跟隨的寵物。 */
+  private playerTile: Point | null = null;
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
   private onKeyDown = (event: KeyboardEvent): void => {
@@ -104,10 +146,9 @@ export class MapScene extends Phaser.Scene {
   create(): void {
     this.world = this.add.container(0, 0);
     // 玩家骨架：腳底中心站在格子底邊中央，上半身與腳分開動作。
-    const def = this.deps.rigs.rigs.find((r) => r.id === 'player');
-    if (!def) throw new Error('rigs.json 缺少 player 的骨架');
-    this.rig = new CharacterRig(this, def, this.deps.assets);
-    this.rig.root.setDepth(10);
+    this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
+    this.rig.root.setDepth(DEPTH_PLAYER);
+    this.createFollowers();
     this.setupCamera();
     window.addEventListener('keydown', this.onKeyDown);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -135,6 +176,8 @@ export class MapScene extends Phaser.Scene {
         },
         setPose: (view, step, u) => this.rig.preview(view, step, u),
         renderCompat: () => this.registry.get(RENDER_COMPAT_KEY) as RenderCompatInfo,
+        actors: () => this.debugActors(),
+        setOthersHidden: (hidden) => this.setOthersHidden(hidden),
         snapshot: () =>
           new Promise((resolve, reject) => {
             if (!('snapshot' in this.game.renderer)) return reject(new Error('目前的繪圖器不支援 snapshot'));
@@ -187,6 +230,8 @@ export class MapScene extends Phaser.Scene {
         playActionEffect(this, event.action, event.x, event.y);
       } else if (event.type === 'slept') {
         sleepEffect(this, this.deps.session.state.player.x, this.deps.session.state.player.y);
+      } else if (event.type === 'talked') {
+        this.reactToTalk(event.npcId);
       }
     }
     const after = this.deps.session.state.player;
@@ -201,7 +246,8 @@ export class MapScene extends Phaser.Scene {
     const map = this.deps.index.map(state.mapId);
     this.deps.hud.update(state, this.deps.pack);
 
-    if (this.renderedMapId !== map.id) {
+    const mapChanged = this.renderedMapId !== map.id;
+    if (mapChanged) {
       this.renderedMapId = map.id;
       this.drawMap(map.id);
       const stand = standOf(state.player.x, state.player.y);
@@ -212,6 +258,8 @@ export class MapScene extends Phaser.Scene {
     this.showFacing(state.player.facing);
     this.drawPlots();
     this.movePlayer(state.player.x, state.player.y);
+    this.moveFollowers(map, state.player, mapChanged);
+    this.playerTile = { x: state.player.x, y: state.player.y };
   }
 
   /** 換成面向的那一張圖；原地轉身時只換圖，不移動。 */
@@ -233,9 +281,98 @@ export class MapScene extends Phaser.Scene {
       }
     }
 
+    this.clearActors();
     for (const placement of map.npcs) {
       const npc = this.deps.index.npc(placement.npcId);
-      this.world.add(this.character(`npc.${npc.id}`, placement.x, placement.y, 5));
+      const def = this.deps.rigs.rigs.find((r) => r.id === npc.id);
+      if (def) {
+        // 有骨架的居民（毛毛）：腳底中心站在格子底邊中央，能搖擺。
+        const rig = new CharacterRig(this, def, this.deps.assets);
+        const stand = standOf(placement.x, placement.y);
+        rig.root.setDepth(DEPTH_RESIDENT);
+        rig.teleport(stand.x, stand.y);
+        this.npcRigs.set(npc.id, rig);
+      } else {
+        this.world.add(this.character(`npc.${npc.id}`, placement.x, placement.y, DEPTH_RESIDENT));
+      }
+    }
+    this.createResidents(map);
+  }
+
+  private rigDef(id: string): RigDef {
+    const def = this.deps.rigs.rigs.find((r) => r.id === id);
+    if (!def) throw new Error(`rigs.json 缺少 ${id} 的骨架`);
+    return def;
+  }
+
+  /** 換地圖前清掉上一張圖的居民骨架與常駐夥伴（跟隨的寵物保留）。 */
+  private clearActors(): void {
+    for (const rig of this.npcRigs.values()) rig.destroy();
+    this.npcRigs.clear();
+    for (const [id, state] of this.companions) {
+      if (!state.def.home) continue;
+      state.rig.destroy();
+      this.companions.delete(id);
+    }
+  }
+
+  /** 跟隨玩家的寵物：整個遊戲只建立一次；位置在每次畫面更新時決定。 */
+  private createFollowers(): void {
+    for (const def of this.deps.companions.companions) {
+      if (!def.follows) continue;
+      const rig = new CharacterRig(this, this.rigDef(def.rig), this.deps.assets);
+      rig.root.setDepth(DEPTH_FOLLOWER).setVisible(false);
+      this.companions.set(def.id, { def, rig, tile: null });
+    }
+  }
+
+  /** 住在這張地圖的夥伴（例如毛毛旁邊的有袋動物）。 */
+  private createResidents(map: MapDef): void {
+    for (const def of this.deps.companions.companions) {
+      if (!def.home || def.home.mapId !== map.id) continue;
+      const rig = new CharacterRig(this, this.rigDef(def.rig), this.deps.assets);
+      const stand = standOf(def.home.x, def.home.y);
+      rig.root.setDepth(DEPTH_RESIDENT);
+      rig.teleport(stand.x, stand.y);
+      this.companions.set(def.id, { def, rig, tile: { x: def.home.x, y: def.home.y } });
+    }
+  }
+
+  /**
+   * 跟隨的寵物：換地圖時站到玩家旁邊；玩家走一步，牠就走到玩家剛離開的那一格。
+   * 寵物只存在於畫面上，不擋路、不進存檔。
+   */
+  private moveFollowers(map: MapDef, player: { x: number; y: number; facing: Direction }, mapChanged: boolean): void {
+    const taken = new Set<string>();
+    for (const state of this.companions.values()) {
+      if (state.def.home && state.tile) taken.add(`${state.tile.x},${state.tile.y}`);
+    }
+    for (const state of this.companions.values()) {
+      if (!state.def.follows) continue;
+      if (mapChanged || state.tile === null) {
+        const spot = placeBeside(map, player, player.facing, taken);
+        state.tile = spot;
+        state.rig.root.setVisible(spot !== null);
+        if (spot) {
+          const stand = standOf(spot.x, spot.y);
+          state.rig.teleport(stand.x, stand.y);
+        }
+      } else if (this.playerTile) {
+        const next = nextPetTile(this.playerTile, player, state.tile);
+        if (next.x !== state.tile.x || next.y !== state.tile.y) {
+          state.tile = next;
+          const stand = standOf(next.x, next.y);
+          state.rig.walkTo(stand.x, stand.y, MOVE_DURATION_MS);
+        }
+      }
+    }
+  }
+
+  /** 玩家跟居民說話：居民原地搖一下，把他當朋友的夥伴也跳一下。 */
+  private reactToTalk(npcId: string): void {
+    this.npcRigs.get(npcId)?.stepInPlace(REACT_DURATION_MS);
+    for (const state of this.companions.values()) {
+      if (state.def.reactsTo === npcId) state.rig.stepInPlace(REACT_DURATION_MS);
     }
   }
 
@@ -275,6 +412,8 @@ export class MapScene extends Phaser.Scene {
 
   override update(_time: number, delta: number): void {
     this.rig.update(delta);
+    for (const rig of this.npcRigs.values()) rig.update(delta);
+    for (const state of this.companions.values()) state.rig.update(delta);
   }
 
   private resolveTexture(assetId: string): string {
@@ -315,10 +454,49 @@ export class MapScene extends Phaser.Scene {
         flipX: image.flipX,
       };
     });
-    return [
-      { key: player.key, left: player.left, top: player.top, width: player.width, height: player.height, flipX: player.flipX },
-      ...others,
-    ];
+    const asSprite = (info: RigDebugInfo): SpriteDebugInfo => ({
+      key: info.key,
+      left: info.left,
+      top: info.top,
+      width: info.width,
+      height: info.height,
+      flipX: info.flipX,
+    });
+    const actors = this.visibleRigs().map(({ rig }) => asSprite(rig.debugInfo()));
+    return [asSprite(player), ...actors, ...others];
+  }
+
+  /** 開發用：藏起或恢復玩家以外的角色。恢復時，沒有地方可站的跟隨寵物仍然保持隱藏。 */
+  private setOthersHidden(hidden: boolean): void {
+    for (const rig of this.npcRigs.values()) rig.root.setVisible(!hidden);
+    for (const state of this.companions.values()) state.rig.root.setVisible(!hidden && state.tile !== null);
+  }
+
+  /** 看得見的居民與夥伴骨架（不含玩家）。 */
+  private visibleRigs(): { id: string; rig: CharacterRig }[] {
+    const list: { id: string; rig: CharacterRig }[] = [];
+    for (const [id, rig] of this.npcRigs) list.push({ id, rig });
+    for (const [id, state] of this.companions) if (state.rig.root.visible) list.push({ id, rig: state.rig });
+    return list;
+  }
+
+  private debugActors(): ActorDebugInfo[] {
+    const describe = (id: string, rig: CharacterRig): ActorDebugInfo => {
+      const info = rig.debugInfo();
+      const foot = rig.footPosition();
+      return {
+        id,
+        kind: info.kind,
+        tileX: Math.floor(foot.x / TILE_SIZE),
+        tileY: Math.round(foot.y / TILE_SIZE) - 1,
+        left: info.left,
+        top: info.top,
+        width: info.width,
+        height: info.height,
+        pose: { ...rig.currentPose() },
+      };
+    };
+    return [describe('player', this.rig), ...this.visibleRigs().map(({ id, rig }) => describe(id, rig))];
   }
 
   private image(key: string, x: number, y: number, depth: number): Phaser.GameObjects.Image {

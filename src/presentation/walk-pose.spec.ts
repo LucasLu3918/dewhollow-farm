@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { WALK_PARAM_KEYS } from '../infrastructure/assets/rig-manifest';
 import {
   DEFAULT_WALK_PARAMS,
+  bodyPose,
+  hopPose,
   REST_POSE,
   effectiveSplit,
   footModeOf,
@@ -271,5 +273,73 @@ describe('walkPose: parameters and bad input', () => {
     expect(JSON.stringify(DEFAULT_WALK_PARAMS)).toBe(before);
     expect(Object.isFrozen(DEFAULT_WALK_PARAMS)).toBe(true);
     expect(Object.isFrozen(REST_POSE)).toBe(true);
+  });
+});
+
+describe('bodyPose (a character with one picture and no feet, like Maomao)', () => {
+  it('bobs, sways and stretches exactly like a walking character, but never moves feet', () => {
+    for (const step of STEPS) {
+      for (const u of SAMPLES) {
+        const { legA, legB, stretch, ...body } = walkPose(step, u, 'down');
+        expect(bodyPose(step, u)).toEqual({ ...body, legA: 0, legB: 0, stretch: 0 });
+      }
+    }
+  });
+
+  it('is exactly the rest pose when the foot lands, so it joins up with standing still', () => {
+    for (const step of STEPS) {
+      expect(bodyPose(step, 0)).toEqual(REST_POSE);
+      expect(bodyPose(step, 1)).toEqual(REST_POSE);
+    }
+  });
+
+  it('leans to opposite sides on adjacent steps', () => {
+    expect(Math.sign(bodyPose(0, 0.5).rotation)).toBe(-Math.sign(bodyPose(1, 0.5).rotation));
+  });
+
+  it('follows the parameters it is given and rejects a progress outside 0 to 1', () => {
+    expect(bodyPose(0, 0.5, { ...P, bob: 9 }).y).toBeCloseTo(-9, 10);
+    expect(() => bodyPose(0, 1.5)).toThrow(RangeError);
+    expect(() => bodyPose(0.5, 0.5)).toThrow(RangeError);
+  });
+});
+
+describe('hopPose (a small pet that hops instead of walking)', () => {
+  it('is exactly the rest pose when it lands', () => {
+    expect(hopPose(0)).toEqual(REST_POSE);
+    expect(hopPose(1)).toEqual(REST_POSE);
+  });
+
+  it('rises by the hop height at the middle of a hop and stretches a little in the air', () => {
+    const top = hopPose(0.5);
+    expect(top.y).toBeCloseTo(-P.hopHeight, 10);
+    expect(top.scaleY).toBeCloseTo(1 + P.hopStretch, 10);
+    expect(top.scaleX).toBeCloseTo(1 - P.hopStretch / 2, 10);
+  });
+
+  it('never goes below the ground, never tilts and never touches feet', () => {
+    for (const u of SAMPLES) {
+      const pose = hopPose(u);
+      expect(pose.y).toBeLessThanOrEqual(0);
+      expect(pose.rotation).toBe(0);
+      expect(pose.legA).toBe(0);
+      expect(pose.legB).toBe(0);
+      expect(pose.stretch).toBe(0);
+    }
+  });
+
+  it('hops higher than a person bobs, which is what makes it look like a hop', () => {
+    expect(P.hopHeight).toBeGreaterThan(P.bob);
+  });
+
+  it('carries no negative zero and rejects a progress outside 0 to 1', () => {
+    for (const u of SAMPLES) for (const value of Object.values(hopPose(u))) expect(Object.is(value, -0)).toBe(false);
+    expect(() => hopPose(-0.1)).toThrow(RangeError);
+    expect(() => hopPose(Number.NaN)).toThrow(RangeError);
+  });
+
+  it('follows the parameters it is given', () => {
+    expect(hopPose(0.5, { ...P, hopHeight: 20, hopStretch: 0.2 }).y).toBeCloseTo(-20, 10);
+    expect(hopPose(0.5, { ...P, hopHeight: 0, hopStretch: 0 })).toEqual(REST_POSE);
   });
 });

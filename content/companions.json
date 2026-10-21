@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "companions": [
+    { "id": "cat", "rig": "cat", "follows": "player" },
+    { "id": "marsupial", "rig": "marsupial", "home": { "mapId": "village", "x": 11, "y": 5 }, "reactsTo": "maomao" }
+  ]
+}

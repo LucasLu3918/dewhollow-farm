@@ -3,10 +3,14 @@
   "rigs": [
     {
       "id": "player",
+      "kind": "biped",
       "textureSize": { "width": 128, "height": 160 },
       "legTop": 130,
       "views": { "down": "player.down", "up": "player.up", "left": "player.left", "right": "player.right" },
       "splits": { "down": 60, "up": 60, "left": 62 }
-    }
+    },
+    { "id": "maomao", "kind": "single", "textureSize": { "width": 128, "height": 160 }, "asset": "npc.maomao" },
+    { "id": "cat", "kind": "hop", "textureSize": { "width": 96, "height": 96 }, "asset": "pet.cat" },
+    { "id": "marsupial", "kind": "hop", "textureSize": { "width": 96, "height": 96 }, "asset": "pet.marsupial" }
   ]
 }
