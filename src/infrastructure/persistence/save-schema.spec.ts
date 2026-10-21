@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import crops from '../../../content/crops.json';
+import mine from '../../../content/mine.json';
 import npcs from '../../../content/npcs.json';
 import start from '../../../content/start.json';
 import tuning from '../../../content/tuning.json';
@@ -31,7 +32,7 @@ import terrain from '../../../content/terrain.json';
 import { SaveFormatError } from './save-errors';
 import { parseSaveRecord } from './save-schema';
 
-const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents });
+const { pack } = loadContent({ crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
 const context = { inventoryCapacity: pack.tuning.inventory.capacity, daysPerSeason: pack.tuning.time.daysPerSeason, wakeMinute: pack.tuning.time.wakeMinute };
 
 function record(state: unknown) {
@@ -77,6 +78,12 @@ describe('save schema', () => {
     const changes = { 'mine,1,1': 'mined', 'mine,2,2': 'cleared', 'forest,3,3': 'cut', 'forest,4,4': 'chopped', 'forest,5,5': 'picked' };
     const parsed = parseSaveRecord(record({ ...state, worldChanges: changes }), context);
     expect(parsed.state.worldChanges).toEqual(changes);
+  });
+
+  it('keeps a checkpoint deeper than floor 40 (the mine has no bottom), and rejects a checkpoint below floor 1', () => {
+    const state = createNewGame(pack, 1);
+    expect(parseSaveRecord(record({ ...state, mineCheckpoint: 45 }), context).state.mineCheckpoint).toBe(45);
+    expect(() => parseSaveRecord(record({ ...state, mineCheckpoint: 0 }), context)).toThrow(SaveFormatError);
   });
 
   it('keeps the talent chosen for each skill and the sickle tier', () => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import mineRulesJson from '../../content/mine.json';
 import type { ContentPack, MapDef } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { countOf } from '../domain/inventory';
@@ -66,6 +67,7 @@ const content: ContentPack = {
   shops: [],
   start: { mapId: 'meadow', gold: 0, seeds: {} },
   talents: { unlockLevel: 5, defs: [] },
+  mine: mineRulesJson,
   tuning: {
     energy: { max: 40, costs: { till: 2, water: 1, plant: 1, harvest: 1, ship: 0, chop: 3, forage: 1, mine: 4, fish: 2, cook: 1, process: 1 } },
     inventory: { capacity: 8 },
@@ -185,6 +187,7 @@ describe('the shipped forest has tufts a player can reach', () => {
     processing,
     crafting,
     talents,
+    mine: mineRulesJson,
   });
   const map = pack.maps.find((m) => m.id === 'forest');
   if (!map) throw new Error('缺少森林地圖');

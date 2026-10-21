@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import mineRulesJson from '../../content/mine.json';
 import type { ContentPack } from '../domain/content';
 import { createNewGame, type GameState, type ToolId } from '../domain/game-state';
 import { addItem, countOf, createInventory } from '../domain/inventory';
@@ -18,6 +19,7 @@ const content: ContentPack = {
   npcs: [],
   crafting: [],
   talents: { unlockLevel: 5, defs: [] },
+  mine: mineRulesJson,
   processing: [],
   recipes: [],
   animals: [],

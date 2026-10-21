@@ -5,6 +5,7 @@ import { TOOL_NAMES, type ToolId } from '../domain/tools';
 import { levelOf, SKILL_IDS, SKILL_NAMES } from '../domain/skills';
 import { WEATHER_NAMES } from '../domain/weather';
 import { pendingTalentSkills } from './skill-panel';
+import { mineStatusLabel } from './mine-status';
 
 const LOG_LIMIT = 6;
 
@@ -19,6 +20,7 @@ export class Hud {
   private readonly energyText: HTMLElement;
   private readonly tool: HTMLElement;
   private readonly seed: HTMLElement;
+  private readonly mine: HTMLElement;
   private readonly log: HTMLElement;
 
   constructor(doc: Document) {
@@ -31,6 +33,7 @@ export class Hud {
     this.energyText = required(doc, '#hud-energy-text');
     this.tool = required(doc, '#hud-tool');
     this.seed = required(doc, '#hud-seed');
+    this.mine = required(doc, '#hud-mine');
     this.log = required(doc, '#hud-log');
   }
 
@@ -48,6 +51,7 @@ export class Hud {
     this.tool.textContent = TOOL_NAMES[state.tool];
     const crop = pack.crops.find((c) => c.id === state.selectedSeed);
     this.seed.textContent = state.tool === 'seedbag' ? `種子：${crop?.name ?? state.selectedSeed}` : '';
+    this.mine.textContent = mineStatusLabel(state);
   }
 
   /** 點技能列就打開技能與天賦面板（鍵盤的 K 也一樣）。 */

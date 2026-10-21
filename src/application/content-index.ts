@@ -1,7 +1,7 @@
 import type { ContentPack, CraftingRecipeDef, CropDef, FishDef, MapDef, NpcDef, ProcessingDef, RecipeDef, ShopDef } from '../domain/content';
 import { cropItems, type ItemDef } from '../domain/items';
 import type { Tuning } from '../domain/tuning';
-import { generateMineLayer, mineId } from '../domain/mine';
+import { generateMineLayer, mineId, type MineRules } from '../domain/mine';
 import type { AnimalDef } from '../domain/content';
 import type { WeatherTable } from '../domain/weather';
 import type { TalentSet } from '../domain/talents';
@@ -35,6 +35,8 @@ export interface ContentIndex {
   cropIds(): string[];
   /** 生成礦坑第 layer 層（同一個種子永遠一樣），之後 map(id) 就找得到它。 */
   ensureMine(layer: number, seed: number): MapDef;
+  /** 礦坑的深層規則（礦石種類與產量，見 mine.json）。 */
+  mine: MineRules;
   tuning: Tuning;
   weather: WeatherTable;
   /** 技能天賦：解鎖等級與所有天賦（見 talents.ts）。 */
@@ -77,10 +79,11 @@ export function createContentIndex(pack: ContentPack): ContentIndex {
       return found;
     },
     ensureMine(layer, seed) {
-      const generated = generateMineLayer(layer, seed);
+      const generated = generateMineLayer(layer, seed, pack.mine);
       maps.set(mineId(layer), generated);
       return generated;
     },
+    mine: pack.mine,
     cropIds() {
       return pack.crops.map((c) => c.id);
     },

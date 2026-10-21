@@ -19,6 +19,7 @@ import recipes from '../../../content/recipes.json';
 import processing from '../../../content/processing.json';
 import crafting from '../../../content/crafting.json';
 import talents from '../../../content/talents.json';
+import mine from '../../../content/mine.json';
 import forest from '../../../content/maps/forest.json';
 import lake from '../../../content/maps/lake.json';
 import house from '../../../content/maps/house.json';
@@ -29,7 +30,7 @@ import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, ...overrides };
+  return { crops, npcs, maps: [farm, village, forest, lake, house, mineEntrance, coop], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine, ...overrides };
 }
 
 describe('loadContent with shipped content', () => {
@@ -45,6 +46,31 @@ describe('loadContent with shipped content', () => {
     ]);
     expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'forest', 'lake', 'house', 'mine-entrance', 'coop']);
     expect(pack.start.mapId).toBe('farm');
+  });
+
+  it('loads the deep mine rules, and every ore they name is a real item', () => {
+    const { pack } = loadContent(shipped());
+    expect(pack.mine.ores.map((o) => o.item)).toEqual(['copper-ore', 'silver-ore', 'gold-ore']);
+    expect(pack.mine.maxWidth).toBeGreaterThan(40);
+  });
+
+  it('reports a deep ore whose item does not exist, a symbol that clashes with the map symbols, and a width cap below the first band', () => {
+    const ghost = { ...mine, ores: [...mine.ores.slice(0, 1), { ...mine.ores[1], item: 'ghost-ore' }, ...mine.ores.slice(2)] };
+    const clash = { ...mine, ores: mine.ores.map((o) => (o.item === 'gold-ore' ? { ...o, symbol: 'r' } : o)) };
+    const narrow = { ...mine, maxWidth: 30 };
+    for (const [broken, text] of [
+      [ghost, '礦石 ghost-ore 不存在'],
+      [clash, '礦石符號 r 與地圖符號衝突'],
+      [narrow, '礦坑寬度上限不可小於第一段的寬度'],
+    ] as const) {
+      try {
+        loadContent(shipped({ mine: broken }));
+        throw new Error('should have thrown');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ContentError);
+        expect((error as ContentError).problems.join('\n')).toContain(text);
+      }
+    }
   });
 });
 

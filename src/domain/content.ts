@@ -5,6 +5,7 @@ import type { WeatherTable } from './weather';
 import type { ItemDef } from './items';
 import type { ToolId } from './tools';
 import type { TalentSet } from './talents';
+import type { MineRules } from './mine';
 
 export interface Point {
   x: number;
@@ -117,6 +118,8 @@ export interface ContentPack {
   shops: ShopDef[];
   /** 技能天賦（見 talents.ts 與 content/talents.json）。 */
   talents: TalentSet;
+  /** 礦坑的深層規則（第 41 層起，見 mine.ts 與 content/mine.json）。 */
+  mine: MineRules;
 }
 
 export interface RecipeDef {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import mineRulesJson from '../../content/mine.json';
 import type { ContentPack, MapDef } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { addItem, countOf, createInventory } from '../domain/inventory';
@@ -35,6 +36,7 @@ function makeContent(slots: number): ContentPack {
     recipes: [],
     crafting: [],
     talents: { unlockLevel: 5, defs: [] },
+    mine: mineRulesJson,
     processing: [
       { id: 'dried-mint', name: '烘乾薄荷', ingredients: { mint: 2 }, output: 'dried-mint', days: 1, level: 0 },
       { id: 'pickle-radish', name: '醃蘿蔔', ingredients: { 'crop.sweet-radish': 1 }, output: 'pickle-radish', days: 2, level: 2 },

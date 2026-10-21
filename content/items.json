@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "不是作物衍生的物品（作物與種子由 crops.json 產生）。kind processed 是加工機的成品（見 processing.json）；kind craft 是合成的成品（見 crafting.json）。木材、石頭、乾草、銅礦石沒有售價：是合成與升級的材料，不能出貨。",
+  "note": "不是作物衍生的物品（作物與種子由 crops.json 產生）。kind processed 是加工機的成品（見 processing.json）；kind craft 是合成的成品（見 crafting.json）。木材、石頭、乾草、銅礦石沒有售價：是合成與升級的材料，不能出貨。銀礦石與金礦石是深層礦坑（見 mine.json）的礦石，有售價。",
   "items": [
     {
       "id": "wood",
@@ -20,6 +20,20 @@
       "name": "銅礦石",
       "kind": "ore",
       "maxStack": 99
+    },
+    {
+      "id": "silver-ore",
+      "name": "銀礦石",
+      "kind": "ore",
+      "maxStack": 99,
+      "sellPrice": 50
+    },
+    {
+      "id": "gold-ore",
+      "name": "金礦石",
+      "kind": "ore",
+      "maxStack": 99,
+      "sellPrice": 140
     },
     {
       "id": "stone",

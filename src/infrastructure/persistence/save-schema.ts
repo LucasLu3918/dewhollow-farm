@@ -89,7 +89,8 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   animals: z.array(z.object({ kind: z.string().min(1), fed: z.boolean(), petted: z.boolean(), mood: z.number().int().min(0).max(10) })),
   processing: z.array(z.object({ recipeId: z.string().min(1), daysLeft: z.number().int().nonnegative() })),
   mineSeed: z.number().int().nonnegative().max(4294967295),
-  mineCheckpoint: z.number().int().min(1).max(40),
+  /** 礦坑沒有底，檢查點可以是任何正整數層（見 domain/mine.ts）。 */
+  mineCheckpoint: z.number().int().min(1),
   worldChanges: z.record(z.string(), z.enum(['chopped', 'picked', 'mined', 'cleared', 'cut'])),
   selectedSeed: z.string().min(1),
   rng: z.number().int().nonnegative().max(4294967295),
