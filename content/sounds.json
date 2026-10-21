@@ -2,6 +2,7 @@
   "version": 1,
   "master": 0.7,
   "note": "程式合成音效（D5 暫採推薦）：每個音效是幾個「音軌」疊在一起，波形與包絡都在這裡調，不需要音訊檔。合成在 src/presentation/audio/synth.ts。",
+  "source": "全部由 voices 配方程式合成，未使用外部音檔（step.splash、step.snow 為 M3 水邊與雪地腳步新增）。",
   "sounds": {
     "click": {
       "voices": [
@@ -311,6 +312,56 @@
           "start": 0,
           "duration": 0.03,
           "gain": 0.06,
+          "attack": 0.002
+        }
+      ]
+    },
+    "step.splash": {
+      "voices": [
+        {
+          "wave": "noise",
+          "from": 2200,
+          "start": 0,
+          "duration": 0.1,
+          "gain": 0.1,
+          "attack": 0.005
+        },
+        {
+          "wave": "sine",
+          "from": 700,
+          "to": 420,
+          "start": 0.02,
+          "duration": 0.1,
+          "gain": 0.12,
+          "attack": 0.005
+        }
+      ]
+    },
+    "step.snow": {
+      "voices": [
+        {
+          "wave": "noise",
+          "from": 1800,
+          "start": 0,
+          "duration": 0.06,
+          "gain": 0.07,
+          "attack": 0.004
+        },
+        {
+          "wave": "noise",
+          "from": 1200,
+          "start": 0.04,
+          "duration": 0.05,
+          "gain": 0.05,
+          "attack": 0.003
+        },
+        {
+          "wave": "sine",
+          "from": 260,
+          "to": 180,
+          "start": 0,
+          "duration": 0.05,
+          "gain": 0.05,
           "attack": 0.002
         }
       ]

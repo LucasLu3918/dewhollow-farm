@@ -1,9 +1,10 @@
 {
   "version": 1,
-  "note": "走在不同地面時的腳步：塵土顏色與腳步音效。每種可走的地形都必須有一筆（載入時檢查）。M3 加入水邊、雪地時在這裡新增。",
+  "note": "走在不同地面時的腳步：塵土顏色與腳步音效。每種可走的地形都必須有一筆（載入時檢查）。outdoor 決定雪地腳步是否適用（室內不下雪）。shore（水邊）與 snow（雪地）不是格子種類，而是覆蓋在地面上的腳步，由 src/presentation/footstep-surface.ts 決定何時使用。",
   "terrains": [
     {
       "kind": "grass",
+      "outdoor": true,
       "footstep": {
         "dust": "#7fcf6b",
         "sound": "step.soft"
@@ -11,6 +12,7 @@
     },
     {
       "kind": "field",
+      "outdoor": true,
       "footstep": {
         "dust": "#8a6a48",
         "sound": "step.dirt"
@@ -18,6 +20,7 @@
     },
     {
       "kind": "path",
+      "outdoor": true,
       "footstep": {
         "dust": "#d8c9a0",
         "sound": "step.stone"
@@ -25,6 +28,7 @@
     },
     {
       "kind": "floor",
+      "outdoor": false,
       "footstep": {
         "dust": "#c9a06e",
         "sound": "step.wood"
@@ -32,6 +36,7 @@
     },
     {
       "kind": "forage",
+      "outdoor": true,
       "footstep": {
         "dust": "#7fcf6b",
         "sound": "step.soft"
@@ -39,9 +44,26 @@
     },
     {
       "kind": "stairs",
+      "outdoor": false,
       "footstep": {
         "dust": "#8c8a96",
         "sound": "step.stone"
+      }
+    },
+    {
+      "kind": "shore",
+      "outdoor": true,
+      "footstep": {
+        "dust": "#8fc7e8",
+        "sound": "step.splash"
+      }
+    },
+    {
+      "kind": "snow",
+      "outdoor": true,
+      "footstep": {
+        "dust": "#f4f9ff",
+        "sound": "step.snow"
       }
     }
   ]

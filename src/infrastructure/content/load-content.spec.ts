@@ -192,7 +192,7 @@ describe('loadContent with sounds and terrain', () => {
   it('returns the sound catalog and the footstep style of every walkable tile', () => {
     const loaded = loadContent(shipped());
     expect(loaded.sounds.master).toBeGreaterThan(0);
-    expect(loaded.terrain.terrains.map((t) => t.kind).sort()).toEqual(['field', 'floor', 'forage', 'grass', 'path', 'stairs']);
+    expect(loaded.terrain.terrains.map((t) => t.kind).sort()).toEqual(['field', 'floor', 'forage', 'grass', 'path', 'shore', 'snow', 'stairs']);
   });
 
   it('reports a footstep that points at a sound that does not exist', () => {

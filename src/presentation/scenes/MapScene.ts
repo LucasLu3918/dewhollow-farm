@@ -29,7 +29,10 @@ import { CharacterRig, type RigDebugInfo } from '../character-rig';
 import { centerOf, footOf, standOf } from '../layout';
 import { emotesForEvent, type EmoteKind } from '../emote-defs';
 import { playEmote, type EmoteHandle } from '../emote';
-import { footstepDust, pickupFlight, playActionEffect, sleepEffect } from '../effects';
+import { footstepDust, pickupFlight, playActionEffect, shipFlight, sleepEffect, type ShipIcon } from '../effects';
+import { footstepKind, touchesWater, type FootstepEnv } from '../footstep-surface';
+import { shipIconsFor, shippedItemIds } from '../ship-animation';
+import type { Inventory } from '../../domain/inventory';
 import type { SoundPlayer } from '../audio/sound-player';
 import { ACTION_SOUND } from '../audio/sound-ids';
 import { prefersReducedMotion } from '../motion';
@@ -360,11 +363,12 @@ export class MapScene extends Phaser.Scene {
     const { hud, session, sounds } = this.deps;
     const before = { ...session.state.player };
     const plotsBefore = session.state.plots;
+    const inventoryBefore = session.state.inventory;
     try {
       const outcome = await session.dispatch(command);
       hud.messages(outcome.messages);
       if (command.type === 'cycleTool' || command.type === 'cycleSeed') sounds.play('click');
-      this.playEvents(outcome.events, before, plotsBefore);
+      this.playEvents(outcome.events, before, plotsBefore, inventoryBefore);
     } catch (error) {
       hud.error(`存檔失敗：${error instanceof Error ? error.message : String(error)}`);
     }
@@ -376,10 +380,15 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 把應用層的事件轉成視覺效果。效果只在這裡播放，規則不受影響。 */
-  private playEvents(events: readonly GameEvent[], before: { x: number; y: number }, plotsBefore: PlotMap): void {
+  private playEvents(
+    events: readonly GameEvent[],
+    before: { x: number; y: number },
+    plotsBefore: PlotMap,
+    inventoryBefore: Inventory,
+  ): void {
     for (const event of events) {
       if (event.type === 'acted') {
-        this.playAction(event, plotsBefore);
+        this.playAction(event, plotsBefore, inventoryBefore);
       } else if (event.type === 'slept') {
         sleepEffect(this, this.deps.session.state.player.x, this.deps.session.state.player.y);
         this.deps.sounds.play('sleep');
@@ -412,11 +421,23 @@ export class MapScene extends Phaser.Scene {
     if (moved && sameMap) this.footstep(before.x, before.y);
   }
 
-  /** 離開一格時的腳步：依那一格的地面決定塵土顏色與聲音。 */
+  /**
+   * 離開一格時的腳步：依那一格的地面決定塵土顏色與聲音；戶外的水邊與雪地會蓋過地面（見 footstep-surface.ts）。
+   */
   private footstep(x: number, y: number): void {
-    const map = this.deps.index.map(this.deps.session.state.mapId);
+    const state = this.deps.session.state;
+    const map = this.deps.index.map(state.mapId);
     const ground = tileAt(map, x, y);
-    const style = ground ? this.terrainByKind.get(ground.kind) : undefined;
+    const terrain = ground ? this.terrainByKind.get(ground.kind) : undefined;
+    if (!terrain) return;
+    const neighbors = [
+      tileAt(map, x - 1, y),
+      tileAt(map, x + 1, y),
+      tileAt(map, x, y - 1),
+      tileAt(map, x, y + 1),
+    ].map((tile) => tile?.kind);
+    const env: FootstepEnv = { touchesWater: touchesWater(neighbors), weather: state.weather, season: state.calendar.season };
+    const style = this.terrainByKind.get(footstepKind(terrain, env));
     if (!style) return;
     footstepDust(this, x, y, style.footstep.dust);
     this.deps.sounds.play(style.footstep.sound);
@@ -427,7 +448,11 @@ export class MapScene extends Phaser.Scene {
    * 農務動作的回饋：有工具的動作（開墾、澆水、播種）揮工具，粒子與鏡頭微震等到「命中」那一刻才出現；
    * 沒有工具的動作（收成、出貨）維持原本的壓扁伸展，效果立刻出現。
    */
-  private playAction(event: Extract<GameEvent, { type: 'acted' }>, plotsBefore: PlotMap): void {
+  private playAction(event: Extract<GameEvent, { type: 'acted' }>, plotsBefore: PlotMap, inventoryBefore: Inventory): void {
+    if (event.action === 'ship') {
+      this.playShip(event, inventoryBefore);
+      return;
+    }
     const reduced = prefersReducedMotion();
     const key = plotKey(event.x, event.y);
     const impact = (): void => {
@@ -454,6 +479,36 @@ export class MapScene extends Phaser.Scene {
       this.rig.squash();
       impact();
     }
+  }
+
+  /**
+   * 出貨：被取走的物品飛進出貨箱，箱蓋開合一次；物品落地時才出現原本的出貨效果。
+   * 減少動態時不飛、不開蓋，效果立刻出現。
+   */
+  private playShip(event: Extract<GameEvent, { type: 'acted' }>, inventoryBefore: Inventory): void {
+    const impact = (): void => {
+      this.log(`effect:${event.action}`);
+      this.deps.sounds.play(ACTION_SOUND[event.action]);
+      playActionEffect(this, event.action, event.x, event.y);
+    };
+    this.rig.squash();
+    if (prefersReducedMotion()) {
+      impact();
+      return;
+    }
+    const shipped = shippedItemIds(inventoryBefore.stacks, this.deps.session.state.inventory.stacks);
+    const box = { x: event.x * TILE_SIZE, y: event.y * TILE_SIZE };
+    this.log('ship:fly');
+    shipFlight(this, this.shipIcons(shipped), this.headOf(this.rig), box, impact);
+  }
+
+  /** 出貨圖示：有素材的物品用素材（作物的物品 id 與素材 id 相同），其餘用色點。 */
+  private shipIcons(itemIds: readonly string[]): ShipIcon[] {
+    return shipIconsFor(itemIds).map((itemId): ShipIcon => {
+      if (!this.deps.assets.assets.some((asset) => asset.id === itemId)) return { texture: null, scale: 1 };
+      const asset = resolveAsset(this.deps.assets, itemId);
+      return { texture: asset.textureId, scale: asset.scale };
+    });
   }
 
   /** 收成：作物從田裡飛到玩家頭上，再飄出名稱（見 effects.ts 的 pickupFlight）。 */

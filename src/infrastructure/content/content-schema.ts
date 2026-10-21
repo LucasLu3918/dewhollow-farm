@@ -311,6 +311,8 @@ export type SoundsFile = z.infer<typeof soundsFileSchema>;
 /** 地形：走在上面的腳步（塵土顏色與音效）。 */
 const terrainSchema = z.object({
   kind: z.string().min(1),
+  /** 戶外才會有雪地腳步（室內不下雪）。 */
+  outdoor: z.boolean().default(false),
   footstep: z.object({ dust: hexColorSchema, sound: z.string().min(1) }),
 });
 export const terrainFileSchema = z.object({ version: z.literal(1), terrains: z.array(terrainSchema) });
