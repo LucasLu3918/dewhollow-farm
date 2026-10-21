@@ -11,9 +11,13 @@ import {
   mapFileSchema,
   npcsFileSchema,
   rigsFileSchema,
+  soundsFileSchema,
   startFileSchema,
+  terrainFileSchema,
   toolsFileSchema,
   tuningFileSchema,
+  type SoundsFile,
+  type TerrainFile,
 } from './content-schema';
 
 export interface RawContentFiles {
@@ -26,6 +30,8 @@ export interface RawContentFiles {
   rigs: unknown;
   companions: unknown;
   tools: unknown;
+  sounds: unknown;
+  terrain: unknown;
 }
 
 export interface LoadedContent {
@@ -34,6 +40,8 @@ export interface LoadedContent {
   rigs: RigManifest;
   companions: CompanionManifest;
   tools: ToolManifest;
+  sounds: SoundsFile;
+  terrain: TerrainFile;
 }
 
 /** 內容錯誤會一次列出所有問題，方便一次修正。 */
@@ -57,6 +65,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const rigs: RigManifest = rigsFileSchema.parse(raw.rigs);
   const companions: CompanionManifest = companionsFileSchema.parse(raw.companions);
   const tools: ToolManifest = toolsFileSchema.parse(raw.tools);
+  const sounds = soundsFileSchema.parse(raw.sounds);
+  const terrain = terrainFileSchema.parse(raw.terrain);
 
   const pack: ContentPack = { crops, npcs, maps, start, tuning };
   const problems = [
@@ -64,9 +74,33 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     ...rigProblems(rigs, assets),
     ...companionProblems(companions, rigs, pack),
     ...toolProblems(tools, assets),
+    ...terrainProblems(terrain, sounds, maps),
   ];
   if (problems.length > 0) throw new ContentError(problems);
-  return { pack, assets, rigs, companions, tools };
+  return { pack, assets, rigs, companions, tools, sounds, terrain };
+}
+
+/** 每種可走的地形都要有腳步設定，且腳步指向存在的音效。 */
+export function terrainProblems(terrain: TerrainFile, sounds: SoundsFile, maps: MapDef[]): string[] {
+  const problems: string[] = [];
+  const seen = new Set<string>();
+  for (const entry of terrain.terrains) {
+    if (seen.has(entry.kind)) problems.push(`地形 ${entry.kind} 重複定義`);
+    seen.add(entry.kind);
+    if (!(entry.footstep.sound in sounds.sounds)) {
+      problems.push(`地形 ${entry.kind} 的腳步音效 ${entry.footstep.sound} 不存在`);
+    }
+  }
+  const walkedKinds = new Set<string>();
+  for (const map of maps) {
+    for (const tile of Object.values(map.legend)) {
+      if (isWalkable(tile.kind) && tile.kind !== 'door') walkedKinds.add(tile.kind);
+    }
+  }
+  for (const kind of walkedKinds) {
+    if (!seen.has(kind)) problems.push(`地圖上的地形 ${kind} 沒有腳步設定（content/terrain.json）`);
+  }
+  return problems;
 }
 
 export function validateCrossReferences(pack: ContentPack, assets: AssetManifest): string[] {

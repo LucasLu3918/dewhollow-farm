@@ -7,6 +7,8 @@ import type { Hud } from '../hud';
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
 import type { ContentPack, Direction } from '../../domain/content';
+import type { TerrainDef } from '../../infrastructure/content/content-schema';
+import type { SoundPlayer } from '../audio/sound-player';
 import { registerEmoteTextures } from '../emote';
 import { MapScene, type MapSceneDeps } from './MapScene';
 import { TILE_SIZE, UNIT } from '../constants';
@@ -17,6 +19,8 @@ export interface BootDeps {
   rigs: RigManifest;
   companions: CompanionManifest;
   tools: ToolManifest;
+  sounds: SoundPlayer;
+  terrain: TerrainDef[];
   session: GameSession;
   index: ContentIndex;
   pack: ContentPack;
@@ -65,6 +69,8 @@ export class BootScene extends Phaser.Scene {
       rigs: this.deps.rigs,
       companions: this.deps.companions,
       tools: this.deps.tools,
+      sounds: this.deps.sounds,
+      terrain: this.deps.terrain,
     };
     this.scene.start('map', sceneDeps);
   }

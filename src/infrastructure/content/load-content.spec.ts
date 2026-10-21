@@ -7,12 +7,14 @@ import assets from '../../../content/assets.json';
 import rigs from '../../../content/rigs.json';
 import companions from '../../../content/companions.json';
 import tools from '../../../content/tools.json';
+import sounds from '../../../content/sounds.json';
+import terrain from '../../../content/terrain.json';
 import farm from '../../../content/maps/farm.json';
 import village from '../../../content/maps/village.json';
 import { ContentError, loadContent, type RawContentFiles } from './load-content';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
-  return { crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, tools, ...overrides };
+  return { crops, npcs, maps: [farm, village], start, tuning, assets, rigs, companions, tools, sounds, terrain, ...overrides };
 }
 
 describe('loadContent with shipped content', () => {
@@ -147,5 +149,39 @@ describe('loadContent validation', () => {
 
   it('reports schema errors from malformed JSON', () => {
     expect(() => loadContent(shipped({ crops: [{ id: 'x' }] }))).toThrow();
+  });
+});
+
+describe('loadContent with sounds and terrain', () => {
+  it('returns the sound catalog and the footstep style of every walkable tile', () => {
+    const loaded = loadContent(shipped());
+    expect(loaded.sounds.master).toBeGreaterThan(0);
+    expect(loaded.terrain.terrains.map((t) => t.kind).sort()).toEqual(['field', 'grass', 'path']);
+  });
+
+  it('reports a footstep that points at a sound that does not exist', () => {
+    const broken = { ...terrain, terrains: terrain.terrains.map((t) => (t.kind === 'grass' ? { ...t, footstep: { ...t.footstep, sound: 'step.nope' } } : t)) };
+    try {
+      loadContent(shipped({ terrain: broken }));
+      throw new Error('should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ContentError);
+      expect((error as ContentError).problems).toContain('地形 grass 的腳步音效 step.nope 不存在');
+    }
+  });
+
+  it('reports a walkable tile that has no footstep style', () => {
+    const missing = { ...terrain, terrains: terrain.terrains.filter((t) => t.kind !== 'path') };
+    try {
+      loadContent(shipped({ terrain: missing }));
+      throw new Error('should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ContentError);
+      expect((error as ContentError).problems).toContain('地圖上的地形 path 沒有腳步設定（content/terrain.json）');
+    }
+  });
+
+  it('rejects a malformed sound recipe', () => {
+    expect(() => loadContent(shipped({ sounds: { version: 1, master: 0.5, sounds: { click: { voices: [{ wave: 'organ' }] } } } }))).toThrow();
   });
 });

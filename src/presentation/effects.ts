@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { ActionFeedback } from '../application/game-commands';
 import { TILE_SIZE, UNIT } from './constants';
+import { pickupPoint } from './pickup-arc';
 
 /**
  * 動作效果：只負責視覺回饋（粒子、飄字、閃爍），不影響任何規則。
@@ -33,8 +34,8 @@ export function playActionEffect(scene: Phaser.Scene, action: ActionFeedback, x:
       sprout(scene, cx, cy);
       break;
     case 'harvest':
+      // 作物飛到玩家頭上的過程由 pickupFlight 負責，這裡只留田裡的閃光。
       sparkle(scene, cx, cy);
-      floatText(scene, cx, cy - px(8), '+1', '#ffe08a');
       break;
     case 'ship':
       puff(scene, cx, cy, 0xe0b25c, 8);
@@ -43,10 +44,45 @@ export function playActionEffect(scene: Phaser.Scene, action: ActionFeedback, x:
   }
 }
 
-/** 角色走路時的腳步塵土，發生在離開的格子。 */
-export function footstepDust(scene: Phaser.Scene, x: number, y: number): void {
+/** 角色走路時的腳步塵土，發生在離開的格子；顏色由地面決定（見 content/terrain.json）。 */
+export function footstepDust(scene: Phaser.Scene, x: number, y: number, color: string): void {
   const { px: cx, py: cy } = tileCenter(x, y);
-  puff(scene, cx, cy + px(10), 0xd8c9a0, 3, 0.5);
+  puff(scene, cx, cy + px(10), Number.parseInt(color.slice(1), 16), 3, 0.5);
+}
+
+/** 拾取飛行的時間（毫秒）。 */
+const PICKUP_MS = 420;
+
+/**
+ * 收成時，作物從田裡拱著飛到玩家頭上，縮小淡出，接著在那裡飄出名稱。
+ * `to` 每一幀都重新計算，玩家若在飛行途中走開，作物會跟著去找他。
+ */
+export function pickupFlight(
+  scene: Phaser.Scene,
+  texture: string,
+  scale: number,
+  from: { x: number; y: number },
+  to: () => { x: number; y: number },
+  label: string,
+): void {
+  const image = scene.add.image(from.x, from.y, texture).setDepth(25).setScale(scale);
+  const progress = { t: 0 };
+  scene.tweens.add({
+    targets: progress,
+    t: 1,
+    duration: PICKUP_MS,
+    ease: 'Quad.easeIn',
+    onUpdate: () => {
+      const p = pickupPoint(from, to(), progress.t, px(20));
+      image.setPosition(p.x, p.y);
+      image.setScale(scale * p.scale);
+    },
+    onComplete: () => {
+      const end = to();
+      image.destroy();
+      floatText(scene, end.x, end.y - px(10), label, '#ffe08a');
+    },
+  });
 }
 
 /** 角色動作的壓扁伸展回饋，例如開墾、澆水時的一下下壓。 */

@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "master": 0.7,
+  "note": "程式合成音效（D5 暫採推薦）：每個音效是幾個「音軌」疊在一起，波形與包絡都在這裡調，不需要音訊檔。合成在 src/presentation/audio/synth.ts。",
+  "sounds": {
+    "click": {
+      "voices": [{ "wave": "triangle", "from": 1400, "to": 1000, "start": 0, "duration": 0.03, "gain": 0.25, "attack": 0.002 }]
+    },
+    "swing": {
+      "voices": [{ "wave": "noise", "from": 1000, "start": 0, "duration": 0.18, "gain": 0.12, "attack": 0.06 }]
+    },
+    "till": {
+      "voices": [
+        { "wave": "sine", "from": 150, "to": 60, "start": 0, "duration": 0.18, "gain": 0.6, "attack": 0.003 },
+        { "wave": "noise", "from": 1000, "start": 0, "duration": 0.06, "gain": 0.25, "attack": 0.001 }
+      ]
+    },
+    "water": {
+      "voices": [
+        { "wave": "noise", "from": 1000, "start": 0, "duration": 0.25, "gain": 0.18, "attack": 0.01 },
+        { "wave": "sine", "from": 900, "to": 1400, "start": 0.05, "duration": 0.08, "gain": 0.12, "attack": 0.01 },
+        { "wave": "sine", "from": 1100, "to": 1600, "start": 0.12, "duration": 0.08, "gain": 0.1, "attack": 0.01 }
+      ]
+    },
+    "plant": {
+      "voices": [
+        { "wave": "sine", "from": 380, "to": 760, "start": 0, "duration": 0.12, "gain": 0.35, "attack": 0.005 },
+        { "wave": "triangle", "from": 600, "start": 0.08, "duration": 0.09, "gain": 0.15, "attack": 0.005 }
+      ]
+    },
+    "harvest": {
+      "voices": [
+        { "wave": "sine", "from": 660, "start": 0, "duration": 0.25, "gain": 0.25, "attack": 0.005 },
+        { "wave": "sine", "from": 880, "start": 0.08, "duration": 0.3, "gain": 0.22, "attack": 0.005 },
+        { "wave": "sine", "from": 1320, "start": 0.16, "duration": 0.35, "gain": 0.18, "attack": 0.005 }
+      ]
+    },
+    "ship": {
+      "voices": [
+        { "wave": "square", "from": 988, "start": 0, "duration": 0.08, "gain": 0.12, "attack": 0.002 },
+        { "wave": "sine", "from": 1319, "start": 0.08, "duration": 0.3, "gain": 0.2, "attack": 0.003 }
+      ]
+    },
+    "sleep": {
+      "voices": [{ "wave": "triangle", "from": 523, "to": 262, "start": 0, "duration": 0.6, "gain": 0.25, "attack": 0.04 }]
+    },
+    "talk": {
+      "voices": [
+        { "wave": "triangle", "from": 520, "to": 620, "start": 0, "duration": 0.07, "gain": 0.2, "attack": 0.005 },
+        { "wave": "triangle", "from": 740, "start": 0.06, "duration": 0.07, "gain": 0.15, "attack": 0.005 }
+      ]
+    },
+    "gift": {
+      "voices": [
+        { "wave": "sine", "from": 784, "start": 0, "duration": 0.14, "gain": 0.22, "attack": 0.004 },
+        { "wave": "sine", "from": 988, "start": 0.12, "duration": 0.14, "gain": 0.22, "attack": 0.004 },
+        { "wave": "sine", "from": 1175, "start": 0.24, "duration": 0.28, "gain": 0.22, "attack": 0.004 }
+      ]
+    },
+    "refuse": {
+      "voices": [
+        { "wave": "square", "from": 200, "to": 150, "start": 0, "duration": 0.14, "gain": 0.1, "attack": 0.005 },
+        { "wave": "square", "from": 200, "to": 150, "start": 0.18, "duration": 0.14, "gain": 0.1, "attack": 0.005 }
+      ]
+    },
+    "save": {
+      "voices": [
+        { "wave": "sine", "from": 523, "start": 0, "duration": 0.12, "gain": 0.2, "attack": 0.005 },
+        { "wave": "sine", "from": 784, "start": 0.1, "duration": 0.2, "gain": 0.2, "attack": 0.005 }
+      ]
+    },
+    "step.soft": {
+      "voices": [
+        { "wave": "noise", "from": 1000, "start": 0, "duration": 0.07, "gain": 0.08, "attack": 0.01 },
+        { "wave": "sine", "from": 180, "to": 120, "start": 0, "duration": 0.06, "gain": 0.05, "attack": 0.005 }
+      ]
+    },
+    "step.dirt": {
+      "voices": [
+        { "wave": "noise", "from": 1000, "start": 0, "duration": 0.08, "gain": 0.12, "attack": 0.005 },
+        { "wave": "sine", "from": 120, "to": 80, "start": 0, "duration": 0.07, "gain": 0.2, "attack": 0.003 }
+      ]
+    },
+    "step.stone": {
+      "voices": [
+        { "wave": "triangle", "from": 1000, "to": 700, "start": 0, "duration": 0.05, "gain": 0.08, "attack": 0.002 },
+        { "wave": "noise", "from": 1000, "start": 0, "duration": 0.03, "gain": 0.06, "attack": 0.002 }
+      ]
+    }
+  }
+}

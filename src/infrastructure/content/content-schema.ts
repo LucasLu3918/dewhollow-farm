@@ -139,3 +139,35 @@ export const rigsFileSchema = z.object({ version: z.literal(1), rigs: z.array(ri
 export const toolsFileSchema = z.object({ version: z.literal(1), tools: z.array(toolSchema) });
 export const companionsFileSchema = z.object({ version: z.literal(1), companions: z.array(companionSchema) });
 export const assetsFileSchema = z.object({ version: z.literal(1), assets: z.array(assetSchema) });
+
+/** 音效：程式合成用的音軌（見 src/presentation/audio/synth.ts）。 */
+const hexColorSchema = z.string().regex(/^#[0-9a-f]{6}$/, '顏色必須是小寫的 #rrggbb');
+const voiceSchema = z
+  .object({
+    wave: z.enum(['sine', 'triangle', 'square', 'sawtooth', 'noise']),
+    from: z.number().min(20).max(8000),
+    /** 省略表示音高不變。 */
+    to: z.number().min(20).max(8000).optional(),
+    start: z.number().min(0).max(1),
+    duration: z.number().positive().max(1),
+    gain: z.number().min(0).max(1),
+    attack: z.number().min(0),
+  })
+  .refine((voice) => voice.attack <= voice.duration, { message: 'attack 不可長於 duration' });
+const soundRecipeSchema = z.object({ voices: z.array(voiceSchema).min(1) });
+export const soundsFileSchema = z.object({
+  version: z.literal(1),
+  master: z.number().min(0).max(1),
+  sounds: z.record(z.string(), soundRecipeSchema),
+});
+export type SoundRecipe = z.infer<typeof soundRecipeSchema>;
+export type SoundsFile = z.infer<typeof soundsFileSchema>;
+
+/** 地形：走在上面的腳步（塵土顏色與音效）。 */
+const terrainSchema = z.object({
+  kind: z.string().min(1),
+  footstep: z.object({ dust: hexColorSchema, sound: z.string().min(1) }),
+});
+export const terrainFileSchema = z.object({ version: z.literal(1), terrains: z.array(terrainSchema) });
+export type TerrainDef = z.infer<typeof terrainSchema>;
+export type TerrainFile = z.infer<typeof terrainFileSchema>;

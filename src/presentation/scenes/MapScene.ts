@@ -9,6 +9,7 @@ import type { Command, GameEvent } from '../../application/game-commands';
 import type { CompanionDef, CompanionManifest } from '../../infrastructure/assets/companion-manifest';
 import type { ToolDef, ToolManifest } from '../../infrastructure/assets/tool-manifest';
 import type { RigDef, RigManifest } from '../../infrastructure/assets/rig-manifest';
+import type { TerrainDef } from '../../infrastructure/content/content-schema';
 import type { Hud } from '../hud';
 import { cameraBounds, deadzoneOf } from '../camera';
 import { TILE_SIZE } from '../constants';
@@ -17,7 +18,9 @@ import { CharacterRig, type RigDebugInfo } from '../character-rig';
 import { centerOf, footOf, standOf } from '../layout';
 import { emotesForEvent, type EmoteKind } from '../emote-defs';
 import { playEmote, type EmoteHandle } from '../emote';
-import { footstepDust, playActionEffect, sleepEffect } from '../effects';
+import { footstepDust, pickupFlight, playActionEffect, sleepEffect } from '../effects';
+import type { SoundPlayer } from '../audio/sound-player';
+import { ACTION_SOUND } from '../audio/sound-ids';
 import { prefersReducedMotion } from '../motion';
 import { nextPetTile, placeBeside } from '../pet-follow';
 import type { RenderCompatInfo } from '../render-compat';
@@ -36,6 +39,10 @@ export interface MapSceneDeps {
   companions: CompanionManifest;
   /** 工具：農務動作時握在手上揮動。 */
   tools: ToolManifest;
+  /** 音效播放器（程式合成，見 audio/sound-player.ts）。 */
+  sounds: SoundPlayer;
+  /** 各種地形的腳步（塵土顏色與音效），來自 content/terrain.json。 */
+  terrain: TerrainDef[];
 }
 
 const MOVE_KEYS: Record<string, Direction> = {
@@ -140,6 +147,10 @@ declare global {
       emotes(): EmoteDebugInfo[];
       /** 效果發生的紀錄（揮動開始、命中時的粒子、鏡頭微震），用來驗證效果落在命中那一刻。 */
       effectLog(): { name: string; at: number }[];
+      /** 最近播放過的音效 id（靜音時不記）。 */
+      soundLog(): string[];
+      /** 目前是否靜音。 */
+      muted(): boolean;
     };
   }
 }
@@ -165,6 +176,7 @@ export class MapScene extends Phaser.Scene {
    * 遊戲狀態是立刻改變的，但畫面上鋤頭還在空中時，田地不該已經翻好。
    */
   private heldPlots = new Map<string, PlotState | null>();
+  private terrainByKind = new Map<string, TerrainDef>();
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
   private onKeyDown = (event: KeyboardEvent): void => {
@@ -177,6 +189,7 @@ export class MapScene extends Phaser.Scene {
 
   init(deps: MapSceneDeps): void {
     this.deps = deps;
+    this.terrainByKind = new Map(deps.terrain.map((entry) => [entry.kind, entry]));
   }
 
   create(): void {
@@ -216,6 +229,8 @@ export class MapScene extends Phaser.Scene {
         setOthersHidden: (hidden) => this.setOthersHidden(hidden),
         emotes: () => this.debugEmotes(),
         effectLog: () => this.effectEntries.map((e) => ({ ...e })),
+        soundLog: () => this.deps.sounds.playedIds(),
+        muted: () => this.deps.sounds.isMuted(),
         snapshot: () =>
           new Promise((resolve, reject) => {
             if (!('snapshot' in this.game.renderer)) return reject(new Error('目前的繪圖器不支援 snapshot'));
@@ -243,17 +258,25 @@ export class MapScene extends Phaser.Scene {
   }
 
   private async handleKey(event: KeyboardEvent): Promise<void> {
+    const { hud, session, sounds } = this.deps;
+    if (event.key.toLowerCase() === 'm') {
+      // 靜音是玩家的偏好，不是遊戲指令，所以不經過應用層。
+      event.preventDefault();
+      const muted = sounds.toggleMute();
+      hud.messages([muted ? '已靜音（按 M 開啟音效）' : '已開啟音效（按 M 靜音）']);
+      return;
+    }
     const direction = MOVE_KEYS[event.key];
     const command = direction ? ({ type: 'move', direction } as const) : COMMAND_KEYS[event.key.toLowerCase()];
     if (!command) return;
     event.preventDefault();
 
-    const { hud, session } = this.deps;
     const before = { ...session.state.player };
     const plotsBefore = session.state.plots;
     try {
       const outcome = await session.dispatch(command);
       hud.messages(outcome.messages);
+      if (command.type === 'cycleTool' || command.type === 'cycleSeed') sounds.play('click');
       this.playEvents(outcome.events, before, plotsBefore);
     } catch (error) {
       hud.error(`存檔失敗：${error instanceof Error ? error.message : String(error)}`);
@@ -268,8 +291,14 @@ export class MapScene extends Phaser.Scene {
         this.playAction(event, plotsBefore);
       } else if (event.type === 'slept') {
         sleepEffect(this, this.deps.session.state.player.x, this.deps.session.state.player.y);
+        this.deps.sounds.play('sleep');
       } else if (event.type === 'talked') {
         this.reactToTalk(event.npcId);
+        this.deps.sounds.play(event.gifted ? 'gift' : 'talk');
+      } else if (event.type === 'refused') {
+        this.deps.sounds.play('refuse');
+      } else if (event.type === 'saveRequested') {
+        this.deps.sounds.play('save');
       }
       for (const emote of emotesForEvent(event)) {
         this.showEmote(emote.who === 'player' ? 'player' : emote.who.npc, emote.kind);
@@ -278,7 +307,18 @@ export class MapScene extends Phaser.Scene {
     const after = this.deps.session.state.player;
     const moved = before.x !== after.x || before.y !== after.y;
     const sameMap = this.renderedMapId === this.deps.session.state.mapId;
-    if (moved && sameMap) footstepDust(this, before.x, before.y);
+    if (moved && sameMap) this.footstep(before.x, before.y);
+  }
+
+  /** 離開一格時的腳步：依那一格的地面決定塵土顏色與聲音。 */
+  private footstep(x: number, y: number): void {
+    const map = this.deps.index.map(this.deps.session.state.mapId);
+    const ground = tileAt(map, x, y);
+    const style = ground ? this.terrainByKind.get(ground.kind) : undefined;
+    if (!style) return;
+    footstepDust(this, x, y, style.footstep.dust);
+    this.deps.sounds.play(style.footstep.sound);
+    this.log(`step:${style.kind}`);
   }
 
   /**
@@ -291,6 +331,8 @@ export class MapScene extends Phaser.Scene {
     const impact = (): void => {
       if (this.heldPlots.delete(key)) this.drawPlots(); // 命中：這一格才更新成動作後的樣子
       this.log(`effect:${event.action}`);
+      this.deps.sounds.play(ACTION_SOUND[event.action]);
+      if (event.action === 'harvest') this.pickUp(event.x, event.y, plotsBefore);
       playActionEffect(this, event.action, event.x, event.y);
       if (event.action === 'till' && !reduced) {
         this.cameras.main.shake(90, 0.003);
@@ -299,7 +341,10 @@ export class MapScene extends Phaser.Scene {
     };
     const tool = this.deps.tools.tools.find((t) => t.action === event.action);
     if (tool && this.rig.canSwing()) {
-      this.rig.swing(tool, SWING_DURATION_MS, reduced, impact, () => this.log(`swing:${event.action}`));
+      this.rig.swing(tool, SWING_DURATION_MS, reduced, impact, () => {
+        this.log(`swing:${event.action}`);
+        this.deps.sounds.play('swing');
+      });
       // swing() 可能已經補播了上一個被打斷的動作的命中，所以在它之後才凍結這一格。
       this.heldPlots.set(key, plotsBefore[key] ?? null);
       this.drawPlots();
@@ -307,6 +352,22 @@ export class MapScene extends Phaser.Scene {
       this.rig.squash();
       impact();
     }
+  }
+
+  /** 收成：作物從田裡飛到玩家頭上，再飄出名稱（見 effects.ts 的 pickupFlight）。 */
+  private pickUp(x: number, y: number, plotsBefore: PlotMap): void {
+    const cropId = plotsBefore[plotKey(x, y)]?.crop?.cropId;
+    if (!cropId) return;
+    const crop = this.deps.index.crop(cropId);
+    const asset = resolveAsset(this.deps.assets, `crop.${cropId}`);
+    const from = { x: x * TILE_SIZE + TILE_SIZE / 2, y: y * TILE_SIZE + TILE_SIZE / 2 };
+    pickupFlight(this, asset.textureId, asset.scale, from, () => this.headOf(this.rig), `+${crop.name}`);
+    this.log(`pickup:${cropId}`);
+  }
+
+  /** 角色頭頂附近（飄字與拾取的終點）。 */
+  private headOf(rig: CharacterRig): { x: number; y: number } {
+    return { x: rig.root.x, y: rig.root.y - rig.displayHeight() * 0.8 };
   }
 
   /** 在某個角色頭上彈出表情氣泡；同一個角色已有氣泡時先換掉。找不到那個角色（沒有骨架的居民）就略過。 */

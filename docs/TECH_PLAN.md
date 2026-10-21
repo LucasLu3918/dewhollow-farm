@@ -51,7 +51,7 @@ domain 負責判斷「可否觸發」與「效果結算」；presentation 的事
 - **精靈動畫**：以貼圖集（texture atlas）載入，動畫由 `content/animations.json` 描述。
 - **UI**：DOM HUD 擴充為背包、任務、地圖、設定、對話框，遵守 `game-ui-ux` 技能的鍵盤焦點與事件驅動更新。
 - **特效**：Phaser 粒子為主，統一在 `effects.ts`；提供「減少動態」開關。
-- **音訊**：音量匯流排與音效事件對照表 `content/audio.json`。
+- **音訊**：音效配方 `content/sounds.json`（程式合成，M2 已實作）、地形腳步 `content/terrain.json`；音量匯流排與音樂來源留到 M3。
 - **輸入**：動作映射與重新綁定（`input-systems` 技能），虛擬搖桿供觸控。
 
 ### 場景切換與載入
