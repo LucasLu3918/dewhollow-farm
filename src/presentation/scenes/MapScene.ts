@@ -23,6 +23,7 @@ import { WorkshopPanel } from '../workshop-panel';
 import { WorkbenchPanel } from '../workbench-panel';
 import { SkillPanel } from '../skill-panel';
 import { ResidentPanel } from '../resident-panel';
+import { QuestPanel } from '../quest-panel';
 import { HeartEventPanel } from '../heart-event-panel';
 import { PlaceholderResident, type ResidentView } from '../placeholder-resident';
 import { residentsOn } from '../../application/residents';
@@ -222,6 +223,7 @@ export class MapScene extends Phaser.Scene {
   private workbenchPanel!: WorkbenchPanel;
   private skillPanel!: SkillPanel;
   private residentPanel!: ResidentPanel;
+  private questPanel!: QuestPanel;
   private heartEventPanel!: HeartEventPanel;
   /** 雞舍裡的動物圖片，每次重畫時重建。 */
   private animalSprites: Phaser.GameObjects.Image[] = [];
@@ -250,6 +252,7 @@ export class MapScene extends Phaser.Scene {
     this.workbenchPanel = new WorkbenchPanel(document, deps.index, (command) => void this.run(command));
     this.skillPanel = new SkillPanel(document, deps.index, (command) => void this.run(command));
     this.residentPanel = new ResidentPanel(document, deps.index, (command) => void this.run(command));
+    this.questPanel = new QuestPanel(document, deps.index, (command) => void this.run(command));
     this.heartEventPanel = new HeartEventPanel(document, deps.index, (command) => void this.run(command));
     deps.hud.bindSkills(() => this.skillPanel.toggle(deps.session.state));
     this.terrainByKind = new Map(deps.terrain.map((entry) => [entry.kind, entry]));
@@ -360,7 +363,7 @@ export class MapScene extends Phaser.Scene {
       }
       return;
     }
-    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen() || this.residentPanel.isOpen()) {
+    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen() || this.residentPanel.isOpen() || this.questPanel.isOpen()) {
       // 櫃檯、廚房或面板開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠完成。
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -370,6 +373,7 @@ export class MapScene extends Phaser.Scene {
         this.workbenchPanel.close();
         this.skillPanel.close();
         this.residentPanel.close();
+        this.questPanel.close();
       }
       return;
     }
@@ -383,6 +387,12 @@ export class MapScene extends Phaser.Scene {
       // 居民與好感面板：不花體力與時間，不經過應用層的指令。
       event.preventDefault();
       this.residentPanel.toggle(this.deps.session.state);
+      return;
+    }
+    if (event.key.toLowerCase() === 'j') {
+      // 委託與佈告欄面板：不花體力與時間，不經過應用層的指令。
+      event.preventDefault();
+      this.questPanel.toggle(this.deps.session.state);
       return;
     }
     const direction = MOVE_KEYS[event.key];
@@ -424,6 +434,7 @@ export class MapScene extends Phaser.Scene {
     this.workshopPanel.refresh(session.state);
     this.workbenchPanel.refresh(session.state);
     this.skillPanel.refresh(session.state);
+    this.questPanel.refresh(session.state);
     this.refresh();
   }
 
@@ -456,6 +467,8 @@ export class MapScene extends Phaser.Scene {
         this.workshopPanel.open(this.deps.session.state);
       } else if (event.type === 'workbenchOpened') {
         this.workbenchPanel.open(this.deps.session.state);
+      } else if (event.type === 'bulletinOpened') {
+        this.questPanel.open(this.deps.session.state);
       } else if (event.type === 'saveRequested') {
         this.deps.sounds.play('save');
       }
@@ -631,6 +644,7 @@ export class MapScene extends Phaser.Scene {
     this.moveFollowers(map, state.player, mapChanged);
     this.playerTile = { x: state.player.x, y: state.player.y };
     this.residentPanel.refresh(state);
+    this.questPanel.refresh(state);
     this.heartEventPanel.sync(state);
   }
 

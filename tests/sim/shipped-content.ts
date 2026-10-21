@@ -4,6 +4,8 @@ import npcs from '../../content/npcs.json';
 import schedules from '../../content/schedules.json';
 import events from '../../content/events.json';
 import friendship from '../../content/friendship.json';
+import quests from '../../content/quests.json';
+import letters from '../../content/letters.json';
 import start from '../../content/start.json';
 import tuning from '../../content/tuning.json';
 import assets from '../../content/assets.json';
@@ -42,6 +44,8 @@ const { pack } = loadContent({
   schedules,
   events,
   friendship,
+    quests,
+    letters,
   maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,

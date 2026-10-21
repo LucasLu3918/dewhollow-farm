@@ -39,6 +39,8 @@ import plaza from '../../content/maps/plaza.json';
 import schedules from '../../content/schedules.json';
 import events from '../../content/events.json';
 import friendship from '../../content/friendship.json';
+import quests from '../../content/quests.json';
+import letters from '../../content/letters.json';
 
 /**
  * M4b：合成（工作台）。站在小屋的工作台 (4,1) 前面，也就是 (4,2) 面向上方。
@@ -49,6 +51,8 @@ const { pack } = loadContent({
   schedules,
   events,
   friendship,
+    quests,
+    letters,
   maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,

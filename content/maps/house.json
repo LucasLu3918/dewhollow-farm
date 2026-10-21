@@ -8,7 +8,7 @@
     "#B..T..KW#",
     "#........#",
     "#........#",
-    "#.P....M.#",
+    "#.P....L.#",
     "#........#",
     "####D#####"
   ],
@@ -28,8 +28,9 @@
     "W": {
       "kind": "workshop"
     },
-    "M": {
-      "kind": "furniture"
+    "L": {
+      "kind": "furniture",
+      "notice": "mailbox"
     },
     "P": {
       "kind": "furniture"

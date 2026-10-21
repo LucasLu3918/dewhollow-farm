@@ -39,8 +39,10 @@ import plaza from '../../content/maps/plaza.json';
 import schedules from '../../content/schedules.json';
 import events from '../../content/events.json';
 import friendship from '../../content/friendship.json';
+import quests from '../../content/quests.json';
+import letters from '../../content/letters.json';
 
-const { pack } = loadContent({ crops, npcs, schedules, events, friendship, maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+const { pack } = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
 const index = createContentIndex(pack);
 
 /** 測試輔助：把玩家放到指定位置後建立 session。 */

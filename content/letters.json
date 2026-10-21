@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "note": "信件（M5b）。每天早上，到期（due）且條件（unlock）符合、還沒送過的信會進入信箱；玩家到信箱前按 X 取信。一封信只送一次。文字全部原創（見 docs/ORIGINALITY.md）。playMinutes 為估計值。",
+  "letters": [
+    {
+      "id": "maomao-letter-1",
+      "from": "maomao",
+      "title": "湖邊的信",
+      "body": ["今天的湖水很安靜，夕陽落下來的時候特別好看。", "如果你有空，去湖邊走一走吧。"],
+      "phase": "spring",
+      "playMinutes": 0.5,
+      "due": { "season": "spring", "day": 4 },
+      "unlock": { "hearts": { "npcId": "maomao", "hearts": 1 } }
+    },
+    {
+      "id": "maomao-letter-2",
+      "from": "maomao",
+      "title": "謝謝你的分享",
+      "body": ["上次的蘿蔔很甜，我全部吃完了。", "下次換我請你吃點心。"],
+      "phase": "summer",
+      "playMinutes": 0.5,
+      "due": { "season": "summer", "day": 1 },
+      "unlock": { "heartEvent": "maomao-heart-1" }
+    },
+    {
+      "id": "rong-bo-letter-1",
+      "from": "rong-bo",
+      "title": "致農場的朋友",
+      "body": ["最近礦坑入口有奇怪的回音，我想請人去看看。", "第五層如果你到過，麻煩告訴我一聲。"],
+      "phase": "spring",
+      "playMinutes": 0.5,
+      "due": { "season": "spring", "day": 6 },
+      "unlock": { "hearts": { "npcId": "rong-bo", "hearts": 1 } }
+    },
+    {
+      "id": "rong-bo-letter-2",
+      "from": "rong-bo",
+      "title": "佈告欄的新告示",
+      "body": ["佈告欄每天都會換新的告示，記得去看看。", "大委託每週一張，報酬也比較豐厚。"],
+      "phase": "summer",
+      "playMinutes": 0.5,
+      "due": { "season": "summer", "day": 5 },
+      "unlock": { "hearts": { "npcId": "rong-bo", "hearts": 2 } }
+    },
+    {
+      "id": "a-gan-letter-1",
+      "from": "a-gan",
+      "title": "菜籃的事",
+      "body": ["店裡的菜籃最近都是舊貨，客人越來越少。", "如果你能帶幾種應季的作物來，我會好好謝你。"],
+      "phase": "spring",
+      "playMinutes": 0.5,
+      "due": { "season": "spring", "day": 9 },
+      "unlock": { "hearts": { "npcId": "a-gan", "hearts": 1 } }
+    },
+    {
+      "id": "a-gan-letter-2",
+      "from": "a-gan",
+      "title": "週末的特價",
+      "body": ["這週末雜貨店有特價，種子全部打九折。", "別忘了先站到櫃檯前面再買。"],
+      "phase": "summer",
+      "playMinutes": 0.5,
+      "due": { "season": "summer", "day": 2 },
+      "unlock": { "hearts": { "npcId": "a-gan", "hearts": 2 } }
+    },
+    {
+      "id": "shi-shifu-letter-1",
+      "from": "shi-shifu",
+      "title": "工具的保養",
+      "body": ["鋤頭用久了要磨一磨，才不會太費力。", "等你攢夠了銅礦，再來找我。"],
+      "phase": "spring",
+      "playMinutes": 0.5,
+      "due": { "season": "spring", "day": 12 },
+      "unlock": { "hearts": { "npcId": "shi-shifu", "hearts": 1 } }
+    },
+    {
+      "id": "shi-shifu-letter-2",
+      "from": "shi-shifu",
+      "title": "礦坑的深處",
+      "body": ["我年輕的時候也常往下挖，每一層的石頭都不太一樣。", "到了第八層，記得把石頭的顏色記下來。"],
+      "phase": "summer",
+      "playMinutes": 0.5,
+      "due": { "season": "summer", "day": 6 },
+      "unlock": { "hearts": { "npcId": "shi-shifu", "hearts": 2 } }
+    },
+    {
+      "id": "zhi-lan-letter-1",
+      "from": "zhi-lan",
+      "title": "森林的新芽",
+      "body": ["春天的新芽長出來了，採的時候只摘頂端一小段就好。", "剩下的留給明年。"],
+      "phase": "spring",
+      "playMinutes": 0.5,
+      "due": { "season": "spring", "day": 10 },
+      "unlock": { "hearts": { "npcId": "zhi-lan", "hearts": 1 } }
+    },
+    {
+      "id": "zhi-lan-letter-2",
+      "from": "zhi-lan",
+      "title": "一張標本",
+      "body": ["我把湖裡的魚畫成了標本，還差一條鯽魚就完成了。", "如果你釣到了，請讓我看看。"],
+      "phase": "summer",
+      "playMinutes": 0.5,
+      "due": { "season": "summer", "day": 3 },
+      "unlock": { "hearts": { "npcId": "zhi-lan", "hearts": 2 } }
+    },
+    {
+      "id": "xiao-sui-letter-1",
+      "from": "xiao-sui",
+      "title": "新的麵包",
+      "body": ["我正在試做三種口味的麵包，還差一些配料。", "等你有空，來店裡嚐嚐看吧。"],
+      "phase": "spring",
+      "playMinutes": 0.5,
+      "due": { "season": "spring", "day": 14 },
+      "unlock": { "hearts": { "npcId": "xiao-sui", "hearts": 2 } }
+    },
+    {
+      "id": "xiao-sui-letter-2",
+      "from": "xiao-sui",
+      "title": "給常客的話",
+      "body": ["你這陣子常來，我都記得。", "明天的新口味，我會留一份給你。"],
+      "phase": "summer",
+      "playMinutes": 0.5,
+      "due": { "season": "summer", "day": 9 },
+      "unlock": { "hearts": { "npcId": "xiao-sui", "hearts": 2 } }
+    }
+  ]
+}

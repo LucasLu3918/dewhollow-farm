@@ -36,6 +36,8 @@ import plaza from '../../../content/maps/plaza.json';
 import schedules from '../../../content/schedules.json';
 import events from '../../../content/events.json';
 import friendship from '../../../content/friendship.json';
+import quests from '../../../content/quests.json';
+import letters from '../../../content/letters.json';
 
 /** M4c 的內容：牛、牛舍、牧草地、乳製品。內容錯誤由 loadContent 一次列出。 */
 const { pack } = loadContent({
@@ -44,6 +46,8 @@ const { pack } = loadContent({
   schedules,
   events,
   friendship,
+    quests,
+    letters,
   maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,

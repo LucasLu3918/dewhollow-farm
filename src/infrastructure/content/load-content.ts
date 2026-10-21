@@ -3,6 +3,7 @@ import type { ContentPack, MapDef, Point } from '../../domain/content';
 import { isWalkable, tileAt } from '../../domain/world';
 import { MINE_WIDTH } from '../../domain/mine';
 import { PERIODS, spotOf } from '../../domain/schedule';
+import type { QuestUnlock } from '../../domain/quests';
 import { WEATHERS } from '../../domain/weather';
 import { assetProblems, missingAssetIds, requiredAssetIds, type AssetManifest } from '../assets/asset-manifest';
 import { companionProblems, type CompanionManifest } from '../assets/companion-manifest';
@@ -34,6 +35,8 @@ import {
   scheduleFileSchema,
   heartEventsFileSchema,
   friendshipFileSchema,
+  questsFileSchema,
+  lettersFileSchema,
   type MusicFile,
   type SoundsFile,
   type TerrainFile,
@@ -48,6 +51,10 @@ export interface RawContentFiles {
   events: unknown;
   /** 好感規則（content/friendship.json）。 */
   friendship: unknown;
+  /** 委託與佈告欄（content/quests.json）。 */
+  quests: unknown;
+  /** 信件（content/letters.json）。 */
+  letters: unknown;
   maps: unknown[];
   start: unknown;
   tuning: unknown;
@@ -119,6 +126,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const schedule = scheduleFileSchema.parse(raw.schedules);
   const heartEvents = heartEventsFileSchema.parse(raw.events);
   const friendship = friendshipFileSchema.parse(raw.friendship);
+  const quests = questsFileSchema.parse(raw.quests);
+  const letters = lettersFileSchema.parse(raw.letters);
 
   const pack: ContentPack = {
     crops,
@@ -139,10 +148,13 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     schedule: { periods: schedule.periods, entries: schedule.entries },
     heartEvents: heartEvents.events,
     friendship,
+    quests: { defs: quests.quests, bulletin: quests.bulletin },
+    letters: letters.letters,
   };
   const problems = [
     ...validateCrossReferences(pack, assets),
     ...residentProblems(pack),
+    ...questProblems(pack),
     ...rigProblems(rigs, assets),
     ...companionProblems(companions, rigs, pack),
     ...toolProblems(tools, assets),
@@ -323,6 +335,107 @@ export function residentProblems(pack: ContentPack): string[] {
 }
 
 const PERIOD_LABEL = { morning: '早上', noon: '中午', evening: '傍晚' } as const;
+
+/**
+ * 委託與信件的交叉參照：委託人、物品、作物、魚、食譜、地點、心形事件、信件與旗標都要存在；
+ * 居民委託的好感目標要在春夏的好感上限以內（否則春夏做不完）；佈告欄的候選與委託種類要一致。
+ */
+export function questProblems(pack: ContentPack): string[] {
+  const problems: string[] = [];
+  const quests = pack.quests;
+  const letters = pack.letters ?? [];
+  if (!quests) return problems;
+  const npcs = new Map(pack.npcs.map((n) => [n.id, n]));
+  const maps = new Set(pack.maps.map((m) => m.id));
+  const fishIds = new Set(pack.fish.map((f) => f.id));
+  const recipeIds = new Set(pack.recipes.map((r) => r.id));
+  const heartEventIds = new Set(pack.heartEvents.map((e) => e.id));
+  const letterIds = new Set(letters.map((l) => l.id));
+  const itemIds = new Set([
+    ...pack.items.map((i) => i.id),
+    ...pack.crops.flatMap((c) => [`seed.${c.id}`, `crop.${c.id}`]),
+    ...pack.fish.map((f) => `fish.${f.id}`),
+    ...pack.recipes.map((r) => `dish.${r.id}`),
+    ...pack.animals.map((a) => `animal.${a.id}`),
+  ]);
+  // 旗標的來源：合成的效果、店家的改建，以及委託的獎勵；解鎖條件用到的旗標都要有來源。
+  const knownFlags = new Set<string>([
+    ...pack.crafting.flatMap((r) => (r.effect?.type === 'flag' ? [r.effect.flag] : [])),
+    ...pack.shops.flatMap((s) => s.stock.filter((line) => line.itemId.startsWith('building.')).map((line) => line.itemId.slice('building.'.length))),
+    ...quests.defs.flatMap((q) => (q.reward.flag ? [q.reward.flag] : [])),
+  ]);
+  const earlyHearts = pack.friendship.earlyCap.hearts;
+
+  duplicates(quests.defs.map((q) => q.id), 'quest', problems);
+  duplicates(letters.map((l) => l.id), 'letter', problems);
+
+  const checkUnlock = (owner: string, unlock: QuestUnlock): void => {
+    if (unlock.hearts && !npcs.has(unlock.hearts.npcId)) problems.push(`${owner} 的好感條件居民 ${unlock.hearts.npcId} 不存在`);
+    if (unlock.heartEvent !== undefined && !heartEventIds.has(unlock.heartEvent)) problems.push(`${owner} 的條件心形事件 ${unlock.heartEvent} 不存在`);
+    if (unlock.letter !== undefined && !letterIds.has(unlock.letter)) problems.push(`${owner} 的條件信件 ${unlock.letter} 不存在`);
+    if (unlock.flag !== undefined && !knownFlags.has(unlock.flag)) problems.push(`${owner} 的條件旗標 ${unlock.flag} 沒有任何來源`);
+  };
+
+  for (const quest of quests.defs) {
+    const owner = `委託 ${quest.id}`;
+    if (quest.kind === 'resident') {
+      if (!quest.giver || !npcs.has(quest.giver)) problems.push(`${owner} 的委託人 ${quest.giver ?? '(未填)'} 不存在`);
+    } else {
+      if (quest.giver !== undefined) problems.push(`${owner} 是佈告欄的委託，不應指定委託人`);
+      if (quest.reward.friendship !== undefined) problems.push(`${owner} 是佈告欄的委託，沒有委託人可以加好感`);
+    }
+    for (const itemId of Object.keys(quest.reward.items ?? {})) {
+      if (!itemIds.has(itemId)) problems.push(`${owner} 的獎勵物品 ${itemId} 不存在`);
+    }
+    const goal = quest.goal;
+    switch (goal.type) {
+      case 'deliver':
+        if (!itemIds.has(goal.itemId)) problems.push(`${owner} 要交付的物品 ${goal.itemId} 不存在`);
+        break;
+      case 'hearts':
+        if (!npcs.has(goal.npcId)) problems.push(`${owner} 的好感目標居民 ${goal.npcId} 不存在`);
+        if ((quest.phase === 'spring' || quest.phase === 'summer') && goal.hearts > earlyHearts) {
+          problems.push(`${owner} 的好感目標 ${goal.hearts} 顆心超過春夏的上限 ${earlyHearts} 顆`);
+        }
+        break;
+      case 'visit':
+        if (!maps.has(goal.mapId)) problems.push(`${owner} 要拜訪的地點 ${goal.mapId} 不存在`);
+        break;
+      case 'fish':
+        if (!fishIds.has(goal.fishId)) problems.push(`${owner} 要釣的魚 ${goal.fishId} 不存在`);
+        break;
+      case 'cook':
+        if (!recipeIds.has(goal.recipeId)) problems.push(`${owner} 要烹飪的食譜 ${goal.recipeId} 不存在`);
+        break;
+      case 'harvestKinds':
+      case 'ship':
+      case 'mineLayer':
+        break;
+    }
+    if (quest.unlock) checkUnlock(owner, quest.unlock);
+  }
+
+  const bulletin = quests.bulletin;
+  for (const id of bulletin.daily) {
+    const def = quests.defs.find((q) => q.id === id);
+    if (!def || def.kind !== 'daily') problems.push(`佈告欄的每日候選 ${id} 不存在或不是每日委託`);
+  }
+  for (const id of bulletin.weekly) {
+    const def = quests.defs.find((q) => q.id === id);
+    if (!def || def.kind !== 'weekly') problems.push(`佈告欄的大委託候選 ${id} 不存在或不是大委託`);
+  }
+  if (bulletin.daily.length < bulletin.dailyCount) problems.push(`佈告欄每天要抽 ${bulletin.dailyCount} 件，但候選只有 ${bulletin.daily.length} 件`);
+  for (const def of quests.defs) {
+    if (def.kind === 'daily' && !bulletin.daily.includes(def.id)) problems.push(`每日委託 ${def.id} 不在佈告欄的候選清單裡`);
+    if (def.kind === 'weekly' && !bulletin.weekly.includes(def.id)) problems.push(`大委託 ${def.id} 不在佈告欄的候選清單裡`);
+  }
+
+  for (const letter of letters) {
+    if (!npcs.has(letter.from)) problems.push(`信件 ${letter.id} 的寄件人 ${letter.from} 不存在`);
+    if (letter.unlock) checkUnlock(`信件 ${letter.id}`, letter.unlock);
+  }
+  return problems;
+}
 
 function validateMapShape(map: MapDef, problems: string[]): void {
   if (map.rows.length !== map.height) {

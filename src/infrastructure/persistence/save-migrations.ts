@@ -36,6 +36,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   11: migrateV11ToV12,
   12: migrateV12ToV13,
   13: migrateV13ToV14,
+  14: migrateV14ToV15,
 };
 
 /**
@@ -197,6 +198,24 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v14 → v15：委託（舊存檔一件都還沒接過）、佈告欄（還沒抽過，day 為 0）、信箱（沒有信）、圖鑑碎片（0）。
+ */
+function migrateV14ToV15(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(14) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v14 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 15,
+    quests: {},
+    board: { day: 0, daily: [], weekly: null },
+    mail: {},
+    dexFragments: 0,
+  };
 }
 
 /**
