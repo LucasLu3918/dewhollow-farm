@@ -31,7 +31,8 @@
 
 - `step` 為累計步數，奇偶決定「這一步是哪隻腳」。
 - `u` 為這一步的進度，0 到 1。
-- 一步內：落地 → 離地最高點 → 落地，所以起伏是半個正弦：`bounce = sin(π·u)`。
+- 一步內：落地 → 離地最高點 → 落地，所以起伏是半個正弦：`bounce = sin(π·u)`，兩端精確為 0。
+- **落地姿勢必須等於靜止姿勢**（全部為 0、縮放為 1），走路的開始與結束才不會跳一下。
 - 搖擺方向依步數奇偶交替：`side = (step 為偶數 ? +1 : -1)`。
 
 換成原型用的「兩步一循環」寫法：`phase = (step + u) / 2`，`s = sin(2π·phase)`，`bounce = |s|`。
@@ -42,9 +43,9 @@
 | --- | --- | --- | --- |
 | `bob` | 4 | 2 px | 上下起伏，落地為 0 |
 | `sway` | 3.2° | — | 以腳底中心為軸，左右傾斜，隨步數交替 |
-| `squash` | 0.045 | 4.5% | 落地時 Y 壓扁、X 微胖，離地最高點恢復 |
+| `airStretch` | 0.045 | 4.5% | 離地最高點 Y 拉長、X 縮小一半（體積大致不變），落地回到原狀 |
 | `lift` | 7 | 3.5 px | 正面、背面：被抬腳的上移量 |
-| `stretch` | 0.14 | 14% | 側面：腳部水平伸縮量 |
+| `footStretch` | 0.14 | 14% | 側面：腳部水平伸縮量 |
 | `legTop` | 130 | — | 腳的切線（母版 y，裙擺下緣附近）；以下算「腳」 |
 | `split` | 正面 60、背面 60、側面 62 | — | 兩隻腳的分界 x（母版）；朝右的值為 `128 − split` |
 
@@ -54,7 +55,7 @@
 
 ### 第 1 層：搖擺步（全部方向）
 
-整張圖以「腳底中心」為軸做 `rotation`、`scaleX/scaleY`、`y` 位移。素材零切割、四個方向一致，是保底層。
+整張圖以「腳底中心」為軸做 `rotation`、`scaleX/scaleY`、`y` 位移。離地時微微拉長，落地回到原狀（原型曾寫「落地壓扁」，但那會讓落地姿勢與靜止姿勢不同，改為離地拉長）。素材零切割、四個方向一致，是保底層。
 
 ### 第 2 層：正面與背面抬腳
 
@@ -72,12 +73,12 @@
 ### 靜止時（idle）
 
 - 回到第 1 層的基準姿勢（全部為 0）。
-- 呼吸：`scaleY = 1 ± 1.5%`，週期 2 秒；站著不動超過數秒才開始，避免和走路混在一起。
+- 呼吸：`scaleY = 1 ± 1.5%`，週期 2 秒；站定超過 3 秒才開始，之前完全靜止，避免和走路混在一起。
 - 眨眼做不到（臉是烤死的），不做。
 
 ## 與現有效果的關係
 
-- 取代現有的 `walkBob`（只做上下起伏與位移補間）：位置補間仍由它負責，姿勢（起伏、傾斜、壓扁、腳）改由新的姿勢函式提供。
+- 取代現有的 `walkBob`（只做上下起伏與位移補間）：位置補間仍由它負責，姿勢（起伏、傾斜、離地拉長、腳）改由新的姿勢函式提供。
 - 腳步塵土、轉身壓扁、動作壓扁（`squashSprite`）沿用，並以「基準縮放」為準（M1 已改）。
 - 工具揮動與表情氣泡是獨立效果，不在本文件範圍。
 
@@ -87,9 +88,9 @@
 
 | 檔案 | 責任 |
 | --- | --- |
-| `src/presentation/walk-pose.ts` | `walkPose(step, u, view, rig, params)` → `{ y, rotation, scaleX, scaleY, legA, legB, stretch }`；純函式 |
-| `src/presentation/character-rig.ts` | 依 rig 資料把一張貼圖切成「上半身／左腳／右腳」三個 Phaser 影格，包成 Container，套用姿勢；處理 `flipX` |
-| `content/rigs.json` | 每個角色素材的 `legTop`、`split`、`mode`（`split-legs` 或 `stretch-feet`）與參數覆寫，以 zod 驗證 |
+| `src/presentation/walk-pose.ts`（**已完成**） | `walkPose(step, u, view, params?)` → `{ y, rotation, scaleX, scaleY, legA, legB, stretch }`；另有 `idlePose(stillMs)`、`REST_POSE`、`footModeOf(view)`、`effectiveSplit(view, split, textureWidth)`；純函式。`legA`、`legB` 是腳塊的垂直位移（≤ 0，只往上），`stretch` 是側面腳部的水平伸縮。姿勢數學與 rig 無關，所以不收 rig 參數 |
+| `src/presentation/character-rig.ts` | 依 rig 資料把一張貼圖切成「上半身／左腳／右腳」三個 Phaser 影格，包成 Container，套用姿勢；處理 `flipX`（朝右時分界改用 `effectiveSplit`） |
+| `content/rigs.json` | 每個角色素材的 `legTop`、各方向的 `split`（正面、背面、朝左；朝右由程式翻轉）與參數覆寫，以 zod 驗證。腳的做法（`split-legs`／`stretch-feet`）由方向決定（`footModeOf`），不放進資料 |
 | `content/assets.json` | `mirrorOf`（已完成）：`player.right` 指向 `player.left`，引擎翻轉，不另存檔 |
 
 切影格用 Phaser 的 `texture.add(name, 0, x, y, w, h)`：**一張貼圖、多個影格**，不產生額外檔案，也不需要預處理工具。
@@ -99,13 +100,14 @@
 先寫測試，再實作（[AGENTS.md](../AGENTS.md)）。
 
 單元（`walk-pose.spec.ts`，純函式）：
-- 落地時（`u = 0` 與 `u = 1`）起伏為 0，最高點（`u = 0.5`）起伏為 `bob`。
+- 落地時（`u = 0` 與 `u = 1`）姿勢**完全等於**靜止姿勢，最高點（`u = 0.5`）起伏為 `bob`；相鄰兩步的銜接處沒有跳動。
 - 相鄰兩步的搖擺方向相反；兩步一循環後回到原狀。
 - 腳塊的 `dy` 永遠 ≤ 0（只往上移，不會露出切線）。
 - 左右腳不會同時抬起（正面、背面）。
 - 靜止姿勢全為 0。
-- 側面不使用切腳模式（`mode` 為 `stretch-feet`）。
-- 朝右的 `split` 為 `128 − split`。
+- 側面不使用切腳模式（`footModeOf` 為 `stretch-feet`，`legB` 永遠為 0）。
+- 姿勢中不含 `-0`（`-0` 會讓精確比較出現難查的差異）；進度超出 0 到 1、步數不是整數都會丟 `RangeError`。
+- 朝右的分界為 `貼圖寬度 − split`（`effectiveSplit`），且翻兩次回到原值。
 
 內容驗證（`rigs.json`）：每個 `legTop`／`split` 都在貼圖範圍內；`mirrorOf` 指向存在的素材；不得循環。
 
@@ -130,7 +132,7 @@
 ## 實作拆分（M2，建議順序）
 
 1. ✅ 四方向素材入庫（背面、側面）、`assets.json` 與 `mirrorOf`，含素材清單與 e2e 測試（2026-10-21 完成）。
-2. `walk-pose.ts` 與測試。
+2. ✅ `walk-pose.ts` 與測試（2026-10-21 完成，30 項；另做兩個變異測試確認測試抓得到錯誤）。
 3. `character-rig.ts`、`rigs.json` 與其驗證，先接玩家；`walkBob` 改接姿勢。
 4. e2e 與人工視覺驗收；調參數。
 5. 毛毛與寵物沿用同一套（寵物走路另議：跟隨與小跳步）。
