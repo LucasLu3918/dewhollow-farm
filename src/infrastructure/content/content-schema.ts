@@ -53,6 +53,7 @@ const tileSchema = z.object({
   shop: z.string().min(1).optional(),
   spawn: point.optional(),
   requires: requirementSchema.optional(),
+  notice: z.enum(['bulletin', 'mailbox']).optional(),
 });
 
 const mapSchema = z.object({
@@ -423,6 +424,72 @@ export const friendshipFileSchema = z.object({
     perResident: z.number().min(0).max(1),
     cap: z.number().min(0).max(1),
   }),
+});
+
+/** 委託與佈告欄（見 domain/quests.ts、domain/bulletin.ts 與 content/quests.json）。 */
+const questGoalSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('deliver'), itemId: z.string().min(1), count: z.number().int().positive().max(99) }),
+  z.object({ type: z.literal('harvestKinds'), count: z.number().int().positive().max(10) }),
+  z.object({ type: z.literal('ship'), count: z.number().int().positive().max(999) }),
+  z.object({ type: z.literal('hearts'), npcId: z.string().min(1), hearts: z.number().int().min(1).max(10) }),
+  z.object({ type: z.literal('visit'), mapId: z.string().min(1) }),
+  z.object({ type: z.literal('fish'), fishId: z.string().min(1), count: z.number().int().positive().max(99) }),
+  z.object({ type: z.literal('mineLayer'), layer: z.number().int().min(1) }),
+  z.object({ type: z.literal('cook'), recipeId: z.string().min(1), count: z.number().int().positive().max(99) }),
+]);
+const questUnlockSchema = z.object({
+  hearts: z.object({ npcId: z.string().min(1), hearts: z.number().int().min(1).max(10) }).optional(),
+  flag: z.string().min(1).optional(),
+  heartEvent: z.string().min(1).optional(),
+  letter: z.string().min(1).optional(),
+});
+const questRewardSchema = z.object({
+  gold: z.number().int().nonnegative().optional(),
+  items: z.record(z.string().min(1), z.number().int().positive()).optional(),
+  friendship: z.number().int().nonnegative().max(200).optional(),
+  flag: z.string().min(1).optional(),
+  fragments: z.number().int().nonnegative().optional(),
+});
+const questSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(['resident', 'daily', 'weekly']),
+  title: z.string().min(1),
+  giver: z.string().min(1).optional(),
+  request: z.string().min(1),
+  thanks: z.string().min(1),
+  goal: questGoalSchema,
+  unlock: questUnlockSchema.optional(),
+  reward: questRewardSchema,
+  phase: z.enum(SEASONS),
+  playMinutes: z.number().positive().max(60),
+});
+export const questsFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  bulletin: z.object({
+    postedBy: z.string().min(1),
+    dailyCount: z.number().int().positive(),
+    daily: z.array(z.string().min(1)),
+    weekly: z.array(z.string().min(1)),
+  }),
+  quests: z.array(questSchema),
+});
+
+/** 信件（見 domain/mail.ts 與 content/letters.json）。 */
+const letterSchema = z.object({
+  id: z.string().min(1),
+  from: z.string().min(1),
+  title: z.string().min(1),
+  body: z.array(z.string().min(1)).min(1),
+  phase: z.enum(SEASONS),
+  playMinutes: z.number().positive().max(60),
+  due: z.object({ season: z.enum(SEASONS), day: z.number().int().positive().max(60) }).optional(),
+  unlock: questUnlockSchema.optional(),
+});
+export const lettersFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  letters: z.array(letterSchema),
 });
 
 export const cropsFileSchema = z.array(cropSchema);

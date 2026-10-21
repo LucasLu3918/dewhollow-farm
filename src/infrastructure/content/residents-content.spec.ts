@@ -33,11 +33,14 @@ import plaza from '../../../content/maps/plaza.json';
 import schedules from '../../../content/schedules.json';
 import events from '../../../content/events.json';
 import friendship from '../../../content/friendship.json';
+import quests from '../../../content/quests.json';
+import letters from '../../../content/letters.json';
 import { PERIODS, spotOf, type ScheduleDef } from '../../domain/schedule';
 import { WEATHERS } from '../../domain/weather';
 import { tileAt, isWalkable } from '../../domain/world';
 import type { ContentPack } from '../../domain/content';
-import { loadContent, residentProblems, type RawContentFiles } from './load-content';
+import { loadContent, questProblems, residentProblems, type RawContentFiles } from './load-content';
+import { drawBoard } from '../../domain/bulletin';
 
 function shipped(): RawContentFiles {
   return {
@@ -66,6 +69,8 @@ function shipped(): RawContentFiles {
     schedules,
     events,
     friendship,
+    quests,
+    letters,
   };
 }
 
@@ -168,6 +173,79 @@ describe('居民內容（M5a，真實內容）', () => {
     const minutes = springSummerEvents.reduce((sum, e) => sum + e.playMinutes, 0) + pack.npcs.reduce((sum, n) => sum + n.playMinutes, 0);
     console.info(`[時數] M5a 春夏居民與心形事件合計 ${minutes} 分鐘（M5 之前為 0）`);
     expect(minutes).toBeGreaterThan(0);
+  });
+});
+
+describe('委託與信件（M5b，真實內容）', () => {
+  const quests = pack.quests;
+  const defs = quests?.defs ?? [];
+  const residentQuests = defs.filter((q) => q.kind === 'resident');
+
+  it('居民委託共 25 件，每位居民 3–5 件；春夏的時數估計合計 37.5 分鐘（報告用）', () => {
+    expect(residentQuests).toHaveLength(25);
+    for (const npc of pack.npcs) {
+      const count = residentQuests.filter((q) => q.giver === npc.id).length;
+      expect(count, npc.id).toBeGreaterThanOrEqual(3);
+      expect(count, npc.id).toBeLessThanOrEqual(5);
+    }
+    expect(residentQuests.every((q) => q.phase === 'spring' || q.phase === 'summer')).toBe(true);
+    expect(residentQuests.reduce((sum, q) => sum + q.playMinutes, 0)).toBeCloseTo(37.5);
+  });
+
+  it('居民委託的目標類型涵蓋交付、收成 N 種、出貨、好感、拜訪、釣魚、挖到某層與烹飪', () => {
+    expect([...new Set(residentQuests.map((q) => q.goal.type))].sort()).toEqual(
+      ['cook', 'deliver', 'fish', 'harvestKinds', 'hearts', 'mineLayer', 'ship', 'visit'],
+    );
+  });
+
+  it('委託的名稱互不相同（原創性與可辨識度）', () => {
+    const titles = defs.map((q) => q.title);
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
+  it('佈告欄每天抽 2 件（候選 8 件）、每週 1 件大委託（候選 3 件）', () => {
+    expect(quests?.bulletin.dailyCount).toBe(2);
+    expect(quests?.bulletin.daily).toHaveLength(8);
+    expect(quests?.bulletin.weekly).toHaveLength(3);
+  });
+
+  it('春夏每一天的佈告欄都抽得出 2 件不重複的每日委託與 1 件大委託', () => {
+    const rules = quests?.bulletin;
+    if (!rules) throw new Error('缺少佈告欄規則');
+    for (const season of ['spring', 'summer'] as const) {
+      for (let day = 1; day <= 20; day += 1) {
+        const board = drawBoard(rules, { year: 1, season, day, minuteOfDay: 360 }, 20);
+        expect(board.daily).toHaveLength(2);
+        expect(new Set(board.daily).size).toBe(2);
+        expect(board.weekly).not.toBeNull();
+      }
+    }
+  });
+
+  it('信件共 12 封，寄件人都是居民，寄出日期都在春或夏之內', () => {
+    const letters = pack.letters ?? [];
+    expect(letters).toHaveLength(12);
+    for (const letter of letters) {
+      expect(letter.phase === 'spring' || letter.phase === 'summer').toBe(true);
+      expect(pack.npcs.some((n) => n.id === letter.from), letter.id).toBe(true);
+      if (letter.due) expect(letter.due.day, letter.id).toBeLessThanOrEqual(20);
+    }
+  });
+
+  it('委託的交叉參照：真實內容沒有問題，改壞一個委託人或物品就會被找出來', () => {
+    expect(questProblems(pack)).toEqual([]);
+    const [first, ...rest] = defs;
+    if (!quests || !first) throw new Error('缺少委託');
+    const badGiver = { ...pack, quests: { ...quests, defs: [{ ...first, giver: 'nobody' }, ...rest] } };
+    expect(questProblems(badGiver).some((p) => p.includes('nobody'))).toBe(true);
+    const badItem = { ...pack, quests: { ...quests, defs: [{ ...first, reward: { ...first.reward, items: { 'no-such-item': 1 } } }, ...rest] } };
+    expect(questProblems(badItem).some((p) => p.includes('no-such-item'))).toBe(true);
+  });
+
+  it('鎮廣場有佈告欄、小屋有信箱（地圖上的標記）', () => {
+    const notices = (map: { legend: Record<string, { notice?: string }> }) => Object.values(map.legend).map((t) => t.notice).filter(Boolean);
+    expect(notices(pack.maps.find((m) => m.id === 'plaza')!)).toEqual(['bulletin']);
+    expect(notices(pack.maps.find((m) => m.id === 'house')!)).toEqual(['mailbox']);
   });
 });
 

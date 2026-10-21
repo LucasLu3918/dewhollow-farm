@@ -8,6 +8,9 @@ import type { TalentSet } from '../domain/talents';
 import type { ScheduleDef } from '../domain/schedule';
 import type { HeartEventDef } from '../domain/heart-events';
 import type { FriendshipRules } from '../domain/friendship';
+import type { BulletinRules } from '../domain/bulletin';
+import type { QuestDef } from '../domain/quests';
+import type { LetterDef } from '../domain/mail';
 
 /**
  * 以 id 快速查找內容。假設內容已由基礎設施層驗證過參照完整性；
@@ -53,7 +56,17 @@ export interface ContentIndex {
   heartEvent(id: string): HeartEventDef;
   /** 好感規則（見 friendship.ts）。 */
   friendship: FriendshipRules;
+  /** 所有委託（順序與內容檔相同）。 */
+  quests: QuestDef[];
+  quest(id: string): QuestDef;
+  /** 佈告欄的抽取規則（見 bulletin.ts）。 */
+  bulletin: BulletinRules;
+  /** 所有信件（順序與內容檔相同）。 */
+  letters: LetterDef[];
+  letter(id: string): LetterDef;
 }
+
+const NO_BULLETIN: BulletinRules = { postedBy: '鎮公所', dailyCount: 0, daily: [], weekly: [] };
 
 export function createContentIndex(pack: ContentPack): ContentIndex {
   const crops = new Map(pack.crops.map((c) => [c.id, c]));
@@ -135,5 +148,18 @@ export function createContentIndex(pack: ContentPack): ContentIndex {
       return found;
     },
     friendship: pack.friendship,
+    quests: pack.quests?.defs ?? [],
+    quest(id) {
+      const found = (pack.quests?.defs ?? []).find((q) => q.id === id);
+      if (!found) throw new Error(`找不到委託：${id}`);
+      return found;
+    },
+    bulletin: pack.quests?.bulletin ?? NO_BULLETIN,
+    letters: pack.letters ?? [],
+    letter(id) {
+      const found = (pack.letters ?? []).find((l) => l.id === id);
+      if (!found) throw new Error(`找不到信件：${id}`);
+      return found;
+    },
   };
 }

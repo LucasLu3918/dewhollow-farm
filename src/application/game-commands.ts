@@ -27,6 +27,7 @@ import { rollWeather, WEATHER_NAMES, waters } from '../domain/weather';
 import type { ActionKind } from '../domain/tuning';
 import { applySellBonus, biteBonusPoints, dishEnergyBonus, extraYieldChance, rollExtraYield, sellBonusPercent } from '../domain/talents';
 import type { ContentIndex } from './content-index';
+import { acceptQuest, collectMail, currentBoard, deliverLetters, recordQuestEvent, refreshBoard, settleQuests, shortfallOf, submitQuest } from './quests';
 
 export type Command =
   | { type: 'move'; direction: Direction }
@@ -57,6 +58,10 @@ export type Command =
   | { type: 'giveGift'; npcId: string; itemId: string }
   /** 心形事件的選項（事件進行中才有效）。 */
   | { type: 'chooseHeartOption'; optionId: string }
+  /** 接取委託（居民委託的條件符合、或佈告欄上今天的委託）。不花體力與時間。 */
+  | { type: 'acceptQuest'; questId: string }
+  /** 交付委託要的物品（交付型委託；東西從背包拿走）。不花體力與時間。 */
+  | { type: 'submitQuest'; questId: string }
   | { type: 'manualSave' };
 
 export type GameEvent =
@@ -80,7 +85,9 @@ export type GameEvent =
   /** 走到廚房前按互動：畫面打開料理面板（不花體力與時間）。 */
   | { type: 'kitchenOpened' }
   | { type: 'workshopOpened' }
-  | { type: 'workbenchOpened' };
+  | { type: 'workbenchOpened' }
+  /** 站在佈告欄前按互動：畫面打開委託面板（狀態裡的今日佈告欄已經更新）。 */
+  | { type: 'bulletinOpened' };
 
 export type ActionFeedback = 'till' | 'water' | 'plant' | 'harvest' | 'ship' | 'chop' | 'forage' | 'mine' | 'fish';
 
@@ -143,6 +150,13 @@ const FAILURE_MESSAGES: Record<string, string> = {
   NO_GIFT_ITEM: '背包裡沒有這樣東西',
   NO_OPTION: '沒有這個選項',
   NO_EVENT: '現在沒有進行中的對話',
+  NO_QUEST: '沒有這個委託',
+  ALREADY_ACCEPTED: '這個委託已經接了',
+  ALREADY_DONE: '這個委託已經完成了',
+  NOT_OFFERED: '這個委託還沒開放',
+  NOT_ON_BOARD: '佈告欄上已經沒有這件委託了',
+  NOT_ACTIVE: '這個委託還沒接',
+  NOT_DELIVERY: '這個委託不用交付東西',
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
@@ -155,7 +169,17 @@ function reply(state: GameState, messages: string[] = [], events: GameEvent[] = 
   return { state, messages, events };
 }
 
+/**
+ * 執行一個指令，然後檢查委託：目標已達到（好感、收成、出貨…）的委託在這裡自動完成，並把完成的訊息接在後面。
+ */
 export function executeCommand(current: GameState, command: Command, index: ContentIndex): CommandOutcome {
+  const outcome = executeCore(current, command, index);
+  const settled = settleQuests(outcome.state, index);
+  if (settled.messages.length === 0) return outcome;
+  return { ...outcome, state: settled.state, messages: [...outcome.messages, ...settled.messages] };
+}
+
+function executeCore(current: GameState, command: Command, index: ContentIndex): CommandOutcome {
   // 心形事件還沒選完：只有選項能送出，其餘指令都擋下（畫面也會先顯示事件面板）。
   if (current.pendingHeartEvent && command.type !== 'chooseHeartOption') {
     return reply(current, [messageFor('EVENT_PENDING')], [refused('EVENT_PENDING')]);
@@ -200,6 +224,10 @@ export function executeCommand(current: GameState, command: Command, index: Cont
     }
     case 'chooseTalent':
       return chooseTalent(state, command.talentId, index);
+    case 'acceptQuest':
+      return acceptQuestCommand(state, command.questId, index);
+    case 'submitQuest':
+      return submitQuestCommand(state, command.questId, index);
     case 'manualSave':
       return reply(state, [], [{ type: 'saveRequested' }]);
   }
@@ -242,11 +270,11 @@ function enter(state: GameState, tile: TileDef, direction: Direction, index: Con
   const destination = index.map(destinationId);
   const spawn = tile.spawn ?? destination.spawn;
   const mineCheckpoint = layer !== null && isCheckpoint(layer) ? Math.max(state.mineCheckpoint, layer) : state.mineCheckpoint;
-  return reply(
-    { ...state, mapId: destination.id, mineCheckpoint, player: { ...spawn, facing: direction } },
-    [],
-    [{ type: 'enteredMap', mapId: destination.id }],
-  );
+  const entered: GameState = { ...state, mapId: destination.id, mineCheckpoint, player: { ...spawn, facing: direction } };
+  // 委託的進度：拜訪這張地圖；進礦坑時也記下到了哪一層。
+  const visited = recordQuestEvent(entered, { type: 'visit', mapId: destination.id }, index);
+  const reached = layer !== null ? recordQuestEvent(visited, { type: 'mineLayer', layer }, index) : visited;
+  return reply(reached, [], [{ type: 'enteredMap', mapId: destination.id }]);
 }
 
 function interact(state: GameState, index: ContentIndex): CommandOutcome {
@@ -259,6 +287,8 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
   if (!tile) return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
   const kind = effectiveKind(tile.kind, changeAt(state.worldChanges, state.mapId, target.x, target.y));
 
+  if (tile.notice === 'bulletin') return openBulletin(state, index);
+  if (tile.notice === 'mailbox') return collectMailbox(state, index);
   if (tile.kind === 'rock' || tile.kind === 'ore') {
     if (kind === tile.kind) return mineRock(state, target, tile, index);
   }
@@ -328,7 +358,8 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
       const stored = addItem(s.inventory, index.item(cropItemId(harvested.value.cropId)), count, quality);
       if (!stored.ok) return fail(stored.reason);
       yielded = count;
-      return ok({ ...s, plots: harvested.value.plots, inventory: stored.value, rng: q.rng });
+      const harvestedState: GameState = { ...s, plots: harvested.value.plots, inventory: stored.value, rng: q.rng };
+      return ok(recordQuestEvent(harvestedState, { type: 'harvest', cropId: cropDef.id }, index));
     });
     const label = QUALITY_LABEL[quality];
     return finish(state, result, `收成了 ${cropDef.name}${label} × ${yielded}`, { action: 'harvest', key });
@@ -411,7 +442,9 @@ function shipAll(state: GameState, index: ContentIndex): CommandOutcome {
   const result = spendThen(state, 'ship', index, (s) => {
     let box = s.shipBox;
     for (const stack of taken) box = shipStack(box, stack);
-    return ok({ ...s, inventory, shipBox: box });
+    let next: GameState = { ...s, inventory, shipBox: box };
+    for (const stack of taken) next = recordQuestEvent(next, { type: 'ship', itemId: stack.itemId, count: stack.count }, index);
+    return ok(next);
   });
   const box = neighbor(state.player, state.player.facing);
   return finish(state, result, '把作物放進了出貨箱', { action: 'ship', key: `${box.x},${box.y}` });
@@ -543,7 +576,7 @@ function sleep(state: GameState, index: ContentIndex): CommandOutcome {
     const bonus = sellBonusPercent(state.talents, index.talents.defs, item.kind);
     return applySellBonus(priceWithQuality(item.sellPrice ?? 0, quality), bonus);
   });
-  const next: GameState = {
+  const wakeUp: GameState = {
     ...state,
     calendar,
     worldChanges: clearDaily(state.worldChanges),
@@ -559,8 +592,12 @@ function sleep(state: GameState, index: ContentIndex): CommandOutcome {
     shipBox: settled.box,
     energy: restore(state.energy),
   };
+  // 早上：到期的居民來信送進信箱，佈告欄換成今天的委託。
+  const delivered = deliverLetters(wakeUp, index);
+  const next = refreshBoard(delivered.state, index);
   const messages = [`你睡了一覺。${dateLabel(calendar)} ${formatClock(calendar)}`];
   if (morning.seasonChanged) messages.push(`季節換了，現在是${SEASON_LABEL[calendar.season]}天`);
+  if (delivered.arrived.length > 0) messages.push(`信箱收到 ${delivered.arrived.length} 封信，到信箱取信`);
   if (settled.gold > 0) messages.push(`出貨箱結算 +${settled.gold} 金`);
   if (laid.count > 0) messages.push(`雞下了 ${laid.count} 顆蛋`);
   const finished = takeReady(processing).ready.length;
@@ -642,7 +679,8 @@ function reel(state: GameState, hit: boolean, index: ContentIndex): CommandOutco
   if (!hit) return reply(cleared, ['魚跑掉了']);
   const stored = addItem(cleared.inventory, index.item(`fish.${fishId}`), 1);
   if (!stored.ok) return reply(cleared, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
-  return reply({ ...cleared, inventory: stored.value }, [`釣到了${index.item(`fish.${fishId}`).name}`]);
+  const caught = recordQuestEvent({ ...cleared, inventory: stored.value }, { type: 'fish', fishId }, index);
+  return reply(caught, [`釣到了${index.item(`fish.${fishId}`).name}`]);
 }
 
 /**
@@ -995,7 +1033,7 @@ function cook(state: GameState, recipeId: string, index: ContentIndex): CommandO
     }
     const stored = addItem(inventory, index.item(`dish.${recipe.id}`), 1);
     if (!stored.ok) return fail(stored.reason);
-    return ok({ ...s, inventory: stored.value });
+    return ok(recordQuestEvent({ ...s, inventory: stored.value }, { type: 'cook', recipeId: recipe.id }, index));
   });
   if (!result.ok) return reply(state, [messageFor(result.reason)], [refused(result.reason)]);
   return reply(result.value, [`做好了${recipe.name}`]);
@@ -1113,5 +1151,32 @@ function eat(state: GameState, itemId: string, index: ContentIndex): CommandOutc
     { ...state, inventory: taken.value, energy: { ...state.energy, current } },
     [`吃了${recipe.name}，體力 +${gained}`],
   );
+}
+
+/** 站在佈告欄前：把今天的抽取寫進狀態，然後打開委託面板（不花體力與時間）。 */
+function openBulletin(state: GameState, index: ContentIndex): CommandOutcome {
+  return reply({ ...state, board: currentBoard(state, index) }, [], [{ type: 'bulletinOpened' }]);
+}
+
+/** 站在信箱前按 X：取信（未讀的信都讀過），不花體力與時間。 */
+function collectMailbox(state: GameState, index: ContentIndex): CommandOutcome {
+  const collected = collectMail(state, index);
+  return reply(collected.state, collected.messages);
+}
+
+/** 接取委託（不花體力與時間）。接取失敗時說明原因，狀態不變。 */
+function acceptQuestCommand(state: GameState, questId: string, index: ContentIndex): CommandOutcome {
+  const accepted = acceptQuest(state, questId, index);
+  if (!accepted.ok) return reply(state, [messageFor(accepted.reason)], [refused(accepted.reason)]);
+  return reply(accepted.value, [`接下了委託「${index.quest(questId).title}」`]);
+}
+
+/** 交付委託（不花體力與時間）。東西不夠時說明還差多少；獎勵放不下時什麼都不改。 */
+function submitQuestCommand(state: GameState, questId: string, index: ContentIndex): CommandOutcome {
+  const submitted = submitQuest(state, questId, index);
+  if (submitted.ok) return reply(submitted.value.state, submitted.value.messages);
+  const shortfall = submitted.reason === 'NO_MATERIAL' ? shortfallOf(state, questId, index) : null;
+  const message = shortfall ? `${messageFor('NO_MATERIAL')}：還差 ${shortfall}` : messageFor(submitted.reason);
+  return reply(state, [message], [refused(submitted.reason)]);
 }
 

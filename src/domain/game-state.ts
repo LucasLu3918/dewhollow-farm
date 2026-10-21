@@ -17,8 +17,11 @@ import type { PlotMap } from './farm';
 import { createShipBox, type ShipBox } from './shipping';
 import type { TalentChoices } from './talents';
 import type { Friendship } from './friendship';
+import { EMPTY_BOARD, type BoardState } from './bulletin';
+import type { QuestRecord } from './quests';
+import type { LetterStatus } from './mail';
 
-export const SAVE_SCHEMA_VERSION = 14;
+export const SAVE_SCHEMA_VERSION = 15;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -65,6 +68,14 @@ export interface GameState {
   heartEvents: string[];
   /** 正在進行、還沒選完選項的心形事件 id；有值時畫面要先讓玩家選完（其他指令會被擋下）。 */
   pendingHeartEvent: string | null;
+  /** 委託的紀錄（接過的才有）：進行中或已完成，見 quests.ts。 */
+  quests: Record<string, QuestRecord>;
+  /** 佈告欄今天的抽取（day 為抽取當天的總天數；0 表示還沒抽過），見 bulletin.ts。 */
+  board: BoardState;
+  /** 信箱：送進來的信與已讀狀態（沒有紀錄代表還沒送到）。 */
+  mail: Record<string, LetterStatus>;
+  /** 圖鑑碎片的數量（委託獎勵；圖鑑本身在之後的里程碑）。 */
+  dexFragments: number;
   /** 礦坑的種子：同一個種子每一層的樣子都一樣。 */
   mineSeed: number;
   /** 最深到過的檢查點層數（從入口下來會直接到這裡）；至少是第 1 層。 */
@@ -121,6 +132,10 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     friendship: {},
     heartEvents: [],
     pendingHeartEvent: null,
+    quests: {},
+    board: { ...EMPTY_BOARD },
+    mail: {},
+    dexFragments: 0,
     mineSeed: advanceRng(seed >>> 0),
     mineCheckpoint: 1,
     selectedSeed: selectedSeed.id,

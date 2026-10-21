@@ -80,6 +80,8 @@ export interface TileDef {
   /** 採集點：採到的物品（省略為野薄荷）與能採的季節（省略為四季皆可）。 */
   item?: string;
   seasons?: Season[];
+  /** 站在它前面按 X 的用途：佈告欄（看今日委託並接取）或信箱（取信）。 */
+  notice?: 'bulletin' | 'mailbox';
 }
 
 export interface MapDef {
@@ -99,6 +101,8 @@ import type { Tuning } from './tuning';
 import type { ScheduleDef } from './schedule';
 import type { HeartEventDef } from './heart-events';
 import type { FriendshipRules } from './friendship';
+import type { QuestSet } from './quests';
+import type { LetterDef } from './mail';
 
 export type { ScheduleDef, ScheduleEntry, PeriodRules, Period } from './schedule';
 export type { HeartEventDef, HeartEventOption, HeartEmote } from './heart-events';
@@ -141,6 +145,10 @@ export interface ContentPack {
   heartEvents: HeartEventDef[];
   /** 好感規則（點數、上限、送禮與作物品質，見 friendship.ts 與 content/friendship.json）。 */
   friendship: FriendshipRules;
+  /** 委託與佈告欄（見 quests.ts、bulletin.ts 與 content/quests.json）。測試用的最小內容可以省略。 */
+  quests?: QuestSet;
+  /** 信件（見 mail.ts 與 content/letters.json）。測試用的最小內容可以省略。 */
+  letters?: LetterDef[];
 }
 
 export interface RecipeDef {

@@ -109,6 +109,24 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   ),
   heartEvents: z.array(z.string().min(1)),
   pendingHeartEvent: z.string().min(1).nullable(),
+  /** 委託紀錄（接過的才有）：進行中或已完成、數量進度、收成過的作物種類。 */
+  quests: z.record(
+    z.string().min(1),
+    z.object({
+      status: z.enum(['active', 'done']),
+      progress: z.number().int().nonnegative(),
+      seen: z.array(z.string().min(1)),
+    }),
+  ),
+  /** 佈告欄今天的抽取（day 為總天數，0 表示還沒抽過）。 */
+  board: z.object({
+    day: z.number().int().nonnegative(),
+    daily: z.array(z.string().min(1)),
+    weekly: z.string().min(1).nullable(),
+  }),
+  /** 信箱：信件的已讀狀態（沒有紀錄代表還沒送到）。 */
+  mail: z.record(z.string().min(1), z.enum(['unread', 'read'])),
+  dexFragments: z.number().int().nonnegative(),
   mineSeed: z.number().int().nonnegative().max(4294967295),
   /** 礦坑沒有底，檢查點可以是任何正整數層（見 domain/mine.ts）。 */
   mineCheckpoint: z.number().int().min(1),

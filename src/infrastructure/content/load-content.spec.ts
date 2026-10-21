@@ -34,6 +34,8 @@ import plaza from '../../../content/maps/plaza.json';
 import schedules from '../../../content/schedules.json';
 import events from '../../../content/events.json';
 import friendship from '../../../content/friendship.json';
+import quests from '../../../content/quests.json';
+import letters from '../../../content/letters.json';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
   return {
@@ -42,6 +44,8 @@ function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
     schedules,
     events,
     friendship,
+    quests,
+    letters,
     maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
     start,
     tuning,
