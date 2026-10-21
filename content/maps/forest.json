@@ -5,18 +5,18 @@
   "height": 16,
   "rows": [
     "TTTTTTTTTTTTNTTTTTTTTTTT",
-    "T..TT.........TTT......T",
+    "T.RTT.........TTT......T",
     "T..T.M.TT.M...T..B...B..",
-    "T.F...TTT....F....TTH..T",
-    "T....T...........TTT...T",
+    "T.F...TTT....F....TTH.ET",
+    "T....T........Q..TTT...T",
     "T...G...G.=====.J...J..T",
     "T.........=..........T.L",
     "W=========.....TT.......",
-    "T..........=....TT.....T",
+    "T..........=....TT..C..T",
     "T.H....TT...=..........T",
     "T......TT...=..TT......T",
     "T..........H.=..TTT....T",
-    "T.TT.........=.........T",
+    "T.TT...P.....=.........T",
     "T.TT......TT.=.........T",
     "T.........TTT=....TT...T",
     "TTTTTTTTTTTTTTTTTTTTTTTT"
@@ -89,6 +89,38 @@
     "J": {
       "kind": "forage",
       "item": "herb"
+    },
+    "R": {
+      "kind": "forage",
+      "item": "fern-shoot",
+      "seasons": [
+        "spring"
+      ]
+    },
+    "Q": {
+      "kind": "forage",
+      "item": "flower-bell",
+      "seasons": [
+        "spring"
+      ]
+    },
+    "C": {
+      "kind": "forage",
+      "item": "creek-celery",
+      "seasons": [
+        "summer"
+      ]
+    },
+    "E": {
+      "kind": "forage",
+      "item": "flower-night",
+      "seasons": [
+        "summer"
+      ]
+    },
+    "P": {
+      "kind": "forage",
+      "item": "pine-nut"
     }
   },
   "spawn": {

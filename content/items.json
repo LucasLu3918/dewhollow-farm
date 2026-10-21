@@ -111,6 +111,41 @@
       "sellPrice": 8
     },
     {
+      "id": "fern-shoot",
+      "name": "嫩蕨芽",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 9
+    },
+    {
+      "id": "flower-bell",
+      "name": "小鈴花",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 4
+    },
+    {
+      "id": "creek-celery",
+      "name": "溪芹",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 7
+    },
+    {
+      "id": "flower-night",
+      "name": "夜燈花",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 5
+    },
+    {
+      "id": "pine-nut",
+      "name": "松子",
+      "kind": "forage",
+      "maxStack": 99,
+      "sellPrice": 8
+    },
+    {
       "id": "fertilizer-basic",
       "name": "普通肥料",
       "kind": "material",
