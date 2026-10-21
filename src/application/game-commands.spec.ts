@@ -1,0 +1,264 @@
+import { describe, expect, it } from 'vitest';
+import type { ContentPack } from '../domain/content';
+import { createNewGame, type GameState } from '../domain/game-state';
+import { plotKey } from '../domain/farm';
+import { rollInt } from '../domain/random';
+import { sellPriceOf } from '../domain/pricing';
+import { executeCommand } from './game-commands';
+import { createContentIndex } from './content-index';
+
+/** 測試用的小型內容：農場與村莊各一張，足以覆蓋各種操作。 */
+const content: ContentPack = {
+  crops: [
+    { id: 'sweet-radish', name: '甜蘿蔔', seedPrice: 20, growthDays: 2 },
+    { id: 'moon-bean', name: '月光豆', seedPrice: 35, growthDays: 4 },
+  ],
+  npcs: [{ id: 'mira', name: '米拉', lines: ['早安。', '今天也辛苦了。'], gift: { cropId: 'sweet-radish', count: 3 } }],
+  start: { mapId: 'farm', gold: 100, seeds: { 'sweet-radish': 5 } },
+  tuning: {
+    energy: { max: 20, costs: { till: 2, water: 1, plant: 1, harvest: 1, ship: 0 } },
+    harvest: { min: 1, max: 5 },
+    time: { wakeMinute: 360, minutesPerAction: 10 },
+  },
+  maps: [
+    {
+      id: 'farm',
+      name: '農場',
+      width: 5,
+      height: 3,
+      //        0123 4
+      rows: ['#####', '.ff.B', '.S.D.'],
+      legend: {
+        '#': { kind: 'wall' },
+        '.': { kind: 'grass' },
+        f: { kind: 'field' },
+        B: { kind: 'bed' },
+        S: { kind: 'shipbox' },
+        D: { kind: 'door', to: 'village', spawn: { x: 1, y: 1 } },
+      },
+      spawn: { x: 3, y: 1 },
+      npcs: [],
+    },
+    {
+      id: 'village',
+      name: '村莊',
+      width: 3,
+      height: 3,
+      rows: ['.M.', '...', '#D#'],
+      legend: {
+        '#': { kind: 'wall' },
+        '.': { kind: 'grass' },
+        M: { kind: 'grass' },
+        D: { kind: 'door', to: 'farm', spawn: { x: 3, y: 1 } },
+      },
+      spawn: { x: 1, y: 1 },
+      npcs: [{ npcId: 'mira', x: 1, y: 0 }],
+    },
+  ],
+};
+
+const index = createContentIndex(content);
+
+/** 田地 (2,1)：玩家站在 (3,1) 面向左側即可互動。 */
+const FIELD = plotKey(2, 1);
+const FIELD_SIDE = { x: 3, y: 1, facing: 'left' as const };
+/** 出貨箱 (1,2)：玩家站在 (2,2) 面向左側。 */
+const SHIP_SIDE = { x: 2, y: 2, facing: 'left' as const };
+/** 床 (4,1)：玩家站在 (3,1) 面向右側。 */
+const BED_SIDE = { x: 3, y: 1, facing: 'right' as const };
+
+function start(overrides: Partial<GameState> = {}): GameState {
+  return { ...createNewGame(content, 1), ...overrides };
+}
+
+function at(state: GameState, player: GameState['player']): GameState {
+  return { ...state, player };
+}
+
+function act(state: GameState): GameState {
+  return executeCommand(state, { type: 'interact' }, index).state;
+}
+
+function sleep(state: GameState): GameState {
+  return executeCommand(at(state, BED_SIDE), { type: 'interact' }, index).state;
+}
+
+describe('movement', () => {
+  it('moving into a wall only changes facing', () => {
+    const state = at(start(), { x: 1, y: 1, facing: 'down' });
+    const out = executeCommand(state, { type: 'move', direction: 'up' }, index);
+    expect(out.state.player).toEqual({ x: 1, y: 1, facing: 'up' });
+  });
+
+  it('moves one tile into open ground', () => {
+    const state = at(start(), { x: 3, y: 1, facing: 'down' });
+    const out = executeCommand(state, { type: 'move', direction: 'left' }, index);
+    expect(out.state.player).toEqual({ x: 2, y: 1, facing: 'left' });
+  });
+
+  it('walking into a door changes map and lands on the spawn tile', () => {
+    const state = at(start(), { x: 3, y: 1, facing: 'down' });
+    const out = executeCommand(state, { type: 'move', direction: 'down' }, index);
+    expect(out.state.mapId).toBe('village');
+    expect(out.state.player).toMatchObject({ x: 1, y: 1 });
+    expect(out.events).toContainEqual({ type: 'enteredMap', mapId: 'village' });
+  });
+});
+
+describe('farming actions', () => {
+  it('tills a field with the hoe, costs energy and time', () => {
+    const state = at(start(), FIELD_SIDE);
+    const out = executeCommand(state, { type: 'interact' }, index);
+    expect(out.state.plots[FIELD]).toEqual({ watered: false, dryDays: 0, crop: null });
+    expect(out.state.energy.current).toBe(state.energy.current - 2);
+    expect(out.state.calendar.minuteOfDay).toBe(state.calendar.minuteOfDay + 10);
+  });
+
+  it('leaves the state untouched when energy is not enough', () => {
+    const state = at(start({ energy: { current: 1, max: 20 } }), FIELD_SIDE);
+    const out = executeCommand(state, { type: 'interact' }, index);
+    expect(out.state).toEqual(state);
+    expect(out.messages).toEqual(['體力不足，請回家睡覺']);
+  });
+
+  it('plants, waters, grows overnight, and refuses to plant twice', () => {
+    let state = at(start(), FIELD_SIDE);
+    state = act(state); // 開墾（鋤頭）
+    state = executeCommand(state, { type: 'cycleTool' }, index).state; // 水壺
+    state = executeCommand(state, { type: 'cycleTool' }, index).state; // 種子袋
+    state = act(state); // 播種
+    expect(state.plots[FIELD]?.crop).toEqual({ cropId: 'sweet-radish', growthDays: 0 });
+    expect(state.bag.seeds['sweet-radish']).toBe(4);
+
+    state = executeCommand(state, { type: 'cycleTool' }, index).state; // 鋤頭
+    state = executeCommand(state, { type: 'cycleTool' }, index).state; // 水壺
+    state = act(state); // 澆水
+    expect(state.plots[FIELD]?.watered).toBe(true);
+
+    state = sleep(state);
+    expect(state.plots[FIELD]?.crop?.growthDays).toBe(1);
+    expect(state.plots[FIELD]?.watered).toBe(false);
+
+    state = executeCommand(state, { type: 'cycleTool' }, index).state; // 種子袋
+    const again = executeCommand(at(state, FIELD_SIDE), { type: 'interact' }, index);
+    expect(again.messages).toEqual(['這塊田已經種了作物']);
+    expect(again.state.bag.seeds['sweet-radish']).toBe(4);
+  });
+
+  it('does not grow an unwatered crop overnight', () => {
+    const planted = start({
+      plots: { [FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 } } },
+    });
+    expect(sleep(planted).plots[FIELD]?.crop?.growthDays).toBe(0);
+  });
+
+  it('harvests a ripe crop into the bag with any tool', () => {
+    const ripe = start({
+      plots: { [FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 2 } } },
+    });
+    const out = executeCommand(at(ripe, FIELD_SIDE), { type: 'interact' }, index);
+    expect(out.state.plots[FIELD]?.crop).toBeNull();
+    const expected = rollInt(ripe.rng, 1, 5).value;
+    expect(out.state.bag.crops['sweet-radish']).toBe(expected);
+    expect(out.messages).toEqual([`收成了 甜蘿蔔 × ${expected}`]);
+  });
+
+  it('yields between 1 and 5 crops and advances the random state', () => {
+    const ripe = start({
+      plots: { [FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } },
+    });
+    const out = executeCommand(at(ripe, FIELD_SIDE), { type: 'interact' }, index);
+    const count = out.state.bag.crops['sweet-radish'] ?? 0;
+    expect(count).toBeGreaterThanOrEqual(1);
+    expect(count).toBeLessThanOrEqual(5);
+    expect(out.state.rng).not.toBe(ripe.rng);
+  });
+
+  it('withers an unwatered crop on the second night and reports it', () => {
+    const planted = start({
+      plots: { [FIELD]: { watered: false, dryDays: 1, crop: { cropId: 'sweet-radish', growthDays: 1 } } },
+    });
+    const slept = sleep(planted);
+    expect(slept.plots[FIELD]?.crop).toBeNull();
+    const out = executeCommand(at(planted, BED_SIDE), { type: 'interact' }, index);
+    expect(out.messages).toContain('缺水，甜蘿蔔 枯死了');
+  });
+});
+
+describe('action feedback', () => {
+  it('emits an acted event with the tile when tilling succeeds', () => {
+    const out = executeCommand(at(start(), FIELD_SIDE), { type: 'interact' }, index);
+    expect(out.events).toContainEqual({ type: 'acted', action: 'till', x: 2, y: 1 });
+  });
+
+  it('emits no acted event when the action fails', () => {
+    const state = at(start({ energy: { current: 0, max: 20 } }), FIELD_SIDE);
+    const out = executeCommand(state, { type: 'interact' }, index);
+    expect(out.events.some((e) => e.type === 'acted')).toBe(false);
+  });
+
+  it('emits an acted event at the shipping box when shipping', () => {
+    const state = at(start({ bag: { seeds: {}, crops: { 'sweet-radish': 1 } } }), SHIP_SIDE);
+    const out = executeCommand(state, { type: 'interact' }, index);
+    expect(out.events).toContainEqual({ type: 'acted', action: 'ship', x: 1, y: 2 });
+  });
+});
+
+describe('shipping and sleep', () => {
+  it('ships crops from the bag and pays out after sleeping', () => {
+    const state = at(start({ bag: { seeds: {}, crops: { 'sweet-radish': 2 } } }), SHIP_SIDE);
+    const shipped = act(state);
+    expect(shipped.bag.crops).toEqual({});
+    expect(shipped.shipBox.items).toEqual({ 'sweet-radish': 2 });
+
+    const slept = sleep(shipped);
+    expect(slept.gold).toBe(100 + 2 * sellPriceOf(20, 2)); // 甜蘿蔔：20 × 3 × 1.2 = 72
+    expect(slept.shipBox.items).toEqual({});
+    expect(slept.calendar.day).toBe(2);
+    expect(slept.energy.current).toBe(20);
+  });
+
+  it('reports nothing to ship when the bag has no crops', () => {
+    const out = executeCommand(at(start(), SHIP_SIDE), { type: 'interact' }, index);
+    expect(out.messages).toEqual(['背包裡沒有可出貨的作物']);
+  });
+
+  it('emits a slept event when the player sleeps in bed', () => {
+    const out = executeCommand(at(start(), BED_SIDE), { type: 'interact' }, index);
+    expect(out.events).toContainEqual({ type: 'slept' });
+  });
+});
+
+describe('villagers', () => {
+  it('gives the gift once and then repeats only the last line', () => {
+    const village = at({ ...start(), mapId: 'village' }, { x: 1, y: 1, facing: 'up' });
+    const first = executeCommand(village, { type: 'interact' }, index);
+    expect(first.state.bag.seeds['sweet-radish']).toBe(5 + 3);
+    expect(first.state.flags['talked:mira']).toBe(true);
+    expect(first.messages).toEqual(['早安。', '今天也辛苦了。', '獲得 甜蘿蔔種子 × 3']);
+
+    const second = executeCommand(first.state, { type: 'interact' }, index);
+    expect(second.state.bag.seeds['sweet-radish']).toBe(8);
+    expect(second.messages).toEqual(['今天也辛苦了。']);
+  });
+});
+
+describe('tools and seeds', () => {
+  it('cycles tools in order', () => {
+    let state = start();
+    const seen: string[] = [];
+    for (let i = 0; i < 4; i += 1) {
+      state = executeCommand(state, { type: 'cycleTool' }, index).state;
+      seen.push(state.tool);
+    }
+    expect(seen).toEqual(['can', 'seedbag', 'hoe', 'can']);
+  });
+
+  it('cycles the selected seed through the crop list', () => {
+    let state = start();
+    state = executeCommand(state, { type: 'cycleSeed' }, index).state;
+    expect(state.selectedSeed).toBe('moon-bean');
+    state = executeCommand(state, { type: 'cycleSeed' }, index).state;
+    expect(state.selectedSeed).toBe('sweet-radish');
+  });
+});

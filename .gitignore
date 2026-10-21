@@ -1,0 +1,11 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+.DS_Store
+# 原版 ROM、BIOS 與來源不明的素材不得進入版本控制
+private/
+*.gba
+*.gb
+*.gbc
+*.bios

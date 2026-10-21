@@ -1,0 +1,28 @@
+{
+  "name": "dewhollow-farm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "晨露農場：原創農場生活網頁遊戲（垂直切片 MVP）",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "dexie": "^4.4.6",
+    "phaser": "^4.2.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}

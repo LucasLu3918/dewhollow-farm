@@ -1,0 +1,20 @@
+{
+  "energy": {
+    "max": 100,
+    "costs": {
+      "till": 2,
+      "water": 1,
+      "plant": 1,
+      "harvest": 1,
+      "ship": 0
+    }
+  },
+  "harvest": {
+    "min": 1,
+    "max": 5
+  },
+  "time": {
+    "wakeMinute": 360,
+    "minutesPerAction": 10
+  }
+}

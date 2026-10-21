@@ -1,0 +1,8 @@
+[
+  {"id": "dew-grass", "name": "晨露草", "seedPrice": 10, "growthDays": 1},
+  {"id": "moon-bean", "name": "月光豆", "seedPrice": 15, "growthDays": 2},
+  {"id": "sweet-radish", "name": "甜蘿蔔", "seedPrice": 25, "growthDays": 3},
+  {"id": "star-pepper", "name": "星辣椒", "seedPrice": 40, "growthDays": 5},
+  {"id": "dusk-potato", "name": "暮光薯", "seedPrice": 70, "growthDays": 8},
+  {"id": "silver-wheat", "name": "銀穗麥", "seedPrice": 120, "growthDays": 13}
+]

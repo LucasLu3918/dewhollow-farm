@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "tile.grass",
+      "kind": "tile",
+      "color": "#7fae6b",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.field",
+      "kind": "tile",
+      "color": "#8a6a48",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.path",
+      "kind": "tile",
+      "color": "#c9b38a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.wall",
+      "kind": "tile",
+      "color": "#5c5a63",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.bed",
+      "kind": "object",
+      "color": "#c97f8f",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.shipbox",
+      "kind": "object",
+      "color": "#a0764e",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.door",
+      "kind": "tile",
+      "color": "#e0b25c",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "tile.soil",
+      "kind": "overlay",
+      "color": "#5e4330",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.sweet-radish",
+      "kind": "crop",
+      "color": "#e8745a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.moon-bean",
+      "kind": "crop",
+      "color": "#c9d96a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.star-pepper",
+      "kind": "crop",
+      "color": "#d94f4f",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "player.up",
+      "kind": "character",
+      "color": "#4a7fd0",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "player.down",
+      "kind": "character",
+      "color": "#4a7fd0",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "player.left",
+      "kind": "character",
+      "color": "#4a7fd0",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "player.right",
+      "kind": "character",
+      "color": "#4a7fd0",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "npc.maomao",
+      "kind": "character",
+      "color": "#b07ad0",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.dew-grass",
+      "kind": "crop",
+      "color": "#9be07a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.dusk-potato",
+      "kind": "crop",
+      "color": "#b98a5e",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.silver-wheat",
+      "kind": "crop",
+      "color": "#d9d4c0",
+      "source": "占位（程式產生）"
+    }
+  ]
+}

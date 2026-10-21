@@ -1,0 +1,5 @@
+{
+  "mapId": "farm",
+  "gold": 100,
+  "seeds": { "sweet-radish": 5, "moon-bean": 2 }
+}

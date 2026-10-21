@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="晨露農場：原創農場生活網頁遊戲（垂直切片 MVP）。" />
+    <title>晨露農場</title>
+  </head>
+  <body>
+    <main class="app">
+      <header class="status" aria-label="遊戲狀態">
+        <span id="hud-day">第 1 天</span>
+        <span id="hud-clock">06:00</span>
+        <span id="hud-gold">0 金</span>
+        <span class="energy" aria-label="體力">
+          <span class="energy-track"><span id="hud-energy-fill"></span></span>
+          <span id="hud-energy-text">20 / 20</span>
+        </span>
+        <span id="hud-tool">鋤頭</span>
+        <span id="hud-seed"></span>
+      </header>
+      <div id="game" class="stage"></div>
+      <section class="panel" aria-label="訊息">
+        <ul id="hud-log" class="log" aria-live="polite"></ul>
+        <p class="help">方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · S 存檔</p>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
