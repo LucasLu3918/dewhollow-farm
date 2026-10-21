@@ -7,6 +7,7 @@ import rigs from '../../content/rigs.json';
 import companions from '../../content/companions.json';
 import tools from '../../content/tools.json';
 import sounds from '../../content/sounds.json';
+import music from '../../content/music.json';
 import terrain from '../../content/terrain.json';
 import weather from '../../content/weather.json';
 import items from '../../content/items.json';
@@ -38,6 +39,7 @@ const { pack } = loadContent({
   companions,
   tools,
   sounds,
+  music,
   terrain,
   weather,
   items,

@@ -1,3 +1,4 @@
+import { SEASONS } from '../../domain/calendar';
 import type { ContentPack, MapDef, Point } from '../../domain/content';
 import { isWalkable, tileAt } from '../../domain/world';
 import { assetProblems, missingAssetIds, requiredAssetIds, type AssetManifest } from '../assets/asset-manifest';
@@ -18,12 +19,14 @@ import {
   recipesFileSchema,
   processingFileSchema,
   craftingFileSchema,
+  musicFileSchema,
   soundsFileSchema,
   startFileSchema,
   terrainFileSchema,
   toolsFileSchema,
   tuningFileSchema,
   weatherFileSchema,
+  type MusicFile,
   type SoundsFile,
   type TerrainFile,
 } from './content-schema';
@@ -39,6 +42,7 @@ export interface RawContentFiles {
   companions: unknown;
   tools: unknown;
   sounds: unknown;
+  music: unknown;
   terrain: unknown;
   weather: unknown;
   items: unknown;
@@ -57,6 +61,7 @@ export interface LoadedContent {
   companions: CompanionManifest;
   tools: ToolManifest;
   sounds: SoundsFile;
+  music: MusicFile;
   terrain: TerrainFile;
 }
 
@@ -82,6 +87,7 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const companions: CompanionManifest = companionsFileSchema.parse(raw.companions);
   const tools: ToolManifest = toolsFileSchema.parse(raw.tools);
   const sounds = soundsFileSchema.parse(raw.sounds);
+  const music = musicFileSchema.parse(raw.music);
   const terrain = terrainFileSchema.parse(raw.terrain);
   const weather = weatherFileSchema.parse(raw.weather);
 
@@ -100,10 +106,33 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     ...companionProblems(companions, rigs, pack),
     ...toolProblems(tools, assets),
     ...terrainProblems(terrain, sounds, maps),
+    ...musicProblems(music),
     ...economyProblems(pack),
   ];
   if (problems.length > 0) throw new ContentError(problems);
-  return { pack, assets, rigs, companions, tools, sounds, terrain };
+  return { pack, assets, rigs, companions, tools, sounds, music, terrain };
+}
+
+/** 背景音樂：音階要存在、旋律與低音等長（循環才對齊），且每個季節與時段恰好一首。 */
+export function musicProblems(music: MusicFile): string[] {
+  const problems: string[] = [];
+  duplicates(music.tracks.map((t) => t.id), 'music track', problems);
+  for (const track of music.tracks) {
+    if (!(track.scale in music.scales)) problems.push(`曲目 ${track.id} 的音階 ${track.scale} 不存在`);
+    const melodyBeats = track.melody.notes.reduce((sum, [, beats]) => sum + beats, 0);
+    const bassBeats = track.bass.notes.reduce((sum, [, beats]) => sum + beats, 0);
+    if (melodyBeats !== bassBeats) {
+      problems.push(`曲目 ${track.id} 的旋律與低音拍數不同（${melodyBeats} 與 ${bassBeats}）`);
+    }
+  }
+  for (const season of SEASONS) {
+    for (const period of ['day', 'night'] as const) {
+      const count = music.tracks.filter((t) => t.season === season && t.period === period).length;
+      if (count === 0) problems.push(`缺少 ${season} ${period} 的曲目`);
+      if (count > 1) problems.push(`${season} ${period} 有 ${count} 首曲目，每個季節與時段只能有一首`);
+    }
+  }
+  return problems;
 }
 
 /** 每種可走的地形都要有腳步設定，且腳步指向存在的音效。 */

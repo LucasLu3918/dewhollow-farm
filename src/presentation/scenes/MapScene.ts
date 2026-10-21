@@ -34,6 +34,7 @@ import { footstepKind, touchesWater, type FootstepEnv } from '../footstep-surfac
 import { shipIconsFor, shippedItemIds } from '../ship-animation';
 import type { Inventory } from '../../domain/inventory';
 import type { SoundPlayer } from '../audio/sound-player';
+import type { MusicPlayer } from '../audio/music-player';
 import { ACTION_SOUND } from '../audio/sound-ids';
 import { prefersReducedMotion } from '../motion';
 import { nextPetTile, placeBeside } from '../pet-follow';
@@ -55,6 +56,8 @@ export interface MapSceneDeps {
   tools: ToolManifest;
   /** 音效播放器（程式合成，見 audio/sound-player.ts）。 */
   sounds: SoundPlayer;
+  /** 背景音樂（程式合成，B 開關；M 靜音見 audio/music-player.ts）。 */
+  music: MusicPlayer;
   /** 各種地形的腳步（塵土顏色與音效），來自 content/terrain.json。 */
   terrain: TerrainDef[];
 }
@@ -176,6 +179,10 @@ declare global {
       soundLog(): string[];
       /** 目前是否靜音。 */
       muted(): boolean;
+      /** 背景音樂是否正在播放（按 B 開始）。 */
+      musicPlaying(): boolean;
+      /** 目前選定的背景音樂曲目 id。 */
+      musicTrack(): string | null;
     };
   }
 }
@@ -284,6 +291,8 @@ export class MapScene extends Phaser.Scene {
         effectLog: () => this.effectEntries.map((e) => ({ ...e })),
         soundLog: () => this.deps.sounds.playedIds(),
         muted: () => this.deps.sounds.isMuted(),
+        musicPlaying: () => this.deps.music.isPlaying(),
+        musicTrack: () => this.deps.music.currentTrackId(),
         snapshot: () =>
           new Promise((resolve, reject) => {
             if (!('snapshot' in this.game.renderer)) return reject(new Error('目前的繪圖器不支援 snapshot'));
@@ -317,6 +326,13 @@ export class MapScene extends Phaser.Scene {
       event.preventDefault();
       const muted = sounds.toggleMute();
       hud.messages([muted ? '已靜音（按 M 開啟音效）' : '已開啟音效（按 M 靜音）']);
+      return;
+    }
+    if (event.key.toLowerCase() === 'b') {
+      // 背景音樂預設不播放，由玩家按 B 開始（瀏覽器要求使用者手勢才能出聲）。
+      event.preventDefault();
+      const playing = this.deps.music.toggle();
+      hud.messages([playing ? '背景音樂開始播放（按 B 暫停）' : '背景音樂已暫停（按 B 播放）']);
       return;
     }
     if (this.reelTimer) {
@@ -574,6 +590,7 @@ export class MapScene extends Phaser.Scene {
 
     this.showFacing(state.player.facing);
     this.applySeason(state.calendar.season);
+    this.deps.music.update(state.calendar.season, state.calendar.minuteOfDay, state.weather);
     this.syncWorldTiles();
     this.syncAnimals(state.mapId);
     this.drawPlots();
