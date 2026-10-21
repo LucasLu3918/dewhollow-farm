@@ -9,3 +9,5 @@ private/
 *.gb
 *.gbc
 *.bios
+.venv/
+__pycache__/
