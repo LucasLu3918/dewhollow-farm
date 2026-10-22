@@ -432,6 +432,18 @@
 - ⚠️ 說明頁的按鍵表仍是預設鍵（已加註）；每個動作只能綁一個鍵；橫式緊湊版在窄螢幕上的按鈕尺寸未實測。
 - **測試**：`npm run check` 通過（1320 項、1 項跳過）；`npm run sim` 通過；`npm run test:e2e` 通過（131 項，含 1 項預期失敗的金絲雀，含新增的 `accessibility.spec.ts` 與 `touch.spec.ts`）。
 
+### M7 PWA、首次載入預算、授權清單與部署說明（commit a2ef44e，2026-10-22，已合併）
+
+- ✅ **PWA**：手寫 service worker 樣板（`tools/pwa/service-worker.template.js`），由 vite 外掛在建置時產生 `dist/sw.js`，未新增依賴。預快取 index.html、建置產物與 public 素材；導覽請求網路優先、離線回退快取；建置產物快取優先。不自動取代執行中的版本：出現新版本時顯示「有新版本，重新整理即可更新」，按下後先存檔再重新整理。只在正式建置註冊。圖示由 `tools/pwa/make-icons.mjs` 程式產生（登錄於 assets.json，來源「程式產生」）。
+- ✅ **離線的真實瀏覽器驗證**：`tests/e2e/pwa.spec.ts` 在建置後的 preview（4173 埠）執行，包括離線開啟遊戲。e2e 設定已加入 4173 的 build 與 preview 作為第二個 webServer（`playwright.config.ts`）。
+- ✅ **首次載入大小**（dist）：HTML 10.1 KiB／2.6 KiB gzip；JS 1874.3 KiB／508.8 KiB；CSS 7.6 KiB／2.1 KiB；素材 75.4 KiB／73.5 KiB；合計 2.015 MB 原始、587 KiB gzip，預算 8 MB。`npm run budget` 已加入 `npm run check`。
+- ⚠️ **程式碼拆分**：只拆出 phaser、zod、dexie 三個 vendor chunk（利於快取，不減少位元組）。Phaser 佔首次載入 1.37 MB，是單一封裝，要裁切需要自訂引擎建置，待你決定。
+- ✅ **授權清單**：`docs/LICENSES.md` 由 `npm run licenses` 產生，涵蓋 65 筆素材（Z-Image Turbo，Apache-2.0）、7 個直接依賴、68 個已安裝套件；24 個平台專用原生套件本機未安裝，已標示為未讀取授權。
+- ✅ **私有資料**：`private/` 已在 .gitignore，git 追蹤清單中沒有 `private/` 的檔案。
+- ✅ **部署說明**：`docs/DEPLOY.md`（建置、`VITE_BASE` 子路徑、MIME 與快取標頭、service worker 的 scope 與 HTTPS、版本發布步驟）。主機與網域留給你決定。
+- ⚠️ **未完成的提交**：M7-C 的 e2e 設定修正（`playwright.config.ts`、`tests/e2e/pwa.spec.ts`）與本段文件，因 AIPS guard 阻擋 commit 而尚未提交，已暫存在主 repo 的索引中。
+- **測試**：`npm run check` 通過（1368 項、1 項跳過，含建置後檢查）；`npm run sim` 通過；`npm run test:e2e` 通過（135 項，含 1 項預期失敗的金絲雀，含新增的 `pwa.spec.ts`）。
+
 ### M6 農場評級、豐收重置與傳承（存檔 v23，2026-10-22，已合併）
 
 - ✅ **收入**：所有金幣流入（出貨、委託、主線、節慶、修復、圖鑑、成就）經 `domain/income.ts` 記入 `yearlyIncome`；換年時移到 `previousYearIncome`。購買與升級不算收入。

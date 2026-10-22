@@ -15,9 +15,10 @@ const BASE = 'http://127.0.0.1:4173';
 
 test.use({ baseURL: BASE });
 
+/** 正式建置沒有 window.__dewhollow（只有開發模式才有），所以用 HUD 的日期列判斷遊戲已經就緒。 */
 async function waitForGame(page: Page): Promise<void> {
   await expect(page.locator('#game canvas')).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).not.toBe('');
+  await expect(page.locator('#hud-day')).not.toHaveText('');
 }
 
 test('the page links a web app manifest with the game name and icons', async ({ page, request }) => {
