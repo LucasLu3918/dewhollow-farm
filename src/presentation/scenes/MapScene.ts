@@ -92,6 +92,8 @@ export interface MapSceneDeps {
   saves: SavePanel;
   /** 玩家偏好（按鍵、字級、閃光與震動等），不進存檔。 */
   settings: SettingsService;
+  /** 鍵盤監聽與畫面都接好後呼叫一次（見 create 結尾與 main.ts 的 markStageReady）。 */
+  onReady: () => void;
 }
 
 /** 動作 → 移動方向（按鍵由偏好的按鍵表決定，見 handleKey）。 */
@@ -356,8 +358,12 @@ export class MapScene extends Phaser.Scene {
       window.removeEventListener('keydown', this.onKeyDown);
     });
     // 讀取存檔的提示等到鍵盤已經接上才顯示：提示出現時，按鍵一定會被接到（載入素材的期間按的鍵不算）。
+    // 新遊戲則提示玩家可以按 ? 看操作說明（訊息列在新遊戲開場是空的）。
     if (this.deps.session.restored) this.deps.hud.messages(['已讀取存檔，繼續遊玩。']);
+    else this.deps.hud.messages(['按 ? 看操作說明']);
     this.refresh();
+    // 鍵盤監聽已掛上、畫面也已更新：通知開機流程顯示畫布（畫布在這之前是隱藏的，見 main.ts）。
+    this.deps.onReady();
   }
 
   /** 天色與天氣的遮罩與粒子：固定在畫面上（不隨鏡頭移動）。 */

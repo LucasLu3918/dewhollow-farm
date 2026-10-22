@@ -78,6 +78,20 @@ import { MusicPlayer } from './presentation/audio/music-player';
 import { AudioOutput } from './presentation/audio/audio-output';
 import { registerServiceWorker } from './presentation/service-worker';
 
+/** 移除開機載入提示（index.html 的 #game 內）；啟動失敗或讀不開存檔時也用它，免得一直顯示「載入中」。 */
+function hideLoader(): void {
+  document.querySelector('#game .loading')?.remove();
+}
+
+/**
+ * 場景與鍵盤監聽都接好後呼叫（見 MapScene.create）：#game 標上 data-ready，畫布才會顯示，並移除載入提示。
+ * 畫布在這之前是隱藏的，所以玩家看得到畫面時，按鍵一定會被接到。
+ */
+function markStageReady(): void {
+  document.getElementById('game')?.setAttribute('data-ready', 'true');
+  hideLoader();
+}
+
 /**
  * 組裝點（composition root）：這裡是唯一知道具體實作的地方。
  * 其他層只看見介面（port）與純資料。
@@ -153,6 +167,7 @@ async function bootstrap(): Promise<void> {
 
   if (!session) {
     // 讀不開這一格：直接打開存檔槽，讓玩家選別的格子或處理這一格（遊戲本身還沒有開始）。
+    hideLoader();
     void saves.open();
     return;
   }
@@ -182,6 +197,7 @@ async function bootstrap(): Promise<void> {
         help: helpPanel,
         saves,
         settings,
+        onReady: markStageReady,
       }),
       new MapScene(),
     ],
@@ -204,6 +220,7 @@ async function bootstrap(): Promise<void> {
 
 bootstrap().catch((error: unknown) => {
   // 啟動階段的錯誤（例如內容資料有誤）無法經由 HUD 物件顯示，直接寫入訊息列表。
+  hideLoader();
   const item = document.createElement('li');
   item.className = 'error';
   item.textContent = `啟動失敗：${error instanceof Error ? error.message : String(error)}`;
