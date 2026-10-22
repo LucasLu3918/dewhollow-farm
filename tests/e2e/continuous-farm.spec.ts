@@ -1,0 +1,274 @@
+import { expect, test, type Page } from '@playwright/test';
+
+async function start(page: Page): Promise<void> {
+  await page.goto('/');
+  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+}
+
+async function moveToEmptyField(page: Page): Promise<void> {
+  for (let i = 0; i < 4; i += 1) await page.keyboard.press('ArrowLeft');
+  for (let i = 0; i < 4; i += 1) await page.keyboard.press('ArrowUp');
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(async () => page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy ?? true)).toBe(false);
+}
+
+async function enableContinuousActions(page: Page): Promise<void> {
+  await page.keyboard.press('o');
+  const checkbox = page.locator('#settings-continuous-actions');
+  await expect(checkbox).not.toBeChecked();
+  await checkbox.check();
+  await page.locator('#settings-close').click();
+  await expect(page.locator('#settings-panel')).toBeHidden();
+}
+
+async function holdMainAction(page: Page, durationMs: number): Promise<void> {
+  const box = await page.locator('#hud-action').boundingBox();
+  expect(box).not.toBeNull();
+  const x = (box?.x ?? 0) + (box?.width ?? 0) / 2;
+  const y = (box?.y ?? 0) + (box?.height ?? 0) / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.waitForTimeout(durationMs);
+  await page.mouse.up();
+}
+
+async function saveGame(page: Page): Promise<void> {
+  await page.keyboard.press('s');
+  await expect(page.locator('#hud-log')).toContainText('已存檔');
+}
+
+async function savedRecord(page: Page): Promise<{ state: Record<string, unknown>; [key: string]: unknown }> {
+  return page.evaluate(() => new Promise((resolve, reject) => {
+    const open = indexedDB.open('dewhollow-farm');
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const db = open.result;
+      const request = db.transaction('saves').objectStore('saves').get('slot-1');
+      request.onsuccess = () => { db.close(); resolve(request.result); };
+      request.onerror = () => { db.close(); reject(request.error); };
+    };
+  })) as Promise<{ state: Record<string, unknown>; [key: string]: unknown }>;
+}
+
+async function prepareFarmState(page: Page, configure: (state: Record<string, unknown>) => void): Promise<{ state: Record<string, unknown>; [key: string]: unknown }> {
+  await start(page);
+  await saveGame(page);
+  const record = await savedRecord(page);
+  configure(record.state);
+  await restoreRecord(page, record);
+  await page.reload();
+  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+  return record;
+}
+
+async function restoreRecord(page: Page, record: unknown): Promise<void> {
+  await page.evaluate((value) => new Promise<void>((resolve, reject) => {
+    const open = indexedDB.open('dewhollow-farm');
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const db = open.result;
+      const tx = db.transaction('saves', 'readwrite');
+      tx.objectStore('saves').put(value);
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
+    };
+  }), record);
+}
+
+test.describe('可取消的長按連續農務', () => {
+  test('設定預設關閉；關閉時長按只在放開後執行一次原本動作', async ({ page }) => {
+    await start(page);
+    await moveToEmptyField(page);
+    await page.keyboard.press('o');
+    await expect(page.locator('#settings-continuous-actions')).not.toBeChecked();
+    await page.locator('#settings-close').click();
+
+    await holdMainAction(page, 420);
+    await expect.poll(async () => page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0)).toBe(1);
+  });
+
+  test('啟用後放開會取消尚未執行的重複工作，等待命中動畫結束也不會重複同格', async ({ page }) => {
+    await start(page);
+    await moveToEmptyField(page);
+    await enableContinuousActions(page);
+
+    // Synthetic mouse pointer lifecycle; release after the first command starts but before its swing completes.
+    await holdMainAction(page, 330);
+    await page.waitForTimeout(550);
+    const hits = await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0);
+    expect(hits).toBe(1);
+  });
+
+  test('持續移動會重新查詢面前田地；舊田不重做且新田可執行', async ({ page }) => {
+    await start(page);
+    await moveToEmptyField(page);
+    await enableContinuousActions(page);
+    const action = page.locator('#hud-action');
+    const box = await action.boundingBox();
+    expect(box).not.toBeNull();
+    const clientX = (box?.x ?? 0) + (box?.width ?? 0) / 2;
+    const clientY = (box?.y ?? 0) + (box?.height ?? 0) / 2;
+    await page.mouse.move(clientX, clientY);
+    await page.mouse.down();
+    await expect.poll(() => page.evaluate(() => [
+      window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0,
+      window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy ?? false,
+    ])).toEqual([0, true]);
+    const playerBeforeMove = await page.evaluate(() => {
+      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+      return player ? { x: player.tileX, y: player.tileY } : null;
+    });
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(() => page.evaluate(() => {
+      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+      return player ? `${player.tileX},${player.tileY}` : '';
+    })).not.toBe(`${playerBeforeMove?.x},${playerBeforeMove?.y}`);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0), { timeout: 5000 }).toBe(2);
+    await expect.poll(() => page.evaluate(() => {
+      const candidate = window.__dewhollow?.interaction();
+      return `${candidate?.labelKey}:${candidate?.plotKey}`;
+    })).toBe('alreadyTilled:6,5');
+    await page.waitForTimeout(800);
+    await page.mouse.up();
+    const hits = await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0);
+    expect(hits).toBe(2);
+  });
+
+  test('pointerleave 在長按啟動後立即停止未執行工作', async ({ page }) => {
+    await start(page);
+    await moveToEmptyField(page);
+    await enableContinuousActions(page);
+    const action = page.locator('#hud-action');
+    const box = await action.boundingBox();
+    expect(box).not.toBeNull();
+    await page.evaluate(() => {
+      const button = document.querySelector('#hud-action')!;
+      button.addEventListener('pointerleave', () => undefined);
+    });
+    const clientX = (box?.x ?? 0) + (box?.width ?? 0) / 2;
+    const clientY = (box?.y ?? 0) + (box?.height ?? 0) / 2;
+    await page.mouse.move(clientX, clientY);
+    await page.mouse.down();
+    await page.evaluate(() => new Promise<void>((resolve) => {
+      const button = document.querySelector('#hud-action')!;
+      const poll = (): void => {
+        if (window.__dewhollow?.continuousFarmActionsRunning()) {
+          button.dispatchEvent(new PointerEvent('pointerleave', {
+            pointerId: 1, pointerType: 'mouse', clientX: 2, clientY: 2, bubbles: true,
+          }));
+          resolve();
+          return;
+        }
+        window.setTimeout(poll, 0);
+      };
+      poll();
+    }));
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? true)).toBe(false);
+    await page.mouse.up();
+    await page.waitForTimeout(900);
+    const hits = await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0);
+    expect(hits).toBeLessThanOrEqual(1);
+  });
+
+  test('單次互動與長按農務經原有 command 路徑產生相同終態', async ({ page }) => {
+    await start(page);
+    await moveToEmptyField(page);
+    await enableContinuousActions(page);
+    await saveGame(page);
+    const initial = await savedRecord(page);
+
+    await page.locator('#hud-action').click();
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0)).toBe(1);
+    await expect.poll(async () => page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy ?? true)).toBe(false);
+    await saveGame(page);
+    const singleAction = await savedRecord(page);
+
+    await restoreRecord(page, initial);
+    await page.reload();
+    await expect(page.locator('#game canvas')).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+    await holdMainAction(page, 900);
+    await expect.poll(async () => page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy ?? true)).toBe(false);
+    await saveGame(page);
+    const continuous = await savedRecord(page);
+
+    const withoutPlaytime = (state: Record<string, unknown>) => {
+      const { playtimeSeconds: _playtimeSeconds, ...stableState } = state;
+      return stableState;
+    };
+    expect(withoutPlaytime(continuous.state)).toEqual(withoutPlaytime(singleAction.state));
+  });
+
+  test('最後一顆種子只播一次；單次 command 與長按的背包、日曆、任務及 RNG 終態相同', async ({ page }) => {
+    const initial = await prepareFarmState(page, (state) => {
+      state.plots = { '5,5': { watered: false, crop: null, dryDays: 0 } };
+      state.tool = 'seedbag';
+      state.selectedSeed = 'moon-bean';
+      const inventory = state.inventory as { capacity: number; stacks: Array<{ itemId: string; quality: string; count: number }> };
+      state.inventory = {
+        ...inventory,
+        stacks: [
+          ...inventory.stacks.filter((stack) => !stack.itemId.startsWith('seed.')),
+          { itemId: 'seed.moon-bean', quality: 'normal', count: 1 },
+        ],
+      };
+    });
+    await moveToEmptyField(page);
+    await enableContinuousActions(page);
+    await expect.poll(() => page.evaluate(() => {
+      const candidate = window.__dewhollow?.interaction();
+      return `${candidate?.labelKey}:${candidate?.plotKey}`;
+    })).toBe('plant:5,5');
+    await saveGame(page);
+    const configured = await savedRecord(page);
+
+    await page.locator('#hud-action').click();
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:plant').length ?? 0)).toBe(1);
+    await expect.poll(async () => page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy ?? true)).toBe(false);
+    await saveGame(page);
+    const singleAction = await savedRecord(page);
+
+    await restoreRecord(page, configured);
+    await page.reload();
+    await expect(page.locator('#game canvas')).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+    await holdMainAction(page, 1000);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:plant').length ?? 0)).toBe(1);
+    await saveGame(page);
+    const continuous = await savedRecord(page);
+
+    const stable = (state: Record<string, unknown>) => {
+      const { playtimeSeconds: _playtimeSeconds, ...rest } = state;
+      return rest;
+    };
+    expect(stable(continuous.state)).toEqual(stable(singleAction.state));
+    const inventory = continuous.state.inventory as { stacks: Array<{ itemId: string; count: number }> };
+    expect(inventory.stacks.some((stack) => stack.itemId === 'seed.moon-bean')).toBe(false);
+    expect(initial.state.rng).toBe(continuous.state.rng);
+  });
+
+  test('體力不足時長按不派發農務，也不消耗時間、資源或狀態', async ({ page }) => {
+    await prepareFarmState(page, (state) => {
+      state.plots = {};
+      state.tool = 'hoe';
+      state.energy = { current: 0, max: 100 };
+    });
+    await moveToEmptyField(page);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.interaction().labelKey ?? '')).toBe('till');
+    await enableContinuousActions(page);
+    await saveGame(page);
+    const before = await savedRecord(page);
+    await holdMainAction(page, 900);
+    await saveGame(page);
+    const after = await savedRecord(page);
+
+    const stable = (state: Record<string, unknown>) => {
+      const { playtimeSeconds: _playtimeSeconds, ...rest } = state;
+      return rest;
+    };
+    expect(stable(after.state)).toEqual(stable(before.state));
+    expect(await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0)).toBe(0);
+  });
+});

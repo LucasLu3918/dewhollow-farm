@@ -44,6 +44,7 @@ export class SettingsPanel {
   private readonly placement: HTMLSelectElement;
   private readonly controlStyle: HTMLSelectElement;
   private readonly handedness: HTMLSelectElement;
+  private readonly continuousActions: HTMLInputElement;
   private readonly dialog: PanelDialog;
   private capturing: ActionId | null = null;
   private pendingSwap: { action: ActionId; key: string; conflict: ActionId } | null = null;
@@ -70,6 +71,7 @@ export class SettingsPanel {
     this.placement = required<HTMLSelectElement>(doc, '#settings-placement');
     this.controlStyle = required<HTMLSelectElement>(doc, '#settings-control-style');
     this.handedness = required<HTMLSelectElement>(doc, '#settings-handedness');
+    this.continuousActions = required<HTMLInputElement>(doc, '#settings-continuous-actions');
 
     required(doc, '#settings-close').addEventListener('click', () => this.close());
     required(doc, '#settings-reset').addEventListener('click', () => this.restoreDefaults());
@@ -103,6 +105,11 @@ export class SettingsPanel {
     this.handedness.addEventListener('change', () => {
       const saved = this.service.update({ mobile: { handedness: this.handedness.value as Handedness } });
       this.say(saved ? '已更新慣用手。' : `已更新慣用手。${SAVE_FAILED}`);
+      this.render();
+    });
+    this.continuousActions.addEventListener('change', () => {
+      const saved = this.service.update({ mobile: { continuousActions: this.continuousActions.checked } });
+      this.say(saved ? '已更新長按連續農務設定。' : `已更新長按連續農務設定。${SAVE_FAILED}`);
       this.render();
     });
 
@@ -308,6 +315,7 @@ export class SettingsPanel {
     this.placement.value = settings.mobile.controlsPlacement;
     this.controlStyle.value = settings.mobile.controlStyle;
     this.handedness.value = settings.mobile.handedness;
+    this.continuousActions.checked = settings.mobile.continuousActions;
     this.reduced.textContent = prefersReducedMotion()
       ? '系統的「減少動態」已開啟，閃光、震動與粒子效果會一律關閉。'
       : '這些效果在系統開啟「減少動態」時會一律關閉。';

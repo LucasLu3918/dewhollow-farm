@@ -6,7 +6,7 @@ import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/as
 import type { GameSession } from '../../application/game-session';
 import { resolveInteraction, type InteractionLabelKey } from '../../application/interaction';
 import type { ContentIndex } from '../../application/content-index';
-import type { ActionFeedback, Command, GameEvent } from '../../application/game-commands';
+import type { ActionFeedback, Command, CommandOutcome, GameEvent } from '../../application/game-commands';
 import type { CompanionDef, CompanionManifest } from '../../infrastructure/assets/companion-manifest';
 import type { ToolDef, ToolManifest } from '../../infrastructure/assets/tool-manifest';
 import type { RigDef, RigManifest } from '../../infrastructure/assets/rig-manifest';
@@ -70,6 +70,7 @@ import { gateAction, type ActionGateAction } from '../action-gate';
 import { cameraViewportFor } from '../responsive/layout';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
 import { ToolSeedSelector } from '../tool-seed-selector';
+import { ContinuousFarmActions, farmActionTarget } from '../continuous-farm-actions';
 
 /** 鍵盤事件與虛擬按鍵共用的形狀：只需要按鍵名稱與 preventDefault。 */
 type KeyLike = Pick<KeyboardEvent, 'key' | 'preventDefault'>;
@@ -117,6 +118,10 @@ const MOVE_ACTIONS: Partial<Record<ActionId, Direction>> = {
   moveLeft: 'left',
   moveRight: 'right',
 };
+
+function isMovementAction(action: ActionId | ActionGateAction | null): boolean {
+  return action === 'moveUp' || action === 'moveDown' || action === 'moveLeft' || action === 'moveRight';
+}
 
 /** 動作 → 遊戲指令。 */
 const COMMAND_ACTIONS: Partial<Record<ActionId, Command>> = {
@@ -228,6 +233,9 @@ declare global {
       cameraScroll(): { x: number; y: number };
       worldGeneration(): number;
       responsiveLayout(): ReturnType<ResponsiveLayoutController['get']>;
+      interaction(): ReturnType<typeof resolveInteraction>;
+      continuousFarmActionsStopReason(): string;
+      continuousFarmCancelSource(): string;
       cameraView(): { x: number; y: number; width: number; height: number; zoom: number; bounds: { x: number; y: number; width: number; height: number } };
       mapId(): string;
       /** 玩家與地圖上所有圖片的貼圖名稱與畫面範圍（世界座標）。 */
@@ -252,6 +260,8 @@ declare global {
       emotes(): EmoteDebugInfo[];
       /** 效果發生的紀錄（揮動開始、命中時的粒子、鏡頭微震），用來驗證效果落在命中那一刻。 */
       effectLog(): { name: string; at: number }[];
+      /** Whether the opt-in continuous farm gesture is active (E2E diagnostics). */
+      continuousFarmActionsRunning(): boolean;
       /** 最近播放過的音效 id（靜音時不記）。 */
       soundLog(): string[];
       /** 目前是否靜音。 */
@@ -302,6 +312,10 @@ export class MapScene extends Phaser.Scene {
   private collectionPanel!: CollectionPanel;
   private legacyPanel!: LegacyPanel;
   private touchControls!: TouchControls;
+  private continuousFarmActions!: ContinuousFarmActions;
+  private disposeMainActionHold: (() => void) | null = null;
+  private lastContinuousCancelReason = 'not-cancelled';
+  private unsubscribeContinuousSetting: (() => void) | null = null;
   private toolSeedSelector!: ToolSeedSelector;
   /** 夜釣星星進行中的計時器與甩竿的時刻（一圈的時限，見 star-fishing.ts）。 */
   private starTimer: Phaser.Time.TimerEvent | null = null;
@@ -343,13 +357,39 @@ export class MapScene extends Phaser.Scene {
   init(deps: MapSceneDeps): void {
     this.deps = deps;
     this.settingsPanel = new SettingsPanel(document, deps.settings, deps.controls.settingsLabels);
+    this.continuousFarmActions = new ContinuousFarmActions({
+      enabled: () => deps.settings.get().mobile.continuousActions,
+      context: () => `${deps.session.state.tool}\u0000${deps.session.state.selectedSeed}`,
+      candidate: () => {
+        const descriptor = resolveInteraction(deps.session.state, deps.index);
+        // A move can finish an in-flight swing early while the rig is walking; swing() queues
+        // the next farm action until that walk completes, so walking must not invalidate the target.
+        if (this.playerActionInProgress) return null;
+        return farmActionTarget(descriptor.labelKey, descriptor.plotKey);
+      },
+      execute: async (target) => {
+        const outcome = await this.handleAction('interact', undefined, undefined, true);
+        const acted = outcome?.events.find((event) => event.type === 'acted' && event.action === target.action && plotKey(event.x, event.y) === target.key);
+        return { ...target, success: Boolean(acted) };
+      },
+    });
+    this.unsubscribeContinuousSetting = deps.settings.onChange((settings) => {
+      if (!settings.mobile.continuousActions) this.continuousFarmActions.stop('settings-disabled');
+    });
+    this.disposeMainActionHold = deps.hud.bindMainActionHold(
+      () => { this.continuousFarmActions.start(); return this.continuousFarmActions.isRunning; },
+      () => this.continuousFarmActions.stop('hud-hold-ended'),
+    );
     deps.hud.bindSettings(() => {
       this.touchControls.cancelAll();
       this.settingsPanel.open();
     });
     deps.hud.bindMainAction(() => this.pressAction('interact'));
     // 虛擬按鍵（觸控）：按鈕本身掛在 DOM 上，顯示與否由 apply-settings.ts 決定。
-    this.touchControls = new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons, deps.controls.touchMore, deps.settings);
+    this.touchControls = new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons, deps.controls.touchMore, deps.settings, (reason) => {
+      this.lastContinuousCancelReason = reason;
+      this.continuousFarmActions.stop(`touch-controls:${reason}`);
+    });
     this.toolSeedSelector = new ToolSeedSelector(document, deps.index, (command) => {
       // Direct selectors use distinct gate actions and preserve the selected ID in the command.
       void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command);
@@ -409,6 +449,11 @@ export class MapScene extends Phaser.Scene {
     window.addEventListener('keydown', this.onKeyDown);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener('keydown', this.onKeyDown);
+      this.continuousFarmActions.stop('scene-shutdown');
+      this.disposeMainActionHold?.();
+      this.disposeMainActionHold = null;
+      this.unsubscribeContinuousSetting?.();
+      this.unsubscribeContinuousSetting = null;
       this.touchControls.dispose();
     });
     // 讀取存檔的提示等到鍵盤已經接上才顯示：提示出現時，按鍵一定會被接到（載入素材的期間按的鍵不算）。
@@ -454,6 +499,7 @@ export class MapScene extends Phaser.Scene {
         cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
         worldGeneration: () => this.worldGeneration,
         responsiveLayout: () => this.deps.responsive.get(),
+      interaction: () => resolveInteraction(this.deps.session.state, this.deps.index),
         cameraView: () => ({ x: camera.x, y: camera.y, width: camera.width / camera.zoom, height: camera.height / camera.zoom, zoom: camera.zoom, bounds: { ...camera.getBounds() } }),
         mapId: () => this.deps.session.state.mapId,
         sprites: () => this.debugSprites(),
@@ -468,6 +514,9 @@ export class MapScene extends Phaser.Scene {
         setOthersHidden: (hidden) => this.setOthersHidden(hidden),
         emotes: () => this.debugEmotes(),
         effectLog: () => this.effectEntries.map((e) => ({ ...e })),
+        continuousFarmActionsRunning: () => this.continuousFarmActions.isRunning,
+        continuousFarmActionsStopReason: () => this.continuousFarmActions.lastStopReason,
+        continuousFarmCancelSource: () => this.lastContinuousCancelReason,
         soundLog: () => this.deps.sounds.playedIds(),
         muted: () => this.deps.sounds.isMuted(),
         musicPlaying: () => this.deps.music.isPlaying(),
@@ -500,6 +549,7 @@ export class MapScene extends Phaser.Scene {
 
   /** 虛擬按鍵直接送出語意動作；按鍵重綁只影響鍵盤 adapter。 */
   private pressAction(action: ActionId): void {
+    if (!isMovementAction(action)) this.continuousFarmActions.stop('non-movement-touch-action');
     void this.handleAction(action);
   }
 
@@ -527,22 +577,23 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 鍵盤與觸控共用語意動作入口；鍵盤 adapter 保留自訂按鍵與 Esc 語意。 */
-  private async handleAction(action: ActionGateAction | null, event?: KeyLike, commandOverride?: Command): Promise<void> {
+  private async handleAction(action: ActionGateAction | null, event?: KeyLike, commandOverride?: Command, waitForFarmAnimation = false): Promise<CommandOutcome | null> {
     const { hud, sounds } = this.deps;
-    if (this.settingsPanel.isCapturing()) return;
+    if (action !== 'interact' && !isMovementAction(action)) this.continuousFarmActions.stop('non-farm-action');
+    if (this.settingsPanel.isCapturing()) return null;
     if (action === 'mute') {
       // 靜音是玩家的偏好，不是遊戲指令，所以不經過應用層。
       event?.preventDefault();
       const muted = sounds.toggleMute();
       hud.messages([muted ? '已靜音（按 M 開啟音效）' : '已開啟音效（按 M 靜音）']);
-      return;
+      return null;
     }
     if (action === 'music') {
       // 背景音樂預設不播放，由玩家按 B 開始（瀏覽器要求使用者手勢才能出聲）。
       event?.preventDefault();
       const playing = this.deps.music.toggle();
       hud.messages([playing ? '背景音樂開始播放（按 B 暫停）' : '背景音樂已暫停（按 B 播放）']);
-      return;
+      return null;
     }
     const openGroup = this.modalGroups.find((group) => group.some((panel) => panel.isOpen()));
     if (!action) {
@@ -552,7 +603,7 @@ export class MapScene extends Phaser.Scene {
         this.touchControls.cancelAll();
         for (const panel of openGroup) panel.close();
       }
-      return;
+      return null;
     }
     const decision = gateAction(action, {
       sceneActive: this.scene.isActive(),
@@ -566,86 +617,86 @@ export class MapScene extends Phaser.Scene {
     if (openGroup || this.heartEventPanel.isOpen() || this.reelTimer !== null || this.starTimer !== null || !this.scene.isActive()) {
       this.touchControls.cancelAll();
     }
-    if (decision === 'ignore') return;
+    if (decision === 'ignore') return null;
     if (decision === 'close-modal') {
       event?.preventDefault();
       for (const panel of openGroup ?? []) panel.close();
-      return;
+      return null;
     }
     if (decision === 'finish-reel') {
       event?.preventDefault();
       this.finishReel(true);
-      return;
+      return null;
     }
     if (decision === 'finish-star') {
       event?.preventDefault();
       this.finishStar(performance.now() - this.starStartedAt);
-      return;
+      return null;
     }
     if (action === 'help') {
       // 說明頁：操作按鍵、版本號、更新日誌與隱私說明；不花體力與時間。
       event?.preventDefault();
       this.touchControls.cancelAll();
       this.deps.help.open();
-      return;
+      return null;
     }
     if (action === 'saves') {
       // 存檔槽：讀取、新遊戲、刪除、匯出與匯入；不花體力與時間。
       event?.preventDefault();
       this.touchControls.cancelAll();
       void this.deps.saves.open();
-      return;
+      return null;
     }
     if (action === 'settings') {
       // 設定：改按鍵、字級、色盲模式、閃光與震動、觸控；不花體力與時間。
       event?.preventDefault();
       this.touchControls.cancelAll();
       this.settingsPanel.open();
-      return;
+      return null;
     }
     if (action === 'skills') {
       // 技能與天賦面板：不花體力與時間，不經過應用層的指令。
       event?.preventDefault();
       this.touchControls.cancelAll();
       this.skillPanel.toggle(this.deps.session.state);
-      return;
+      return null;
     }
     if (action === 'residents') {
       // 居民與好感面板：不花體力與時間，不經過應用層的指令。
       event?.preventDefault();
       this.touchControls.cancelAll();
       this.residentPanel.toggle(this.deps.session.state);
-      return;
+      return null;
     }
     if (action === 'collection') {
       // 圖鑑與成就面板：不花體力與時間，不經過應用層的指令。
       event?.preventDefault();
       this.touchControls.cancelAll();
       this.collectionPanel.open(this.deps.session.state);
-      return;
+      return null;
     }
     if (action === 'quests') {
       // 委託與佈告欄面板：不花體力與時間，不經過應用層的指令。
       event?.preventDefault();
       this.touchControls.cancelAll();
       this.questPanel.toggle(this.deps.session.state);
-      return;
+      return null;
     }
     const direction = action && action in MOVE_ACTIONS ? MOVE_ACTIONS[action as ActionId] : undefined;
     const mappedCommand = action && action in COMMAND_ACTIONS ? COMMAND_ACTIONS[action as ActionId] : undefined;
     const command: Command | undefined = commandOverride ?? (direction ? { type: 'move', direction } : mappedCommand);
-    if (!command) return;
+    if (!command) return null;
     event?.preventDefault();
-    let run: Promise<void>;
+    let run: Promise<CommandOutcome | null>;
     try {
       // run() applies the command synchronously before its first await; keep the gate closed only
       // across that state transition, not while an automatic save finishes in the background.
       this.playerActionInProgress = true;
-      run = this.run(command);
+      run = this.run(command, waitForFarmAnimation);
     } finally {
       this.playerActionInProgress = false;
     }
-    await run;
+    return run;
   }
 
   /** 魚上鉤：頭上冒出驚嘆號，開始計時。 */
@@ -706,21 +757,24 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 把一個指令交給應用層，顯示訊息與效果，然後重畫。鍵盤與商店面板共用這條路。 */
-  private async run(command: Command): Promise<void> {
+  private async run(command: Command, waitForFarmAnimation = false): Promise<CommandOutcome | null> {
     const { hud, session, sounds } = this.deps;
     const previousMapId = session.state.mapId;
     const before = { ...session.state.player };
     const plotsBefore = session.state.plots;
     const inventoryBefore = session.state.inventory;
+    let commandOutcome: CommandOutcome | null = null;
     try {
       const outcome = await session.dispatch(command);
+      commandOutcome = outcome;
       hud.messages(outcome.messages);
       // 買或升級的結果也送到商店面板的結果行：面板開著時，底部的訊息列在手機上可能看不到。
       if (command.type === 'buy' || command.type === 'upgrade') {
         this.shopPanel.showMessage(outcome.messages.join('　'), outcome.events.some((event) => event.type === 'refused'));
       }
       if (command.type === 'cycleTool' || command.type === 'cycleSeed') sounds.play('click');
-      this.playEvents(outcome.events, before, plotsBefore, inventoryBefore);
+      const animations = this.playEvents(outcome.events, before, plotsBefore, inventoryBefore);
+      if (waitForFarmAnimation) await animations;
     } catch (error) {
       hud.error(`存檔失敗：${error instanceof Error ? error.message : String(error)}`);
     }
@@ -736,6 +790,7 @@ export class MapScene extends Phaser.Scene {
     this.legacyPanel.refresh(session.state);
     this.refresh();
     if (session.state.mapId !== previousMapId || this.hasTouchInputBlocker()) this.touchControls.cancelAll();
+    return commandOutcome;
   }
 
   private hasTouchInputBlocker(): boolean {
@@ -752,10 +807,11 @@ export class MapScene extends Phaser.Scene {
     before: { x: number; y: number },
     plotsBefore: PlotMap,
     inventoryBefore: Inventory,
-  ): void {
+  ): Promise<void> {
+    const animations: Promise<void>[] = [];
     for (const event of events) {
       if (event.type === 'acted') {
-        this.playAction(event, plotsBefore, inventoryBefore);
+        animations.push(this.playAction(event, plotsBefore, inventoryBefore));
       } else if (event.type === 'slept') {
         sleepEffect(this, this.deps.session.state.player.x, this.deps.session.state.player.y, this.effectGates().flash);
         this.deps.sounds.play('sleep');
@@ -796,6 +852,7 @@ export class MapScene extends Phaser.Scene {
     const moved = before.x !== after.x || before.y !== after.y;
     const sameMap = this.renderedMapId === this.deps.session.state.mapId;
     if (moved && sameMap) this.footstep(before.x, before.y);
+    return Promise.all(animations).then(() => undefined);
   }
 
   /**
@@ -825,10 +882,10 @@ export class MapScene extends Phaser.Scene {
    * 農務動作的回饋：有工具的動作（開墾、澆水、播種）揮工具，粒子與鏡頭微震等到「命中」那一刻才出現；
    * 沒有工具的動作（收成、出貨）維持原本的壓扁伸展，效果立刻出現。
    */
-  private playAction(event: Extract<GameEvent, { type: 'acted' }>, plotsBefore: PlotMap, inventoryBefore: Inventory): void {
+  private playAction(event: Extract<GameEvent, { type: 'acted' }>, plotsBefore: PlotMap, inventoryBefore: Inventory): Promise<void> {
     if (event.action === 'ship') {
       this.playShip(event, inventoryBefore);
-      return;
+      return Promise.resolve();
     }
     const reduced = prefersReducedMotion();
     const gates = this.effectGates();
@@ -857,16 +914,18 @@ export class MapScene extends Phaser.Scene {
     };
     const tool = this.deps.tools.tools.find((t) => t.action === event.action);
     if (tool && this.rig.canSwing()) {
-      this.rig.swing(tool, SWING_DURATION_MS, reduced, impact, () => {
+      const animation = this.rig.swing(tool, SWING_DURATION_MS, reduced, impact, () => {
         this.log(`swing:${event.action}`);
         this.deps.sounds.play('swing');
       });
       // swing() 可能已經補播了上一個被打斷的動作的命中，所以在它之後才凍結這一格。
       this.heldPlots.set(key, plotsBefore[key] ?? null);
       this.drawPlots();
+      return animation;
     } else {
       this.rig.squash();
       impact();
+      return Promise.resolve();
     }
   }
 

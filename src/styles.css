@@ -123,6 +123,7 @@ a:focus-visible {
 }
 
 .status .hud-action {
+  touch-action: none;
   min-height: 48px;
   padding: 0 14px;
   background: var(--accent);

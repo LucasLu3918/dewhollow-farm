@@ -27,6 +27,10 @@ interface PointerGesture {
   target: HTMLElement;
 }
 
+export function becameHidden(previous: boolean, current: boolean): boolean {
+  return !previous && current;
+}
+
 /** DOM adapter for mobile input. Pointer state and repeat timing stay outside game state. */
 export class TouchControls {
   private readonly root: HTMLElement;
@@ -37,12 +41,15 @@ export class TouchControls {
   private readonly morePanel: HTMLElement;
   private readonly gestures = new Map<number, PointerGesture>();
   private readonly movement: MoveInputScheduler;
-  private readonly stopOnResize = (): void => this.cancelAll();
+  private readonly stopOnResize = (): void => this.cancelAll('viewport-change');
   private readonly stopWhenHidden = (): void => {
-    if (this.doc.visibilityState === 'hidden') this.cancelAll();
+    if (this.doc.visibilityState === 'hidden') this.cancelAll('document-hidden');
   };
   private readonly stopOnRootHidden = (): void => {
-    if (this.root.hidden) this.cancelAll();
+    const hidden = this.root.hidden;
+    const becameInvisible = becameHidden(this.rootWasHidden, hidden);
+    this.rootWasHidden = hidden;
+    if (becameInvisible) this.cancelAll('controls-hidden');
   };
   private readonly observer: MutationObserver;
   private readonly unsubscribeSettings: () => void;
@@ -50,6 +57,7 @@ export class TouchControls {
   private joystickCenter = { x: 0, y: 0 };
   private joystickStyle: MobileSettings['controlStyle'] = 'dpad';
   private handedness: Handedness = 'right';
+  private rootWasHidden = false;
 
   constructor(
     private readonly doc: Document,
@@ -57,10 +65,12 @@ export class TouchControls {
     labels: TouchLabels,
     more: TouchText,
     settings: SettingsService,
+    private readonly onCancelAll: (reason: string) => void = () => undefined,
   ) {
     const root = doc.querySelector<HTMLElement>('#touch-controls');
     if (!root) throw new Error('頁面缺少必要元素 #touch-controls');
     this.root = root;
+    this.rootWasHidden = root.hidden;
     root.replaceChildren();
     this.movement = new MoveInputScheduler((direction) => this.onPress(actionForDirection(direction)));
 
@@ -113,7 +123,8 @@ export class TouchControls {
   }
 
   /** Cancel every active gesture when a modal opens, the map changes or the scene shuts down. */
-  cancelAll(): void {
+  cancelAll(reason = 'explicit'): void {
+    this.onCancelAll(reason);
     const active = [...this.gestures.entries()];
     this.gestures.clear();
     this.movement.cancelAll();
@@ -266,7 +277,7 @@ export class TouchControls {
 
   private applyMobileSettings(settings: MobileSettings): void {
     const changed = settings.controlStyle !== this.joystickStyle || settings.handedness !== this.handedness;
-    if (changed) this.cancelAll();
+    if (changed) this.cancelAll('mobile-controls-changed');
     this.joystickStyle = settings.controlStyle;
     this.handedness = settings.handedness;
     this.root.dataset.controlStyle = settings.controlStyle;
