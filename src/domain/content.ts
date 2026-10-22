@@ -2,6 +2,8 @@
 
 import type { Season } from './calendar';
 import type { WeatherTable } from './weather';
+import type { RatingRules } from './rating';
+import type { LegacyContent } from './legacy';
 import type { ItemDef } from './items';
 import type { ToolId } from './tools';
 import type { TalentSet } from './talents';
@@ -81,7 +83,7 @@ export interface TileDef {
   item?: string;
   seasons?: Season[];
   /** 站在它前面按 X 的用途：佈告欄（看今日委託並接取）、信箱（取信）或節慶告示（見 festival.ts）。 */
-  notice?: 'bulletin' | 'mailbox' | 'festival' | 'repair';
+  notice?: 'bulletin' | 'mailbox' | 'festival' | 'repair' | 'legacy';
   /** 節慶的水池（只在節慶開放時有作用，見 star-fishing.ts）；或暖燈節的燈（見 festival.ts）。 */
   festival?: 'stars' | 'lantern';
   /** 溫室的田：不受季節限制（見 greenhouse.ts）。 */
@@ -179,6 +181,10 @@ export interface ContentPack {
   collection?: DexCategory[];
   /** 成就（見 achievements.ts 與 content/achievements.json）。測試用的最小內容可以省略。 */
   achievements?: AchievementDef[];
+  /** 農場評級的權重與門檻（見 rating.ts 與 content/rating.json）。測試用的最小內容可以省略（見 NO_RATING）。 */
+  rating?: RatingRules;
+  /** 豐收重置與傳承的數值與文字（見 legacy.ts 與 content/legacy.json）。測試用的最小內容可以省略（見 NO_LEGACY）。 */
+  legacy?: LegacyContent;
 }
 
 export interface RecipeDef {

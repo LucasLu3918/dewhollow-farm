@@ -5,6 +5,8 @@ import { TOOL_NAMES, type ToolId } from '../domain/tools';
 import { levelOf, SKILL_IDS, SKILL_NAMES } from '../domain/skills';
 import { WEATHER_NAMES } from '../domain/weather';
 import { pendingTalentSkills } from './skill-panel';
+import { farmRating } from '../application/rating';
+import { NO_RATING } from '../domain/rating';
 import { mineStatusLabel } from './mine-status';
 
 const LOG_LIMIT = 6;
@@ -16,6 +18,7 @@ export class Hud {
   private readonly weather: HTMLElement;
   private readonly skills: HTMLElement;
   private readonly gold: HTMLElement;
+  private readonly rating: HTMLElement;
   private readonly energyFill: HTMLElement;
   private readonly energyText: HTMLElement;
   private readonly tool: HTMLElement;
@@ -29,6 +32,7 @@ export class Hud {
     this.weather = required(doc, '#hud-weather');
     this.skills = required(doc, '#hud-skills');
     this.gold = required(doc, '#hud-gold');
+    this.rating = required(doc, '#hud-rating');
     this.energyFill = required(doc, '#hud-energy-fill');
     this.energyText = required(doc, '#hud-energy-text');
     this.tool = required(doc, '#hud-tool');
@@ -42,6 +46,13 @@ export class Hud {
     this.day.textContent = dateLabel(state.calendar);
     this.weather.textContent = `${WEATHER_NAMES[state.weather]}　明天：${WEATHER_NAMES[state.forecast]}`;
     this.gold.textContent = `${state.gold} 金`;
+    const grade = farmRating(state, {
+      rating: pack.rating ?? NO_RATING,
+      dexCategories: pack.collection ?? [],
+      npcIds: pack.npcs.map((n) => n.id),
+      friendship: pack.friendship,
+    });
+    this.rating.textContent = `評級 ${grade.grade}`;
     const pending = pendingTalentSkills(state, pack.tuning.skills.thresholds, pack.talents).length;
     const levels = SKILL_IDS.map((id) => `${SKILL_NAMES[id]} ${levelOf(state.skills[id], pack.tuning.skills.thresholds)}`).join('　');
     this.skills.textContent = pending > 0 ? `${levels}　（有 ${pending} 項可選天賦）` : levels;

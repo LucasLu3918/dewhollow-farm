@@ -5,7 +5,7 @@
   "height": 7,
   "rows": [
     "###############",
-    "#B..T..KW#....#",
+    "#B.GT..KW#....#",
     "#........#....#",
     "#.............#",
     "#.P....L.#....#",
@@ -31,6 +31,10 @@
     "L": {
       "kind": "furniture",
       "notice": "mailbox"
+    },
+    "G": {
+      "kind": "furniture",
+      "notice": "legacy"
     },
     "P": {
       "kind": "furniture",

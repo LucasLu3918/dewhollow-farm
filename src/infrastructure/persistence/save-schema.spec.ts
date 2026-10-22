@@ -45,7 +45,7 @@ import repairs from '../../../content/repairs.json';
 import randomEvents from '../../../content/events-random.json';
 
 const { pack } = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
-const context = { inventoryCapacity: pack.tuning.inventory.capacity, daysPerSeason: pack.tuning.time.daysPerSeason, wakeMinute: pack.tuning.time.wakeMinute };
+const context = { inventoryCapacity: pack.tuning.inventory.capacity, daysPerSeason: pack.tuning.time.daysPerSeason, wakeMinute: pack.tuning.time.wakeMinute, playerName: '小涵' };
 
 function record(state: unknown) {
   return { slot: 'slot-1', savedAt: '2026-10-21T00:00:00.000Z', state };
@@ -137,7 +137,7 @@ describe('save schema with an old save', () => {
 
   it('loads a v1 save as a current-version state', () => {
     const { state } = parseSaveRecord(record(v1), context);
-    expect(state.schemaVersion).toBe(22);
+    expect(state.schemaVersion).toBe(23);
     expect(state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
     expect(state.playtimeSeconds).toBe(0);
     expect(state.calendar.day).toBe(2);

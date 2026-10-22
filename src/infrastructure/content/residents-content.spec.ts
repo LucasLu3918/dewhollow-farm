@@ -251,7 +251,7 @@ describe('委託與信件（M5b，真實內容）', () => {
   it('鎮廣場有佈告欄、小屋有信箱（地圖上的標記）', () => {
     const notices = (map: { legend: Record<string, { notice?: string }> }) => Object.values(map.legend).map((t) => t.notice).filter(Boolean);
     expect(notices(pack.maps.find((m) => m.id === 'plaza')!)).toEqual(['bulletin', 'festival', 'repair']);
-    expect(notices(pack.maps.find((m) => m.id === 'house')!)).toEqual(['mailbox']);
+    expect(notices(pack.maps.find((m) => m.id === 'house')!)).toEqual(['mailbox', 'legacy']);
   });
 });
 

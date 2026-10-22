@@ -53,9 +53,15 @@ import { festivalProblems, storyProblems } from './festival-content';
 import { randomEventProblems, repairProblems } from './repairs-content';
 import { achievementProblems, collectionProblems } from './collection-content';
 import { housePathProblems, merchantProblems } from './merchant-content';
+import { legacyProblems, ratingProblems } from './legacy-content';
+import { legacyFileSchema, ratingFileSchema } from './content-schema';
 import type { StoryChapter } from '../../domain/story';
 
 export interface RawContentFiles {
+  /** 農場評級（content/rating.json）。測試用的最小內容可以省略（視為單一等級、不計分）。 */
+  rating?: unknown;
+  /** 豐收重置與傳承（content/legacy.json）。測試用的最小內容可以省略（視為沒有豐收重置與傳承）。 */
+  legacy?: unknown;
   /** 節慶（content/festivals.json）。測試用的最小內容可以省略（視為沒有節慶）。 */
   festivals?: unknown;
   /** 主線章節（content/main-quest.json）。測試用的最小內容可以省略（視為沒有章節）。 */
@@ -165,6 +171,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const achievements = achievementsFileSchema.parse(raw.achievements ?? { version: 1, achievements: [] });
   const merchant = raw.merchant === undefined ? undefined : merchantFileSchema.parse(raw.merchant);
   const decor = raw.decor === undefined ? undefined : decorFileSchema.parse(raw.decor);
+  const rating = raw.rating === undefined ? undefined : ratingFileSchema.parse(raw.rating);
+  const legacy = raw.legacy === undefined ? undefined : legacyFileSchema.parse(raw.legacy);
 
   const pack: ContentPack = {
     crops,
@@ -202,6 +210,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
       candidates: merchant.candidates,
     },
     decor: decor && { placeMinutes: decor.placeMinutes, wearMinutes: decor.wearMinutes },
+    rating,
+    legacy,
   };
   const problems = [
     ...validateCrossReferences(pack, assets),
@@ -223,6 +233,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     ...economyProblems(pack),
     ...talentProblems(pack),
     ...mineProblems(pack),
+    ...(rating ? ratingProblems(rating) : []),
+    ...legacyProblems(pack),
   ];
   if (problems.length > 0) throw new ContentError(problems);
   return { pack, assets, rigs, companions, tools, sounds, music, terrain };

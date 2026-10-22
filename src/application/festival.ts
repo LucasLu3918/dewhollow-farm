@@ -1,4 +1,5 @@
 import type { GameState } from '../domain/game-state';
+import { receiveGold } from '../domain/income';
 import {
   CROWN_RECIPE,
   doneThisYear,
@@ -95,10 +96,10 @@ export function festivalCrown(state: GameState, index: ContentIndex): Result<Fes
   const year = state.calendar.year;
   const key = festivalKey(festival.id, 'crown');
   const first = !doneThisYear(state.festival, key, year);
+  const banked = first ? receiveGold(state, festival.crown.gold) : state;
   const next: GameState = {
-    ...state,
+    ...banked,
     inventory: stored.value,
-    gold: first ? state.gold + festival.crown.gold : state.gold,
     festival: first ? markDone(state.festival, key, year) : state.festival,
     flags: first ? { ...state.flags, [`attended:${festival.id}`]: true } : state.flags,
   };
@@ -121,8 +122,7 @@ export function recordContestCatch(state: GameState, index: ContentIndex): Festi
   const key = festivalKey(festival.id, 'contest');
   if (contestReached(contest, festival.contest) && !doneThisYear(next.festival, key, year)) {
     next = {
-      ...next,
-      gold: next.gold + festival.contest.gold,
+      ...receiveGold(next, festival.contest.gold),
       festival: markDone(next.festival, key, year),
       flags: { ...next.flags, [`attended:${festival.id}`]: true },
     };
@@ -145,8 +145,7 @@ export function recordHarvestContest(state: GameState, cropId: string, count: nu
   const key = festivalKey(festival.id, 'contest');
   if (harvestContestReached(next.festival.harvest, contest) && !doneThisYear(next.festival, key, year)) {
     next = {
-      ...next,
-      gold: next.gold + contest.gold,
+      ...receiveGold(next, contest.gold),
       festival: markDone(next.festival, key, year),
       flags: { ...next.flags, [`attended:${festival.id}`]: true },
     };
@@ -168,15 +167,14 @@ export function lightLantern(state: GameState, lampKey: string, index: ContentIn
   if (doneThisYear(state.festival, key, year)) return fail('ALREADY_LIT');
 
   let next: GameState = {
-    ...state,
-    gold: state.gold + lamps.gold,
+    ...receiveGold(state, lamps.gold),
     festival: markDone(state.festival, key, year),
     flags: { ...state.flags, [`attended:${festival.id}`]: true },
   };
   const messages = [`點亮了一盞燈，獎勵 ${lamps.gold} 金`];
   const lit = litLanterns(next.festival.done, festival.id, lanternKeysOf(index.map(state.mapId)), year);
   if (lit >= lamps.count && next.flags[lamps.flag] !== true) {
-    next = { ...next, gold: next.gold + lamps.allGold, flags: { ...next.flags, [lamps.flag]: true } };
+    next = { ...receiveGold(next, lamps.allGold), flags: { ...next.flags, [lamps.flag]: true } };
     messages.push(`廣場上全部的燈都亮了！獎勵 ${lamps.allGold} 金`);
   }
   return ok({ state: next, messages });

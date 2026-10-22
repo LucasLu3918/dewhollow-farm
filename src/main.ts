@@ -13,6 +13,8 @@ import collection from '../content/collection.json';
 import achievements from '../content/achievements.json';
 import merchant from '../content/traveling-merchant.json';
 import decor from '../content/decor.json';
+import rating from '../content/rating.json';
+import legacy from '../content/legacy.json';
 import mainQuest from '../content/main-quest.json';
 import repairs from '../content/repairs.json';
 import randomEvents from '../content/events-random.json';
@@ -47,6 +49,7 @@ import farm from '../content/maps/farm.json';
 import village from '../content/maps/village.json';
 import plaza from '../content/maps/plaza.json';
 import { createContentIndex } from './application/content-index';
+import { NO_LEGACY } from './domain/legacy';
 import { GameSession } from './application/game-session';
 import type { SaveRepository } from './application/ports';
 import { loadContent } from './infrastructure/content/load-content';
@@ -67,7 +70,7 @@ import { AudioOutput } from './presentation/audio/audio-output';
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
-  const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, merchant, decor, maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+  const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, merchant, decor, rating, legacy, maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
   const index = createContentIndex(loaded.pack);
   // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
   const audio = new AudioOutput();
@@ -78,6 +81,7 @@ async function bootstrap(): Promise<void> {
       inventoryCapacity: loaded.pack.tuning.inventory.capacity,
       daysPerSeason: loaded.pack.tuning.time.daysPerSeason,
       wakeMinute: loaded.pack.tuning.time.wakeMinute,
+      playerName: (loaded.pack.legacy ?? NO_LEGACY).defaultPlayerName,
     });
   } else {
     repository = new MemorySaveRepository();

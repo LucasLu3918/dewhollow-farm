@@ -40,6 +40,9 @@ import { donateToRepair } from './repairs';
 import { endOfDay, eventBitePoints, eventYieldChance, startDay } from './random-events';
 import { festivalOnDay } from '../domain/festival';
 import { starCatchHit } from '../domain/star-fishing';
+import { closeIncomeYear, receiveGold } from '../domain/income';
+import { cropPriceBonusPercent } from '../domain/legacy';
+import { runHarvestReset, runLegacy, type LegacyOutcome } from './legacy';
 
 export type Command =
   | { type: 'move'; direction: Direction }
@@ -92,6 +95,10 @@ export type Command =
   | { type: 'wear'; itemId?: string }
   /** 脫下身上的衣服或帽子，回到背包。 */
   | { type: 'takeOff' }
+  /** 豐收重置（站在床邊的公告前面）：confirmed 為假時只回報需要再按一次，什麼都不改（見 application/legacy.ts）。 */
+  | { type: 'harvestReset'; confirmed: boolean }
+  /** 傳承（站在床邊的公告前面）：name 是新角色的名字；confirmed 為假時什麼都不改。 */
+  | { type: 'legacy'; name: string; confirmed: boolean }
   | { type: 'manualSave' };
 
 export type GameEvent =
@@ -124,6 +131,8 @@ export type GameEvent =
   | { type: 'starLine' }
   /** 站在修復告示前按互動：畫面打開修復面板（不花體力與時間）。 */
   | { type: 'repairOpened' }
+  /** 站在床邊的公告前面按互動：畫面打開豐收重置與傳承的面板（不花體力與時間）。 */
+  | { type: 'legacyOpened' }
   /** 合成成功（供圖鑑與成就計數，見 application/collection.ts）。 */
   | { type: 'crafted'; recipeId: string };
 
@@ -242,6 +251,12 @@ function refused(reason: string): GameEvent {
   return { type: 'refused', reason };
 }
 
+/** 豐收重置與傳承的結果：失敗時保留原狀態並回報代碼，成功時只回傳訊息。 */
+function legacyCommand(state: GameState, outcome: LegacyOutcome): CommandOutcome {
+  if (outcome.refusal) return reply(outcome.state, outcome.messages, [refused(outcome.refusal)]);
+  return reply(outcome.state, outcome.messages);
+}
+
 function reply(state: GameState, messages: string[] = [], events: GameEvent[] = []): CommandOutcome {
   return { state, messages, events };
 }
@@ -328,6 +343,10 @@ function executeCore(current: GameState, command: Command, index: ContentIndex):
       return wear(state, command.itemId, index);
     case 'takeOff':
       return takeOff(state, index);
+    case 'harvestReset':
+      return legacyCommand(state, runHarvestReset(state, command.confirmed, index));
+    case 'legacy':
+      return legacyCommand(state, runLegacy(state, command.name, command.confirmed, index));
     case 'manualSave':
       return reply(state, [], [{ type: 'saveRequested' }]);
   }
@@ -396,6 +415,7 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
   if (tile.notice === 'mailbox') return collectMailbox(state, index);
   if (tile.notice === 'festival') return reply(state, [], [{ type: 'festivalOpened' }]);
   if (tile.notice === 'repair') return reply(state, [], [{ type: 'repairOpened' }]);
+  if (tile.notice === 'legacy') return reply(state, [], [{ type: 'legacyOpened' }]);
   if (tile.kind === 'rock' || tile.kind === 'ore') {
     if (kind === tile.kind) return mineRock(state, target, tile, index);
   }
@@ -712,8 +732,12 @@ function sleep(today: GameState, index: ContentIndex): CommandOutcome {
   const settled = settleShipBox(state.shipBox, (itemId, quality) => {
     const item = index.item(itemId);
     const bonus = sellBonusPercent(state.talents, index.talents.defs, item.kind);
-    return applySellBonus(priceWithQuality(item.sellPrice ?? 0, quality), bonus);
+    // 豐收重置的加成只給作物（見 domain/legacy.ts）。
+    const reset = item.kind === 'crop' ? cropPriceBonusPercent(state.resetBonus, index.legacy.reset) : 0;
+    return applySellBonus(priceWithQuality(item.sellPrice ?? 0, quality), bonus + reset);
   });
+  // 出貨的金幣是今年的收入（見 domain/income.ts）。
+  const banked = receiveGold(state, settled.gold);
   const wakeUp: GameState = {
     ...state,
     calendar,
@@ -728,12 +752,15 @@ function sleep(today: GameState, index: ContentIndex): CommandOutcome {
     // 羊毛先長一天（要看今天有沒有餵飽），再做照顧結算。
     sheep: dailyCare(growSheep(state.sheep, index)),
     processing,
-    gold: state.gold + settled.gold,
+    gold: banked.gold,
+    yearlyIncome: banked.yearlyIncome,
     shipBox: settled.box,
     energy: restore(state.energy),
   };
+  // 跨年：本年收入移到上一年（農場評級與豐收重置參考）。
+  const yearStart = calendar.year !== state.calendar.year ? closeIncomeYear(wakeUp) : wakeUp;
   // 早上：到期的居民來信送進信箱，佈告欄換成今天的委託。
-  const delivered = deliverLetters(wakeUp, index);
+  const delivered = deliverLetters(yearStart, index);
   // 新的一天的隨機事件：白天的物品在這裡入袋，事件的文字告訴玩家（見 random-events.ts）。
   const day = startDay(refreshBoard(delivered.state, index), index);
   const next = day.state;

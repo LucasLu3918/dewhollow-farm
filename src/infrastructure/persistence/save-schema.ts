@@ -184,6 +184,12 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   selectedSeed: z.string().min(1),
   rng: z.number().int().nonnegative().max(4294967295),
   playtimeSeconds: z.number().int().nonnegative(),
+  /** 農場評級與豐收重置、傳承：本年收入、上一年收入、豐收次數、角色名字與代數（見 domain/income.ts、legacy.ts）。 */
+  yearlyIncome: z.number().int().nonnegative(),
+  previousYearIncome: z.number().int().nonnegative(),
+  resetBonus: z.number().int().min(0).max(3),
+  playerName: z.string().min(1).max(8),
+  generation: z.number().int().positive(),
 });
 
 const recordSchema = z.object({

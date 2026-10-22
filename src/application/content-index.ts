@@ -1,4 +1,5 @@
 import type { ContentPack, CraftingRecipeDef, CropDef, FishDef, MapDef, NpcDef, ProcessingDef, RecipeDef, ShopDef } from '../domain/content';
+import { createNewGame, type GameState } from '../domain/game-state';
 import { cropItems, type ItemDef } from '../domain/items';
 import type { Tuning } from '../domain/tuning';
 import { generateMineLayer, mineId, type MineRules } from '../domain/mine';
@@ -19,6 +20,8 @@ import type { DexCategory } from '../domain/collection';
 import type { AchievementDef } from '../domain/achievements';
 import { greenhouseKeysOf } from '../domain/greenhouse';
 import type { MerchantRules } from '../domain/traveling-merchant';
+import { NO_RATING, type RatingRules } from '../domain/rating';
+import { NO_LEGACY, type LegacyContent } from '../domain/legacy';
 
 /**
  * 以 id 快速查找內容。假設內容已由基礎設施層驗證過參照完整性；
@@ -91,6 +94,12 @@ export interface ContentIndex {
   greenhouse: ReadonlySet<string>;
   /** 旅行商人的規則（沒有內容時是 undefined，見 domain/traveling-merchant.ts）。 */
   merchant: MerchantRules | undefined;
+  /** 農場評級的權重與門檻（見 domain/rating.ts）。 */
+  rating: RatingRules;
+  /** 豐收重置與傳承的數值與文字（見 domain/legacy.ts）。 */
+  legacy: LegacyContent;
+  /** 開局的新遊戲（豐收重置與傳承用它取得開局的金幣、背包與位置）。 */
+  newGame(seed: number): GameState;
 }
 
 const NO_BULLETIN: BulletinRules = { postedBy: '鎮公所', dailyCount: 0, daily: [], weekly: [] };
@@ -205,6 +214,9 @@ export function createContentIndex(pack: ContentPack): ContentIndex {
     achievements: pack.achievements ?? [],
     greenhouse: new Set(pack.maps.flatMap((m) => greenhouseKeysOf(m))),
     merchant: pack.merchant,
+    rating: pack.rating ?? NO_RATING,
+    legacy: pack.legacy ?? NO_LEGACY,
+    newGame: (seed) => createNewGame(pack, seed),
     randomEvents: pack.randomEvents ?? { chance: 0, events: [] },
     randomEvent(id) {
       const found = (pack.randomEvents?.events ?? []).find((e) => e.id === id);
