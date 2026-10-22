@@ -60,6 +60,18 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+/*
+ * 列文字（商店等的 span，tabindex -1）只接受程式聚焦：滑鼠點到時不畫焦點框，只有鍵盤焦點才畫（與按鈕同一組權杖）。
+ */
+.shop-list span[data-focus-key]:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.shop-list span[data-focus-key]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 /* 安全區域（瀏覽器的瀏海、圓角與底部橫條）：至少留 16px 的邊界。 */
 .app {
   max-width: 960px;
@@ -682,14 +694,15 @@ a:focus-visible {
 }
 
 /*
- * 直式手機（寬度 600px 以內）的首屏版面，由上到下：狀態列（主要資訊在前，次要資訊與按鈕在後）→ 遊戲畫面 → 虛擬按鍵。
- * 訊息疊在遊戲畫面上緣（同一格），只顯示最近兩則、單行省略；沒有訊息時不佔位置。
+ * 直式手機（寬度 600px 以內）的首屏版面，由上到下：狀態列（主要資訊在前，次要資訊與按鈕在後）→ 遊戲畫面 → 訊息列 → 虛擬按鍵。
+ * 訊息列是獨立的一條（不疊在地圖上），只顯示最近兩則、單行省略；沒有訊息時不佔高度。
+ * 間距用各區塊的 margin 而非 grid gap，讓空的訊息列連 gap 都不留。
  * 這裡的 orientation 與下方的橫式規則互斥，不會疊在一起。
  */
 @media (max-width: 600px) and (orientation: portrait) {
   .app {
     grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
+    gap: 0;
     padding-top: 8px;
   }
 
@@ -698,6 +711,7 @@ a:focus-visible {
     grid-row: 1;
     gap: 4px 10px;
     padding: 8px 10px;
+    margin-bottom: 8px;
     font-size: calc(13px * var(--font-scale));
   }
 
@@ -764,25 +778,25 @@ a:focus-visible {
   .stage {
     grid-column: 1;
     grid-row: 2;
+    margin-bottom: 8px;
   }
 
-  /* 訊息列：疊在遊戲畫面上緣（與遊戲畫面同一格），不擋點擊（pointer-events: none），aria-live 仍在 DOM 裡。 */
+  /* 訊息列：獨立一列在遊戲畫面與虛擬按鍵之間；沒有訊息時沒有外框、不佔高度；aria-live 仍在 DOM 裡。 */
   .panel {
     grid-column: 1;
-    grid-row: 2;
-    align-self: start;
-    z-index: 1;
-    margin: 6px 6px 0;
-    padding: 4px 8px;
+    grid-row: 3;
+    margin: 0;
+    padding: 0;
     border: 0;
-    border-radius: var(--radius-md);
-    background: color-mix(in srgb, var(--surface-dialog) 80%, transparent);
-    pointer-events: none;
+    background: none;
   }
 
-  .panel:has(> .log:empty) {
-    padding: 0;
-    background: none;
+  .panel:has(> .log:not(:empty)) {
+    padding: 4px 8px;
+    margin-bottom: 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--panel);
   }
 
   .panel #hud-hint {
@@ -806,12 +820,13 @@ a:focus-visible {
   }
 
   /*
-   * 虛擬按鍵：左邊方向鍵（十字，置中）、右邊動作鍵（兩欄），工具鍵獨立一整列（四欄）。
+   * 虛擬按鍵：左邊方向鍵（十字，置中）、右邊動作鍵（三欄），工具鍵獨立一整列（四欄）。
    * 每顆都是 56px 高的觸控目標，寬度用格子撐開，375px 內不溢出、不水平捲動。
+   * 動作鍵用三欄（不用兩欄）是為了讓整組矮到首屏內：8 顆排成三列，而不是四列。
    */
   .touch-controls {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: 4;
     display: grid;
     grid-template-columns: 180px minmax(0, 1fr);
     gap: 8px 12px;
@@ -828,7 +843,7 @@ a:focus-visible {
     grid-column: 2;
     grid-row: 1;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     justify-content: stretch;
     max-width: none;
@@ -847,28 +862,50 @@ a:focus-visible {
     width: 100%;
     min-width: 0;
   }
+
+  /* 動作鍵每格約 46px 寬，兩個字（互動、技能…）要留在同一行：縮小左右內距，不換行。 */
+  .touch-act .touch-button {
+    padding: 0 2px;
+    white-space: nowrap;
+  }
 }
 
 /*
  * 橫式的手機或平板（高度不足）：方向鍵在遊戲區左側、動作鍵在右側，遊戲區維持在中間，不會蓋住角色。
+ * 版面的列（由上到下）：狀態列 → 遊戲列（左：方向鍵，中：遊戲畫面，右：動作鍵）→ 訊息列（兩行）→ 工具列。
+ * .app 高度鎖在視窗內，只有遊戲列吃剩下的高度；遊戲畫面的寬度由高度推出（維持 4:3，不變形），
+ * 所以 812×375、844×390 等矮視窗下，所有虛擬按鍵都在首屏內，不需要垂直捲動。
  * 虛擬按鍵的容器改為 display: contents，讓兩組按鍵直接成為 .app 的格子。
  */
 @media (orientation: landscape) and (max-height: 520px) {
   .app {
     grid-template-columns: 180px minmax(0, 1fr) 180px;
-    gap: 8px;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    gap: 0 8px;
+    height: 100vh;
+    height: 100dvh;
     padding-top: 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
     align-items: center;
   }
 
-  .status,
-  .panel {
+  .status {
     grid-column: 1 / -1;
+    grid-row: 1;
+    margin-bottom: 4px;
+    padding: 4px 10px;
+    gap: 2px 10px;
+    font-size: calc(12px * var(--font-scale));
   }
 
+  /* 遊戲畫面：高度是剩下的列高，寬度由 4:3 推出並置中；寬度不夠時才縮（此時會以寬度為準）。 */
   .stage {
     grid-column: 2;
     grid-row: 2;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    justify-self: center;
   }
 
   .touch-controls:not([hidden]) {
@@ -899,11 +936,48 @@ a:focus-visible {
     font-size: calc(14px * var(--font-scale));
   }
 
-  /* 工具組：明確放在第三列（整列置中），不讓它自動落到方向鍵或動作鍵的格子。 */
-  .touch-tool {
+  /* 訊息列：整列寬，固定兩行高（不因有無訊息而改變遊戲列的高度，畫布不會跟著跳動）。 */
+  .panel {
     grid-column: 1 / -1;
     grid-row: 3;
+    min-height: 40px;
+    margin: 0 0 4px;
+    padding: 2px 10px;
+  }
+
+  .panel:has(> .log:empty) {
+    padding: 0;
+    border-color: transparent;
+    background: none;
+  }
+
+  .panel #hud-hint {
+    display: none;
+  }
+
+  .log {
+    min-height: 0;
+    font-size: calc(12px * var(--font-scale));
+  }
+
+  .log li {
+    padding: 1px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .log li:not(:nth-last-child(-n + 2)) {
+    display: none;
+  }
+
+  /* 工具組：整列置中、單行（七顆 56px 寬的按鈕），放在最下面。 */
+  .touch-tool {
+    grid-column: 1 / -1;
+    grid-row: 4;
     justify-content: center;
+    flex-wrap: nowrap;
+    margin-bottom: 0;
   }
 
   .touch-tool .touch-button {
@@ -912,9 +986,5 @@ a:focus-visible {
     width: 56px;
     padding: 0;
     font-size: calc(14px * var(--font-scale));
-  }
-
-  .status {
-    padding: 6px 10px;
   }
 }
