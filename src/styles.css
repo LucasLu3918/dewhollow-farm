@@ -851,11 +851,15 @@ a:focus-visible {
 /*
  * 觸控裝置（粗指標）：一般文字按鈕至少 44px 高。虛擬按鍵（.touch-button）已是 56px，不在此列。
  * 這裡的 min-height 必須蓋過各按鈕的個別高度（例如 #shop-close 與 .save-actions button），
- * 所以用 !important 當作下限；數值 44px 也大於窄螢幕規則的 40px，兩者不衝突。
+ * 所以用 !important 當作下限；主要 HUD 動作另維持 48px，以符合核心觸控目標。
  */
 @media (pointer: coarse) {
   button:not(.touch-button) {
     min-height: 44px !important;
+  }
+
+  .status .hud-action {
+    min-height: 48px !important;
   }
 }
 

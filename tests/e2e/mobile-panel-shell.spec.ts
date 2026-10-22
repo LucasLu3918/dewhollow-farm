@@ -86,3 +86,36 @@ test.describe('MB-07 compact HUD and shared panel shell', () => {
     }
   });
 });
+
+test.describe('MB-07 touch HUD targets', () => {
+  test.use({ hasTouch: true, isMobile: true });
+
+  test('primary action stays at least 48 CSS pixels high on coarse-pointer touch viewports', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 600 });
+    await start(page);
+
+    for (const viewport of [{ width: 390, height: 600 }, { width: 844, height: 390 }]) {
+      await page.setViewportSize(viewport);
+      await expect.poll(() => page.evaluate(() => window.matchMedia('(pointer: coarse)').matches)).toBe(true);
+
+      const action = page.locator('#hud-action');
+      const bounds = await action.boundingBox();
+      expect(bounds, `${viewport.width}×${viewport.height} touch primary action bounds`).not.toBeNull();
+      expect(bounds!.height).toBeGreaterThanOrEqual(48);
+      expect(bounds!.y).toBeGreaterThanOrEqual(0);
+      expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(viewport.height + 1);
+
+      await page.evaluate(() => {
+        document.body.dataset.lastTouchPointerType = '';
+        document.addEventListener('pointerdown', (event) => {
+          document.body.dataset.lastTouchPointerType = event.pointerType;
+        }, { once: true, capture: true });
+      });
+      const settings = await page.locator('#hud-settings').boundingBox();
+      expect(settings).not.toBeNull();
+      await page.touchscreen.tap(settings!.x + settings!.width / 2, settings!.y + settings!.height / 2);
+      await expect.poll(() => page.locator('body').getAttribute('data-last-touch-pointer-type')).toBe('touch');
+      await page.locator('#settings-close').click();
+    }
+  });
+});
