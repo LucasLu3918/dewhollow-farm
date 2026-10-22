@@ -3,7 +3,7 @@ import { TOUCH_REPEAT_MS, buildTouchButtons, type TouchButton, type TouchLabels,
 
 /**
  * 虛擬按鍵（DOM，pointer events）：畫面下方的方向鍵與常用動作鍵，另有一顆「更多」收起次要選單與工具。
- * 按下只回報「動作」，由 MapScene 轉成該動作目前綁定的按鍵，走鍵盤的同一條路徑。
+ * 按下直接回報語意動作，由 MapScene 與鍵盤 adapter 共用動作閘門。
  * 方向鍵按住會連續移動（每 TOUCH_REPEAT_MS 一次）。顯示與否由 apply-settings.ts 決定（#touch-controls 的 hidden）。
  * 「更多」展開時，選了一個動作就自動收起，避免選單或面板蓋住後面要操作的畫面。
  */

@@ -1,9 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * 觸控操作（M7）：虛擬按鍵（pointer events）模擬對應按鍵的 handleKey，直式與橫式都不蓋住遊戲區，
+ * 觸控操作（M7）：虛擬按鍵（pointer events）直接送出語意動作，直式與橫式都不蓋住遊戲區，
  * 觸控與鍵盤並存，設定可以強制顯示或隱藏。
- * 本檔尚未執行（依任務規定，不跑 npm run test:e2e）。
  */
 
 const SETTINGS_KEY = 'dewhollow-farm.settings';
@@ -31,6 +30,47 @@ async function tapPad(page: Page, action: string): Promise<void> {
   await button.dispatchEvent('pointerup');
 }
 
+async function playerPosition(page: Page): Promise<{ x: number; y: number }> {
+  const actors = await page.evaluate(() => window.__dewhollow?.actors() ?? []);
+  const player = (actors as { id: string; tileX: number; tileY: number }[]).find((actor) => actor.id === 'player');
+  if (!player) throw new Error('找不到玩家');
+  return { x: player.tileX, y: player.tileY };
+}
+
+async function saveStatePatchAndReload(page: Page, patch: Record<string, unknown>): Promise<void> {
+  await page.keyboard.press('s');
+  await expect(page.locator('#hud-log')).toContainText('已存檔');
+  const record = await page.evaluate(
+    () => new Promise<{ slot: string; savedAt: string; state: Record<string, unknown> }>((resolve, reject) => {
+      const request = indexedDB.open('dewhollow-farm');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const db = request.result;
+        const get = db.transaction('saves').objectStore('saves').get('slot-1');
+        get.onsuccess = () => { db.close(); resolve(get.result); };
+        get.onerror = () => { db.close(); reject(get.error); };
+      };
+    }),
+  );
+  await page.evaluate(
+    ({ saved, changes }) => new Promise<void>((resolve, reject) => {
+      const request = indexedDB.open('dewhollow-farm');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction('saves', 'readwrite');
+        tx.objectStore('saves').put({ ...saved, state: { ...saved.state, ...changes } });
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror = () => { db.close(); reject(tx.error); };
+      };
+    }),
+    { saved: record, changes: patch },
+  );
+  await page.reload();
+  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).not.toBe('');
+}
+
 test.describe('直式手機（390 x 844，觸控）', () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 
@@ -53,6 +93,45 @@ test.describe('直式手機（390 x 844，觸控）', () => {
     await expect(page.locator('#skill-panel')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page.locator('#skill-panel')).toBeHidden();
+  });
+
+  test('面板開啟時觸控移動被閘門擋下，且開面板只派發一次', async ({ page }) => {
+    await seedTouchMode(page, 'on');
+    await startGame(page);
+    const before = await playerPosition(page);
+    await tapPad(page, 'skills');
+    await expect(page.locator('#skill-panel')).toBeVisible();
+    await tapPad(page, 'moveDown');
+    await expect(page.locator('#skill-panel')).toBeVisible();
+    expect(await playerPosition(page)).toEqual(before);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#skill-panel')).toBeHidden();
+  });
+
+  test('改鍵捕捉期間觸控操作不派發遊戲動作', async ({ page }) => {
+    await seedTouchMode(page, 'on');
+    await startGame(page);
+    await page.keyboard.press('o');
+    await expect(page.locator('#settings-panel')).toBeVisible();
+    await page.locator('#settings-keys button[data-action="interact"]').click();
+    const before = await playerPosition(page);
+    await tapPad(page, 'moveDown');
+    expect(await playerPosition(page)).toEqual(before);
+    await expect(page.locator('#settings-panel')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#settings-panel')).toBeHidden();
+  });
+
+  test('心形事件開啟時觸控移動被閘門擋下', async ({ page }) => {
+    await seedTouchMode(page, 'on');
+    await startGame(page);
+    await saveStatePatchAndReload(page, { pendingHeartEvent: 'maomao-heart-1' });
+    await expect(page.locator('#heart-event-panel')).toBeVisible();
+    const before = await playerPosition(page);
+    await tapPad(page, 'moveDown');
+    expect(await playerPosition(page)).toEqual(before);
+    await expect(page.locator('#heart-event-panel')).toBeVisible();
   });
 
   test('點居民鍵（虛擬）會打開居民面板，點了之後仍可用鍵盤', async ({ page }) => {
