@@ -22,8 +22,8 @@
           <span class="energy-track"><span id="hud-energy-fill"></span></span>
           <span id="hud-energy-text">20 / 20</span>
         </span>
-        <span id="hud-tool">鋤頭</span>
-        <span id="hud-seed"></span>
+        <button id="hud-tool" class="status-selector" type="button" aria-label="選擇工具，長按開啟輪盤">鋤頭</button>
+        <button id="hud-seed" class="status-selector" type="button" aria-label="選擇種子，長按開啟輪盤"></button>
         <span id="hud-mine" aria-label="礦坑狀態"></span>
         <span class="status-actions">
           <button id="hud-saves" class="status-button" type="button" aria-label="存檔槽，可讀取、新遊戲、刪除、匯出與匯入（或按 L）">存檔</button>
@@ -35,6 +35,13 @@
       </header>
       <div id="game" class="stage" role="region" aria-label="晨露農場遊戲畫面。用方向鍵移動，按問號鍵看操作說明"><p class="loading" role="status">農場載入中…</p></div>
       <div id="touch-controls" class="touch-controls" hidden></div>
+      <section id="tool-seed-panel" class="shop-panel tool-seed-panel" aria-labelledby="tool-seed-title" role="dialog" aria-modal="true" hidden>
+        <header><h2 id="tool-seed-title">選擇工具</h2></header>
+        <p id="tool-seed-note" class="tool-seed-note" hidden></p>
+        <ul id="tool-seed-list" class="shop-list"></ul>
+        <div class="tool-seed-pages"><button id="tool-seed-prev" type="button" hidden>上一頁</button><span id="tool-seed-page" hidden></span><button id="tool-seed-next" type="button" hidden>下一頁</button></div>
+        <button id="tool-seed-close" type="button">關閉（Esc）</button>
+      </section>
       <section id="settings-panel" class="shop-panel settings-panel" aria-labelledby="settings-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="settings-title">設定</h2>

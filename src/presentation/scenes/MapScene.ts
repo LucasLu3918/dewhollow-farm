@@ -10,7 +10,7 @@ import type { CompanionDef, CompanionManifest } from '../../infrastructure/asset
 import type { ToolDef, ToolManifest } from '../../infrastructure/assets/tool-manifest';
 import type { RigDef, RigManifest } from '../../infrastructure/assets/rig-manifest';
 import type { TerrainDef } from '../../infrastructure/content/content-schema';
-import type { Hud } from '../hud';
+import type { HeldPointerStart, Hud } from '../hud';
 import type { HelpPanel } from '../help-panel';
 import type { SavePanel } from '../save-panel';
 import { cameraBounds, deadzoneOf, mapZoomFor } from '../camera';
@@ -65,9 +65,10 @@ import { TouchControls } from '../touch-controls';
 import type { TouchLabels, TouchText } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
 import type { OpenablePanel } from '../panel-dialog';
-import { gateAction } from '../action-gate';
+import { gateAction, type ActionGateAction } from '../action-gate';
 import { cameraViewportFor } from '../responsive/layout';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
+import { ToolSeedSelector } from '../tool-seed-selector';
 
 /** 鍵盤事件與虛擬按鍵共用的形狀：只需要按鍵名稱與 preventDefault。 */
 type KeyLike = Pick<KeyboardEvent, 'key' | 'preventDefault'>;
@@ -295,6 +296,7 @@ export class MapScene extends Phaser.Scene {
   private collectionPanel!: CollectionPanel;
   private legacyPanel!: LegacyPanel;
   private touchControls!: TouchControls;
+  private toolSeedSelector!: ToolSeedSelector;
   /** 夜釣星星進行中的計時器與甩竿的時刻（一圈的時限，見 star-fishing.ts）。 */
   private starTimer: Phaser.Time.TimerEvent | null = null;
   private starStartedAt = 0;
@@ -341,6 +343,15 @@ export class MapScene extends Phaser.Scene {
     });
     // 虛擬按鍵（觸控）：按鈕本身掛在 DOM 上，顯示與否由 apply-settings.ts 決定。
     this.touchControls = new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons, deps.controls.touchMore, deps.settings);
+    this.toolSeedSelector = new ToolSeedSelector(document, deps.index, (command) => {
+      // Direct selectors use distinct gate actions and preserve the selected ID in the command.
+      void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command);
+    });
+    deps.hud.bindToolSeedSelectors(
+      (wheel, pointer) => this.openToolSeedSelector('tool', wheel, pointer),
+      (wheel, pointer) => this.openToolSeedSelector('seed', wheel, pointer),
+      () => this.toolSeedSelector.cancelActiveGesture(),
+    );
     this.shopPanel = new ShopPanel(document, deps.index, (command) => void this.run(command));
     this.kitchenPanel = new KitchenPanel(document, deps.index, (command) => void this.run(command));
     this.workshopPanel = new WorkshopPanel(document, deps.index, (command) => void this.run(command));
@@ -371,7 +382,7 @@ export class MapScene extends Phaser.Scene {
         this.collectionPanel,
         this.legacyPanel,
       ],
-      [deps.help, deps.saves, this.settingsPanel],
+      [deps.help, deps.saves, this.settingsPanel, this.toolSeedSelector],
     ];
     this.terrainByKind = new Map(deps.terrain.map((entry) => [entry.kind, entry]));
   }
@@ -485,6 +496,12 @@ export class MapScene extends Phaser.Scene {
     void this.handleAction(action);
   }
 
+  private openToolSeedSelector(mode: 'tool' | 'seed', wheel: boolean, pointer?: HeldPointerStart): void {
+    if (this.hasTouchInputBlocker()) return;
+    this.touchControls.cancelAll();
+    this.toolSeedSelector.open(mode, wheel, this.deps.session.state, pointer);
+  }
+
   /** 目前的效果開關：系統「減少動態」或玩家關掉的效果都不出現（見 accessibility.ts）。 */
   private effectGates() {
     return reducedEffects(prefersReducedMotion(), this.deps.settings.get().effects);
@@ -503,7 +520,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 鍵盤與觸控共用語意動作入口；鍵盤 adapter 保留自訂按鍵與 Esc 語意。 */
-  private async handleAction(action: ActionId | null, event?: KeyLike): Promise<void> {
+  private async handleAction(action: ActionGateAction | null, event?: KeyLike, commandOverride?: Command): Promise<void> {
     const { hud, sounds } = this.deps;
     if (this.settingsPanel.isCapturing()) return;
     if (action === 'mute') {
@@ -607,8 +624,9 @@ export class MapScene extends Phaser.Scene {
       this.questPanel.toggle(this.deps.session.state);
       return;
     }
-    const direction = action ? MOVE_ACTIONS[action] : undefined;
-    const command: Command | undefined = direction ? { type: 'move', direction } : action ? COMMAND_ACTIONS[action] : undefined;
+    const direction = action && action in MOVE_ACTIONS ? MOVE_ACTIONS[action as ActionId] : undefined;
+    const mappedCommand = action && action in COMMAND_ACTIONS ? COMMAND_ACTIONS[action as ActionId] : undefined;
+    const command: Command | undefined = commandOverride ?? (direction ? { type: 'move', direction } : mappedCommand);
     if (!command) return;
     event?.preventDefault();
     let run: Promise<void>;

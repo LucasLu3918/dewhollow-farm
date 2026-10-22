@@ -12,9 +12,11 @@ export interface ActionGateState {
 }
 
 export type ActionGateDecision = 'dispatch' | 'finish-reel' | 'finish-star' | 'close-modal' | 'ignore';
+/** UI selections are direct semantic actions, not keyboard bindings or cycle commands. */
+export type ActionGateAction = ActionId | 'selectTool' | 'selectSeed';
 
 /** Decide whether a semantic player action may enter the map scene right now. */
-export function gateAction(action: ActionId, state: ActionGateState, escapePressed = false): ActionGateDecision {
+export function gateAction(action: ActionGateAction, state: ActionGateState, escapePressed = false): ActionGateDecision {
   if (!state.sceneActive || state.settingsCapturing || state.heartEventOpen) return 'ignore';
   if (state.reelPending) return action === 'interact' ? 'finish-reel' : 'ignore';
   if (state.starPending) return action === 'interact' ? 'finish-star' : 'ignore';
