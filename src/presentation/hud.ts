@@ -79,7 +79,7 @@ export class Hud {
     this.energyText.textContent = `${state.energy.current} / ${state.energy.max}`;
     this.tool.textContent = TOOL_NAMES[state.tool];
     const crop = pack.crops.find((c) => c.id === state.selectedSeed);
-    this.seed.textContent = state.tool === 'seedbag' ? `種子：${crop?.name ?? state.selectedSeed}` : '';
+    this.seed.textContent = `種子：${crop?.name ?? state.selectedSeed}`;
     this.mine.textContent = mineStatusLabel(state);
   }
 
@@ -104,6 +104,41 @@ export class Hud {
   /** 狀態列的「設定」按鈕（鍵盤的 O 也一樣）。 */
   bindSettings(onOpen: () => void): void {
     required(this.doc, '#hud-settings').addEventListener('click', onOpen);
+  }
+
+  /** 狀態列工具／種子捷徑：短按清單，長按輪盤。 */
+  bindToolSeedSelectors(onTool: (wheel: boolean) => void, onSeed: (wheel: boolean) => void): void {
+    this.bindHoldSelector(required(this.doc, '#hud-tool'), onTool);
+    this.bindHoldSelector(required(this.doc, '#hud-seed'), onSeed);
+  }
+
+  private bindHoldSelector(element: HTMLElement, onOpen: (wheel: boolean) => void): void {
+    let timer: number | null = null;
+    let holdOpenedAt = 0;
+    const clear = (): void => {
+      if (timer !== null) window.clearTimeout(timer);
+      timer = null;
+    };
+    element.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0 && event.pointerType !== 'touch') return;
+      clear();
+      timer = window.setTimeout(() => {
+        holdOpenedAt = Date.now();
+        onOpen(true);
+      }, 280);
+    });
+    element.addEventListener('pointerup', clear);
+    element.addEventListener('pointercancel', clear);
+    element.addEventListener('pointerleave', clear);
+    element.addEventListener('click', (event) => {
+      if (holdOpenedAt > 0 && Date.now() - holdOpenedAt < 1000) {
+        holdOpenedAt = 0;
+        event.preventDefault();
+        return;
+      }
+      onOpen(false);
+    });
+    element.addEventListener('contextmenu', (event) => event.preventDefault());
   }
 
   /** 色盲模式：訊息前面加上 ✕ 或 ✓ 的文字標記（見 accessibility.ts）。 */

@@ -572,6 +572,56 @@ describe('tools and seeds', () => {
     state = executeCommand(state, { type: 'cycleSeed' }, index).state;
     expect(state.selectedSeed).toBe('sweet-radish');
   });
+
+  it('directly selects a held seed and atomically switches to the seedbag', () => {
+    const state = start({
+      tool: 'can',
+      inventory: bagOf([{ itemId: 'seed.moon-bean', quality: 'normal', count: 1 }]),
+    });
+    const out = executeCommand(state, { type: 'selectSeed', cropId: 'moon-bean' }, index);
+
+    expect(out.state.selectedSeed).toBe('moon-bean');
+    expect(out.state.tool).toBe('seedbag');
+    expect(out.events).toEqual([]);
+    expect(out.messages).toEqual([]);
+  });
+
+  it('refuses an unknown seed id without changing state', () => {
+    const state = start({ tool: 'can' });
+    const out = executeCommand(state, { type: 'selectSeed', cropId: 'missing-crop' }, index);
+
+    expect(out.state).toEqual(state);
+    expect(out.messages).toEqual(['找不到這種種子']);
+    expect(out.events).toContainEqual({ type: 'refused', reason: 'INVALID_SEED' });
+  });
+
+  it('refuses a known seed with no inventory without changing state', () => {
+    const state = start({
+      tool: 'can',
+      inventory: bagOf([{ itemId: 'seed.sweet-radish', quality: 'normal', count: 1 }]),
+    });
+    const out = executeCommand(state, { type: 'selectSeed', cropId: 'moon-bean' }, index);
+
+    expect(out.state).toEqual(state);
+    expect(out.messages).toEqual(['種子袋裡沒有這種種子']);
+    expect(out.events).toContainEqual({ type: 'refused', reason: 'NO_SEED' });
+  });
+
+  it('allows selecting the last held seed and leaves planting rules to interact', () => {
+    const state = start({
+      tool: 'can',
+      inventory: bagOf([{ itemId: 'seed.moon-bean', quality: 'normal', count: 1 }]),
+      calendar: { year: 1, season: 'winter', day: 1, minuteOfDay: 360 },
+      plots: { [FIELD]: { watered: false, dryDays: 0, crop: null } },
+    });
+    const selected = executeCommand(state, { type: 'selectSeed', cropId: 'moon-bean' }, index).state;
+    const planted = executeCommand(at(selected, FIELD_SIDE), { type: 'interact' }, index);
+
+    expect(selected.selectedSeed).toBe('moon-bean');
+    expect(selected.tool).toBe('seedbag');
+    expect(planted.state.inventory).toEqual(selected.inventory);
+    expect(planted.messages).toContain('這個季節種不了這種作物');
+  });
 });
 
 describe('seasons and weather', () => {

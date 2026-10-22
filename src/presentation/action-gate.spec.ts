@@ -15,6 +15,8 @@ describe('shared action gate', () => {
   it('dispatches semantic actions when the map is ready', () => {
     expect(gateAction('moveUp', open)).toBe('dispatch');
     expect(gateAction('skills', open)).toBe('dispatch');
+    expect(gateAction('selectTool', open)).toBe('dispatch');
+    expect(gateAction('selectSeed', open)).toBe('dispatch');
   });
 
   it.each([
@@ -37,5 +39,10 @@ describe('shared action gate', () => {
   it('lets Escape close the current modal without dispatching a game action', () => {
     expect(gateAction('moveRight', { ...open, modalOpen: true }, true)).toBe('close-modal');
     expect(gateAction('moveRight', { ...open, modalOpen: true })).toBe('ignore');
+  });
+
+  it('gates direct selector choices independently from cycle shortcuts', () => {
+    expect(gateAction('selectTool', { ...open, modalOpen: true })).toBe('ignore');
+    expect(gateAction('selectSeed', { ...open, actionInProgress: true })).toBe('ignore');
   });
 });

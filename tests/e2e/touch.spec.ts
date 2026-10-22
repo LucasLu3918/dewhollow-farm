@@ -197,6 +197,42 @@ test.describe('虛擬按鍵的顯示設定', () => {
   });
 });
 
+test.describe('MB-06 工具與種子直接選取（合成 pointer input）', () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test('兩次點擊可直接選取工具或持有的種子，鍵盤仍可循環工具', async ({ page }) => {
+    await seedTouchMode(page, 'on');
+    await startGame(page);
+    await page.locator('#hud-tool').click();
+    await expect(page.locator('#tool-seed-panel')).toBeVisible();
+    await page.locator('#tool-seed-list [data-selector-id="axe"]').click();
+    await expect(page.locator('#hud-tool')).toHaveText('斧頭');
+
+    await page.locator('#hud-seed').click();
+    await expect(page.locator('#tool-seed-list [data-selector-id="moon-bean"]')).toBeVisible();
+    await page.locator('#tool-seed-list [data-selector-id="moon-bean"]').click();
+    await expect(page.locator('#hud-tool')).toHaveText('種子袋');
+    await expect(page.locator('#hud-seed')).toContainText('月光豆');
+    await page.keyboard.press('z');
+    await expect(page.locator('#hud-tool')).toHaveText('鋤頭');
+  });
+
+  test('長按 280ms 開啟工具輪盤，Esc 取消且不選取項目', async ({ page }) => {
+    await seedTouchMode(page, 'on');
+    await startGame(page);
+    const tool = page.locator('#hud-tool');
+    await tool.dispatchEvent('pointerdown', { pointerId: 12, pointerType: 'touch', button: 0 });
+    await page.waitForTimeout(320);
+    await tool.dispatchEvent('pointerup', { pointerId: 12, pointerType: 'touch', button: 0 });
+    await tool.dispatchEvent('click');
+    await expect(page.locator('#tool-seed-panel')).toBeVisible();
+    await expect(page.locator('#tool-seed-title')).toHaveText('工具輪盤');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#tool-seed-panel')).toBeHidden();
+    await expect(tool).toHaveText('鋤頭');
+  });
+});
+
 test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 

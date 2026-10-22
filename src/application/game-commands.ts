@@ -54,6 +54,8 @@ export type Command =
   | { type: 'upgrade'; shopId: string; toolId: ToolId }
   | { type: 'cycleTool' }
   | { type: 'cycleSeed' }
+  /** 直接選擇一種持有中的種子，並同步切換至種子袋。 */
+  | { type: 'selectSeed'; cropId: string }
   /** 直接取出斧頭（不進 Z 的循環）。 */
   | { type: 'takeTool'; tool: ToolId }
   /** 收線：hit 表示有沒有在時限內按下（時機由畫面判斷）。只有魚上鉤後才有效。 */
@@ -154,6 +156,7 @@ const FAILURE_MESSAGES: Record<string, string> = {
   NO_CROP: '這裡沒有作物',
   NOT_RIPE: '作物還沒成熟',
   NO_SEED: '種子袋裡沒有這種種子',
+  INVALID_SEED: '找不到這種種子',
   BAG_FULL: '背包已滿',
   NEED_AXE: '要先切到斧頭才能砍樹',
   ALREADY_PICKED: '這裡已經採過了，明天再來',
@@ -331,6 +334,15 @@ function executeCore(current: GameState, command: Command, index: ContentIndex):
       const ids = index.cropIds();
       const i = ids.indexOf(state.selectedSeed);
       return reply({ ...state, selectedSeed: ids[(i + 1) % ids.length] ?? state.selectedSeed });
+    }
+    case 'selectSeed': {
+      if (!index.cropIds().includes(command.cropId)) {
+        return reply(state, [messageFor('INVALID_SEED')], [refused('INVALID_SEED')]);
+      }
+      if (countOf(state.inventory, seedItemId(command.cropId)) <= 0) {
+        return reply(state, [messageFor('NO_SEED')], [refused('NO_SEED')]);
+      }
+      return reply({ ...state, selectedSeed: command.cropId, tool: 'seedbag' });
     }
     case 'chooseTalent':
       return chooseTalent(state, command.talentId, index);
