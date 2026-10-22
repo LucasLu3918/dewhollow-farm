@@ -477,7 +477,8 @@ a:focus-visible {
 
 .tool-seed-panel .tool-seed-wheel li { position: absolute; left: 50%; top: 50%; border: 0; padding: 0; }
 .tool-seed-panel .tool-seed-wheel button { width: 112px; min-height: 52px; transform: translate(calc(-50% + var(--wheel-x, 0px)), calc(-50% + var(--wheel-y, 0px))); }
-.tool-seed-panel { inset: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); max-height: min(80dvh, 600px); }
+.tool-seed-panel { inset: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); width: min(92vw, calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - 16px), 420px); max-height: min(80dvh, 600px); }
+.tool-seed-wheel button[data-wheel-highlighted='true'] { outline: 4px solid var(--accent); outline-offset: 2px; z-index: 1; }
 .tool-seed-pages { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
 .tool-seed-pages button { min-height: 44px; }
 .tool-seed-note { margin: 0 0 10px; font-size: calc(13px * var(--font-scale)); }

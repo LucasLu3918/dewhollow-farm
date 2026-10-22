@@ -10,7 +10,7 @@ import type { CompanionDef, CompanionManifest } from '../../infrastructure/asset
 import type { ToolDef, ToolManifest } from '../../infrastructure/assets/tool-manifest';
 import type { RigDef, RigManifest } from '../../infrastructure/assets/rig-manifest';
 import type { TerrainDef } from '../../infrastructure/content/content-schema';
-import type { Hud } from '../hud';
+import type { HeldPointerStart, Hud } from '../hud';
 import type { HelpPanel } from '../help-panel';
 import type { SavePanel } from '../save-panel';
 import { cameraBounds, deadzoneOf, mapZoomFor } from '../camera';
@@ -348,8 +348,9 @@ export class MapScene extends Phaser.Scene {
       void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command);
     });
     deps.hud.bindToolSeedSelectors(
-      (wheel) => this.openToolSeedSelector('tool', wheel),
-      (wheel) => this.openToolSeedSelector('seed', wheel),
+      (wheel, pointer) => this.openToolSeedSelector('tool', wheel, pointer),
+      (wheel, pointer) => this.openToolSeedSelector('seed', wheel, pointer),
+      () => this.toolSeedSelector.cancelActiveGesture(),
     );
     this.shopPanel = new ShopPanel(document, deps.index, (command) => void this.run(command));
     this.kitchenPanel = new KitchenPanel(document, deps.index, (command) => void this.run(command));
@@ -495,10 +496,10 @@ export class MapScene extends Phaser.Scene {
     void this.handleAction(action);
   }
 
-  private openToolSeedSelector(mode: 'tool' | 'seed', wheel: boolean): void {
+  private openToolSeedSelector(mode: 'tool' | 'seed', wheel: boolean, pointer?: HeldPointerStart): void {
     if (this.hasTouchInputBlocker()) return;
     this.touchControls.cancelAll();
-    this.toolSeedSelector.open(mode, wheel, this.deps.session.state);
+    this.toolSeedSelector.open(mode, wheel, this.deps.session.state, pointer);
   }
 
   /** 目前的效果開關：系統「減少動態」或玩家關掉的效果都不出現（見 accessibility.ts）。 */

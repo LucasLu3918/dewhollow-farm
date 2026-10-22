@@ -5,6 +5,7 @@ import { countOf } from '../domain/inventory';
 import { seedItemId } from '../domain/items';
 import { TOOL_IDS, TOOL_NAMES } from '../domain/tools';
 import { PanelDialog } from './panel-dialog';
+import type { HeldPointerStart } from './hud';
 
 const WHEEL_PAGE_SIZE = 8;
 
@@ -20,6 +21,34 @@ export class ToolSeedSelector {
   private wheel = false;
   private pageIndex = 0;
   private state: GameState | null = null;
+  private wheelPointerId: number | null = null;
+  private highlightedButton: HTMLButtonElement | null = null;
+  private readonly onWheelPointerMove = (event: PointerEvent): void => {
+    if (event.pointerId !== this.wheelPointerId) return;
+    this.highlightAt(event.clientX, event.clientY);
+  };
+  private readonly onWheelPointerUp = (event: PointerEvent): void => {
+    if (event.pointerId !== this.wheelPointerId) return;
+    event.preventDefault();
+    this.highlightAt(event.clientX, event.clientY);
+    const button = this.highlightedButton;
+    const command = button ? this.entries().find((entry) => entry.id === button.dataset.selectorId)?.command : undefined;
+    const bounds = this.list.getBoundingClientRect();
+    const centerRelease = Math.hypot(event.clientX - (bounds.left + bounds.width / 2), event.clientY - (bounds.top + bounds.height / 2)) < 72;
+    this.cancelWheelGesture();
+    if (command && !centerRelease) this.select(command);
+    else if (!centerRelease) this.close();
+  };
+  private readonly onWheelPointerCancel = (event: PointerEvent): void => {
+    if (event.pointerId !== this.wheelPointerId) return;
+    this.cancelWheelGesture();
+    this.close();
+  };
+  private readonly onWindowBlur = (): void => {
+    if (this.wheelPointerId === null) return;
+    this.cancelWheelGesture();
+    this.close();
+  };
 
   constructor(
     private readonly doc: Document,
@@ -38,15 +67,67 @@ export class ToolSeedSelector {
   }
 
   isOpen(): boolean { return this.dialog.isOpen(); }
-  close(): void { this.state = null; this.dialog.close(); }
+  close(): void {
+    this.cancelWheelGesture();
+    this.state = null;
+    this.dialog.close();
+  }
 
-  open(mode: 'tool' | 'seed', wheel: boolean, state: GameState): void {
+  open(mode: 'tool' | 'seed', wheel: boolean, state: GameState, pointer?: HeldPointerStart): void {
     this.mode = mode;
     this.wheel = wheel;
     this.pageIndex = 0;
     this.state = state;
-    this.render();
     this.dialog.open();
+    this.render();
+    if (wheel && pointer) this.beginWheelGesture(pointer);
+  }
+
+  cancelWheelGesture(): void {
+    if (this.wheelPointerId === null) return;
+    this.doc.removeEventListener('pointermove', this.onWheelPointerMove, true);
+    this.doc.removeEventListener('pointerup', this.onWheelPointerUp, true);
+    this.doc.removeEventListener('pointercancel', this.onWheelPointerCancel, true);
+    window.removeEventListener('blur', this.onWindowBlur);
+    this.wheelPointerId = null;
+    this.setHighlighted(null);
+  }
+
+  cancelActiveGesture(): void {
+    if (this.wheelPointerId === null) return;
+    this.cancelWheelGesture();
+    this.close();
+  }
+
+  private beginWheelGesture(pointer: HeldPointerStart): void {
+    this.cancelWheelGesture();
+    this.wheelPointerId = pointer.pointerId;
+    this.doc.addEventListener('pointermove', this.onWheelPointerMove, true);
+    this.doc.addEventListener('pointerup', this.onWheelPointerUp, true);
+    this.doc.addEventListener('pointercancel', this.onWheelPointerCancel, true);
+    window.addEventListener('blur', this.onWindowBlur);
+  }
+
+  private highlightAt(x: number, y: number): void {
+    const buttons = Array.from(this.list.querySelectorAll<HTMLButtonElement>('[data-selector-id]'));
+    const hit = buttons.find((button) => {
+      const box = button.getBoundingClientRect();
+      return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
+    }) ?? null;
+    this.setHighlighted(hit);
+  }
+
+  private setHighlighted(button: HTMLButtonElement | null): void {
+    this.highlightedButton?.removeAttribute('data-wheel-highlighted');
+    this.highlightedButton?.setAttribute('aria-pressed', 'false');
+    this.highlightedButton = button;
+    this.highlightedButton?.setAttribute('data-wheel-highlighted', 'true');
+    this.highlightedButton?.setAttribute('aria-pressed', 'true');
+  }
+
+  private select(command: Command): void {
+    this.close();
+    this.onCommand(command);
   }
 
   private changePage(delta: number): void {
@@ -95,14 +176,17 @@ export class ToolSeedSelector {
       button.setAttribute('aria-label', entry.count === undefined ? entry.name : `${entry.name}，${entry.count} 包`);
       if (this.wheel) {
         const angle = -Math.PI / 2 + (index * Math.PI * 2) / Math.max(1, visible.length);
-        const radius = Math.min(96, Math.max(72, this.root.clientWidth * 0.25));
+        const buttonSize = 112;
+        const safeWidth = Math.max(40, (this.list.clientWidth - buttonSize) / 2);
+        const safeHeight = Math.max(40, (this.list.clientHeight - 52) / 2);
+        const radius = Math.min(96, safeWidth, safeHeight);
         button.style.setProperty('--wheel-x', `${Math.cos(angle) * radius}px`);
         button.style.setProperty('--wheel-y', `${Math.sin(angle) * radius}px`);
       }
-      button.addEventListener('click', () => {
-        const command = entry.command;
-        this.close();
-        this.onCommand(command);
+      button.addEventListener('click', (event) => {
+        // Wheel pointer actions commit only on release over a highlighted sector; keyboard activation remains available.
+        if (this.wheel && event.detail !== 0) return;
+        this.select(entry.command);
       });
       row.append(button);
       this.list.append(row);

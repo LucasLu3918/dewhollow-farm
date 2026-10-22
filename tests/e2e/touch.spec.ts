@@ -217,19 +217,89 @@ test.describe('MB-06 工具與種子直接選取（合成 pointer input）', () 
     await expect(page.locator('#hud-tool')).toHaveText('鋤頭');
   });
 
-  test('長按 280ms 開啟工具輪盤，Esc 取消且不選取項目', async ({ page }) => {
+  test('長按後滑到工具項目並放開會直接選取', async ({ page }) => {
     await seedTouchMode(page, 'on');
     await startGame(page);
     const tool = page.locator('#hud-tool');
     await tool.dispatchEvent('pointerdown', { pointerId: 12, pointerType: 'touch', button: 0 });
     await page.waitForTimeout(320);
-    await tool.dispatchEvent('pointerup', { pointerId: 12, pointerType: 'touch', button: 0 });
-    await tool.dispatchEvent('click');
     await expect(page.locator('#tool-seed-panel')).toBeVisible();
     await expect(page.locator('#tool-seed-title')).toHaveText('工具輪盤');
-    await page.keyboard.press('Escape');
+    const axe = page.locator('#tool-seed-list [data-selector-id="axe"]');
+    const axeBox = await axe.boundingBox();
+    expect(axeBox).not.toBeNull();
+    await page.locator('#tool-seed-list').dispatchEvent('pointermove', {
+      pointerId: 12, pointerType: 'touch', buttons: 1,
+      clientX: (axeBox?.x ?? 0) + (axeBox?.width ?? 0) / 2,
+      clientY: (axeBox?.y ?? 0) + (axeBox?.height ?? 0) / 2,
+    });
+    await expect(axe).toHaveAttribute('data-wheel-highlighted', 'true');
+    await page.locator('#tool-seed-list').dispatchEvent('pointerup', {
+      pointerId: 12, pointerType: 'touch', button: 0,
+      clientX: (axeBox?.x ?? 0) + (axeBox?.width ?? 0) / 2,
+      clientY: (axeBox?.y ?? 0) + (axeBox?.height ?? 0) / 2,
+    });
     await expect(page.locator('#tool-seed-panel')).toBeHidden();
+    await expect(tool).toHaveText('斧頭');
+  });
+
+  test('中心放開不選項目，中心外放開取消；pointercancel 後立刻短按仍開啟清單', async ({ page }) => {
+    await seedTouchMode(page, 'on');
+    await startGame(page);
+    const tool = page.locator('#hud-tool');
+    await tool.dispatchEvent('pointerdown', { pointerId: 13, pointerType: 'touch', button: 0 });
+    await page.waitForTimeout(320);
+    const list = page.locator('#tool-seed-list');
+    await list.evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      element.dispatchEvent(new PointerEvent('pointerup', {
+        pointerId: 13, pointerType: 'touch', button: 0, bubbles: true, cancelable: true,
+        clientX: box.left + box.width / 2, clientY: box.top + box.height / 2,
+      }));
+    });
+    await expect(page.locator('#tool-seed-panel')).toBeVisible();
     await expect(tool).toHaveText('鋤頭');
+    await page.keyboard.press('Escape');
+
+    await tool.dispatchEvent('pointerdown', { pointerId: 14, pointerType: 'touch', button: 0 });
+    await page.waitForTimeout(320);
+    await page.locator('#tool-seed-list').dispatchEvent('pointerup', {
+      pointerId: 14, pointerType: 'touch', button: 0, clientX: 4, clientY: 4,
+    });
+    await expect(page.locator('#tool-seed-panel')).toBeHidden();
+
+    await tool.dispatchEvent('pointerdown', { pointerId: 15, pointerType: 'touch', button: 0 });
+    await page.waitForTimeout(320);
+    await tool.dispatchEvent('pointercancel', { pointerId: 15, pointerType: 'touch' });
+    await expect(page.locator('#tool-seed-panel')).toBeHidden();
+    await tool.click();
+    await expect(page.locator('#tool-seed-panel')).toBeVisible();
+    await expect(page.locator('#tool-seed-title')).toHaveText('選擇工具');
+  });
+
+  test('窄 viewport 的輪盤項目維持在畫面內', async ({ page }) => {
+    await seedTouchMode(page, 'on');
+    await page.setViewportSize({ width: 320, height: 568 });
+    await startGame(page);
+    const tool = page.locator('#hud-tool');
+    await tool.dispatchEvent('pointerdown', { pointerId: 16, pointerType: 'touch', button: 0 });
+    await page.waitForTimeout(320);
+    const viewport = page.viewportSize();
+    const boxes = await page.locator('#tool-seed-list [data-selector-id]').evaluateAll((buttons) =>
+      buttons.map((button) => {
+        const box = button.getBoundingClientRect();
+        return { left: box.left, top: box.top, right: box.right, bottom: box.bottom };
+      }),
+    );
+    expect(viewport).not.toBeNull();
+    expect(boxes).toHaveLength(7);
+    for (const box of boxes) {
+      expect(box.left).toBeGreaterThanOrEqual(0);
+      expect(box.top).toBeGreaterThanOrEqual(0);
+      expect(box.right).toBeLessThanOrEqual(viewport?.width ?? 0);
+      expect(box.bottom).toBeLessThanOrEqual(viewport?.height ?? 0);
+    }
+    await page.locator('#tool-seed-list').dispatchEvent('pointercancel', { pointerId: 16, pointerType: 'touch' });
   });
 });
 
