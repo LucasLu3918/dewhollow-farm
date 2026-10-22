@@ -3,7 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="晨露農場：原創農場生活網頁遊戲（垂直切片 MVP）。" />
+    <meta name="description" content="晨露農場：原創農場生活網頁遊戲。可安裝到主畫面，離線也能玩。" />
+    <meta name="theme-color" content="#7fae6b" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
     <title>晨露農場</title>
   </head>
   <body>
@@ -26,6 +29,7 @@
           <button id="hud-saves" class="status-button" type="button" aria-label="存檔槽，可讀取、新遊戲、刪除、匯出與匯入（或按 L）">存檔</button>
           <button id="hud-settings" class="status-button" type="button" aria-label="設定：按鍵、字級、色盲模式、閃光與震動、觸控（或按 O）">設定</button>
           <button id="hud-help" class="status-button" type="button" aria-label="說明、操作按鍵、更新日誌與隱私說明（或按 ?）">說明</button>
+          <button id="hud-update" class="status-button" type="button" hidden aria-label="有新版本：按下後會先存檔，再重新整理以更新">有新版本，重新整理即可更新</button>
           <span id="hud-version" class="version"></span>
         </span>
       </header>

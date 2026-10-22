@@ -399,6 +399,24 @@
       "kind": "object",
       "color": "#c9b79c",
       "source": "占位（程式產生）：物品目前沒有圖示，這筆只登錄來源（布）"
+    },
+    {
+      "id": "pwa.icon-192",
+      "kind": "object",
+      "file": "assets/icons/icon-192.png",
+      "source": "程式產生：tools/pwa/make-icons.mjs 以幾何圖形與純色繪製（太陽、幼苗、土丘），自行設計，無外部素材。PWA 圖示（192 px）"
+    },
+    {
+      "id": "pwa.icon-512",
+      "kind": "object",
+      "file": "assets/icons/icon-512.png",
+      "source": "程式產生：tools/pwa/make-icons.mjs 以幾何圖形與純色繪製（太陽、幼苗、土丘），自行設計，無外部素材。PWA 圖示（512 px）"
+    },
+    {
+      "id": "pwa.icon-maskable-512",
+      "kind": "object",
+      "file": "assets/icons/icon-maskable-512.png",
+      "source": "程式產生：tools/pwa/make-icons.mjs 以幾何圖形與純色繪製（太陽、幼苗、土丘），內容在中央圓以內，自行設計，無外部素材。PWA maskable 圖示（512 px）"
     }
   ]
 }

@@ -13,7 +13,10 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "sim": "SIM_REPORT=1 vitest run tests/sim",
-    "check": "npm run typecheck && npm test && npm run build"
+    "budget": "node tools/build/check-dist.mjs",
+    "licenses": "node tools/licenses/generate.mjs",
+    "icons": "node tools/pwa/make-icons.mjs",
+    "check": "npm run typecheck && npm test && npm run build && npm run budget"
   },
   "dependencies": {
     "dexie": "^4.4.6",

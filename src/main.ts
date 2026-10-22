@@ -75,6 +75,7 @@ import { VIEW_SIZE } from './presentation/constants';
 import { SoundPlayer } from './presentation/audio/sound-player';
 import { MusicPlayer } from './presentation/audio/music-player';
 import { AudioOutput } from './presentation/audio/audio-output';
+import { registerServiceWorker } from './presentation/service-worker';
 
 /**
  * 組裝點（composition root）：這裡是唯一知道具體實作的地方。
@@ -128,14 +129,15 @@ async function bootstrap(): Promise<void> {
     npcIds: index.npcs.map((n) => n.id),
     friendship: index.friendship,
   };
+  // 離開目前的存檔或重新整理（更新）前先存檔；沒有進行中的遊戲（例如損毀時）就什麼也不做。
+  const flushSave = async (): Promise<void> => {
+    if (session) await session.save();
+  };
   const saves = new SavePanel(document, {
     service: new SaveSlotService({ repository, parse: (raw) => parseSaveRecord(raw, migration), rating: ratingSource, gameVersion: GAME_VERSION }),
     currentSlot: slot,
     persistent,
-    // 離開目前的存檔前先存檔（沒有進行中的遊戲，例如損毀時，就什麼也不做）。
-    beforeLeave: async () => {
-      if (session) await session.save();
-    },
+    beforeLeave: flushSave,
     navigate: (target) => window.location.assign(`${window.location.pathname}?slot=${target}`),
   });
   const helpPanel = new HelpPanel(document, parseHelpContent(help), parseChangelog(changelog), GAME_VERSION);
@@ -181,6 +183,18 @@ async function bootstrap(): Promise<void> {
   });
   // 軟體繪圖器會把旋轉的角色畫壞（見 render-compat.ts）；繪圖器建立好後偵測並套用保底。
   game.events.once(Phaser.Core.Events.READY, () => applyRenderCompat(game));
+
+  // 離線可玩：只在正式建置註冊 service worker（dev 模式不註冊，免得快取干擾開發）。
+  if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+    registerServiceWorker(
+      { container: navigator.serviceWorker, flush: flushSave, reload: () => window.location.reload() },
+      `${import.meta.env.BASE_URL}sw.js`,
+      import.meta.env.BASE_URL,
+      (apply) => hud.showUpdate(() => void apply()),
+    ).catch((error: unknown) => {
+      hud.error(`離線功能無法啟用：${error instanceof Error ? error.message : String(error)}`);
+    });
+  }
 }
 
 bootstrap().catch((error: unknown) => {

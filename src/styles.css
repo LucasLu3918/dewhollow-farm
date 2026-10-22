@@ -295,6 +295,12 @@ body {
   cursor: pointer;
 }
 
+/* 有新版本時的提示按鈕：用強調色，讓玩家看得到。 */
+#hud-update {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .version {
   font-size: calc(12px * var(--font-scale));
   color: var(--muted);
