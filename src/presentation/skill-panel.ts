@@ -3,6 +3,7 @@ import { levelOf, SKILL_IDS, SKILL_NAMES, type SkillId } from '../domain/skills'
 import type { TalentDef, TalentSet } from '../domain/talents';
 import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 技能與天賦面板（DOM）：列出五項技能的等級，到了解鎖等級的技能列出兩個天賦讓玩家選。
@@ -66,7 +67,7 @@ export class SkillPanel {
   private readonly root: HTMLElement;
   private readonly summary: HTMLElement;
   private readonly list: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
 
   constructor(
     doc: Document,
@@ -75,33 +76,32 @@ export class SkillPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#skill-panel');
+    this.dialog = new PanelDialog(this.root);
     this.summary = required(doc, '#skill-summary');
     this.list = required(doc, '#skill-list');
     required(doc, '#skill-close').addEventListener('click', () => this.close());
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   open(state: GameState): void {
-    this.open_ = true;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   toggle(state: GameState): void {
-    if (this.open_) this.close();
+    if (this.dialog.isOpen()) this.close();
     else this.open(state);
   }
 
   refresh(state: GameState): void {
-    if (this.open_) this.render(state);
+    if (this.dialog.isOpen()) this.render(state);
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

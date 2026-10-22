@@ -35,7 +35,7 @@
       </header>
       <div id="game" class="stage"></div>
       <div id="touch-controls" class="touch-controls" hidden></div>
-      <section id="settings-panel" class="shop-panel settings-panel" aria-labelledby="settings-title" hidden>
+      <section id="settings-panel" class="shop-panel settings-panel" aria-labelledby="settings-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="settings-title">設定</h2>
           <p id="settings-note">偏好只存在這個瀏覽器，不影響存檔。</p>
@@ -62,7 +62,7 @@
         <label class="settings-check">虛擬按鍵 <select id="settings-touch"></select></label>
         <button id="settings-close" type="button">關閉（Esc）</button>
       </section>
-      <section id="shop-panel" class="shop-panel" aria-labelledby="shop-title" hidden>
+      <section id="shop-panel" class="shop-panel" aria-labelledby="shop-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="shop-title"></h2>
           <p id="shop-funds"></p>
@@ -70,7 +70,7 @@
         <ul id="shop-list" class="shop-list"></ul>
         <button id="shop-close" type="button">離開櫃檯（Esc）</button>
       </section>
-      <section id="kitchen-panel" class="shop-panel" aria-labelledby="kitchen-title" hidden>
+      <section id="kitchen-panel" class="shop-panel" aria-labelledby="kitchen-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="kitchen-title">廚房</h2>
           <p id="kitchen-funds"></p>
@@ -78,7 +78,7 @@
         <ul id="kitchen-list" class="shop-list"></ul>
         <button id="kitchen-close" type="button">離開廚房（Esc）</button>
       </section>
-      <section id="workbench-panel" class="shop-panel" aria-labelledby="workbench-title" hidden>
+      <section id="workbench-panel" class="shop-panel" aria-labelledby="workbench-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="workbench-title">工作台</h2>
           <p id="workbench-funds"></p>
@@ -86,7 +86,7 @@
         <ul id="workbench-list" class="shop-list"></ul>
         <button id="workbench-close" type="button">離開工作台（Esc）</button>
       </section>
-      <section id="workshop-panel" class="shop-panel" aria-labelledby="workshop-title" hidden>
+      <section id="workshop-panel" class="shop-panel" aria-labelledby="workshop-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="workshop-title">加工台</h2>
           <p id="workshop-funds"></p>
@@ -94,7 +94,7 @@
         <ul id="workshop-list" class="shop-list"></ul>
         <button id="workshop-close" type="button">離開加工台（Esc）</button>
       </section>
-      <section id="skill-panel" class="shop-panel" aria-labelledby="skill-title" hidden>
+      <section id="skill-panel" class="shop-panel" aria-labelledby="skill-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="skill-title">技能與天賦</h2>
           <p id="skill-summary"></p>
@@ -102,7 +102,7 @@
         <ul id="skill-list" class="shop-list"></ul>
         <button id="skill-close" type="button">離開（Esc）</button>
       </section>
-      <section id="resident-panel" class="shop-panel" aria-labelledby="resident-title" hidden>
+      <section id="resident-panel" class="shop-panel" aria-labelledby="resident-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="resident-title">居民與好感</h2>
           <p id="resident-summary"></p>
@@ -110,7 +110,7 @@
         <ul id="resident-list" class="shop-list"></ul>
         <button id="resident-close" type="button">離開（Esc）</button>
       </section>
-      <section id="quest-panel" class="shop-panel" aria-labelledby="quest-title" hidden>
+      <section id="quest-panel" class="shop-panel" aria-labelledby="quest-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="quest-title">委託與佈告欄</h2>
           <p id="quest-summary"></p>
@@ -118,7 +118,7 @@
         <ul id="quest-list" class="shop-list"></ul>
         <button id="quest-close" type="button">離開（Esc）</button>
       </section>
-      <section id="festival-panel" class="shop-panel" aria-labelledby="festival-title" hidden>
+      <section id="festival-panel" class="shop-panel" aria-labelledby="festival-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="festival-title">節慶告示</h2>
           <p id="festival-summary"></p>
@@ -126,7 +126,7 @@
         <ul id="festival-list" class="shop-list"></ul>
         <button id="festival-close" type="button">離開（Esc）</button>
       </section>
-      <section id="repair-panel" class="shop-panel" aria-labelledby="repair-title" hidden>
+      <section id="repair-panel" class="shop-panel" aria-labelledby="repair-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="repair-title">修復委員會</h2>
           <p id="repair-summary"></p>
@@ -134,7 +134,7 @@
         <ul id="repair-list" class="shop-list"></ul>
         <button id="repair-close" type="button">離開（Esc）</button>
       </section>
-      <section id="collection-panel" class="shop-panel" aria-labelledby="collection-title" hidden>
+      <section id="collection-panel" class="shop-panel" aria-labelledby="collection-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="collection-title">圖鑑與成就</h2>
           <p id="collection-summary"></p>
@@ -142,7 +142,7 @@
         <ul id="collection-list" class="shop-list"></ul>
         <button id="collection-close" type="button">離開（Esc）</button>
       </section>
-      <section id="save-panel" class="shop-panel save-panel" aria-labelledby="save-title" hidden>
+      <section id="save-panel" class="shop-panel save-panel" aria-labelledby="save-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="save-title">存檔槽</h2>
           <p id="save-note">三格存檔各自保存一份農場。讀取另一格前會先存檔目前的進度。</p>
@@ -151,7 +151,7 @@
         <ul id="save-list" class="shop-list"></ul>
         <button id="save-close" type="button">關閉（Esc）</button>
       </section>
-      <section id="help-panel" class="shop-panel help-panel" aria-labelledby="help-title" hidden>
+      <section id="help-panel" class="shop-panel help-panel" aria-labelledby="help-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="help-title">說明</h2>
           <p id="help-version"></p>
@@ -159,7 +159,7 @@
         <div id="help-body"></div>
         <button id="help-close" type="button">關閉（? 或 Esc）</button>
       </section>
-      <section id="legacy-panel" class="shop-panel" aria-labelledby="legacy-title" hidden>
+      <section id="legacy-panel" class="shop-panel" aria-labelledby="legacy-title" role="dialog" aria-modal="true" hidden>
         <div>
           <h2 id="legacy-title">床邊的公告</h2>
           <p id="legacy-summary"></p>
@@ -167,7 +167,7 @@
         <ul id="legacy-list" class="shop-list"></ul>
         <button id="legacy-close" type="button">離開（Esc）</button>
       </section>
-      <section id="heart-event-panel" class="shop-panel" aria-labelledby="heart-event-title" hidden>
+      <section id="heart-event-panel" class="shop-panel" aria-labelledby="heart-event-title" role="dialog" aria-modal="true" hidden>
         <header>
           <h2 id="heart-event-title"></h2>
         </header>

@@ -6,6 +6,7 @@ import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
 import { residentsOn } from '../application/residents';
 import { warmGiftOpen } from '../application/festival';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 居民與好感面板（DOM）：每位居民的顆心、今天是否已對話與送禮、喜歡的東西，以及送禮的下拉選單。
@@ -16,7 +17,7 @@ export class ResidentPanel {
   private readonly root: HTMLElement;
   private readonly summary: HTMLElement;
   private readonly list: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
 
   constructor(
     doc: Document,
@@ -25,33 +26,32 @@ export class ResidentPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#resident-panel');
+    this.dialog = new PanelDialog(this.root);
     this.summary = required(doc, '#resident-summary');
     this.list = required(doc, '#resident-list');
     required(doc, '#resident-close').addEventListener('click', () => this.close());
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   toggle(state: GameState): void {
-    if (this.open_) this.close();
+    if (this.dialog.isOpen()) this.close();
     else this.open(state);
   }
 
   open(state: GameState): void {
-    this.open_ = true;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   refresh(state: GameState): void {
-    if (this.open_) this.render(state);
+    if (this.dialog.isOpen()) this.render(state);
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

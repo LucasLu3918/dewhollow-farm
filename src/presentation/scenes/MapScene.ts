@@ -63,6 +63,7 @@ import { SettingsPanel } from '../settings-panel';
 import { TouchControls } from '../touch-controls';
 import { touchKeyFor } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
+import type { OpenablePanel } from '../panel-dialog';
 
 /** 鍵盤事件與虛擬按鍵共用的形狀：只需要按鍵名稱與 preventDefault。 */
 type KeyLike = Pick<KeyboardEvent, 'key' | 'preventDefault'>;
@@ -290,6 +291,12 @@ export class MapScene extends Phaser.Scene {
   };
   /** 設定面板（改按鍵、字級、閃光與震動、觸控）。 */
   private settingsPanel!: SettingsPanel;
+  /**
+   * 開著時按鍵只用來離開（Esc）的面板，依群組排列：先看第一組，有開著的就整組關掉，其餘組不動（與原本的 handleKey 相同）。
+   * 第一組是遊戲內的櫃檯與面板，第二組是說明頁、存檔槽與設定。心形事件面板不在這裡：它不吃 Esc，見 handleKey。
+   * 新增面板時加進對應的群組即可。
+   */
+  private modalGroups: readonly (readonly OpenablePanel[])[] = [];
 
   constructor() {
     super('map');
@@ -314,6 +321,22 @@ export class MapScene extends Phaser.Scene {
     this.collectionPanel = new CollectionPanel(document, deps.index);
     this.legacyPanel = new LegacyPanel(document, deps.index, (command) => void this.run(command));
     deps.hud.bindSkills(() => this.skillPanel.toggle(deps.session.state));
+    this.modalGroups = [
+      [
+        this.shopPanel,
+        this.kitchenPanel,
+        this.workshopPanel,
+        this.workbenchPanel,
+        this.skillPanel,
+        this.residentPanel,
+        this.questPanel,
+        this.festivalPanel,
+        this.repairPanel,
+        this.collectionPanel,
+        this.legacyPanel,
+      ],
+      [deps.help, deps.saves, this.settingsPanel],
+    ];
     this.terrainByKind = new Map(deps.terrain.map((entry) => [entry.kind, entry]));
   }
 
@@ -455,31 +478,12 @@ export class MapScene extends Phaser.Scene {
       }
       return;
     }
-    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen() || this.residentPanel.isOpen() || this.questPanel.isOpen() || this.festivalPanel.isOpen() || this.repairPanel.isOpen() || this.collectionPanel.isOpen() || this.legacyPanel.isOpen()) {
-      // 櫃檯、廚房或面板開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠完成。
+    const openGroup = this.modalGroups.find((group) => group.some((panel) => panel.isOpen()));
+    if (openGroup) {
+      // 櫃檯、廚房、面板、說明頁、存檔槽或設定開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠或 Tab 完成。
       if (event.key === 'Escape') {
         event.preventDefault();
-        this.shopPanel.close();
-        this.kitchenPanel.close();
-        this.workshopPanel.close();
-        this.workbenchPanel.close();
-        this.skillPanel.close();
-        this.residentPanel.close();
-        this.questPanel.close();
-        this.festivalPanel.close();
-        this.repairPanel.close();
-        this.collectionPanel.close();
-        this.legacyPanel.close();
-      }
-      return;
-    }
-    if (this.deps.help.isOpen() || this.deps.saves.isOpen() || this.settingsPanel.isOpen()) {
-      // 說明頁、存檔槽或設定開著時，按鍵只用來離開（Esc），其餘都在面板上用滑鼠完成。
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        this.deps.help.close();
-        this.deps.saves.close();
-        this.settingsPanel.close();
+        for (const panel of openGroup) panel.close();
       }
       return;
     }

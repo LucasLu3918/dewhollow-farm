@@ -3,6 +3,7 @@ import type { QuestDef } from '../domain/quests';
 import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
 import { questBoardView, type QuestEntry } from '../application/quests';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 委託與佈告欄面板（DOM）：進行中的委託（含進度與交付）、今天佈告欄上的委託、已開放的居民委託。
@@ -25,7 +26,7 @@ export class QuestPanel {
   private readonly root: HTMLElement;
   private readonly summary: HTMLElement;
   private readonly list: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
 
   constructor(
     doc: Document,
@@ -34,33 +35,32 @@ export class QuestPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#quest-panel');
+    this.dialog = new PanelDialog(this.root);
     this.summary = required(doc, '#quest-summary');
     this.list = required(doc, '#quest-list');
     required(doc, '#quest-close').addEventListener('click', () => this.close());
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   toggle(state: GameState): void {
-    if (this.open_) this.close();
+    if (this.dialog.isOpen()) this.close();
     else this.open(state);
   }
 
   open(state: GameState): void {
-    this.open_ = true;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   refresh(state: GameState): void {
-    if (this.open_) this.render(state);
+    if (this.dialog.isOpen()) this.render(state);
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

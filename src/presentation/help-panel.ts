@@ -1,4 +1,5 @@
 import type { ChangelogEntry, HelpContent } from '../infrastructure/content/info-content';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 說明頁（DOM）：操作按鍵、版本號、更新日誌與隱私說明。文字全部來自 content/help.json 與 content/changelog.json。
@@ -8,7 +9,7 @@ export class HelpPanel {
   private readonly doc: Document;
   private readonly root: HTMLElement;
   private readonly body: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
 
   constructor(
     doc: Document,
@@ -18,6 +19,7 @@ export class HelpPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#help-panel');
+    this.dialog = new PanelDialog(this.root);
     this.body = required(doc, '#help-body');
     required(doc, '#help-version').textContent = `目前版本：v${version}`;
     required(doc, '#help-close').addEventListener('click', () => this.close());
@@ -25,21 +27,19 @@ export class HelpPanel {
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   open(): void {
-    this.open_ = true;
-    this.root.hidden = false;
+    this.dialog.open();
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   toggle(): void {
-    if (this.open_) this.close();
+    if (this.dialog.isOpen()) this.close();
     else this.open();
   }
 

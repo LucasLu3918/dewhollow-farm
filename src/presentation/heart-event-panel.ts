@@ -2,6 +2,7 @@ import type { GameState } from '../domain/game-state';
 import { heartsOf } from '../domain/friendship';
 import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 心形事件面板（DOM，模態）：依序顯示事件的每一頁，最後列出選項。
@@ -14,6 +15,7 @@ export class HeartEventPanel {
   private readonly body: HTMLElement;
   private readonly options: HTMLElement;
   private readonly next: HTMLButtonElement;
+  private readonly dialog: PanelDialog;
   /** 目前顯示的事件 id（事件結束後清掉）。 */
   private shownId: string | null = null;
   private page = 0;
@@ -25,6 +27,7 @@ export class HeartEventPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#heart-event-panel');
+    this.dialog = new PanelDialog(this.root);
     this.title = required(doc, '#heart-event-title');
     this.body = required(doc, '#heart-event-body');
     this.options = required(doc, '#heart-event-options');
@@ -32,13 +35,15 @@ export class HeartEventPanel {
     this.next.addEventListener('click', () => {
       this.page += 1;
       if (this.lastState) this.render(this.lastState);
+      this.dialog.restoreFocusIfLost();
     });
   }
 
   private lastState: GameState | null = null;
 
+  /** 模態：開著時焦點陷阱生效；但不吃 Esc（見 MapScene.handleKey）。 */
   isOpen(): boolean {
-    return !this.root.hidden;
+    return this.dialog.isOpen();
   }
 
   /** 依目前狀態開啟、更新或關閉面板：有進行中的事件就顯示，沒有就關掉。 */
@@ -47,15 +52,16 @@ export class HeartEventPanel {
     const pending = state.pendingHeartEvent;
     if (!pending) {
       this.shownId = null;
-      this.root.hidden = true;
+      this.dialog.close();
       return;
     }
     if (pending !== this.shownId) {
       this.shownId = pending;
       this.page = 0;
     }
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
+    this.dialog.restoreFocusIfLost();
   }
 
   private render(state: GameState): void {
