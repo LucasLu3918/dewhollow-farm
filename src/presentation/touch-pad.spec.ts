@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import controls from '../../content/controls.json';
 import { ACTION_IDS, type ActionId } from '../domain/keybindings';
 import { parseControlsContent } from '../infrastructure/content/controls-content';
-import { TOUCH_LAYOUT, buildTouchButtons, touchVisible } from './touch-pad';
+import { TOUCH_LAYOUT, TOUCH_REPEAT_MS, buildTouchButtons, directionForJoystick, MoveInputScheduler, touchVisible } from './touch-pad';
 
 /** 按鈕文字來自 content/controls.json（與遊戲載入的是同一份）；測試的預期值不變。 */
 const TOUCH_BUTTONS = buildTouchButtons(parseControlsContent(controls).touchButtons);
@@ -79,5 +79,60 @@ describe('virtual pad visibility', () => {
   it('can be forced on or off in the settings', () => {
     expect(touchVisible('on', false)).toBe(true);
     expect(touchVisible('off', true)).toBe(false);
+  });
+});
+
+describe('joystick direction', () => {
+  it('uses a dead zone and quantizes diagonals to the dominant cardinal axis', () => {
+    expect(directionForJoystick(0.1, 0.1)).toBeNull();
+    expect(directionForJoystick(0.9, 0.8)).toBe('right');
+    expect(directionForJoystick(-0.4, -0.8)).toBe('up');
+  });
+
+  it('keeps the current axis near a diagonal boundary and permits decisive axis changes', () => {
+    expect(directionForJoystick(0.7, 0.72, 'right')).toBe('right');
+    expect(directionForJoystick(0.45, 0.8, 'right')).toBe('down');
+    expect(directionForJoystick(-0.8, 0, 'right')).toBe('left');
+  });
+});
+
+describe('multi-pointer movement scheduler', () => {
+  it('releases only the changed pointer and resumes another held direction', () => {
+    vi.useFakeTimers();
+    try {
+      const moved = vi.fn();
+      const scheduler = new MoveInputScheduler(moved);
+      scheduler.setPointer(1, 'up');
+      scheduler.setPointer(2, 'right');
+      expect(moved.mock.calls.map(([direction]) => direction)).toEqual(['up', 'right']);
+
+      scheduler.releasePointer(2);
+      expect(moved.mock.calls.map(([direction]) => direction)).toEqual(['up', 'right', 'up']);
+      vi.advanceTimersByTime(TOUCH_REPEAT_MS);
+      expect(moved.mock.calls.at(-1)?.[0]).toBe('up');
+
+      scheduler.releasePointer(1);
+      const callsAtRelease = moved.mock.calls.length;
+      vi.advanceTimersByTime(TOUCH_REPEAT_MS * 2);
+      expect(moved).toHaveBeenCalledTimes(callsAtRelease);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('stops immediately when all active pointers are cancelled', () => {
+    vi.useFakeTimers();
+    try {
+      const moved = vi.fn();
+      const scheduler = new MoveInputScheduler(moved);
+      scheduler.setPointer(7, 'left');
+      scheduler.cancelAll();
+      const callsAtCancel = moved.mock.calls.length;
+      vi.advanceTimersByTime(TOUCH_REPEAT_MS * 2);
+      expect(moved).toHaveBeenCalledTimes(callsAtCancel);
+      expect(scheduler.activeDirection).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

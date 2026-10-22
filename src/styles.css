@@ -249,6 +249,7 @@ a:focus-visible {
 
 .touch-move {
   display: grid;
+  position: relative;
   grid-template-columns: repeat(3, 56px);
   grid-template-rows: repeat(2, 56px);
   gap: 6px;
@@ -273,6 +274,58 @@ a:focus-visible {
 .touch-move .touch-button[data-action='moveRight'] {
   grid-column: 3;
   grid-row: 2;
+}
+
+/* Joysticks replace the D-pad inside the same control slot; the fixed and floating variants share pointer geometry. */
+#touch-controls[data-control-style='fixed-joystick'] .touch-move,
+#touch-controls[data-control-style='floating-joystick'] .touch-move {
+  display: block;
+  width: 144px;
+  height: 144px;
+  touch-action: none;
+}
+
+#touch-controls[data-control-style='fixed-joystick'] .touch-move > .touch-button,
+#touch-controls[data-control-style='floating-joystick'] .touch-move > .touch-button {
+  display: none;
+}
+
+.touch-joystick-base {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  width: 112px;
+  height: 112px;
+  border: 2px solid rgba(232, 240, 230, 0.55);
+  border-radius: 50%;
+  background: rgba(21, 32, 26, 0.58);
+  box-shadow: inset 0 0 0 12px rgba(232, 240, 230, 0.08);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.touch-joystick-knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  border: 2px solid var(--action-border);
+  border-radius: 50%;
+  background: var(--action-fill-translucent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  transform: translate(-50%, -50%);
+}
+
+#touch-controls[data-control-style='fixed-joystick'] .touch-joystick-base,
+#touch-controls[data-control-style='floating-joystick'] .touch-joystick-base.is-active {
+  display: block;
+}
+
+#touch-controls[data-handedness='left'] .touch-common {
+  flex-direction: row-reverse;
 }
 
 .touch-act {
@@ -891,6 +944,9 @@ a:focus-visible {
     max-width: none;
   }
 
+  #touch-controls[data-handedness='left'] .touch-move { grid-column: 3; }
+  #touch-controls[data-handedness='left'] .touch-act { grid-column: 1; }
+
   .touch-more {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -1066,4 +1122,7 @@ a:focus-visible {
   #touch-controls[data-placement='overlay'] .touch-move { position: absolute; left: var(--responsive-safe-left, 0px); top: 50%; transform: translateY(-50%); }
   #touch-controls[data-placement='overlay'] .touch-act { position: absolute; right: var(--responsive-safe-right, 0px); top: 50%; transform: translateY(-50%); }
   #touch-controls[data-placement='overlay'] .touch-more { position: absolute; right: var(--responsive-safe-right, 0px); bottom: var(--responsive-safe-bottom, 0px); }
+  #touch-controls[data-placement='overlay'][data-handedness='left'] .touch-move { left: auto; right: var(--responsive-safe-right, 0px); }
+  #touch-controls[data-placement='overlay'][data-handedness='left'] .touch-act { right: auto; left: var(--responsive-safe-left, 0px); }
+  #touch-controls[data-placement='overlay'][data-handedness='left'] .touch-more { right: auto; left: var(--responsive-safe-left, 0px); }
 }

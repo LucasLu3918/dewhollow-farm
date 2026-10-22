@@ -1,6 +1,6 @@
 import type { SettingsService } from '../application/settings';
 import { ACTION_IDS, assignKey, bindableKeyProblem, keyLabel, normalizeKey, resetBindings, type ActionId, type Bindings } from '../domain/keybindings';
-import { CONTROLS_PLACEMENTS, FONT_SIZES, TOUCH_MODES, type ControlsPlacement, type FontSize, type Settings, type TouchMode } from '../domain/settings';
+import { CONTROLS_PLACEMENTS, CONTROL_STYLES, FONT_SIZES, HANDEDNESSES, TOUCH_MODES, type ControlStyle, type ControlsPlacement, type FontSize, type Handedness, type Settings, type TouchMode } from '../domain/settings';
 import { FONT_SIZE_LABELS } from './accessibility';
 import { prefersReducedMotion } from './motion';
 import { PanelDialog } from './panel-dialog';
@@ -16,6 +16,12 @@ const TOUCH_LABELS: Record<TouchMode, string> = {
   off: '隱藏',
 };
 const PLACEMENT_LABELS: Record<ControlsPlacement, string> = { external: '畫面外（不遮住遊戲）', overlay: '覆蓋於畫面邊緣' };
+const CONTROL_STYLE_LABELS: Record<ControlStyle, string> = {
+  dpad: '方向鍵',
+  'fixed-joystick': '固定搖桿',
+  'floating-joystick': '浮動搖桿',
+};
+const HANDEDNESS_LABELS: Record<Handedness, string> = { right: '右手動作', left: '左手動作' };
 
 /**
  * 設定面板（DOM）：改按鍵、字級、色盲模式、閃光與震動、觸控按鍵。
@@ -36,6 +42,8 @@ export class SettingsPanel {
   private readonly reduced: HTMLElement;
   private readonly touch: HTMLSelectElement;
   private readonly placement: HTMLSelectElement;
+  private readonly controlStyle: HTMLSelectElement;
+  private readonly handedness: HTMLSelectElement;
   private readonly dialog: PanelDialog;
   private capturing: ActionId | null = null;
   private pendingSwap: { action: ActionId; key: string; conflict: ActionId } | null = null;
@@ -60,6 +68,8 @@ export class SettingsPanel {
     this.reduced = required(doc, '#settings-reduced');
     this.touch = required<HTMLSelectElement>(doc, '#settings-touch');
     this.placement = required<HTMLSelectElement>(doc, '#settings-placement');
+    this.controlStyle = required<HTMLSelectElement>(doc, '#settings-control-style');
+    this.handedness = required<HTMLSelectElement>(doc, '#settings-handedness');
 
     required(doc, '#settings-close').addEventListener('click', () => this.close());
     required(doc, '#settings-reset').addEventListener('click', () => this.restoreDefaults());
@@ -85,10 +95,22 @@ export class SettingsPanel {
       this.say(saved ? '已更新觸控按鍵版位。' : `已更新觸控按鍵版位。${SAVE_FAILED}`);
       this.render();
     });
+    this.controlStyle.addEventListener('change', () => {
+      const saved = this.service.update({ mobile: { controlStyle: this.controlStyle.value as ControlStyle } });
+      this.say(saved ? '已更新移動控制方式。' : `已更新移動控制方式。${SAVE_FAILED}`);
+      this.render();
+    });
+    this.handedness.addEventListener('change', () => {
+      const saved = this.service.update({ mobile: { handedness: this.handedness.value as Handedness } });
+      this.say(saved ? '已更新慣用手。' : `已更新慣用手。${SAVE_FAILED}`);
+      this.render();
+    });
 
     this.buildFontChoices();
     this.buildTouchOptions();
     this.buildPlacementOptions();
+    this.buildControlStyleOptions();
+    this.buildHandednessOptions();
     this.render();
   }
 
@@ -244,6 +266,24 @@ export class SettingsPanel {
     }
   }
 
+  private buildControlStyleOptions(): void {
+    for (const style of CONTROL_STYLES) {
+      const option = this.doc.createElement('option');
+      option.value = style;
+      option.textContent = CONTROL_STYLE_LABELS[style];
+      this.controlStyle.append(option);
+    }
+  }
+
+  private buildHandednessOptions(): void {
+    for (const handedness of HANDEDNESSES) {
+      const option = this.doc.createElement('option');
+      option.value = handedness;
+      option.textContent = HANDEDNESS_LABELS[handedness];
+      this.handedness.append(option);
+    }
+  }
+
   /**
    * 依目前的偏好重畫整個面板（按鍵列表、字級按鈕、勾選框與交換提示）。
    * 經過 dialog.redraw：重畫前記下焦點，按鍵列表重建後焦點回到同一個動作的「改鍵」按鈕（data-focus-key）。
@@ -266,6 +306,8 @@ export class SettingsPanel {
     this.particles.checked = settings.effects.particles;
     this.touch.value = settings.touchControls;
     this.placement.value = settings.mobile.controlsPlacement;
+    this.controlStyle.value = settings.mobile.controlStyle;
+    this.handedness.value = settings.mobile.handedness;
     this.reduced.textContent = prefersReducedMotion()
       ? '系統的「減少動態」已開啟，閃光、震動與粒子效果會一律關閉。'
       : '這些效果在系統開啟「減少動態」時會一律關閉。';

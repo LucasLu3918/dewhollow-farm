@@ -294,6 +294,7 @@ export class MapScene extends Phaser.Scene {
   private repairPanel!: RepairPanel;
   private collectionPanel!: CollectionPanel;
   private legacyPanel!: LegacyPanel;
+  private touchControls!: TouchControls;
   /** 夜釣星星進行中的計時器與甩竿的時刻（一圈的時限，見 star-fishing.ts）。 */
   private starTimer: Phaser.Time.TimerEvent | null = null;
   private starStartedAt = 0;
@@ -334,9 +335,12 @@ export class MapScene extends Phaser.Scene {
   init(deps: MapSceneDeps): void {
     this.deps = deps;
     this.settingsPanel = new SettingsPanel(document, deps.settings, deps.controls.settingsLabels);
-    deps.hud.bindSettings(() => this.settingsPanel.open());
+    deps.hud.bindSettings(() => {
+      this.touchControls.cancelAll();
+      this.settingsPanel.open();
+    });
     // 虛擬按鍵（觸控）：按鈕本身掛在 DOM 上，顯示與否由 apply-settings.ts 決定。
-    new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons, deps.controls.touchMore);
+    this.touchControls = new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons, deps.controls.touchMore, deps.settings);
     this.shopPanel = new ShopPanel(document, deps.index, (command) => void this.run(command));
     this.kitchenPanel = new KitchenPanel(document, deps.index, (command) => void this.run(command));
     this.workshopPanel = new WorkshopPanel(document, deps.index, (command) => void this.run(command));
@@ -349,7 +353,10 @@ export class MapScene extends Phaser.Scene {
     this.repairPanel = new RepairPanel(document, deps.index, (command) => void this.run(command));
     this.collectionPanel = new CollectionPanel(document, deps.index);
     this.legacyPanel = new LegacyPanel(document, deps.index, (command) => void this.run(command));
-    deps.hud.bindSkills(() => this.skillPanel.toggle(deps.session.state));
+    deps.hud.bindSkills(() => {
+      this.touchControls.cancelAll();
+      this.skillPanel.toggle(deps.session.state);
+    });
     this.modalGroups = [
       [
         this.shopPanel,
@@ -384,6 +391,7 @@ export class MapScene extends Phaser.Scene {
     window.addEventListener('keydown', this.onKeyDown);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener('keydown', this.onKeyDown);
+      this.touchControls.dispose();
     });
     // 讀取存檔的提示等到鍵盤已經接上才顯示：提示出現時，按鍵一定會被接到（載入素材的期間按的鍵不算）。
     // 新遊戲則提示玩家可以按 ? 看操作說明（訊息列在新遊戲開場是空的）。
@@ -517,6 +525,7 @@ export class MapScene extends Phaser.Scene {
       // Escape 不一定綁定成遊戲動作；保留鍵盤的原生面板關閉行為。
       if (openGroup && event?.key === 'Escape') {
         event.preventDefault();
+        this.touchControls.cancelAll();
         for (const panel of openGroup) panel.close();
       }
       return;
@@ -530,6 +539,9 @@ export class MapScene extends Phaser.Scene {
       modalOpen: openGroup !== undefined,
       actionInProgress: this.playerActionInProgress,
     }, event?.key === 'Escape');
+    if (openGroup || this.heartEventPanel.isOpen() || this.reelTimer !== null || this.starTimer !== null || !this.scene.isActive()) {
+      this.touchControls.cancelAll();
+    }
     if (decision === 'ignore') return;
     if (decision === 'close-modal') {
       event?.preventDefault();
@@ -549,42 +561,49 @@ export class MapScene extends Phaser.Scene {
     if (action === 'help') {
       // 說明頁：操作按鍵、版本號、更新日誌與隱私說明；不花體力與時間。
       event?.preventDefault();
+      this.touchControls.cancelAll();
       this.deps.help.open();
       return;
     }
     if (action === 'saves') {
       // 存檔槽：讀取、新遊戲、刪除、匯出與匯入；不花體力與時間。
       event?.preventDefault();
+      this.touchControls.cancelAll();
       void this.deps.saves.open();
       return;
     }
     if (action === 'settings') {
       // 設定：改按鍵、字級、色盲模式、閃光與震動、觸控；不花體力與時間。
       event?.preventDefault();
+      this.touchControls.cancelAll();
       this.settingsPanel.open();
       return;
     }
     if (action === 'skills') {
       // 技能與天賦面板：不花體力與時間，不經過應用層的指令。
       event?.preventDefault();
+      this.touchControls.cancelAll();
       this.skillPanel.toggle(this.deps.session.state);
       return;
     }
     if (action === 'residents') {
       // 居民與好感面板：不花體力與時間，不經過應用層的指令。
       event?.preventDefault();
+      this.touchControls.cancelAll();
       this.residentPanel.toggle(this.deps.session.state);
       return;
     }
     if (action === 'collection') {
       // 圖鑑與成就面板：不花體力與時間，不經過應用層的指令。
       event?.preventDefault();
+      this.touchControls.cancelAll();
       this.collectionPanel.open(this.deps.session.state);
       return;
     }
     if (action === 'quests') {
       // 委託與佈告欄面板：不花體力與時間，不經過應用層的指令。
       event?.preventDefault();
+      this.touchControls.cancelAll();
       this.questPanel.toggle(this.deps.session.state);
       return;
     }
@@ -664,6 +683,7 @@ export class MapScene extends Phaser.Scene {
   /** 把一個指令交給應用層，顯示訊息與效果，然後重畫。鍵盤與商店面板共用這條路。 */
   private async run(command: Command): Promise<void> {
     const { hud, session, sounds } = this.deps;
+    const previousMapId = session.state.mapId;
     const before = { ...session.state.player };
     const plotsBefore = session.state.plots;
     const inventoryBefore = session.state.inventory;
@@ -690,6 +710,15 @@ export class MapScene extends Phaser.Scene {
     this.collectionPanel.refresh(session.state);
     this.legacyPanel.refresh(session.state);
     this.refresh();
+    if (session.state.mapId !== previousMapId || this.hasTouchInputBlocker()) this.touchControls.cancelAll();
+  }
+
+  private hasTouchInputBlocker(): boolean {
+    return this.modalGroups.some((group) => group.some((panel) => panel.isOpen()))
+      || this.heartEventPanel.isOpen()
+      || this.reelTimer !== null
+      || this.starTimer !== null
+      || !this.scene.isActive();
   }
 
   /** 把應用層的事件轉成視覺效果。效果只在這裡播放，規則不受影響。 */
@@ -1191,6 +1220,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   override update(time: number, delta: number): void {
+    if (this.hasTouchInputBlocker()) this.touchControls.cancelAll();
     this.updateSky(time);
     this.rig.update(delta);
     this.moveWearBadge();

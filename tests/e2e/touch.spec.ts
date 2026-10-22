@@ -17,6 +17,19 @@ async function seedTouchMode(page: Page, touchControls: 'auto' | 'on' | 'off'): 
   );
 }
 
+async function seedMobileControls(
+  page: Page,
+  controlStyle: 'dpad' | 'fixed-joystick' | 'floating-joystick',
+  handedness: 'right' | 'left' = 'right',
+): Promise<void> {
+  await page.addInitScript(({ key, style, hand }) => {
+    window.localStorage.setItem(key, JSON.stringify({
+      schemaVersion: 2,
+      settings: { touchControls: 'on', mobile: { controlStyle: style, handedness: hand } },
+    }));
+  }, { key: SETTINGS_KEY, style: controlStyle, hand: handedness });
+}
+
 async function startGame(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
@@ -181,5 +194,87 @@ test.describe('虛擬按鍵的顯示設定', () => {
     const coarse = await page.evaluate(() => window.matchMedia('(pointer: coarse)').matches);
     if (coarse) await expect(page.locator('#touch-controls')).toBeVisible();
     else await expect(page.locator('#touch-controls')).toBeHidden();
+  });
+});
+
+test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test('設定可選固定／浮動搖桿、慣用手並恢復 D-pad', async ({ page }) => {
+    await seedMobileControls(page, 'dpad');
+    await startGame(page);
+    await page.keyboard.press('o');
+    const style = page.locator('#settings-control-style');
+    const handedness = page.locator('#settings-handedness');
+    await expect(style).toHaveValue('dpad');
+    await style.selectOption('fixed-joystick');
+    await expect(page.locator('#touch-controls')).toHaveAttribute('data-control-style', 'fixed-joystick');
+    await expect(page.locator('.touch-joystick-base')).toBeVisible();
+    await style.selectOption('floating-joystick');
+    await expect(page.locator('#touch-controls')).toHaveAttribute('data-control-style', 'floating-joystick');
+    await handedness.selectOption('left');
+    await expect(page.locator('#touch-controls')).toHaveAttribute('data-handedness', 'left');
+    await style.selectOption('dpad');
+    await expect(page.locator('#touch-controls button[data-action="moveUp"]')).toBeVisible();
+    await expect(page.locator('.touch-joystick-base')).toBeHidden();
+    const saved = await page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? '{}'), SETTINGS_KEY);
+    expect(saved.settings.mobile).toMatchObject({ controlStyle: 'dpad', handedness: 'left' });
+  });
+
+  test('floating joystick moves on cardinal axes and stops on pointer cancellation', async ({ page }) => {
+    await seedMobileControls(page, 'floating-joystick');
+    await startGame(page);
+    const before = await playerPosition(page);
+    const pad = page.locator('.touch-move');
+    const box = await pad.boundingBox();
+    expect(box).not.toBeNull();
+    const center = { x: (box?.x ?? 0) + (box?.width ?? 0) / 2, y: (box?.y ?? 0) + (box?.height ?? 0) / 2 };
+    const send = (type: string, x: number, y: number) => pad.dispatchEvent(type, {
+      pointerId: 31,
+      pointerType: 'touch',
+      bubbles: true,
+      cancelable: true,
+      clientX: x,
+      clientY: y,
+    });
+    await send('pointerdown', center.x, center.y);
+    await send('pointermove', center.x + 58, center.y);
+    await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(before.x);
+    await send('pointercancel', center.x + 58, center.y);
+    const stopped = await playerPosition(page);
+    await page.waitForTimeout(350);
+    expect(await playerPosition(page)).toEqual(stopped);
+  });
+
+  test('releasing the action finger leaves movement active; opening a modal cancels all held gestures', async ({ page }) => {
+    await seedMobileControls(page, 'dpad');
+    await startGame(page);
+    const before = await playerPosition(page);
+    const move = page.locator('#touch-controls button[data-action="moveRight"]');
+    const action = page.locator('#touch-controls button[data-action="cycleTool"]');
+    await move.dispatchEvent('pointerdown', { pointerId: 41, pointerType: 'touch', bubbles: true, cancelable: true });
+    await action.dispatchEvent('pointerdown', { pointerId: 42, pointerType: 'touch', bubbles: true, cancelable: true });
+    await page.waitForTimeout(360);
+    const afterMoving = await playerPosition(page);
+    expect(afterMoving.x).toBeGreaterThan(before.x);
+    await action.dispatchEvent('pointerup', { pointerId: 42, pointerType: 'touch', bubbles: true, cancelable: true });
+    await page.waitForTimeout(240);
+    expect((await playerPosition(page)).x).toBeGreaterThan(afterMoving.x);
+
+    const skills = page.locator('#touch-controls button[data-action="skills"]');
+    await skills.dispatchEvent('pointerdown', { pointerId: 43, pointerType: 'touch', bubbles: true, cancelable: true });
+    await expect(page.locator('#skill-panel')).toBeVisible();
+    // The last accepted step may still be animating when the modal opens; let that step settle
+    // before checking that cancellation prevented any further repeats.
+    await expect.poll(async () => {
+      const actors = await page.evaluate(() => window.__dewhollow?.actors() ?? []);
+      return (actors as { id: string; busy: boolean }[]).find((actor) => actor.id === 'player')?.busy;
+    }).toBe(false);
+    const stopped = await playerPosition(page);
+    await page.waitForTimeout(350);
+    expect(await playerPosition(page)).toEqual(stopped);
+    await move.dispatchEvent('pointerup', { pointerId: 41, pointerType: 'touch', bubbles: true, cancelable: true });
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#skill-panel')).toBeHidden();
   });
 });
