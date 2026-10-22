@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "加工機（house 的加工台）的配方。放入材料後機器開始加工，過 days 天（睡覺時推進）就完成，之後要站在加工台前取回成品。同時最多 tuning.processing.slots 批。level 是需要的烹飪等級。",
+  "note": "加工機（house 的加工台）的配方。放入材料後機器開始加工，過 days 天（睡覺時推進）就完成，之後要站在加工台前取回成品。同時最多 tuning.processing.slots 批。level 是需要的烹飪等級。織布機就是加工台的織布配方（weave-cloth：2 羊毛 → 1 布，不需要烹飪等級）。",
   "recipes": [
     {
       "id": "pickle-bean",
@@ -71,6 +71,16 @@
       "output": "cheese",
       "days": 2,
       "level": 3
+    },
+    {
+      "id": "weave-cloth",
+      "name": "織布",
+      "ingredients": {
+        "wool": 2
+      },
+      "output": "cloth",
+      "days": 2,
+      "level": 0
     }
   ]
 }

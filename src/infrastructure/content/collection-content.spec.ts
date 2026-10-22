@@ -13,8 +13,8 @@ describe('圖鑑與成就的真實內容', () => {
     expect(achievementProblems(shippedPack)).toEqual([]);
   });
 
-  it('seven dex categories: fish, crops, minerals, wild vegetables and flowers, dishes, processed goods, animals', () => {
-    expect((shippedPack.collection ?? []).map((c) => c.id)).toEqual(['fish', 'crops', 'minerals', 'forage', 'dishes', 'processed', 'animals']);
+  it('eight dex categories: fish, crops, minerals, wild vegetables and flowers, dishes, processed goods, animals, clothing (羊與布之後新增服飾)', () => {
+    expect((shippedPack.collection ?? []).map((c) => c.id)).toEqual(['fish', 'crops', 'minerals', 'forage', 'dishes', 'processed', 'animals', 'clothing']);
   });
 
   it('has exactly twenty spring and summer achievements, each given once', () => {

@@ -15,11 +15,18 @@
     "F..ttt.....ttt.......F",
     "F...tt...tt..........F",
     "F....tt....tt........F",
-    "F....................F",
-    "F....................F",
+    "F..s.s.s.............F",
+    "F....T...............F",
     "FFFFFFFFFFFFFFFFFFFFFF"
   ],
   "legend": {
+    "s": {
+      "kind": "grass",
+      "slot": true
+    },
+    "T": {
+      "kind": "trough"
+    },
     "F": {
       "kind": "fence"
     },
@@ -56,5 +63,6 @@
   "spawn": {
     "x": 1,
     "y": 7
-  }
+  },
+  "flock": "sheep"
 }

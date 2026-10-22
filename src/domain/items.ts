@@ -4,9 +4,10 @@ import { sellPriceOf } from './pricing';
 /**
  * 種子與作物由作物衍生；木材、野薄荷、礦石是獨立定義的（content/items.json）。
  * building 是店家賣的建築改建（例如牛舍），只出現在貨架上，不會進背包。
- * decor 是裝飾（星河兌換得到，沒有售價、不能出貨；擺放系統之後才做）。
+ * decor 是裝飾（星河兌換或合成得到，沒有售價、不能出貨；擺放系統之後才做）。
+ * recipe 是配方（商店賣的，買了就學會，只出現在貨架上，不進背包）。
  */
-export type ItemKind = 'seed' | 'crop' | 'material' | 'forage' | 'ore' | 'fish' | 'animal' | 'dish' | 'processed' | 'craft' | 'building' | 'decor';
+export type ItemKind = 'seed' | 'crop' | 'material' | 'forage' | 'ore' | 'fish' | 'animal' | 'dish' | 'processed' | 'craft' | 'building' | 'decor' | 'recipe';
 
 export type Quality = 'normal' | 'good' | 'fine';
 

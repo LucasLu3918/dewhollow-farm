@@ -27,7 +27,7 @@ import { noEvent, type TodayEvent } from './random-events';
 import { emptyCollection, type CollectionState } from './collection';
 import { emptyAchievements, type AchievementState } from './achievements';
 
-export const SAVE_SCHEMA_VERSION = 20;
+export const SAVE_SCHEMA_VERSION = 21;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -64,6 +64,8 @@ export interface GameState {
   animals: Animal[];
   /** 牛舍裡的牛（依座位排序）。牛舍要先改建（flags.cowbarn），見 game-commands.ts。 */
   cows: Animal[];
+  /** 牧草地羊圈裡的羊（依座位排序）；羊長的羊毛與剪毛見 animals.ts。 */
+  sheep: Animal[];
   /** 加工機裡的批次（醃漬、烘乾）；daysLeft 為 0 表示已完成、等玩家取回。 */
   processing: ProcessingJob[];
   /** 投竿後等待收線的魚（魚上鉤後才有；任何其他動作都會放掉它）。 */
@@ -148,6 +150,7 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     fishing: null,
     animals: [],
     cows: [],
+    sheep: [],
     processing: [],
     friendship: {},
     heartEvents: [],

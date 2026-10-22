@@ -794,14 +794,14 @@ export class MapScene extends Phaser.Scene {
     }
   }
 
-  /** 雞舍的雞、牛舍的牛：每隻坐在對應的座位上（座位順序見 slotsOf；住哪一群看地圖的 flock）。 */
+  /** 雞舍的雞、牛舍的牛、羊圈的羊：每隻坐在對應的座位上（座位順序見 slotsOf；住哪一群看地圖的 flock）。 */
   private syncAnimals(mapId: string): void {
     for (const sprite of this.animalSprites) sprite.destroy();
     this.animalSprites = [];
     const state = this.deps.session.state;
     const map = this.deps.index.map(mapId);
     if (!map.flock) return;
-    const herd = map.flock === 'cows' ? state.cows : state.animals;
+    const herd = map.flock === 'cows' ? state.cows : map.flock === 'sheep' ? state.sheep : state.animals;
     const seats = slotsOf(map);
     seats.forEach((seat, i) => {
       const animal = herd[i];

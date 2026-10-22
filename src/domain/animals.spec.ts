@@ -1,8 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { dailyCare, feedAll, milkQuality, newAnimal, petAnimal, produceEggs, type Animal } from './animals';
+import { dailyCare, feedAll, growWool, milkQuality, newAnimal, petAnimal, produceEggs, productQuality, shearAt, woolReady, type Animal } from './animals';
 
 const CHICKEN = { id: 'chicken', name: '雞', eggItem: 'egg', eggQuality: 0.3 };
 const MILK = { item: 'milk', goodChance: 0.3, fineChance: 0.1 };
+const WOOL = { item: 'wool', everyDays: 3, goodChance: 0.3, fineChance: 0.1 };
+
+/** 一隻已經餵過、摸過的羊，羊毛長了幾天。 */
+function sheep(woolDays: number, extra: Partial<Animal> = {}): Animal {
+  return { ...newAnimal('sheep'), woolDays, ...extra };
+}
 
 describe('animal care', () => {
   it('a new animal is hungry, not yet petted or milked, with a neutral mood', () => {
@@ -74,5 +80,50 @@ describe('milk quality (cows)', () => {
     expect(milkQuality(9, 0.05, MILK)).toBe('fine');
     expect(milkQuality(9, 0.2, MILK)).toBe('good');
     expect(milkQuality(8, 0.05, MILK)).toBe('good');
+  });
+});
+
+describe('wool (sheep)', () => {
+  it('a sheep that ate gains one day of wool at the new day; a hungry one does not', () => {
+    const flock = [newAnimal('sheep'), { ...newAnimal('sheep'), fed: true }];
+    const grown = growWool(flock, WOOL.everyDays);
+    expect(grown.map((a) => a.woolDays ?? 0)).toEqual([0, 1]);
+  });
+
+  it('wool is ready after three fed days, and not before', () => {
+    let flock = [{ ...newAnimal('sheep'), fed: true }];
+    flock = growWool(flock, WOOL.everyDays);
+    flock = growWool(flock, WOOL.everyDays);
+    expect(woolReady(flock[0] ?? newAnimal('sheep'), WOOL.everyDays)).toBe(false);
+    flock = growWool(flock, WOOL.everyDays);
+    expect(woolReady(flock[0] ?? newAnimal('sheep'), WOOL.everyDays)).toBe(true);
+  });
+
+  it('the wool stops at ready: more fed days do not make it longer than the interval', () => {
+    const flock = growWool([{ ...sheep(3), fed: true }], WOOL.everyDays);
+    expect(flock[0]?.woolDays).toBe(3);
+  });
+
+  it('shearing one sheep resets its wool and leaves the others alone', () => {
+    const flock = [sheep(3), sheep(2)];
+    const shorn = shearAt(flock, 0);
+    expect(shorn.map((a) => a.woolDays)).toEqual([0, 2]);
+  });
+
+  it('shearing a missing seat changes nothing', () => {
+    const flock = [sheep(3)];
+    expect(shearAt(flock, 4)).toEqual(flock);
+  });
+
+  it('the wool survives the new day care (only feeding, petting and milking are reset)', () => {
+    const next = dailyCare([sheep(2, { fed: true, petted: true })]);
+    expect(next[0]).toMatchObject({ fed: false, petted: false, woolDays: 2 });
+  });
+
+  it('wool quality follows the mood like milk: a happy sheep can give good wool, a very happy one fine wool', () => {
+    expect(productQuality(4, 0, WOOL)).toBe('normal');
+    expect(productQuality(5, 0.1, WOOL)).toBe('good');
+    expect(productQuality(9, 0.05, WOOL)).toBe('fine');
+    expect(productQuality(8, 0.05, WOOL)).toBe('good');
   });
 });

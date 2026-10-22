@@ -67,7 +67,7 @@ const mapSchema = z.object({
   rows: z.array(z.string()),
   legend: z.record(z.string().length(1), tileSchema),
   spawn: point,
-  flock: z.enum(['animals', 'cows']).optional(),
+  flock: z.enum(['animals', 'cows', 'sheep']).optional(),
 });
 
 const startSchema = z.object({
@@ -235,7 +235,7 @@ export const itemsFileSchema = z.object({
     z.object({
       id: z.string().min(1),
       name: z.string().min(1),
-      kind: z.enum(['material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft', 'building', 'decor']),
+      kind: z.enum(['material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft', 'building', 'decor', 'recipe']),
       maxStack: z.number().int().positive(),
       sellPrice: z.number().int().nonnegative().optional(),
     }),
@@ -248,6 +248,8 @@ const shopStockSchema = z.object({
   limit: z.number().int().positive().optional(),
   /** 只在這些季節進貨（省略為四季都有）。 */
   seasons: z.array(z.enum(SEASONS)).min(1).optional(),
+  /** 第一次買到這項的內容時數估計（分鐘）；只有要計入時數的商品才有（見 docs/PLAYTIME_PLAN.md）。 */
+  playMinutes: z.number().positive().max(60).optional(),
 });
 const toolUpgradeSchema = z.object({
   toolId: z.enum(TOOL_IDS),
@@ -313,6 +315,14 @@ const milkSchema = z
     fineChance: z.number().min(0).max(1),
   })
   .refine((m) => m.fineChance <= m.goodChance, '精良奶的機率不可高於優良奶');
+const woolSchema = z
+  .object({
+    item: z.string().min(1),
+    everyDays: z.number().int().positive().max(14),
+    goodChance: z.number().min(0).max(1),
+    fineChance: z.number().min(0).max(1),
+  })
+  .refine((w) => w.fineChance <= w.goodChance, '精良羊毛的機率不可高於優良羊毛');
 export const animalsFileSchema = z.object({
   version: z.literal(1),
   animals: z.array(
@@ -323,8 +333,12 @@ export const animalsFileSchema = z.object({
         eggItem: z.string().min(1).optional(),
         eggQuality: z.number().min(0).max(1).optional(),
         milk: milkSchema.optional(),
+        wool: woolSchema.optional(),
       })
-      .refine((a) => (a.eggItem !== undefined) !== (a.milk !== undefined), '動物要嘛下蛋、要嘛產奶，且只能是其中一種')
+      .refine(
+        (a) => [a.eggItem, a.milk, a.wool].filter((x) => x !== undefined).length === 1,
+        '動物要嘛下蛋、要嘛產奶、要嘛產毛，且只能是其中一種',
+      )
       .refine((a) => a.eggItem === undefined || a.eggQuality !== undefined, '下蛋的動物要有 eggQuality'),
   ),
 });

@@ -31,6 +31,12 @@ function unitsOf(pack: ContentPack): Unit[] {
   for (const r of pack.crafting) units.push({ label: `合成 ${r.id}`, minutes: r.playMinutes, seasons: null });
   for (const a of pack.achievements ?? []) units.push({ label: `成就 ${a.id}`, minutes: a.playMinutes, seasons: [a.phase] });
   for (const c of pack.collection ?? []) units.push({ label: `圖鑑 ${c.id}`, minutes: c.playMinutes, seasons: [c.phase] });
+  // 商店的第一次購買（羊、小屋擴建、季節限定的配方）：只有標了 playMinutes 的商品才計入。
+  for (const shop of pack.shops) {
+    for (const line of shop.stock) {
+      if (line.playMinutes !== undefined) units.push({ label: `商店 ${line.itemId}`, minutes: line.playMinutes, seasons: line.seasons ?? null });
+    }
+  }
   return units;
 }
 

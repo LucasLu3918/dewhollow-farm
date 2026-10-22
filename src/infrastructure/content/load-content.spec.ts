@@ -23,6 +23,8 @@ import mine from '../../../content/mine.json';
 import forest from '../../../content/maps/forest.json';
 import lake from '../../../content/maps/lake.json';
 import house from '../../../content/maps/house.json';
+import houseWing from '../../../content/maps/house-wing.json';
+import houseFull from '../../../content/maps/house-full.json';
 import mineEntrance from '../../../content/maps/mine-entrance.json';
 import coop from '../../../content/maps/coop.json';
 import pasture from '../../../content/maps/pasture.json';
@@ -52,7 +54,7 @@ function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
     letters,
     festivals,
     mainQuest, repairs, randomEvents,
-    maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+    maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn],
     start,
     tuning,
     assets,
@@ -93,7 +95,7 @@ describe('loadContent with shipped content', () => {
       'frost-mushroom',
       'ember-onion',
     ]);
-    expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'plaza', 'forest', 'lake', 'house', 'mine-entrance', 'coop', 'pasture', 'cowbarn']);
+    expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'plaza', 'forest', 'lake', 'house', 'house-wing', 'house-full', 'mine-entrance', 'coop', 'pasture', 'cowbarn']);
     expect(pack.start.mapId).toBe('farm');
   });
 

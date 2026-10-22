@@ -36,7 +36,7 @@ export function gainedEntries(before: GameState, after: GameState, index: Conten
   for (const [itemId, count] of now) {
     if (dexIds.has(itemId) && count > (was.get(itemId) ?? 0)) gained.push(itemId);
   }
-  const kindsOf = (state: GameState) => new Set([...state.animals, ...state.cows].map((a) => `animal.${a.kind}`));
+  const kindsOf = (state: GameState) => new Set([...state.animals, ...state.cows, ...state.sheep].map((a) => `animal.${a.kind}`));
   const had = kindsOf(before);
   for (const id of kindsOf(after)) {
     if (!had.has(id) && dexIds.has(id)) gained.push(id);
