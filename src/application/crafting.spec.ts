@@ -43,6 +43,8 @@ import quests from '../../content/quests.json';
 import letters from '../../content/letters.json';
 import festivals from '../../content/festivals.json';
 import mainQuest from '../../content/main-quest.json';
+import repairs from '../../content/repairs.json';
+import randomEvents from '../../content/events-random.json';
 
 /**
  * M4b：合成（工作台）。站在小屋的工作台 (4,1) 前面，也就是 (4,2) 面向上方。
@@ -56,7 +58,7 @@ const { pack } = loadContent({
     quests,
     letters,
     festivals,
-    mainQuest,
+    mainQuest, repairs, randomEvents,
   maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,

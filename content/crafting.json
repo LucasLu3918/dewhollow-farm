@@ -219,6 +219,22 @@
         "flag": "recipe:star-sugar"
       },
       "playMinutes": 1.5
+    },
+    {
+      "id": "fountain",
+      "name": "噴泉",
+      "ingredients": {
+        "stone": 10,
+        "slate": 4
+      },
+      "output": {
+        "item": "fountain",
+        "count": 1
+      },
+      "unlock": {
+        "flag": "blueprint:fountain"
+      },
+      "playMinutes": 2
     }
   ]
 }

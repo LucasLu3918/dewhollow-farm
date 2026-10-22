@@ -37,6 +37,8 @@ import quests from '../../../content/quests.json';
 import letters from '../../../content/letters.json';
 import festivals from '../../../content/festivals.json';
 import mainQuest from '../../../content/main-quest.json';
+import repairs from '../../../content/repairs.json';
+import randomEvents from '../../../content/events-random.json';
 import { PERIODS, spotOf, type ScheduleDef } from '../../domain/schedule';
 import { WEATHERS } from '../../domain/weather';
 import { tileAt, isWalkable } from '../../domain/world';
@@ -74,7 +76,7 @@ function shipped(): RawContentFiles {
     quests,
     letters,
     festivals,
-    mainQuest,
+    mainQuest, repairs, randomEvents,
   };
 }
 
@@ -248,7 +250,7 @@ describe('委託與信件（M5b，真實內容）', () => {
 
   it('鎮廣場有佈告欄、小屋有信箱（地圖上的標記）', () => {
     const notices = (map: { legend: Record<string, { notice?: string }> }) => Object.values(map.legend).map((t) => t.notice).filter(Boolean);
-    expect(notices(pack.maps.find((m) => m.id === 'plaza')!)).toEqual(['bulletin', 'festival']);
+    expect(notices(pack.maps.find((m) => m.id === 'plaza')!)).toEqual(['bulletin', 'festival', 'repair']);
     expect(notices(pack.maps.find((m) => m.id === 'house')!)).toEqual(['mailbox']);
   });
 });

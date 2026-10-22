@@ -42,9 +42,9 @@ describe('節慶與主線的真實內容', () => {
     expect(exchange.some((line) => line.flag?.startsWith('recipe:'))).toBe(true);
   });
 
-  it('chapter 3 waits on the lake bridge flag that M5d sets', () => {
+  it('chapter 3 waits on the lake bridge repair flag (set by the summer repair)', () => {
     const third = shippedPack.chapters?.find((c) => c.number === 3);
-    expect(third?.steps.some((s) => 'flag' in s && s.flag === 'lakeBridge')).toBe(true);
+    expect(third?.steps.some((s) => 'flag' in s && s.flag === 'repair:lake-bridge')).toBe(true);
   });
 });
 

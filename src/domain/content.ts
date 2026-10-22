@@ -81,7 +81,7 @@ export interface TileDef {
   item?: string;
   seasons?: Season[];
   /** 站在它前面按 X 的用途：佈告欄（看今日委託並接取）、信箱（取信）或節慶告示（見 festival.ts）。 */
-  notice?: 'bulletin' | 'mailbox' | 'festival';
+  notice?: 'bulletin' | 'mailbox' | 'festival' | 'repair';
   /** 節慶的水池（只在節慶開放時有作用，見 star-fishing.ts）。 */
   festival?: 'stars';
 }
@@ -107,6 +107,8 @@ import type { QuestSet } from './quests';
 import type { LetterDef } from './mail';
 import type { FestivalDef } from './festival';
 import type { StoryChapter } from './story';
+import type { RepairDef } from './repairs';
+import type { DailyEventRules } from './random-events';
 
 export type { ScheduleDef, ScheduleEntry, PeriodRules, Period } from './schedule';
 export type { HeartEventDef, HeartEventOption, HeartEmote } from './heart-events';
@@ -157,6 +159,10 @@ export interface ContentPack {
   festivals?: FestivalDef[];
   /** 主線章節（見 story.ts 與 content/main-quest.json）。測試用的最小內容可以省略。 */
   chapters?: StoryChapter[];
+  /** 社區修復（見 repairs.ts 與 content/repairs.json）。測試用的最小內容可以省略。 */
+  repairs?: RepairDef[];
+  /** 隨機事件（見 random-events.ts 與 content/events-random.json）。測試用的最小內容可以省略。 */
+  randomEvents?: DailyEventRules;
 }
 
 export interface RecipeDef {

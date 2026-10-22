@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "note": "社區修復（M5d）：鎮廣場修復委員會的每季目標。候選物品與數量在這裡定義；規則在 src/domain/repairs.ts。kinds：候選裡不同的物品各捐 each 件，共 count 種；total：候選加總到 count 件，種類不限。獎勵的旗標由主線與合成配方使用。playMinutes 為內容時數的估計。",
+  "repairs": [
+    {
+      "id": "garden",
+      "season": "spring",
+      "name": "花園修復",
+      "request": "廣場的花圃荒了一半。委員會請大家捐出山裡採來的花與野菜，每一種各一件就夠。",
+      "done": "花圃重新開滿了花，委員會也從抽屜裡找出了噴泉的圖紙。",
+      "goal": {
+        "type": "kinds",
+        "pool": ["mushroom", "berry", "flower-spring", "flower-summer", "herb", "fern-shoot", "flower-bell", "creek-celery", "flower-night", "pine-nut"],
+        "count": 10,
+        "each": 1
+      },
+      "reward": { "gold": 300, "flags": ["repair:garden", "blueprint:fountain"] },
+      "playMinutes": 10
+    },
+    {
+      "id": "lake",
+      "season": "summer",
+      "name": "湖畔修復",
+      "request": "湖畔的橋被水沖壞了一角，補強要用湖裡的魚去換料。委員會請大家捐出八條魚，種類不限。",
+      "done": "橋修好了，湖的那一邊又連起來了。老浪說，他想在湖畔蓋一間小屋。",
+      "goal": {
+        "type": "total",
+        "pool": ["fish.carp", "fish.crucian", "fish.bass"],
+        "count": 8
+      },
+      "reward": { "gold": 400, "flags": ["repair:lake-bridge", "repair:lake-house"] },
+      "playMinutes": 10
+    }
+  ]
+}

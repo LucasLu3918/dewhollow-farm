@@ -13,6 +13,8 @@ import type { QuestDef } from '../domain/quests';
 import type { LetterDef } from '../domain/mail';
 import type { FestivalDef } from '../domain/festival';
 import type { StoryChapter } from '../domain/story';
+import type { RepairDef } from '../domain/repairs';
+import type { DailyEventRules, RandomEventDef } from '../domain/random-events';
 
 /**
  * 以 id 快速查找內容。假設內容已由基礎設施層驗證過參照完整性；
@@ -70,6 +72,12 @@ export interface ContentIndex {
   festivals: FestivalDef[];
   /** 主線章節（依章節號排序）。 */
   chapters: StoryChapter[];
+  /** 社區修復（順序與內容檔相同，見 repairs.ts）。 */
+  repairs: RepairDef[];
+  repair(id: string): RepairDef;
+  /** 隨機事件的機率與候選（見 random-events.ts）。 */
+  randomEvents: DailyEventRules;
+  randomEvent(id: string): RandomEventDef;
 }
 
 const NO_BULLETIN: BulletinRules = { postedBy: '鎮公所', dailyCount: 0, daily: [], weekly: [] };
@@ -169,5 +177,17 @@ export function createContentIndex(pack: ContentPack): ContentIndex {
     },
     festivals: pack.festivals ?? [],
     chapters: [...(pack.chapters ?? [])].sort((a, b) => a.number - b.number),
+    repairs: pack.repairs ?? [],
+    repair(id) {
+      const found = (pack.repairs ?? []).find((r) => r.id === id);
+      if (!found) throw new Error(`找不到修復：${id}`);
+      return found;
+    },
+    randomEvents: pack.randomEvents ?? { chance: 0, events: [] },
+    randomEvent(id) {
+      const found = (pack.randomEvents?.events ?? []).find((e) => e.id === id);
+      if (!found) throw new Error(`找不到隨機事件：${id}`);
+      return found;
+    },
   };
 }

@@ -38,6 +38,8 @@ import quests from '../../../content/quests.json';
 import letters from '../../../content/letters.json';
 import festivals from '../../../content/festivals.json';
 import mainQuest from '../../../content/main-quest.json';
+import repairs from '../../../content/repairs.json';
+import randomEvents from '../../../content/events-random.json';
 
 function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
   return {
@@ -49,7 +51,7 @@ function shipped(overrides: Partial<RawContentFiles> = {}): RawContentFiles {
     quests,
     letters,
     festivals,
-    mainQuest,
+    mainQuest, repairs, randomEvents,
     maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
     start,
     tuning,

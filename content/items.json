@@ -265,6 +265,12 @@
       "maxStack": 20
     },
     {
+      "id": "fountain",
+      "name": "噴泉",
+      "kind": "decor",
+      "maxStack": 1
+    },
+    {
       "id": "star-sugar",
       "name": "星河糖",
       "kind": "craft",

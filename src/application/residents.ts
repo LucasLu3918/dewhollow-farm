@@ -1,6 +1,7 @@
 import type { GameState } from '../domain/game-state';
 import { periodOf, spotOf, type Period } from '../domain/schedule';
 import type { ContentIndex } from './content-index';
+import { concertNow } from './random-events';
 
 /** 居民在某張地圖上站的格子。 */
 export interface ResidentPlacement {
@@ -20,8 +21,15 @@ export function currentPeriod(state: GameState, index: ContentIndex): Period {
  */
 export function residentsOn(state: GameState, index: ContentIndex): ResidentPlacement[] {
   const period = currentPeriod(state, index);
+  // 今天的廣場音樂會（隨機事件）：這個時段，音樂會的居民改到音樂會的位置（見 random-events.ts）。
+  const concert = concertNow(state, index, period);
   const found: ResidentPlacement[] = [];
   for (const npc of index.npcs) {
+    const staged = concert?.spots.find((s) => s.npcId === npc.id);
+    if (concert && staged) {
+      if (concert.mapId === state.mapId) found.push({ npcId: npc.id, x: staged.x, y: staged.y });
+      continue;
+    }
     const spot = spotOf(index.schedule, npc.id, period, state.weather);
     if (spot && spot.mapId === state.mapId) found.push({ npcId: npc.id, x: spot.x, y: spot.y });
   }

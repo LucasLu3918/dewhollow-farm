@@ -30,6 +30,8 @@ import type { ContentIndex } from './content-index';
 import { acceptQuest, collectMail, currentBoard, deliverLetters, recordQuestEvent, refreshBoard, settleQuests, shortfallOf, submitQuest } from './quests';
 import { festivalCrown, festivalHere, festivalSwap, recordContestCatch, recordStallSale, stallRefusal, starExchange, type FestivalOutcome } from './festival';
 import { settleStory, storyObjective } from './story';
+import { donateToRepair } from './repairs';
+import { endOfDay, eventBitePoints, eventYieldChance, startDay } from './random-events';
 import { festivalOnDay } from '../domain/festival';
 import { starCatchHit } from '../domain/star-fishing';
 
@@ -72,6 +74,8 @@ export type Command =
   | { type: 'festivalCrown' }
   /** 夜市的星河兌換：用星河碎片換物品或解鎖配方，每項每年有上限（不花體力與時間，見 festival.ts）。 */
   | { type: 'starExchange'; lineId: string }
+  /** 社區修復的捐獻：站在修復告示前（畫面）送出，從背包拿走 count 件（不花體力與時間，見 application/repairs.ts）。 */
+  | { type: 'donate'; repairId: string; itemId: string; count: number }
   /** 夜釣星星：站在節慶水池前甩竿（耗釣魚的體力與時間），之後等 catchStar。 */
   | { type: 'castStar' }
   /** 星星收網：elapsedMs 是甩竿後到按下的毫秒數；null 表示時限內沒按。只有甩竿後才有效。 */
@@ -105,7 +109,9 @@ export type GameEvent =
   /** 站在節慶告示前按互動：畫面打開節慶面板（不花體力與時間）。 */
   | { type: 'festivalOpened' }
   /** 夜釣星星甩竿成功：畫面開始星星的時機小遊戲，按 X 時送出 catchStar。 */
-  | { type: 'starLine' };
+  | { type: 'starLine' }
+  /** 站在修復告示前按互動：畫面打開修復面板（不花體力與時間）。 */
+  | { type: 'repairOpened' };
 
 export type ActionFeedback = 'till' | 'water' | 'plant' | 'harvest' | 'ship' | 'chop' | 'forage' | 'mine' | 'fish';
 
@@ -189,6 +195,12 @@ const FAILURE_MESSAGES: Record<string, string> = {
   EXCHANGE_LIMIT: '這項今年已經換過了',
   ALREADY_UNLOCKED: '這份配方已經解鎖過了',
   NOT_UNLOCKED: '還沒有這個配方，要先在夜市的星河兌換換到',
+  NO_REPAIR: '沒有這項修復',
+  REPAIR_CLOSED: '這項修復不在這個季節，等它的季節再來',
+  REPAIR_DONE: '這項修復已經完成了，明年再來',
+  NOT_REPAIR_ITEM: '這項修復不收這個東西',
+  BAD_COUNT: '要捐至少一件',
+  REPAIR_ENOUGH: '這一項已經捐夠了，換別的東西吧',
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
@@ -229,6 +241,8 @@ function executeCore(current: GameState, command: Command, index: ContentIndex):
       return festivalCommand(state, festivalCrown(state, index));
     case 'starExchange':
       return festivalCommand(state, starExchange(state, command.lineId, index));
+    case 'donate':
+      return donateCommand(state, command, index);
     case 'castStar':
       return castStar(state, index);
     case 'catchStar':
@@ -336,6 +350,7 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
   if (tile.notice === 'bulletin') return openBulletin(state, index);
   if (tile.notice === 'mailbox') return collectMailbox(state, index);
   if (tile.notice === 'festival') return reply(state, [], [{ type: 'festivalOpened' }]);
+  if (tile.notice === 'repair') return reply(state, [], [{ type: 'repairOpened' }]);
   if (tile.kind === 'rock' || tile.kind === 'ore') {
     if (kind === tile.kind) return mineRock(state, target, tile, index);
   }
@@ -397,7 +412,7 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
       if (!harvested.ok) return fail(harvested.reason);
       const roll = rollInt(s.rng, index.tuning.harvest.min, index.tuning.harvest.max);
       const level = levelOf(s.skills.farming, index.tuning.skills.thresholds);
-      const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'harvest'));
+      const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'harvest') + eventYieldChance(s, index, 'harvest'));
       const count = roll.value + bonusYield(level, index.tuning.skills) + extra.value;
       const q = rollInt(extra.rng, 0, 999);
       // 居民喜歡這種作物、而且好感夠：品質的隨機數往好的方向移（見 friendship.ts 的 favorQualityBonus）。
@@ -598,7 +613,10 @@ function chooseHeartOption(state: GameState, optionId: string, index: ContentInd
   return reply(next, [option.reply]);
 }
 
-function sleep(state: GameState, index: ContentIndex): CommandOutcome {
+function sleep(today: GameState, index: ContentIndex): CommandOutcome {
+  // 夜間的隨機事件（例如流星）在睡前入袋。
+  const night = endOfDay(today, index);
+  const state = night.state;
   // 今天的天氣決定田地要不要澆水（雨與暴風雨），然後才結算作物生長。
   const watered = waters(state.weather) || state.flags.sprinkler ? waterAllPlots(state.plots) : state.plots;
   const growth = growCrops(watered, (id) => index.crop(id).growthDays);
@@ -645,10 +663,13 @@ function sleep(state: GameState, index: ContentIndex): CommandOutcome {
   };
   // 早上：到期的居民來信送進信箱，佈告欄換成今天的委託。
   const delivered = deliverLetters(wakeUp, index);
-  const next = refreshBoard(delivered.state, index);
-  const messages = [`你睡了一覺。${dateLabel(calendar)} ${formatClock(calendar)}`];
-  const today = festivalOnDay(index.festivals, calendar);
-  if (today) messages.push(`今天是${today.name}！到${index.map(today.mapId).name}看看吧。`);
+  // 新的一天的隨機事件：白天的物品在這裡入袋，事件的文字告訴玩家（見 random-events.ts）。
+  const day = startDay(refreshBoard(delivered.state, index), index);
+  const next = day.state;
+  const messages = [`你睡了一覺。${dateLabel(calendar)} ${formatClock(calendar)}`, ...night.messages];
+  const festival = festivalOnDay(index.festivals, calendar);
+  if (festival) messages.push(`今天是${festival.name}！到${index.map(festival.mapId).name}看看吧。`);
+  messages.push(...day.messages);
   if (morning.seasonChanged) messages.push(`季節換了，現在是${SEASON_LABEL[calendar.season]}天`);
   if (delivered.arrived.length > 0) messages.push(`信箱收到 ${delivered.arrived.length} 封信，到信箱取信`);
   if (settled.gold > 0) messages.push(`出貨箱結算 +${settled.gold} 金`);
@@ -701,7 +722,7 @@ function cast(state: GameState, target: Point, index: ContentIndex): CommandOutc
   const events: GameEvent[] = [{ type: 'acted', action: 'fish', x: target.x, y: target.y }];
   const baitInBag = countOf(state.inventory, 'bait') > 0;
   const baitLeft = baitInBag ? removeItem(state.inventory, 'bait', 1) : null;
-  const chance = Math.min(100, biteChanceFor(index.tuning.fishing, { bobber: state.flags.bobber === true, bait: baitInBag }) + biteBonusPoints(state.talents, index.talents.defs));
+  const chance = Math.min(100, biteChanceFor(index.tuning.fishing, { bobber: state.flags.bobber === true, bait: baitInBag }) + biteBonusPoints(state.talents, index.talents.defs) + eventBitePoints(state, index));
   if (bite.value < chance && available.length > 0) {
     const total = available.reduce((sum, f) => sum + f.weight, 0);
     const pick = rollInt(rng, 1, total);
@@ -794,7 +815,7 @@ function mineRock(state: GameState, target: Point, tile: TileDef, index: Content
   const result = spendThen(state, 'mine', index, (s) => {
     const roll = rollInt(s.rng, range.min, range.max);
     const bonus = isOre ? bonusYield(levelOf(s.skills.mining, index.tuning.skills.thresholds), index.tuning.skills) : 0;
-    const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'mine', itemId));
+    const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'mine', itemId) + eventYieldChance(s, index, 'mine'));
     const count = roll.value + bonus + extra.value;
     const stored = addItem(s.inventory, index.item(itemId), count);
     if (!stored.ok) return fail(stored.reason);
@@ -819,7 +840,7 @@ function chopTree(state: GameState, target: Point, index: ContentIndex): Command
   let yielded = 0;
   const result = spendThen(state, 'chop', index, (s) => {
     const roll = rollInt(s.rng, index.tuning.gathering.wood.min, index.tuning.gathering.wood.max);
-    const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'chop'));
+    const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'chop') + eventYieldChance(s, index, 'chop'));
     const count = roll.value + bonusYield(levelOf(s.skills.foraging, index.tuning.skills.thresholds), index.tuning.skills) + extra.value;
     const stored = addItem(s.inventory, index.item('wood'), count);
     if (!stored.ok) return fail(stored.reason);
@@ -842,7 +863,7 @@ function forage(state: GameState, target: Point, index: ContentIndex): CommandOu
   let yielded = 0;
   const result = spendThen(state, 'forage', index, (s) => {
     const roll = rollInt(s.rng, index.tuning.gathering.forage.min, index.tuning.gathering.forage.max);
-    const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'forage', itemId));
+    const extra = rollExtraYield(roll.rng, extraYieldChance(s.talents, index.talents.defs, 'forage', itemId) + eventYieldChance(s, index, 'forage'));
     const count = roll.value + extra.value;
     const stored = addItem(s.inventory, index.item(itemId), count);
     if (!stored.ok) return fail(stored.reason);
@@ -1274,6 +1295,13 @@ function acceptQuestCommand(state: GameState, questId: string, index: ContentInd
   const accepted = acceptQuest(state, questId, index);
   if (!accepted.ok) return reply(state, [messageFor(accepted.reason)], [refused(accepted.reason)]);
   return reply(accepted.value, [`接下了委託「${index.quest(questId).title}」`]);
+}
+
+/** 社區修復的捐獻（不花體力與時間）。失敗時說明原因，狀態不變。 */
+function donateCommand(state: GameState, command: Extract<Command, { type: 'donate' }>, index: ContentIndex): CommandOutcome {
+  const result = donateToRepair(state, command.repairId, command.itemId, command.count, index);
+  if (!result.ok) return reply(state, [messageFor(result.reason)], [refused(result.reason)]);
+  return reply(result.value.state, result.value.messages);
 }
 
 /** 交付委託（不花體力與時間）。東西不夠時說明還差多少；獎勵放不下時什麼都不改。 */

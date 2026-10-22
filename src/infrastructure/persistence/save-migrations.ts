@@ -39,6 +39,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   14: migrateV14ToV15,
   15: migrateV15ToV16,
   16: migrateV16ToV17,
+  17: migrateV17ToV18,
 };
 
 /**
@@ -219,6 +220,22 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v17 → v18：社區修復的紀錄（還沒有捐過任何東西）、今天的隨機事件（今天沒有事件，day 為 0）。
+ */
+function migrateV17ToV18(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(17) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v17 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 18,
+    repairs: {},
+    dailyEvent: { day: 0, id: null },
+  };
 }
 
 /**

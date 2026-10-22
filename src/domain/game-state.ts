@@ -22,8 +22,10 @@ import type { QuestRecord } from './quests';
 import type { LetterStatus } from './mail';
 import { emptyFestivalState, type FestivalState } from './festival';
 import { emptyStory, type StoryState } from './story';
+import type { RepairState } from './repairs';
+import { noEvent, type TodayEvent } from './random-events';
 
-export const SAVE_SCHEMA_VERSION = 17;
+export const SAVE_SCHEMA_VERSION = 18;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -84,6 +86,10 @@ export interface GameState {
   festival: FestivalState;
   /** 夜釣星星：已經甩竿、等玩家在時機到的時候按 X（任何其他動作都會放掉它）。 */
   starLine: boolean;
+  /** 社區修復的捐獻紀錄（每項修復每年一份，見 repairs.ts）。 */
+  repairs: RepairState;
+  /** 今天的隨機事件（睡醒時決定，見 random-events.ts）；id 為 null 表示今天沒有事件。 */
+  dailyEvent: TodayEvent;
   /** 礦坑的種子：同一個種子每一層的樣子都一樣。 */
   mineSeed: number;
   /** 最深到過的檢查點層數（從入口下來會直接到這裡）；至少是第 1 層。 */
@@ -147,6 +153,8 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     story: emptyStory(),
     festival: emptyFestivalState(),
     starLine: false,
+    repairs: {},
+    dailyEvent: noEvent(),
     mineSeed: advanceRng(seed >>> 0),
     mineCheckpoint: 1,
     selectedSeed: selectedSeed.id,
