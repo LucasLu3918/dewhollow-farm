@@ -59,6 +59,7 @@ describe('SettingsService', () => {
       controlStyle: 'floating-joystick',
       buttonScale: 'large',
       controlsPlacement: 'external',
+      continuousActions: false,
     });
   });
 

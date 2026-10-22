@@ -32,6 +32,7 @@ export interface MobileSettings {
   controlStyle: ControlStyle;
   buttonScale: ButtonScale;
   controlsPlacement: ControlsPlacement;
+  continuousActions: boolean;
 }
 
 export interface EffectToggles {
@@ -66,6 +67,7 @@ export function defaultSettings(): Settings {
       controlStyle: 'dpad',
       buttonScale: 'standard',
       controlsPlacement: 'external',
+      continuousActions: false,
     },
   };
 }
@@ -120,6 +122,9 @@ export function sanitizeSettings(raw: unknown): Settings {
     }
     if (typeof fields.mobile.controlsPlacement === 'string' && (CONTROLS_PLACEMENTS as readonly string[]).includes(fields.mobile.controlsPlacement)) {
       base.mobile.controlsPlacement = fields.mobile.controlsPlacement as ControlsPlacement;
+    }
+    if (typeof fields.mobile.continuousActions === 'boolean') {
+      base.mobile.continuousActions = fields.mobile.continuousActions;
     }
   }
   return base;

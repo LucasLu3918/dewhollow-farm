@@ -119,6 +119,112 @@ export class Hud {
     this.mainAction.addEventListener('click', onAction);
   }
 
+  /** Long press is opt-in at the scene; this adapter only reports pointer lifecycle. */
+  bindMainActionHold(onStart: () => boolean, onEnd: () => void): () => void {
+    let timer: number | null = null;
+    let heldPointer: number | null = null;
+    const suppressedClicks = new Map<number, number>();
+    const suppressClickFor = (pointerId: number, expiresAt = Number.POSITIVE_INFINITY): void => {
+      suppressedClicks.set(pointerId, expiresAt);
+    };
+    const pruneSuppressedClicks = (): void => {
+      const now = Date.now();
+      for (const [pointerId, expiresAt] of suppressedClicks) {
+        if (expiresAt < now) suppressedClicks.delete(pointerId);
+      }
+    };
+    const clear = (): void => {
+      if (timer !== null) window.clearTimeout(timer);
+      timer = null;
+    };
+    const end = (event: PointerEvent): void => {
+      if (heldPointer !== event.pointerId) {
+        if (event.type === 'pointerup' && suppressedClicks.has(event.pointerId)) {
+          suppressedClicks.set(event.pointerId, Date.now() + 1000);
+        } else if (event.type === 'pointercancel') {
+          suppressedClicks.delete(event.pointerId);
+        }
+        return;
+      }
+      clear();
+      if (suppressedClicks.has(event.pointerId)) suppressedClicks.set(event.pointerId, Date.now() + 1000);
+      heldPointer = null;
+      onEnd();
+      try {
+        if (this.mainAction.hasPointerCapture(event.pointerId)) this.mainAction.releasePointerCapture(event.pointerId);
+      } catch { /* The browser may already have released it. */ }
+    };
+    const cancel = (): void => {
+      clear();
+      if (heldPointer === null) return;
+      if (suppressedClicks.has(heldPointer)) suppressedClicks.set(heldPointer, Date.now() + 1000);
+      else suppressClickFor(heldPointer, Date.now() + 1000);
+      heldPointer = null;
+      onEnd();
+    };
+    const leave = (event: PointerEvent): void => {
+      if (heldPointer !== event.pointerId) return;
+      const rect = this.mainAction.getBoundingClientRect();
+      if (event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom) return;
+      cancel();
+    };
+    const onDown = (event: PointerEvent): void => {
+      if (this.mainAction.disabled || (event.button !== 0 && event.pointerType !== 'touch')) return;
+      pruneSuppressedClicks();
+      // A continuous action is one owned gesture; extra fingers must not replace its timer or owner.
+      if (heldPointer !== null) {
+        if (event.pointerId !== heldPointer) suppressClickFor(event.pointerId);
+        return;
+      }
+      // A cancelled gesture cannot emit its pending click; allow the browser's reused ID to start fresh.
+      suppressedClicks.delete(event.pointerId);
+      heldPointer = event.pointerId;
+      try { this.mainAction.setPointerCapture(event.pointerId); } catch { /* Synthetic or detached target. */ }
+      timer = window.setTimeout(() => {
+        timer = null;
+        const owner = heldPointer;
+        if (owner !== null && onStart()) suppressClickFor(owner);
+      }, 280);
+    };
+    const onClick = (event: MouseEvent): void => {
+      pruneSuppressedClicks();
+      const pointerId = 'pointerId' in event ? (event as PointerEvent).pointerId : undefined;
+      if (pointerId === undefined || !suppressedClicks.has(pointerId)) return;
+      suppressedClicks.delete(pointerId);
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    };
+    const onContextMenu = (event: MouseEvent): void => event.preventDefault();
+    const onVisibilityChange = (): void => {
+      if (this.doc.visibilityState === 'hidden') cancel();
+    };
+    this.mainAction.addEventListener('pointerdown', onDown);
+    this.mainAction.addEventListener('pointerup', end);
+    this.mainAction.addEventListener('pointercancel', end);
+    this.mainAction.addEventListener('lostpointercapture', end);
+    this.mainAction.addEventListener('pointermove', leave);
+    this.mainAction.addEventListener('pointerleave', leave);
+    this.mainAction.addEventListener('click', onClick, true);
+    this.mainAction.addEventListener('contextmenu', onContextMenu);
+    window.addEventListener('blur', cancel);
+    window.addEventListener('pagehide', cancel);
+    this.doc.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      cancel();
+      this.mainAction.removeEventListener('pointerdown', onDown);
+      this.mainAction.removeEventListener('pointerup', end);
+      this.mainAction.removeEventListener('pointercancel', end);
+      this.mainAction.removeEventListener('lostpointercapture', end);
+      this.mainAction.removeEventListener('pointermove', leave);
+      this.mainAction.removeEventListener('pointerleave', leave);
+      this.mainAction.removeEventListener('click', onClick, true);
+      this.mainAction.removeEventListener('contextmenu', onContextMenu);
+      window.removeEventListener('blur', cancel);
+      window.removeEventListener('pagehide', cancel);
+      this.doc.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }
+
   setMainAction(label: string, enabled: boolean): void {
     this.mainAction.textContent = label;
     this.mainAction.setAttribute('aria-label', `主要動作：${label}`);

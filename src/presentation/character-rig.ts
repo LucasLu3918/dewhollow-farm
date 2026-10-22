@@ -71,9 +71,9 @@ export class CharacterRig {
   private walk?: Phaser.Tweens.Tween;
   private target?: { x: number; y: number };
   /** 進行中的揮工具動作。 */
-  private action?: { tween?: Phaser.Tweens.Tween; image: Phaser.GameObjects.Image; fired: boolean; onImpact: () => void };
+  private action?: { tween?: Phaser.Tweens.Tween; image: Phaser.GameObjects.Image; fired: boolean; onImpact: () => void; onComplete: () => void };
   /** 走路中按下動作：等這一步走完再揮。 */
-  private queued?: { tool: ToolDef; durationMs: number; reducedMotion: boolean; onImpact: () => void; onStart?: () => void };
+  private queued?: { tool: ToolDef; durationMs: number; reducedMotion: boolean; onImpact: () => void; onStart?: () => void; onComplete: () => void };
   private readonly toolImages = new Map<string, Phaser.GameObjects.Image>();
   private toolState: { id: string; rotation: number; scale: number } | null = null;
 
@@ -181,17 +181,18 @@ export class CharacterRig {
    * 命中的時間點再呼叫 onImpact，效果不會漏掉。被新的動作打斷時，還沒到的 onImpact 會立刻補呼叫，不會丟掉。
    * @param onStart 動作真正開始的那一刻（排隊時就是走完之後）。
    */
-  swing(tool: ToolDef, durationMs: number, reducedMotion: boolean, onImpact: () => void, onStart?: () => void): void {
+  swing(tool: ToolDef, durationMs: number, reducedMotion: boolean, onImpact: () => void, onStart?: () => void): Promise<void> {
     this.finishAction();
     const impact = impactAt(tool.swing);
     if (!this.canSwing()) {
       onStart?.();
       this.scene.time.delayedCall(durationMs * impact, onImpact);
-      return;
+      return new Promise((resolve) => this.scene.time.delayedCall(durationMs, resolve));
     }
     if (this.walk) {
-      this.queued = { tool, durationMs, reducedMotion, onImpact, onStart };
-      return;
+      return new Promise((resolve) => {
+        this.queued = { tool, durationMs, reducedMotion, onImpact, onStart, onComplete: resolve };
+      });
     }
     onStart?.();
 
@@ -199,7 +200,9 @@ export class CharacterRig {
     image.setOrigin(tool.grip.x / tool.textureSize.width, tool.grip.y / tool.textureSize.height);
     this.placeTool(image);
     const motion = motionFactor(reducedMotion);
-    const state = { image, fired: false, onImpact, tween: undefined as Phaser.Tweens.Tween | undefined };
+    let resolveAction: () => void;
+    const completion = new Promise<void>((resolve) => { resolveAction = resolve; });
+    const state = { image, fired: false, onImpact, onComplete: () => resolveAction(), tween: undefined as Phaser.Tweens.Tween | undefined };
     this.action = state;
     this.stillMs = 0;
     state.tween = this.scene.tweens.addCounter({
@@ -217,6 +220,7 @@ export class CharacterRig {
       },
       onComplete: () => this.endAction(),
     });
+    return completion;
   }
 
   /** 動作回饋（開墾、澆水…）的壓扁伸展，以顯示縮放為基準。 */
@@ -275,6 +279,29 @@ export class CharacterRig {
     this.root.destroy(true);
   }
 
+  /** Scene shutdown may run after Phaser has torn down the display list; settle promises without visual impacts. */
+  shutdown(): void {
+    const queued = this.queued;
+    this.queued = undefined;
+    const action = this.action;
+    this.action = undefined;
+    const walk = this.walk;
+    this.walk = undefined;
+    this.target = undefined;
+    this.toolState = null;
+
+    try {
+      action?.tween?.stop();
+      walk?.stop();
+    } finally {
+      try {
+        queued?.onComplete();
+      } finally {
+        action?.onComplete();
+      }
+    }
+  }
+
   /** 這一種骨架在走路循環某一刻的姿勢。 */
   private poseAt(step: number, u: number): WalkPose {
     switch (this.rig.kind) {
@@ -313,7 +340,7 @@ export class CharacterRig {
         this.target = undefined;
         const queued = this.queued;
         this.queued = undefined;
-        if (queued) this.swing(queued.tool, queued.durationMs, queued.reducedMotion, queued.onImpact, queued.onStart);
+        if (queued) void this.swing(queued.tool, queued.durationMs, queued.reducedMotion, queued.onImpact, queued.onStart).then(queued.onComplete);
       },
     });
   }
@@ -391,6 +418,7 @@ export class CharacterRig {
     const queued = this.queued;
     this.queued = undefined;
     queued?.onImpact(); // 還沒開始的排隊動作：不再演出，但效果不能丟
+    queued?.onComplete();
     const action = this.action;
     if (!action) return;
     action.tween?.stop();
@@ -402,10 +430,12 @@ export class CharacterRig {
   }
 
   private endAction(): void {
+    const complete = this.action?.onComplete;
     this.action?.image.setVisible(false);
     this.action = undefined;
     this.toolState = null;
     this.applyPose(REST_POSE);
+    complete?.();
   }
 
   private wake(): void {

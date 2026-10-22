@@ -15,6 +15,7 @@ describe('default settings', () => {
       controlStyle: 'dpad',
       buttonScale: 'standard',
       controlsPlacement: 'external',
+      continuousActions: false,
     });
   });
 
@@ -67,6 +68,7 @@ describe('sanitizeSettings', () => {
           controlStyle: 'future-control',
           buttonScale: 'large',
           controlsPlacement: 'overlay',
+        continuousActions: 'yes',
         },
       },
     });
@@ -76,7 +78,17 @@ describe('sanitizeSettings', () => {
       controlStyle: 'dpad',
       buttonScale: 'large',
       controlsPlacement: 'overlay',
+      continuousActions: false,
     });
+  });
+
+  it('defaults continuous farming off for existing v2 mobile settings that predate the field', () => {
+    const { continuousActions: _ignored, ...oldMobile } = defaultSettings().mobile;
+    const settings = sanitizeSettings({
+      schemaVersion: SETTINGS_SCHEMA_VERSION,
+      settings: { ...defaultSettings(), mobile: oldMobile },
+    });
+    expect(settings.mobile.continuousActions).toBe(false);
   });
 
   it('keeps the valid fields it can read and defaults the others one by one', () => {
