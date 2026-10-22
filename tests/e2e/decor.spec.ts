@@ -87,6 +87,7 @@ test('V places a decor in the house, E puts on the clothes, and both are saved',
   await putRecord(page, V11_RECORD);
 
   await page.reload();
+  await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
   await page.keyboard.press('v');
   await expect(page.locator('#hud-log')).toContainText('擺好了星空燈串');
   await page.keyboard.press('e');

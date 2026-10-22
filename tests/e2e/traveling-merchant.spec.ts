@@ -66,6 +66,7 @@ test('on Friday the traveling merchant opens a rotating shelf, and a purchase ta
   await putRecord(page, recordOn(5));
 
   await page.reload();
+  await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
   await page.keyboard.press('x');
   await expect(page.locator('#shop-panel')).toBeVisible();
   await expect(page.locator('#shop-title')).toHaveText('旅行商人');
@@ -79,6 +80,7 @@ test('on Monday the merchant is away: the shelf says so and nothing is taken', a
   await putRecord(page, recordOn(1));
 
   await page.reload();
+  await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
   await page.keyboard.press('x');
   await expect(page.locator('#shop-panel')).toBeVisible();
   await expect(page.locator('#shop-list')).toContainText('旅行商人只在週五、週六的鎮廣場出現');
