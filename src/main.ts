@@ -217,7 +217,12 @@ async function bootstrap(): Promise<void> {
         settings,
         responsive,
         onReady: markStageReady,
-        controls: { settingsLabels: controls.settingsLabels, touchButtons: controls.touchButtons, touchMore: controls.touchMore },
+        controls: {
+          settingsLabels: controls.settingsLabels,
+          touchButtons: controls.touchButtons,
+          touchMore: controls.touchMore,
+          interactionLabels: controls.interactionLabels,
+        },
       }),
       new MapScene(),
     ],

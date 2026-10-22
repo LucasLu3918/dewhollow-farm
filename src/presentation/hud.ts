@@ -36,6 +36,7 @@ export class Hud {
   private readonly version: HTMLElement;
   private readonly log: HTMLElement;
   private readonly hint: HTMLElement;
+  private readonly mainAction: HTMLButtonElement;
 
   constructor(doc: Document) {
     this.doc = doc;
@@ -53,6 +54,7 @@ export class Hud {
     this.version = required(doc, '#hud-version');
     this.log = required(doc, '#hud-log');
     this.hint = required(doc, '#hud-hint');
+    this.mainAction = required(doc, '#hud-action');
   }
 
   /** 底部的操作提示（由 controls-hint.ts 依目前的按鍵產生）。 */
@@ -110,6 +112,17 @@ export class Hud {
   /** 狀態列的「設定」按鈕（鍵盤的 O 也一樣）。 */
   bindSettings(onOpen: () => void): void {
     required(this.doc, '#hud-settings').addEventListener('click', onOpen);
+  }
+
+  /** Compact HUD action label is supplied by the current InteractionDescriptor; this button only emits the existing action. */
+  bindMainAction(onAction: () => void): void {
+    this.mainAction.addEventListener('click', onAction);
+  }
+
+  setMainAction(label: string, enabled: boolean): void {
+    this.mainAction.textContent = label;
+    this.mainAction.setAttribute('aria-label', `主要動作：${label}`);
+    this.mainAction.disabled = !enabled;
   }
 
   /** 狀態列工具／種子捷徑：短按清單，長按輪盤。 */

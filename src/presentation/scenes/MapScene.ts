@@ -4,6 +4,7 @@ import { plotKey, type PlotMap, type PlotState } from '../../domain/farm';
 import { tileAt } from '../../domain/world';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
+import { resolveInteraction, type InteractionLabelKey } from '../../application/interaction';
 import type { ContentIndex } from '../../application/content-index';
 import type { ActionFeedback, Command, GameEvent } from '../../application/game-commands';
 import type { CompanionDef, CompanionManifest } from '../../infrastructure/assets/companion-manifest';
@@ -101,7 +102,12 @@ export interface MapSceneDeps {
   /** 鍵盤監聽與畫面都接好後呼叫一次（見 create 結尾與 main.ts 的 markStageReady）。 */
   onReady: () => void;
   /** 操作說明的文字（設定面板的動作名稱、虛擬按鍵的文字），來自 content/controls.json。 */
-  controls: { settingsLabels: SettingsLabels; touchButtons: TouchLabels; touchMore: TouchText };
+  controls: {
+    settingsLabels: SettingsLabels;
+    touchButtons: TouchLabels;
+    touchMore: TouchText;
+    interactionLabels: Readonly<Record<InteractionLabelKey, string>>;
+  };
 }
 
 /** 動作 → 移動方向（按鍵由偏好的按鍵表決定，見 handleKey）。 */
@@ -341,6 +347,7 @@ export class MapScene extends Phaser.Scene {
       this.touchControls.cancelAll();
       this.settingsPanel.open();
     });
+    deps.hud.bindMainAction(() => this.pressAction('interact'));
     // 虛擬按鍵（觸控）：按鈕本身掛在 DOM 上，顯示與否由 apply-settings.ts 決定。
     this.touchControls = new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons, deps.controls.touchMore, deps.settings);
     this.toolSeedSelector = new ToolSeedSelector(document, deps.index, (command) => {
@@ -944,6 +951,11 @@ export class MapScene extends Phaser.Scene {
     const state = this.deps.session.state;
     const map = this.deps.index.map(state.mapId);
     this.deps.hud.update(state, this.deps.pack);
+    const interaction = resolveInteraction(state, this.deps.index);
+    this.deps.hud.setMainAction(
+      this.deps.controls.interactionLabels[interaction.labelKey],
+      interaction.action !== 'nothing',
+    );
 
     const mapChanged = this.renderedMapId !== map.id;
     if (mapChanged) {
