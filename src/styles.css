@@ -1,3 +1,18 @@
+/* 實機量測覆蓋層（?perf=1）：不攔截點擊，固定在左上角，見 perf-overlay.ts。 */
+.perf-overlay {
+  position: fixed;
+  top: 4px;
+  left: 4px;
+  z-index: 1000;
+  pointer-events: none;
+  padding: 4px 6px;
+  font: 12px/1.4 ui-monospace, Menlo, monospace;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
+  white-space: pre;
+}
+
 :root {
   --bg: #15201a;
   --panel: #1f2d24;

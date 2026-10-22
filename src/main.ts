@@ -79,6 +79,8 @@ import { SoundPlayer } from './presentation/audio/sound-player';
 import { MusicPlayer } from './presentation/audio/music-player';
 import { AudioOutput } from './presentation/audio/audio-output';
 import { registerServiceWorker } from './presentation/service-worker';
+import { parsePerfFlag } from './presentation/frame-stats';
+import { startPerfOverlay } from './presentation/perf-overlay';
 
 /** 移除開機載入提示（index.html 的 #game 內）；啟動失敗或讀不開存檔時也用它，免得一直顯示「載入中」。 */
 function hideLoader(): void {
@@ -222,6 +224,9 @@ async function bootstrap(): Promise<void> {
     });
   }
 }
+
+// 實機量測（網址加 ?perf=1）：顯示幀時間覆蓋層，見 docs/DEVICE_PERF.md。
+if (parsePerfFlag(window.location.search)) startPerfOverlay(document);
 
 bootstrap().catch((error: unknown) => {
   // 啟動階段的錯誤（例如內容資料有誤）無法經由 HUD 物件顯示，直接寫入訊息列表。
