@@ -69,10 +69,21 @@ export class HelpPanel {
 
   private render(): void {
     this.body.replaceChildren(
-      ...keySections(this.help, this.coarse).map((group) => this.section(group.title, this.keyList(group))),
+      this.section('操作按鍵', this.keyGroups()),
       this.section('更新日誌', this.history()),
       this.section(this.help.privacy.title, this.privacy()),
     );
+  }
+
+  // 同一個「操作按鍵」區段內，每組（鍵盤、畫面下方的按鍵）各有一個小標題。
+  private keyGroups(): HTMLElement {
+    const wrap = this.doc.createElement('div');
+    for (const group of keySections(this.help, this.coarse)) {
+      const heading = this.doc.createElement('h4');
+      heading.textContent = group.title;
+      wrap.append(heading, this.keyList(group));
+    }
+    return wrap;
   }
 
   private section(title: string, content: HTMLElement): HTMLElement {

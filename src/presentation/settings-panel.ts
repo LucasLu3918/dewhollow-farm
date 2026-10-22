@@ -5,33 +5,8 @@ import { FONT_SIZE_LABELS } from './accessibility';
 import { prefersReducedMotion } from './motion';
 import { PanelDialog } from './panel-dialog';
 
-/** 設定面板裡每個動作的名稱（給玩家看；按鍵本身由 domain 的表決定）。 */
-export const ACTION_LABELS: Record<ActionId, string> = {
-  moveUp: '上移',
-  moveDown: '下移',
-  moveLeft: '左移',
-  moveRight: '右移',
-  interact: '互動、收割、與居民說話、收線',
-  cycleTool: '切換工具',
-  cycleSeed: '切換種子',
-  takeAxe: '拿斧頭',
-  takePick: '拿鎬',
-  takeRod: '拿釣竿',
-  takeSickle: '拿鐮刀',
-  manualSave: '手動存檔',
-  placeDecor: '擺放裝飾',
-  wear: '穿上衣服',
-  takeOff: '脫下衣服',
-  skills: '技能與天賦',
-  residents: '居民與好感',
-  collection: '圖鑑與成就',
-  quests: '委託與佈告欄',
-  saves: '存檔槽',
-  settings: '設定',
-  help: '說明',
-  music: '背景音樂',
-  mute: '靜音',
-};
+/** 設定面板裡每個動作的名稱（給玩家看；按鍵本身由 domain 的表決定）。文字來自 content/controls.json。 */
+export type SettingsLabels = Readonly<Record<ActionId, string>>;
 
 const SAVE_FAILED = '（這個瀏覽器無法儲存設定，本次的設定只在這個頁面有效。）';
 
@@ -66,6 +41,8 @@ export class SettingsPanel {
   constructor(
     private readonly doc: Document,
     private readonly service: SettingsService,
+    /** 每個動作在面板上的名稱（改鍵列表、提示與交換訊息都用這份）。 */
+    private readonly labels: SettingsLabels,
   ) {
     this.root = required(doc, '#settings-panel');
     this.dialog = new PanelDialog(this.root);
@@ -152,18 +129,18 @@ export class SettingsPanel {
     if (!result.ok) {
       if (result.reason === 'CONFLICT') {
         this.pendingSwap = { action, key, conflict: result.conflict };
-        this.say(`「${keyLabel(key)}」目前是「${ACTION_LABELS[result.conflict]}」的按鍵。要交換兩者的按鍵嗎？`);
+        this.say(`「${keyLabel(key)}」目前是「${this.labels[result.conflict]}」的按鍵。要交換兩者的按鍵嗎？`);
       }
       this.render();
       return;
     }
-    this.commitBindings(result.bindings, `已將「${ACTION_LABELS[action]}」改成 ${keyLabel(key)}。`);
+    this.commitBindings(result.bindings, `已將「${this.labels[action]}」改成 ${keyLabel(key)}。`);
   }
 
   private startCapture(action: ActionId): void {
     this.pendingSwap = null;
     this.capturing = action;
-    this.say(`請按下「${ACTION_LABELS[action]}」的新按鍵（Esc 取消）。`);
+    this.say(`請按下「${this.labels[action]}」的新按鍵（Esc 取消）。`);
     this.render();
   }
 
@@ -179,7 +156,7 @@ export class SettingsPanel {
     }
     this.commitBindings(
       result.bindings,
-      `已交換「${ACTION_LABELS[pending.action]}」與「${ACTION_LABELS[pending.conflict]}」的按鍵。`,
+      `已交換「${this.labels[pending.action]}」與「${this.labels[pending.conflict]}」的按鍵。`,
     );
   }
 
@@ -242,7 +219,7 @@ export class SettingsPanel {
     const settings = this.service.get();
     this.keyList.replaceChildren(...ACTION_IDS.map((action) => this.keyRow(action, settings.bindings[action])));
     this.prompt.hidden = this.pendingSwap === null;
-    if (this.pendingSwap) this.promptText.textContent = `「${keyLabel(this.pendingSwap.key)}」與「${ACTION_LABELS[this.pendingSwap.conflict]}」交換`;
+    if (this.pendingSwap) this.promptText.textContent = `「${keyLabel(this.pendingSwap.key)}」與「${this.labels[this.pendingSwap.conflict]}」交換`;
     for (const button of this.fontChoices.querySelectorAll<HTMLButtonElement>('button[data-font]')) {
       button.setAttribute('aria-pressed', String(button.dataset.font === settings.fontSize));
     }
@@ -259,7 +236,7 @@ export class SettingsPanel {
   private keyRow(action: ActionId, key: string): HTMLElement {
     const item = this.doc.createElement('li');
     const name = this.doc.createElement('span');
-    name.textContent = ACTION_LABELS[action];
+    name.textContent = this.labels[action];
     const current = this.doc.createElement('kbd');
     current.textContent = keyLabel(key);
     const button = this.doc.createElement('button');
@@ -267,7 +244,7 @@ export class SettingsPanel {
     button.dataset.action = action;
     const capturingThis = this.capturing === action;
     button.textContent = capturingThis ? '按下新按鍵…' : '改鍵';
-    button.setAttribute('aria-label', `改鍵：${ACTION_LABELS[action]}，目前是 ${keyLabel(key)}`);
+    button.setAttribute('aria-label', `改鍵：${this.labels[action]}，目前是 ${keyLabel(key)}`);
     item.append(name, current, button);
     return item;
   }

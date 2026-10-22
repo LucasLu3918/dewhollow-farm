@@ -94,7 +94,7 @@ export class ShopPanel {
         const name = this.nameOf(line.itemId);
         this.addRow(`${name}　${line.price} 金`, {
           text: '買一個',
-          name: `買 ${name}`,
+          name: `買一個 ${name}`,
           reason: reasonText(buyRefusal(state, this.index, shop.id, line.itemId, 1)),
           onClick: () => this.onCommand({ type: 'buy', shopId: shop.id, itemId: line.itemId, count: 1 }),
         });

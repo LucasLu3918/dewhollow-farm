@@ -38,6 +38,7 @@ import crafting from '../content/crafting.json';
 import talents from '../content/talents.json';
 import changelog from '../content/changelog.json';
 import help from '../content/help.json';
+import controlsContent from '../content/controls.json';
 import forest from '../content/maps/forest.json';
 import lake from '../content/maps/lake.json';
 import house from '../content/maps/house.json';
@@ -60,6 +61,7 @@ import { LocalSettingsStore } from './infrastructure/persistence/local-settings-
 import { applySettings, isCoarsePointer } from './presentation/apply-settings';
 import { controlsHint } from './presentation/controls-hint';
 import { loadContent } from './infrastructure/content/load-content';
+import { parseControlsContent } from './infrastructure/content/controls-content';
 import { parseChangelog, parseHelpContent } from './infrastructure/content/info-content';
 import { MemorySaveRepository } from './infrastructure/persistence/memory-save-repository';
 import { IndexedDbSaveRepository, hasIndexedDb } from './infrastructure/persistence/indexeddb-save-repository';
@@ -99,6 +101,8 @@ function markStageReady(): void {
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
   const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, merchant, decor, rating, legacy, maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+  // 操作說明的文字（狀態列提示、設定面板的動作名稱、虛擬按鍵）來自 content/controls.json，缺漏會在這裡報錯。
+  const controls = parseControlsContent(controlsContent);
   const index = createContentIndex(loaded.pack);
   // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
   const audio = new AudioOutput();
@@ -112,7 +116,7 @@ async function bootstrap(): Promise<void> {
   applyPreferences();
   settings.onChange(applyPreferences);
   // 操作提示依目前的按鍵產生；開機時套用一次，改鍵後 SettingsService 會通知訂閱者，提示列跟著更新。
-  const showControlsHint = (): void => hud.setControlsHint(controlsHint(settings.get().bindings));
+  const showControlsHint = (): void => hud.setControlsHint(controlsHint(settings.get().bindings, controls.hintLabels, controls.hintText));
   showControlsHint();
   settings.onChange(showControlsHint);
 
@@ -198,6 +202,7 @@ async function bootstrap(): Promise<void> {
         saves,
         settings,
         onReady: markStageReady,
+        controls: { settingsLabels: controls.settingsLabels, touchButtons: controls.touchButtons },
       }),
       new MapScene(),
     ],

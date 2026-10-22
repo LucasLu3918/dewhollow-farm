@@ -36,6 +36,7 @@ export interface BootDeps {
   settings: SettingsService;
   /** 地圖場景的鍵盤與畫面都接好時呼叫一次（移除開機載入提示，見 main.ts）。 */
   onReady: () => void;
+  controls: MapSceneDeps['controls'];
 }
 
 /**
@@ -89,6 +90,7 @@ export class BootScene extends Phaser.Scene {
       saves: this.deps.saves,
       settings: this.deps.settings,
       onReady: this.deps.onReady,
+      controls: this.deps.controls,
     };
     this.scene.start('map', sceneDeps);
   }
