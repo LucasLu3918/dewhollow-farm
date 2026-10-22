@@ -1,4 +1,5 @@
 import type { ActionId } from '../domain/keybindings';
+import type { Direction } from '../domain/content';
 import type { TouchMode } from '../domain/settings';
 
 /**
@@ -65,6 +66,88 @@ export function buildTouchButtons(labels: TouchLabels): TouchButton[] {
 
 /** 方向按鈕按住時連續移動的間隔（毫秒）：比一格的移動時間稍長，避免排隊。 */
 export const TOUCH_REPEAT_MS = 150;
+
+/** Joystick thresholds are shared by fixed and floating controls and deliberately independent of pointer event rate. */
+export const JOYSTICK_DEAD_ZONE = 0.22;
+export const JOYSTICK_SWITCH_HYSTERESIS = 0.2;
+
+/** Convert a normalized joystick vector into one grid direction with a dead zone and axis hysteresis. */
+export function directionForJoystick(dx: number, dy: number, previous: Direction | null = null): Direction | null {
+  const x = Math.max(-1, Math.min(1, dx));
+  const y = Math.max(-1, Math.min(1, dy));
+  if (Math.hypot(x, y) < JOYSTICK_DEAD_ZONE) return null;
+
+  const horizontal = previous === 'left' || previous === 'right';
+  const previousMagnitude = previous ? horizontal ? Math.abs(x) : Math.abs(y) : 0;
+  const otherMagnitude = horizontal ? Math.abs(y) : Math.abs(x);
+  if (previous) {
+    const sameSign = previous === 'left' ? x < 0
+      : previous === 'right' ? x > 0
+        : previous === 'up' ? y < 0 : y > 0;
+    if (sameSign && previousMagnitude >= otherMagnitude * (1 - JOYSTICK_SWITCH_HYSTERESIS)) return previous;
+    if (!sameSign && previousMagnitude >= 0.4 && previousMagnitude >= otherMagnitude) {
+      return horizontal ? x < 0 ? 'left' : 'right' : y < 0 ? 'up' : 'down';
+    }
+    if (otherMagnitude <= previousMagnitude * (1 + JOYSTICK_SWITCH_HYSTERESIS)) {
+      return horizontal ? x < 0 ? 'left' : 'right' : y < 0 ? 'up' : 'down';
+    }
+  }
+
+  if (Math.abs(x) >= Math.abs(y)) return x < 0 ? 'left' : 'right';
+  return y < 0 ? 'up' : 'down';
+}
+
+/** One repeat loop arbitrates independent movement pointers; releasing an action pointer never stops movement. */
+export class MoveInputScheduler {
+  private readonly pointers = new Map<number, { direction: Direction; order: number }>();
+  private sequence = 0;
+  private timer: ReturnType<typeof setInterval> | null = null;
+  private active: Direction | null = null;
+
+  constructor(private readonly onMove: (direction: Direction) => void) {}
+
+  get activeDirection(): Direction | null {
+    return this.active;
+  }
+
+  setPointer(pointerId: number, direction: Direction): void {
+    const current = this.pointers.get(pointerId);
+    this.pointers.set(pointerId, {
+      direction,
+      order: current?.direction === direction ? current.order : ++this.sequence,
+    });
+    this.refresh();
+  }
+
+  releasePointer(pointerId: number): void {
+    if (!this.pointers.delete(pointerId)) return;
+    this.refresh();
+  }
+
+  cancelAll(): void {
+    this.pointers.clear();
+    this.stopTimer();
+    this.active = null;
+  }
+
+  private refresh(): void {
+    const next = [...this.pointers.values()].sort((a, b) => b.order - a.order)[0]?.direction ?? null;
+    if (next === this.active) return;
+    this.stopTimer();
+    this.active = next;
+    if (!next) return;
+    this.onMove(next);
+    this.timer = setInterval(() => {
+      if (this.active) this.onMove(this.active);
+    }, TOUCH_REPEAT_MS);
+  }
+
+  private stopTimer(): void {
+    if (this.timer === null) return;
+    clearInterval(this.timer);
+    this.timer = null;
+  }
+}
 
 /** 虛擬按鍵要不要顯示：auto 遇到粗指標或任一觸控點顯示，on 一律顯示，off 一律隱藏。 */
 export function touchVisible(mode: TouchMode, coarsePointer: boolean, touchPoints = 0): boolean {
