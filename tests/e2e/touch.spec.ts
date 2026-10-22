@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * 觸控操作（M7）：虛擬按鍵（pointer events）直接送出語意動作，直式與橫式都不蓋住遊戲區，
- * 觸控與鍵盤並存，設定可以強制顯示或隱藏。
+ * 觸控操作：這裡的直式與橫式幾何斷言專測外置控制版位；overlay 安全區另由 responsive-layout.spec.ts 覆蓋。
+ * 虛擬按鍵（pointer events）直接送出語意動作，觸控與鍵盤並存，設定可以強制顯示或隱藏。
  */
 
 const SETTINGS_KEY = 'dewhollow-farm.settings';
@@ -87,7 +87,7 @@ async function saveStatePatchAndReload(page: Page, patch: Record<string, unknown
 test.describe('直式手機（390 x 844，觸控）', () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 
-  test('虛擬按鍵顯示在遊戲區的下方，不蓋住畫面', async ({ page }) => {
+  test('外置版位的虛擬按鍵顯示在遊戲區下方，不蓋住畫面', async ({ page }) => {
     await seedTouchMode(page, 'on');
     await startGame(page);
     const pad = page.locator('#touch-controls');
@@ -161,7 +161,7 @@ test.describe('直式手機（390 x 844，觸控）', () => {
 test.describe('橫式手機（844 x 390，觸控）', () => {
   test.use({ hasTouch: true, viewport: { width: 844, height: 390 } });
 
-  test('橫式時方向鍵在遊戲區左側、動作鍵在右側，兩組都不與遊戲區重疊', async ({ page }) => {
+  test('外置版位橫式時方向鍵在遊戲區左側、動作鍵在右側，兩組都不與遊戲區重疊', async ({ page }) => {
     await seedTouchMode(page, 'on');
     await startGame(page);
     const stage = await page.locator('#game').boundingBox();
