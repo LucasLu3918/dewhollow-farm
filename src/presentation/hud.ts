@@ -152,6 +152,8 @@ export class Hud {
     };
     const onDown = (event: PointerEvent): void => {
       if (this.mainAction.disabled || (event.button !== 0 && event.pointerType !== 'touch')) return;
+      // A continuous action is one owned gesture; extra fingers must not replace its timer or owner.
+      if (heldPointer !== null) return;
       heldPointer = event.pointerId;
       suppressClick = false;
       try { this.mainAction.setPointerCapture(event.pointerId); } catch { /* Synthetic or detached target. */ }

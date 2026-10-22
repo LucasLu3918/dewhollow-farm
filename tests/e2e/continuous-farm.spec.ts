@@ -101,6 +101,41 @@ test.describe('可取消的長按連續農務', () => {
     expect(hits).toBe(1);
   });
 
+  test('第二個 pointer 不接管或取消第一個 pointer 的長按農務', async ({ page }) => {
+    await start(page);
+    await moveToEmptyField(page);
+    await enableContinuousActions(page);
+    await page.evaluate(() => {
+      const button = document.querySelector<HTMLButtonElement>('#hud-action')!;
+      const bounds = button.getBoundingClientRect();
+      const init = (pointerId: number) => new PointerEvent('pointerdown', {
+        pointerId, pointerType: 'touch', button: 0, clientX: bounds.left + bounds.width / 2,
+        clientY: bounds.top + bounds.height / 2, bubbles: true,
+      });
+      button.dispatchEvent(init(41));
+    });
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? false)).toBe(true);
+    await page.evaluate(() => {
+      const button = document.querySelector<HTMLButtonElement>('#hud-action')!;
+      const bounds = button.getBoundingClientRect();
+      const init = (type: string, pointerId: number) => new PointerEvent(type, {
+        pointerId, pointerType: 'touch', button: 0, clientX: bounds.left + bounds.width / 2,
+        clientY: bounds.top + bounds.height / 2, bubbles: true,
+      });
+      button.dispatchEvent(init('pointerdown', 42));
+      button.dispatchEvent(init('pointerup', 42));
+    });
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? false)).toBe(true);
+    await page.evaluate(() => {
+      const button = document.querySelector<HTMLButtonElement>('#hud-action')!;
+      button.dispatchEvent(new PointerEvent('pointerup', { pointerId: 41, pointerType: 'touch', bubbles: true }));
+    });
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? true)).toBe(false);
+    await page.waitForTimeout(700);
+    const hits = await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0);
+    expect(hits).toBe(1);
+  });
+
   test('持續移動會重新查詢面前田地；舊田不重做且新田可執行', async ({ page }) => {
     await start(page);
     await moveToEmptyField(page);
