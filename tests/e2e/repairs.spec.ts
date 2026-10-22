@@ -76,7 +76,7 @@ test('in spring, the repair notice in the plaza opens the panel and a donation c
   await expect(page.locator('#repair-panel')).toContainText('花園修復');
 
   await page.locator('#repair-list button', { hasText: '捐一件' }).first().click();
-  await expect(page.locator('#hud-log')).toContainText('捐出了野菇');
+  await expect(page.locator('#hud-log')).toContainText('捐出了 野菇 × 1');
 });
 
 test('a donation the bag cannot cover is refused and nothing leaves the bag', async ({ page }) => {
