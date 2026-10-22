@@ -33,6 +33,43 @@ describe('virtual pad layout', () => {
   it('gives every button a visible label', () => {
     for (const button of TOUCH_BUTTONS) expect(button.label.trim().length).toBeGreaterThan(0);
   });
+
+  it('offers the direct tool grabs and the cabin actions', () => {
+    const tool = TOUCH_BUTTONS.filter((b) => b.group === 'tool').map((b) => b.action);
+    expect(tool).toEqual(['takeAxe', 'takePick', 'takeRod', 'takeSickle', 'placeDecor', 'wear', 'takeOff']);
+  });
+
+  it('keeps the direction group in the same order', () => {
+    const move = TOUCH_BUTTONS.filter((b) => b.group === 'move');
+    expect(move.map((b) => b.action)).toEqual(['moveUp', 'moveLeft', 'moveRight', 'moveDown']);
+    expect(move.map((b) => b.label)).toEqual(['↑', '←', '→', '↓']);
+  });
+
+  it('only uses known groups', () => {
+    for (const button of TOUCH_BUTTONS) expect(['move', 'act', 'tool']).toContain(button.group);
+  });
+
+  it('gives every button a unique label and a unique screen-reader name', () => {
+    const labels = TOUCH_BUTTONS.map((b) => b.label);
+    const names = TOUCH_BUTTONS.map((b) => b.name);
+    expect(new Set(labels).size).toBe(labels.length);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  it('gives every touch action a default key, and the defaults do not collide', () => {
+    const keys = TOUCH_BUTTONS.map((b) => touchKeyFor(b.action, DEFAULT_BINDINGS));
+    for (const key of keys) expect(key.length).toBeGreaterThan(0);
+    expect(new Set(keys).size).toBe(keys.length);
+    expect(bindingsAreValid(DEFAULT_BINDINGS)).toBe(true);
+  });
+
+  it('sends the rebound key for the tool and cabin buttons too', () => {
+    const rebound = { ...DEFAULT_BINDINGS, takeAxe: 'y', placeDecor: 'u' };
+    expect(bindingsAreValid(rebound)).toBe(true);
+    expect(touchKeyFor('takeAxe', rebound)).toBe('y');
+    expect(touchKeyFor('placeDecor', rebound)).toBe('u');
+    expect(touchKeyFor('wear', rebound)).toBe(DEFAULT_BINDINGS.wear);
+  });
 });
 
 describe('virtual pad visibility', () => {
