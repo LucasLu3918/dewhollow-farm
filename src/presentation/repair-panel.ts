@@ -48,6 +48,10 @@ export class RepairPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     this.list.replaceChildren();
     const open = this.index.repairs.filter((def) => seasonOpen(def, state.calendar));
     this.summary.textContent =

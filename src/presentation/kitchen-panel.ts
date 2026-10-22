@@ -47,6 +47,10 @@ export class KitchenPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     const level = levelOf(state.skills.cooking, this.index.tuning.skills.thresholds);
     this.funds.textContent = `你的金幣：${state.gold}　烹飪等級：${level}`;
     this.list.replaceChildren();

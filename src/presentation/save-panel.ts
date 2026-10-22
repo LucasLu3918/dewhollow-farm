@@ -93,6 +93,10 @@ export class SavePanel {
   }
 
   private render(): void {
+    this.dialog.redraw(() => this.paint());
+  }
+
+  private paint(): void {
     this.list.replaceChildren();
     for (const summary of this.summaries) this.renderSlot(summary);
   }

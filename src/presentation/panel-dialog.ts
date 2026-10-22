@@ -34,6 +34,44 @@ export function restoreDecision(input: { modalsLeft: number; focusWasInside: boo
   return input.returnTargetUsable ? 'return' : 'none';
 }
 
+/** 重畫前記下的焦點位置：焦點元素的 data-focus-key（沒有就是 null），以及它在可互動清單中的位置（不在清單中是 -1）。 */
+export interface FocusMemory {
+  key: string | null;
+  interactiveIndex: number;
+}
+
+/** 重畫後面板內的一個焦點候選（依文件順序）。disabled 的按鈕仍在清單中，但不會被選為還原目標。 */
+export interface FocusSlot {
+  key: string | null;
+  disabled: boolean;
+  /** 沒有 disabled、tabindex 不是負的：會進 Tab 循環的可互動元素。 */
+  interactive: boolean;
+}
+
+export type FocusRestore = { kind: 'slot'; index: number } | { kind: 'title' } | { kind: 'none' };
+
+/**
+ * 內容重畫後，焦點該放到哪一個候選。順序：
+ * (a) 同 data-focus-key 的可互動元素；若沒有，同 key 的非停用元素（例如同一列的文字）；
+ * (b) 重畫前在可互動清單中的同一位置（超過清單長度時取最後一個）；
+ * (c) 面板標題；都沒有就不動。disabled 的元素永遠不會被選。
+ */
+export function focusRestoreTarget(memory: FocusMemory | null, slots: readonly FocusSlot[], hasTitle: boolean): FocusRestore {
+  if (memory === null) return { kind: 'none' };
+  if (memory.key !== null) {
+    const byKey = slots.findIndex((s) => s.key === memory.key && s.interactive);
+    if (byKey >= 0) return { kind: 'slot', index: byKey };
+    const text = slots.findIndex((s) => s.key === memory.key && !s.disabled);
+    if (text >= 0) return { kind: 'slot', index: text };
+  }
+  if (memory.interactiveIndex >= 0) {
+    const live = slots.flatMap((s, i) => (s.interactive ? [i] : []));
+    const at = live[Math.min(memory.interactiveIndex, live.length - 1)];
+    if (at !== undefined) return { kind: 'slot', index: at };
+  }
+  return hasTitle ? { kind: 'title' } : { kind: 'none' };
+}
+
 /** 開著的模態面板，最後開啟的在最後面。 */
 const modalStack: PanelDialog[] = [];
 const trappedDocuments = new WeakSet<Document>();
@@ -102,6 +140,37 @@ export class PanelDialog implements OpenablePanel {
     if (!this.root.contains(this.root.ownerDocument.activeElement)) this.focusInitial();
   }
 
+  /**
+   * 包住一次內容重畫：重畫前記下焦點位置，重畫後若焦點掉到面板外（被重畫掉的按鈕），依 focusRestoreTarget 放回。
+   * 面板沒開著時等同直接呼叫 paint()。
+   */
+  redraw(paint: () => void): void {
+    const memory = this.captureFocus();
+    paint();
+    this.restoreFocus(memory);
+  }
+
+  private captureFocus(): FocusMemory | null {
+    if (!this.open_) return null;
+    const active = this.root.ownerDocument.activeElement;
+    if (!(active instanceof HTMLElement) || active === this.root || !this.root.contains(active)) return null;
+    return {
+      key: active.getAttribute('data-focus-key'),
+      interactiveIndex: slotsIn(this.root)
+        .filter(isInteractive)
+        .indexOf(active),
+    };
+  }
+
+  private restoreFocus(memory: FocusMemory | null): void {
+    if (!this.open_ || memory === null) return;
+    if (this.root.contains(this.root.ownerDocument.activeElement)) return;
+    const slots = slotsIn(this.root);
+    const target = focusRestoreTarget(memory, slots.map(describeSlot), this.title !== null);
+    if (target.kind === 'slot') slots[target.index]?.focus();
+    else if (target.kind === 'title') this.title?.focus();
+  }
+
   /** 焦點陷阱用：在面板內循環一步。 */
   cycleFocus(backwards: boolean): void {
     const items = focusablesIn(this.root);
@@ -118,6 +187,21 @@ function focusablesIn(root: HTMLElement): HTMLElement[] {
   return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
     (el) => el.tabIndex >= 0 && !el.matches(':disabled') && el.closest('[hidden]') === null,
   );
+}
+
+/** 焦點候選：可互動元素，加上帶 data-focus-key 的列文字（tabindex -1，只接受程式聚焦）。 */
+const FOCUS_SLOT = `${FOCUSABLE}, [data-focus-key]`;
+
+function slotsIn(root: HTMLElement): HTMLElement[] {
+  return Array.from(root.querySelectorAll<HTMLElement>(FOCUS_SLOT)).filter((el) => el.closest('[hidden]') === null);
+}
+
+function isInteractive(el: HTMLElement): boolean {
+  return el.tabIndex >= 0 && !el.matches(':disabled');
+}
+
+function describeSlot(el: HTMLElement): FocusSlot {
+  return { key: el.getAttribute('data-focus-key'), disabled: el.matches(':disabled'), interactive: isInteractive(el) };
 }
 
 /** 每份文件只掛一次：Tab 只在有開著的模態面板時被攔下，循環在最後開啟的那一個面板內。 */
