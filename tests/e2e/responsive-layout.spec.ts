@@ -114,19 +114,54 @@ test.describe('響應式版面整合', () => {
     expect(overlayStage && overlayPad && overlayPad.y < overlayStage.y + overlayStage.height).toBe(true);
     const layout = await page.evaluate(() => window.__dewhollow?.responsiveLayout());
     expect(layout?.safeRect.height).toBeLessThan(layout?.worldRect.height ?? 0);
-    const safeRect = layout?.safeRect;
-    const controlRect = layout?.controlsRects[0];
-    expect(safeRect && controlRect).toBeTruthy();
-    const overlaps = safeRect && controlRect &&
-      safeRect.x < controlRect.x + controlRect.width && safeRect.x + safeRect.width > controlRect.x &&
-      safeRect.y < controlRect.y + controlRect.height && safeRect.y + safeRect.height > controlRect.y;
-    expect(overlaps).toBe(false);
-    const camera = await page.evaluate(() => ({
-      top: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--responsive-camera-y')),
-      height: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--responsive-camera-height')),
-    }));
-    expect(camera.top).toBeCloseTo(safeRect?.y ?? 0, 1);
-    expect(camera.height).toBeCloseTo(safeRect?.height ?? 0, 1);
+    const actual = await page.evaluate(() => {
+      const host = document.querySelector<HTMLElement>('#game');
+      const canvas = host?.querySelector('canvas');
+      const camera = window.__dewhollow?.cameraView();
+      const layout = window.__dewhollow?.responsiveLayout();
+      if (!host || !canvas || !camera || !layout) return null;
+
+      const hostBounds = host.getBoundingClientRect();
+      const localRect = (element: Element | null): { x: number; y: number; width: number; height: number } | null => {
+        if (!(element instanceof HTMLElement)) return null;
+        const bounds = element.getBoundingClientRect();
+        return { x: bounds.left - hostBounds.left, y: bounds.top - hostBounds.top, width: bounds.width, height: bounds.height };
+      };
+      const canvasRect = localRect(canvas);
+      if (!canvasRect) return null;
+      const scaleX = canvasRect.width / 1024;
+      const scaleY = canvasRect.height / 768;
+      return {
+        safeRect: layout.safeRect,
+        controls: ['.touch-move', '.touch-act'].map((selector) => localRect(host.parentElement?.querySelector(selector) ?? null)),
+        cameraViewport: {
+          x: canvasRect.x + camera.x * scaleX,
+          y: canvasRect.y + camera.y * scaleY,
+          width: camera.width * camera.zoom * scaleX,
+          height: camera.height * camera.zoom * scaleY,
+        },
+      };
+    });
+    expect(actual).not.toBeNull();
+    const { safeRect, controls, cameraViewport } = actual!;
+    const tolerance = 2; // #game has a 1px border around the Phaser canvas.
+    for (const [dimension, actualValue, expectedValue] of [
+      ['x', cameraViewport.x, safeRect.x],
+      ['y', cameraViewport.y, safeRect.y],
+      ['width', cameraViewport.width, safeRect.width],
+      ['height', cameraViewport.height, safeRect.height],
+    ] as const) {
+      expect(Math.abs(actualValue - expectedValue), `actual Phaser viewport ${dimension} vs safeRect`).toBeLessThanOrEqual(tolerance);
+    }
+    expect(controls).toHaveLength(2);
+    for (const [index, control] of controls.entries()) {
+      expect(control, `rendered control group ${index}`).not.toBeNull();
+      const overlapsCamera = control!.x < cameraViewport.x + cameraViewport.width &&
+        control!.x + control!.width > cameraViewport.x &&
+        control!.y < cameraViewport.y + cameraViewport.height &&
+        control!.y + control!.height > cameraViewport.y;
+      expect(overlapsCamera, `rendered control group ${index} intersects the actual camera viewport`).toBe(false);
+    }
     await expect(page.locator('#settings-placement')).toHaveValue('overlay');
   });
 });
