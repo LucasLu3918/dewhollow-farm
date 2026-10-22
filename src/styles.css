@@ -89,6 +89,7 @@ a:focus-visible {
 
 /* 安全區域（瀏覽器的瀏海、圓角與底部橫條）：至少留 16px 的邊界。 */
 .app {
+  position: relative;
   max-width: 960px;
   margin: 0 auto;
   padding: 16px;
@@ -1036,4 +1037,33 @@ a:focus-visible {
     padding: 0;
     font-size: calc(14px * var(--font-scale));
   }
+}
+
+/* Overlay mode stays inside the game host. In short landscape layouts, override the external grid placement. */
+#touch-controls[data-placement='overlay']:not([hidden]) {
+  position: absolute;
+  z-index: 8;
+  left: var(--responsive-host-left, 0px);
+  top: var(--responsive-host-top, 0px);
+  width: var(--responsive-viewport-width, 100%);
+  height: var(--responsive-viewport-height, 100%);
+  box-sizing: border-box;
+  grid-row: auto;
+  grid-column: auto;
+  margin: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--responsive-safe-top, 0px) var(--responsive-safe-right, 0px) var(--responsive-safe-bottom, 0px) var(--responsive-safe-left, 0px);
+  pointer-events: none;
+}
+
+#touch-controls[data-placement='overlay'] > * { pointer-events: auto; }
+#touch-controls[data-placement='overlay'] .touch-common { flex: 1; align-items: flex-end; }
+
+@media (orientation: landscape) and (max-height: 520px) {
+  #touch-controls[data-placement='overlay']:not([hidden]) { display: flex; }
+  #touch-controls[data-placement='overlay'] .touch-common { display: flex; align-items: center; }
+  #touch-controls[data-placement='overlay'] .touch-move { position: absolute; left: var(--responsive-safe-left, 0px); top: 50%; transform: translateY(-50%); }
+  #touch-controls[data-placement='overlay'] .touch-act { position: absolute; right: var(--responsive-safe-right, 0px); top: 50%; transform: translateY(-50%); }
+  #touch-controls[data-placement='overlay'] .touch-more { position: absolute; right: var(--responsive-safe-right, 0px); bottom: var(--responsive-safe-bottom, 0px); }
 }
