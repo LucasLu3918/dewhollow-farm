@@ -1,0 +1,52 @@
+import type { SettingsStore } from '../../application/settings';
+import { SETTINGS_SCHEMA_VERSION, defaultSettings, sanitizeSettings, type Settings } from '../../domain/settings';
+
+/** localStorage 裡偏好的鍵。只放偏好，不放存檔。 */
+export const SETTINGS_STORAGE_KEY = 'dewhollow-farm.settings';
+
+/** 只需要讀寫字串的最小介面（方便測試時替換成假的儲存空間）。 */
+export interface StringStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+}
+
+/** 取得瀏覽器的 localStorage；私密視窗或封鎖儲存時可能丟例外，此時回傳 null。 */
+export function browserStorage(): StringStorage | null {
+  try {
+    if (typeof window === 'undefined') return null;
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 偏好的 localStorage 實作：JSON 格式，帶 schemaVersion。
+ * 每次讀寫都包 try/catch：讀不到、格式錯誤或儲存被封鎖時，讀取回傳預設值，寫入回傳 false，都不丟例外。
+ */
+export class LocalSettingsStore implements SettingsStore {
+  constructor(private readonly storage: () => StringStorage | null = browserStorage) {}
+
+  get(): Settings {
+    try {
+      const storage = this.storage();
+      if (!storage) return defaultSettings();
+      const raw = storage.getItem(SETTINGS_STORAGE_KEY);
+      if (raw === null) return defaultSettings();
+      return sanitizeSettings(JSON.parse(raw));
+    } catch {
+      return defaultSettings();
+    }
+  }
+
+  set(settings: Settings): boolean {
+    try {
+      const storage = this.storage();
+      if (!storage) return false;
+      storage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ schemaVersion: SETTINGS_SCHEMA_VERSION, ...settings }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}

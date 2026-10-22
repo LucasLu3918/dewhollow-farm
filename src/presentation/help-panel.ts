@@ -61,6 +61,7 @@ export class HelpPanel {
   }
 
   private controls(): HTMLElement {
+    const wrap = this.doc.createElement('div');
     const list = this.doc.createElement('ul');
     list.className = 'help-controls';
     for (const control of this.help.controls) {
@@ -72,7 +73,11 @@ export class HelpPanel {
       item.append(keys, action);
       list.append(item);
     }
-    return list;
+    const note = this.doc.createElement('p');
+    note.className = 'help-note';
+    note.textContent = '以上是預設按鍵。已經在「設定」裡改過的按鍵，以設定為準；Esc 永遠用來關閉面板。';
+    wrap.append(list, note);
+    return wrap;
   }
 
   private history(): HTMLElement {

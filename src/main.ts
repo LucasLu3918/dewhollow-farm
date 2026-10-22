@@ -55,6 +55,9 @@ import { NO_LEGACY } from './domain/legacy';
 import { GameSession } from './application/game-session';
 import type { SaveRepository } from './application/ports';
 import { SaveSlotService, slotFromQuery } from './application/save-slots';
+import { SettingsService } from './application/settings';
+import { LocalSettingsStore } from './infrastructure/persistence/local-settings-store';
+import { applySettings, isCoarsePointer } from './presentation/apply-settings';
 import { loadContent } from './infrastructure/content/load-content';
 import { parseChangelog, parseHelpContent } from './infrastructure/content/info-content';
 import { MemorySaveRepository } from './infrastructure/persistence/memory-save-repository';
@@ -83,6 +86,15 @@ async function bootstrap(): Promise<void> {
   const index = createContentIndex(loaded.pack);
   // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
   const audio = new AudioOutput();
+  // 玩家偏好（按鍵、字級、色盲模式、閃光與震動、觸控）存在 localStorage，與存檔分開；讀不到就用預設值。
+  const settings = new SettingsService(new LocalSettingsStore());
+  const applyPreferences = (): void => {
+    const current = settings.get();
+    applySettings(document, current, isCoarsePointer());
+    hud.setColorblind(current.colorblind);
+  };
+  applyPreferences();
+  settings.onChange(applyPreferences);
 
   hud.setVersion(GAME_VERSION);
   const migration: MigrationContext = {
@@ -162,6 +174,7 @@ async function bootstrap(): Promise<void> {
         hud,
         help: helpPanel,
         saves,
+        settings,
       }),
       new MapScene(),
     ],

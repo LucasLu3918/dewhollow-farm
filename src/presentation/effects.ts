@@ -21,46 +21,50 @@ function tileCenter(x: number, y: number): { px: number; py: number } {
   return { px: x * TILE_SIZE + CENTER, py: y * TILE_SIZE + CENTER };
 }
 
-/** 依動作種類播放對應效果，位置為被作用的格子。 */
-export function playActionEffect(scene: Phaser.Scene, action: ActionFeedback, x: number, y: number): void {
+/**
+ * 依動作種類播放對應效果，位置為被作用的格子。
+ * particles 為 false 時不畫粒子（木屑、水滴、水波、閃光等），但文字（出貨）仍然顯示。
+ */
+export function playActionEffect(scene: Phaser.Scene, action: ActionFeedback, x: number, y: number, particles = true): void {
   const { px: cx, py: cy } = tileCenter(x, y);
   switch (action) {
     case 'till':
-      puff(scene, cx, cy, 0x8a6a48, 6);
+      if (particles) puff(scene, cx, cy, 0x8a6a48, 6);
       break;
     case 'water':
-      droplets(scene, cx, cy);
+      if (particles) droplets(scene, cx, cy);
       break;
     case 'plant':
-      sprout(scene, cx, cy);
+      if (particles) sprout(scene, cx, cy);
       break;
     case 'harvest':
       // 作物飛到玩家頭上的過程由 pickupFlight 負責，這裡只留田裡的閃光。
-      sparkle(scene, cx, cy);
+      if (particles) sparkle(scene, cx, cy);
       break;
     case 'ship':
-      puff(scene, cx, cy, 0xe0b25c, 8);
+      if (particles) puff(scene, cx, cy, 0xe0b25c, 8);
       floatText(scene, cx, cy - px(8), '出貨', '#ffe08a');
       break;
     case 'chop':
       // 木屑：砍中的那一刻才飛出；樹被砍掉後那一格變成草地（見 MapScene 的 syncWorldTiles）。
-      puff(scene, cx, cy, 0x8a5a3a, 7);
+      if (particles) puff(scene, cx, cy, 0x8a5a3a, 7);
       break;
     case 'forage':
-      puff(scene, cx, cy, 0x7fcf6b, 5);
+      if (particles) puff(scene, cx, cy, 0x7fcf6b, 5);
       break;
     case 'mine':
-      puff(scene, cx, cy, 0x9a9aa6, 6);
+      if (particles) puff(scene, cx, cy, 0x9a9aa6, 6);
       break;
     case 'fish':
       // 水波：投竿落水的那一圈。
-      puff(scene, cx, cy, 0x6fb6ff, 6);
+      if (particles) puff(scene, cx, cy, 0x6fb6ff, 6);
       break;
   }
 }
 
 /** 角色走路時的腳步塵土，發生在離開的格子；顏色由地面決定（見 content/terrain.json）。 */
-export function footstepDust(scene: Phaser.Scene, x: number, y: number, color: string): void {
+export function footstepDust(scene: Phaser.Scene, x: number, y: number, color: string, particles = true): void {
+  if (!particles) return;
   const { px: cx, py: cy } = tileCenter(x, y);
   puff(scene, cx, cy + px(10), Number.parseInt(color.slice(1), 16), 3, 0.5);
 }
@@ -184,12 +188,16 @@ export function squashSprite(scene: Phaser.Scene, target: Phaser.GameObjects.Ima
   });
 }
 
-/** 睡覺時在角色上方飄出 z 字，並以淡出淡入表示時間流逝。 */
-export function sleepEffect(scene: Phaser.Scene, x: number, y: number): void {
+/**
+ * 睡覺時在角色上方飄出 z 字，並以淡出淡入表示時間流逝。
+ * screenFade 為 false 時不做全螢幕的淡出淡入（對應設定的「螢幕閃光」）。
+ */
+export function sleepEffect(scene: Phaser.Scene, x: number, y: number, screenFade = true): void {
   const { px: cx, py: cy } = tileCenter(x, y);
   for (let i = 0; i < 3; i += 1) {
     scene.time.delayedCall(i * 250, () => floatText(scene, cx + i * px(6), cy - px(12), 'z', '#cfe6ff', 900));
   }
+  if (!screenFade) return;
   scene.cameras.main.fadeOut(250, 0, 0, 0);
   scene.time.delayedCall(450, () => scene.cameras.main.fadeIn(350, 0, 0, 0));
 }

@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="晨露農場：原創農場生活網頁遊戲（垂直切片 MVP）。" />
     <title>晨露農場</title>
   </head>
@@ -24,11 +24,40 @@
         <span id="hud-mine" aria-label="礦坑狀態"></span>
         <span class="status-actions">
           <button id="hud-saves" class="status-button" type="button" aria-label="存檔槽，可讀取、新遊戲、刪除、匯出與匯入（或按 L）">存檔</button>
+          <button id="hud-settings" class="status-button" type="button" aria-label="設定：按鍵、字級、色盲模式、閃光與震動、觸控（或按 O）">設定</button>
           <button id="hud-help" class="status-button" type="button" aria-label="說明、操作按鍵、更新日誌與隱私說明（或按 ?）">說明</button>
           <span id="hud-version" class="version"></span>
         </span>
       </header>
       <div id="game" class="stage"></div>
+      <div id="touch-controls" class="touch-controls" hidden></div>
+      <section id="settings-panel" class="shop-panel settings-panel" aria-labelledby="settings-title" hidden>
+        <header>
+          <h2 id="settings-title">設定</h2>
+          <p id="settings-note">偏好只存在這個瀏覽器，不影響存檔。</p>
+        </header>
+        <p id="settings-message" class="save-message" role="status"></p>
+        <div id="settings-prompt" class="settings-prompt" hidden>
+          <p id="settings-prompt-text"></p>
+          <button id="settings-swap" type="button">交換按鍵</button>
+          <button id="settings-cancel-swap" type="button">取消</button>
+        </div>
+        <h3 class="settings-heading">按鍵</h3>
+        <ul id="settings-keys" class="shop-list settings-keys"></ul>
+        <button id="settings-reset" type="button">恢復預設按鍵</button>
+        <h3 class="settings-heading">字級</h3>
+        <div id="settings-font" class="settings-choices" role="group" aria-label="字級"></div>
+        <h3 class="settings-heading">無障礙</h3>
+        <label class="settings-check"><input id="settings-colorblind" type="checkbox" /> 色盲模式（錯誤與結果加上 ✕ 與 ✓ 標記）</label>
+        <h3 class="settings-heading">閃光與震動</h3>
+        <label class="settings-check"><input id="settings-shake" type="checkbox" /> 鏡頭震動</label>
+        <label class="settings-check"><input id="settings-flash" type="checkbox" /> 螢幕閃光（睡覺時的淡出淡入）</label>
+        <label class="settings-check"><input id="settings-particles" type="checkbox" /> 粒子效果</label>
+        <p id="settings-reduced" class="settings-note"></p>
+        <h3 class="settings-heading">觸控</h3>
+        <label class="settings-check">虛擬按鍵 <select id="settings-touch"></select></label>
+        <button id="settings-close" type="button">關閉（Esc）</button>
+      </section>
       <section id="shop-panel" class="shop-panel" aria-labelledby="shop-title" hidden>
         <header>
           <h2 id="shop-title"></h2>
@@ -144,7 +173,7 @@
       </section>
       <section class="panel" aria-label="訊息">
         <ul id="hud-log" class="log" aria-live="polite"></ul>
-        <p class="help">方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · A 斧頭 · P 鎬 · R 釣竿 · G 鐮刀 · K 技能與天賦 · F 居民與好感 · J 委託與佈告欄 · S 存檔 · L 存檔槽 · B 背景音樂 · M 靜音 · ? 說明</p>
+        <p class="help">方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · A 斧頭 · P 鎬 · R 釣竿 · G 鐮刀 · K 技能與天賦 · F 居民與好感 · J 委託與佈告欄 · S 存檔 · L 存檔槽 · O 設定 · B 背景音樂 · M 靜音 · ? 說明（以上為預設按鍵，可在設定中改）</p>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

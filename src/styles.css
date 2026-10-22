@@ -6,6 +6,8 @@
   --accent: #e0b25c;
   --error: #ff9b8a;
   --line: #2f4537;
+  /* 字級倍率（標準 1、大 1.25、特大 1.5），由設定套用，見 accessibility.ts。 */
+  --font-scale: 1;
 }
 
 * {
@@ -18,12 +20,17 @@ body {
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', system-ui, sans-serif;
   line-height: 1.6;
+  font-size: calc(16px * var(--font-scale));
 }
 
+/* 安全區域（瀏覽器的瀏海、圓角與底部橫條）：至少留 16px 的邊界。 */
 .app {
   max-width: 960px;
   margin: 0 auto;
   padding: 16px;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
   display: grid;
   gap: 12px;
 }
@@ -33,7 +40,7 @@ body {
   flex-wrap: wrap;
   gap: 8px 14px;
   align-items: center;
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
   padding: 10px 12px;
   background: var(--panel);
   border: 1px solid var(--line);
@@ -100,6 +107,86 @@ body {
   image-rendering: pixelated;
 }
 
+/*
+ * 虛擬按鍵（觸控）：放在遊戲區的正下方，不蓋住畫面。直式與橫式都是左右兩組（方向鍵在左、動作鍵在右），
+ * 寬度不夠時動作鍵自動換行。只有在觸控裝置（或設定為一律顯示）時才顯示，見 apply-settings.ts。
+ */
+.touch-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.touch-controls[hidden] {
+  display: none;
+}
+
+.touch-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.touch-move {
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  grid-template-rows: repeat(2, 56px);
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.touch-move .touch-button[data-action='moveUp'] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.touch-move .touch-button[data-action='moveLeft'] {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.touch-move .touch-button[data-action='moveDown'] {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.touch-move .touch-button[data-action='moveRight'] {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.touch-act {
+  justify-content: flex-end;
+  max-width: 100%;
+}
+
+.touch-button {
+  min-width: 56px;
+  min-height: 56px;
+  padding: 0 10px;
+  border-radius: 12px;
+  border: 1px solid #7fae6b;
+  background: rgba(47, 74, 51, 0.85);
+  color: var(--ink);
+  font: inherit;
+  font-size: calc(15px * var(--font-scale));
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.touch-button:active {
+  background: #3f6446;
+}
+
+.touch-act .touch-button {
+  min-width: 64px;
+}
+
 .panel {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -112,7 +199,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 3.2em;
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
 }
 
 .log li {
@@ -126,7 +213,7 @@ body {
 
 .help {
   margin: 8px 0 0;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale));
   color: var(--muted);
 }
 
@@ -152,12 +239,12 @@ body {
 
 .shop-panel h2 {
   margin: 0 0 4px;
-  font-size: 20px;
+  font-size: calc(20px * var(--font-scale));
 }
 
 .shop-panel p {
   margin: 0 0 12px;
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
   opacity: 0.85;
 }
 
@@ -187,7 +274,7 @@ body {
   cursor: pointer;
 }
 
-/* 狀態列的存檔、說明按鈕與版本號。 */
+/* 狀態列的設定、存檔、說明按鈕與版本號。 */
 .status-actions {
   display: inline-flex;
   flex-wrap: wrap;
@@ -204,12 +291,12 @@ body {
   background: #2f4a33;
   color: inherit;
   font: inherit;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale));
   cursor: pointer;
 }
 
 .version {
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale));
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
@@ -237,7 +324,7 @@ body {
 
 .save-detail {
   margin: 2px 0 8px;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale));
   opacity: 0.9;
 }
 
@@ -265,7 +352,7 @@ body {
 .save-message {
   min-height: 1.6em;
   margin: 0 0 8px;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale));
 }
 
 /* 說明頁：寬一點，讓按鍵與更新日誌不擠。 */
@@ -279,20 +366,20 @@ body {
 
 .help-section h3 {
   margin: 0 0 6px;
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale));
   color: var(--accent);
 }
 
 .help-section h4 {
   margin: 10px 0 4px;
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
 }
 
 .help-controls {
   list-style: none;
   margin: 0;
   padding: 0;
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
 }
 
 .help-controls li {
@@ -311,14 +398,196 @@ body {
   text-align: center;
 }
 
+.help-note {
+  margin: 6px 0 0;
+  font-size: calc(12px * var(--font-scale));
+  opacity: 0.8;
+}
+
 .help-changes {
   margin: 0;
   padding-left: 20px;
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
 }
 
 .help-section p {
   margin: 0 0 8px;
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
 }
 
+/* 設定面板：分段的標題、字級按鈕、勾選框與按鍵列表。 */
+.settings-panel {
+  width: min(92vw, 520px);
+}
+
+.settings-heading {
+  margin: 14px 0 6px;
+  font-size: calc(15px * var(--font-scale));
+  color: var(--accent);
+}
+
+.settings-keys li {
+  font-size: calc(14px * var(--font-scale));
+}
+
+.settings-keys kbd {
+  min-width: 48px;
+  padding: 0 6px;
+  border-radius: 5px;
+  border: 1px solid #7fae6b;
+  background: #1a2a1e;
+  font-family: inherit;
+  text-align: center;
+}
+
+.settings-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.settings-choices button,
+.settings-prompt button {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #7fae6b;
+  background: #2f4a33;
+  color: inherit;
+  font: inherit;
+  font-size: calc(14px * var(--font-scale));
+  cursor: pointer;
+}
+
+.settings-choices button[aria-pressed='true'] {
+  background: #5b8c4e;
+  font-weight: 700;
+  outline: 2px solid var(--accent);
+}
+
+.settings-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  font-size: calc(14px * var(--font-scale));
+}
+
+.settings-check input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+}
+
+.settings-check select {
+  min-height: 34px;
+  font: inherit;
+  font-size: calc(14px * var(--font-scale));
+  color: inherit;
+  background: #1a2a1e;
+  border: 1px solid #7fae6b;
+  border-radius: 6px;
+  padding: 0 6px;
+}
+
+.settings-note {
+  margin: 4px 0 0;
+  font-size: calc(12px * var(--font-scale));
+  opacity: 0.8;
+}
+
+.settings-prompt {
+  margin: 0 0 12px;
+  padding: 10px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.settings-prompt[hidden] {
+  display: none;
+}
+
+.settings-prompt p {
+  flex: 1 1 100%;
+  margin: 0;
+}
+
+/* 色盲模式：錯誤除了紅字外，還有粗體、左側粗線與 ✕ 標記（標記文字由 hud.ts 加上）。 */
+:root[data-colorblind='on'] .log li.error,
+:root[data-colorblind='on'] .save-detail.error,
+:root[data-colorblind='on'] .save-message.error {
+  font-weight: 700;
+  border-left: 3px solid var(--error);
+  padding-left: 6px;
+}
+
+:root[data-colorblind='on'] .settings-choices button[aria-pressed='true'] {
+  outline: 3px dashed var(--accent);
+}
+
+/* 窄螢幕（直式手機）：狀態列與面板的按鈕放大到好按的尺寸，字不擠。 */
+@media (max-width: 600px) {
+  .status-button,
+  .shop-panel > button,
+  .settings-choices button {
+    min-height: 40px;
+  }
+}
+
+/*
+ * 橫式的手機或平板（高度不足）：方向鍵在遊戲區左側、動作鍵在右側，遊戲區維持在中間，不會蓋住角色。
+ * 虛擬按鍵的容器改為 display: contents，讓兩組按鍵直接成為 .app 的格子。
+ */
+@media (orientation: landscape) and (max-height: 520px) {
+  .app {
+    grid-template-columns: 180px minmax(0, 1fr) 180px;
+    gap: 8px;
+    padding-top: 8px;
+    align-items: center;
+  }
+
+  .status,
+  .panel {
+    grid-column: 1 / -1;
+  }
+
+  .stage {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .touch-controls:not([hidden]) {
+    display: contents;
+  }
+
+  .touch-move {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: center;
+  }
+
+  .touch-act {
+    grid-column: 3;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(3, 56px);
+    grid-auto-rows: 44px;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .touch-act .touch-button {
+    min-width: 0;
+    min-height: 44px;
+    width: 56px;
+    padding: 0;
+    font-size: calc(14px * var(--font-scale));
+  }
+
+  .status {
+    padding: 6px 10px;
+  }
+}
