@@ -247,6 +247,12 @@
       "maxStack": 1
     },
     {
+      "id": "building.greenhouse",
+      "name": "溫室改建",
+      "kind": "building",
+      "maxStack": 1
+    },
+    {
       "id": "star-shard",
       "name": "星河碎片",
       "kind": "material",

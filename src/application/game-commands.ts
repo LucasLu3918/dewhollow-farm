@@ -29,7 +29,8 @@ import { applySellBonus, biteBonusPoints, dishEnergyBonus, extraYieldChance, rol
 import type { ContentIndex } from './content-index';
 import { acceptQuest, collectMail, currentBoard, deliverLetters, recordQuestEvent, refreshBoard, settleQuests, shortfallOf, submitQuest } from './quests';
 import { observeProgress } from './collection';
-import { festivalCrown, festivalHere, festivalSwap, recordContestCatch, recordStallSale, stallRefusal, starExchange, type FestivalOutcome } from './festival';
+import { festivalCrown, festivalHere, festivalSwap, lightLantern, recordContestCatch, recordHarvestContest, recordStallSale, recordWarmGift, stallRefusal, starExchange, warmGiftOpen, type FestivalOutcome } from './festival';
+import { plantableIn, survivesSeasonChange } from '../domain/greenhouse';
 import { settleStory, storyObjective } from './story';
 import { donateToRepair } from './repairs';
 import { endOfDay, eventBitePoints, eventYieldChance, startDay } from './random-events';
@@ -204,6 +205,8 @@ const FAILURE_MESSAGES: Record<string, string> = {
   NOT_REPAIR_ITEM: '這項修復不收這個東西',
   BAD_COUNT: '要捐至少一件',
   REPAIR_ENOUGH: '這一項已經捐夠了，換別的東西吧',
+  ALREADY_LIT: '這盞燈今年已經點過了',
+  NOT_IN_STOCK_SEASON: '雜貨店這個季節還沒進這批種子',
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
@@ -359,6 +362,7 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
     if (kind === tile.kind) return mineRock(state, target, tile, index);
   }
   if (tile.festival === 'stars') return castStar(state, index);
+  if (tile.festival === 'lantern') return festivalCommand(state, lightLantern(state, `${target.x},${target.y}`, index));
   if (tile.kind === 'water') return cast(state, target, index);
   if (tile.kind === 'trough') return feedAnimals(state, index);
   if (kind === 'kitchen') return reply(state, [], [{ type: 'kitchenOpened' }]);
@@ -411,6 +415,7 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
     const cropDef = index.crop(crop.cropId);
     let yielded = 0;
     let quality: Quality = 'normal';
+    let contestMessages: string[] = [];
     const result = spendThen(state, 'harvest', index, (s) => {
       const harvested = harvestPlot(s.plots, key, cropDef.growthDays);
       if (!harvested.ok) return fail(harvested.reason);
@@ -426,10 +431,15 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
       if (!stored.ok) return fail(stored.reason);
       yielded = count;
       const harvestedState: GameState = { ...s, plots: harvested.value.plots, inventory: stored.value, rng: q.rng };
-      return ok(recordQuestEvent(harvestedState, { type: 'harvest', cropId: cropDef.id }, index));
+      const quest = recordQuestEvent(harvestedState, { type: 'harvest', cropId: cropDef.id }, index);
+      // 豐穗祭的收成比賽：節慶當天收成指定的作物才計數（見 application/festival.ts）。
+      const contest = recordHarvestContest(quest, cropDef.id, count, index);
+      contestMessages = contest.messages;
+      return ok(contest.state);
     });
     const label = QUALITY_LABEL[quality];
-    return finish(state, result, `收成了 ${cropDef.name}${label} × ${yielded}`, { action: 'harvest', key });
+    const out = finish(state, result, `收成了 ${cropDef.name}${label} × ${yielded}`, { action: 'harvest', key });
+    return contestMessages.length > 0 ? { ...out, messages: [...out.messages, ...contestMessages] } : out;
   }
 
   if (state.tool === 'hoe') {
@@ -455,7 +465,8 @@ function workPlot(state: GameState, key: string, index: ContentIndex): CommandOu
 
   const seedName = index.crop(state.selectedSeed).name;
   const result = spendThen(state, 'plant', index, (s) => {
-    if (!index.crop(s.selectedSeed).seasons.includes(s.calendar.season)) return fail('NOT_IN_SEASON');
+    // 溫室裡的田不受季節限制（見 domain/greenhouse.ts）；溫室外只能在作物的季節種。
+    if (!plantableIn(index.crop(s.selectedSeed).seasons, s.calendar.season, index.greenhouse.has(key))) return fail('NOT_IN_SEASON');
     const seeds = removeItem(s.inventory, seedItemId(s.selectedSeed), 1);
     if (!seeds.ok) return fail('NO_SEED');
     const planted = plantCrop(s.plots, key, s.selectedSeed);
@@ -592,16 +603,31 @@ function giveGift(state: GameState, npcId: string, itemId: string, index: Conten
   const npc = index.npc(npcId);
   const today = totalDay(state.calendar, index.tuning.time.daysPerSeason);
   const current = state.friendship[npcId] ?? NO_FRIENDSHIP;
-  if (current.giftedDay === today) return reply(state, [messageFor('ALREADY_GIFTED')], [refused('ALREADY_GIFTED')]);
+  // 暖燈節的交換禮物：當晚的指定居民不受每日一次限制（今年有次數就算），見 application/festival.ts。
+  const warm = warmGiftOpen(state, index, npcId);
+  if (!warm && current.giftedDay === today) return reply(state, [messageFor('ALREADY_GIFTED')], [refused('ALREADY_GIFTED')]);
   const taken = removeItem(state.inventory, itemId, 1);
   if (!taken.ok) return reply(state, [messageFor('NO_GIFT_ITEM')], [refused('NO_GIFT_ITEM')]);
+  const giftRules = warm ? festivalHere(state, index)?.giftExchange : undefined;
+  let inventory = taken.value;
+  if (giftRules) {
+    const back = addItem(inventory, index.item(giftRules.receive.itemId), giftRules.receive.count);
+    if (!back.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
+    inventory = back.value;
+  }
 
   const reaction = giftReaction(itemId, npc.loves, npc.hates);
   const delta = giftPoints(reaction, index.friendship);
   const points = addPoints(current.points, delta, capPointsOf(state, index));
-  const next = withFriendship({ ...state, inventory: taken.value }, npcId, { ...current, points, giftedDay: today });
-  const line = `${REACTION_LINE[reaction](npc.name, index.item(itemId).name)}（好感 ${delta > 0 ? '+' : ''}${delta}）`;
-  return reply(next, [line], [{ type: 'gifted', npcId, reaction }]);
+  // 暖燈禮物不記在「今天送過禮」上，所以同一天還能再送一般的禮。
+  const record = giftRules ? { ...current, points } : { ...current, points, giftedDay: today };
+  let next = withFriendship({ ...state, inventory }, npcId, record);
+  const messages = [`${REACTION_LINE[reaction](npc.name, index.item(itemId).name)}（好感 ${delta > 0 ? '+' : ''}${delta}）`];
+  if (giftRules) {
+    next = recordWarmGift(next);
+    messages.push(`${npc.name}回了你${index.item(giftRules.receive.itemId).name} × ${giftRules.receive.count}`);
+  }
+  return reply(next, messages, [{ type: 'gifted', npcId, reaction }]);
 }
 
 /** 心形事件的選項：好感依選項變化，事件結束（之後的指令恢復正常）。 */
@@ -632,7 +658,8 @@ function sleep(today: GameState, index: ContentIndex): CommandOutcome {
   const outOfSeason: string[] = [];
   if (morning.seasonChanged) {
     for (const [key, plot] of Object.entries(plots)) {
-      if (!plot.crop || index.crop(plot.crop.cropId).seasons.includes(calendar.season)) continue;
+      // 溫室裡的作物不因換季枯死（見 domain/greenhouse.ts）。
+      if (!plot.crop || survivesSeasonChange(index.crop(plot.crop.cropId).seasons, calendar.season, index.greenhouse.has(key))) continue;
       outOfSeason.push(index.crop(plot.crop.cropId).name);
       plots[key] = { watered: false, crop: null, dryDays: 0 };
     }
@@ -927,6 +954,10 @@ function buy(state: GameState, command: Extract<Command, { type: 'buy' }>, index
   if (!facingShop(state, index, command.shopId)) return reply(state, [messageFor('NOT_AT_SHOP')], [refused('NOT_AT_SHOP')]);
   const line = index.shop(command.shopId).stock.find((s) => s.itemId === command.itemId);
   if (!line) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
+  // 季節進貨：秋季的種子只在秋天賣（shops.json 的 seasons）。
+  if (line.seasons && !line.seasons.includes(state.calendar.season)) {
+    return reply(state, [messageFor('NOT_IN_STOCK_SEASON')], [refused('NOT_IN_STOCK_SEASON')]);
+  }
   // 節慶攤位：只在節慶開著時能買，有限量的物品不能超過今年的數量（見 festival.ts）。
   const closed = stallRefusal(state, index, command.shopId, command.itemId, command.count);
   if (closed) return reply(state, [messageFor(closed)], [refused(closed)]);

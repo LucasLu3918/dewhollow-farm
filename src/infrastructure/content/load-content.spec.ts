@@ -86,6 +86,12 @@ describe('loadContent with shipped content', () => {
       'star-pepper',
       'dusk-potato',
       'silver-wheat',
+      'golden-rice',
+      'bell-pumpkin',
+      'maple-berry',
+      'snow-radish',
+      'frost-mushroom',
+      'ember-onion',
     ]);
     expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'plaza', 'forest', 'lake', 'house', 'mine-entrance', 'coop', 'pasture', 'cowbarn']);
     expect(pack.start.mapId).toBe('farm');

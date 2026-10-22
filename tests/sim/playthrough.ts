@@ -144,6 +144,10 @@ function milestonesOf(s: GameState, record: DayRecord, index: ContentIndex): str
   if (s.inventory.capacity > index.tuning.inventory.capacity) out.push('木箱（合成）');
   if (s.inventory.stacks.some((st) => st.itemId.startsWith('fertilizer-'))) out.push('肥料（合成）');
   if (s.flags.bobber) out.push('浮標（合成）');
+  // M6（秋冬）：溫室改建、豐穗祭的收成比賽完成、暖燈節的燈全部點亮（新鮮度測試只看第 1–40 天）。
+  if (s.flags.greenhouse) out.push('溫室改建');
+  if (s.festival.done['harvest-feast:contest'] !== undefined) out.push('豐穗祭：收成比賽完成');
+  if (s.flags['lantern:all']) out.push('暖燈：廣場的燈全部點亮');
 
   // M5d：圖鑑、成就、委託、主線、節慶、心形事件、修復、信件、隨機事件，以及行事曆上的日子（見 freshness.spec.ts）。
   for (const id of s.achievements.unlocked) out.push(`成就：${index.achievements.find((a) => a.id === id)?.name ?? id}`);
@@ -246,14 +250,14 @@ function farmWork(bot: Bot, index: ContentIndex): void {
   const crop = bestCrop(index, bot.state);
   if (crop) {
     const seedItem = `seed.${crop}`;
-    const empty = tilesWhere(bot.state, map, (kind, _t, x, y) => kind === 'field' && !bot.state.plots[plotKey(x, y)]).length;
+    const empty = tilesWhere(bot.state, map, (kind, t, x, y) => kind === 'field' && t.greenhouse !== true && !bot.state.plots[plotKey(x, y)]).length;
     const seeds = countOf(bot.state.inventory, seedItem);
     const tilledEmpty = Object.values(bot.state.plots).filter((p) => !p.crop).length;
     const need = Math.min(seeds - tilledEmpty, empty);
     if (need > 0 && seeds > 0) {
       bot.useTool('hoe');
       for (let i = 0; i < need && bot.state.energy.current > FLOOR.farm; i += 1) {
-        const field = tilesWhere(bot.state, map, (kind, _t, x, y) => kind === 'field' && !bot.state.plots[plotKey(x, y)]);
+        const field = tilesWhere(bot.state, map, (kind, t, x, y) => kind === 'field' && t.greenhouse !== true && !bot.state.plots[plotKey(x, y)]);
         if (!bot.actOn(field, { type: 'interact' })) break;
       }
     }
@@ -291,7 +295,7 @@ function villageTrip(bot: Bot, index: ContentIndex): void {
   const counters = (shopId: string) => tilesWhere(bot.state, village, (_k, t) => t.kind === 'shop' && t.shop === shopId);
   const general = index.shop('general');
   const crop = bestCrop(index, bot.state);
-  const emptyPlots = tilesWhere(bot.state, index.map('farm'), (kind, _t, x, y) => kind === 'field' && !bot.state.plots[plotKey(x, y)]).length;
+  const emptyPlots = tilesWhere(bot.state, index.map('farm'), (kind, t, x, y) => kind === 'field' && t.greenhouse !== true && !bot.state.plots[plotKey(x, y)]).length;
   const wantSeeds = crop && emptyPlots > 0 ? Math.min(emptyPlots, 54) - countOf(bot.state.inventory, `seed.${crop}`) : 0;
 
   const toBuy = { seed: 0, hay: 0, chicken: 0 };

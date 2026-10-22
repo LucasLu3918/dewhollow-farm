@@ -22,7 +22,7 @@ function v18State(overrides: Record<string, unknown> = {}): Record<string, unkno
 describe('migrateState v18 → v19（圖鑑與成就）', () => {
   it('bumps the save to version 19', () => {
     const migrated = migrateState(v18State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(19);
+    expect(migrated.schemaVersion).toBe(20);
   });
 
   it('starts the dex with nothing found and nothing claimed', () => {
@@ -45,7 +45,8 @@ describe('migrateState v18 → v19（圖鑑與成就）', () => {
   it('keeps everything else as it was, including the inventory and the flags', () => {
     const before = v18State();
     const migrated = migrateState(before, context) as Record<string, unknown>;
-    for (const key of ['gold', 'mapId', 'inventory', 'flags', 'festival', 'repairs', 'dailyEvent']) {
+    // 節慶紀錄不在這裡比較：之後的 v19→v20 會加上收成比賽的紀錄（見 save-migrations-v20.spec.ts）。
+    for (const key of ['gold', 'mapId', 'inventory', 'flags', 'repairs', 'dailyEvent']) {
       expect(migrated[key]).toEqual(before[key]);
     }
   });
@@ -58,6 +59,6 @@ describe('migrateState v18 → v19（圖鑑與成就）', () => {
   });
 
   it('a state from a version newer than 19 is still refused', () => {
-    expect(() => migrateState({ schemaVersion: 20 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState({ schemaVersion: 21 }, context)).toThrow(SaveFormatError);
   });
 });

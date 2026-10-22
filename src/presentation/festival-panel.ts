@@ -3,7 +3,7 @@ import { messageFor, type Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
 import { festivalHere, starExchangeRefusal } from '../application/festival';
 import { residentsOn } from '../application/residents';
-import { CROWN_RECIPE, doneThisYear, exchangedThisYear, festivalKey, openFestival, type FestivalDef } from '../domain/festival';
+import { CROWN_RECIPE, doneThisYear, exchangedThisYear, festivalKey, lanternKeysOf, litLanterns, openFestival, warmGiftsLeft, type FestivalDef } from '../domain/festival';
 import { countOf } from '../domain/inventory';
 import { SEASON_NAMES } from '../domain/calendar';
 
@@ -66,6 +66,39 @@ export class FestivalPanel {
     if (here.shop) this.heading('夜市攤位：到廣場右下角的櫃檯（攤位）買，每項有限量。');
     if (here.stars) this.heading('釣星星：到廣場左上角的水池前甩竿（按 X），等星星經過時再按 X 收網。');
     if (here.exchange) this.starExchangeSection(state, here);
+    if (here.harvestContest) this.harvestSection(state, here);
+    if (here.lanterns) this.lanternSection(state, here);
+    if (here.giftExchange) this.giftSection(state, here);
+  }
+
+  /** 收成比賽：今天收成指定的作物，累計到目標就完成（數量由應用層記在 festival.harvest）。 */
+  private harvestSection(state: GameState, festival: FestivalDef): void {
+    const rules = festival.harvestContest;
+    if (!rules) return;
+    const year = state.calendar.year;
+    const count = state.festival.harvest.year === year ? state.festival.harvest.count : 0;
+    const done = doneThisYear(state.festival, festivalKey(festival.id, 'contest'), year);
+    this.heading('收成比賽：今天收成指定的作物，累計到目標就完成獎勵。');
+    this.item(`${this.index.item(`crop.${rules.cropId}`).name}：已收成 ${Math.min(count, rules.count)}/${rules.count}，完成獎勵 ${rules.gold} 金。${done ? '（今年已領過）' : ''}`);
+  }
+
+  /** 點燈：站在廣場的燈前按 X，每盞每年一次；全部點亮再有獎勵。 */
+  private lanternSection(state: GameState, festival: FestivalDef): void {
+    const rules = festival.lanterns;
+    if (!rules) return;
+    const lit = litLanterns(state.festival.done, festival.id, lanternKeysOf(this.index.map(state.mapId)), state.calendar.year);
+    this.heading('點燈：到廣場上的燈前按 X，每盞每年點一次。');
+    this.item(`已點亮 ${lit}/${rules.count} 盞，全部點亮再得 ${rules.allGold} 金。每盞 ${rules.gold} 金。`);
+  }
+
+  /** 交換禮物：指定的居民收禮不受每日一次限制，每年有次數，會回禮。 */
+  private giftSection(state: GameState, festival: FestivalDef): void {
+    const rules = festival.giftExchange;
+    if (!rules) return;
+    const names = rules.npcIds.map((id) => this.index.npc(id).name).join('、');
+    const left = warmGiftsLeft(state.festival.exchanged, state.calendar.year, rules.perYear);
+    this.heading('交換禮物：到指定的居民面前送禮（F 鍵），不受每日一次限制，會收到回禮。');
+    this.item(`${names}：今年還可以送 ${left}/${rules.perYear} 次，回禮 ${this.index.item(rules.receive.itemId).name} × ${rules.receive.count}。`);
   }
 
   /** 星河兌換：能不能換、為什麼不能換都由應用層決定（starExchangeRefusal）；這裡只顯示。 */

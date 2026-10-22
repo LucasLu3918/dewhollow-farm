@@ -33,6 +33,16 @@
         {
           "itemId": "animal.cow",
           "price": 1200
+        },
+        { "itemId": "seed.golden-rice", "price": 50, "seasons": ["autumn"] },
+        { "itemId": "seed.bell-pumpkin", "price": 60, "seasons": ["autumn"] },
+        { "itemId": "seed.maple-berry", "price": 40, "seasons": ["autumn"] },
+        { "itemId": "seed.snow-radish", "price": 70, "seasons": ["winter"] },
+        { "itemId": "seed.frost-mushroom", "price": 65, "seasons": ["winter"] },
+        { "itemId": "seed.ember-onion", "price": 50, "seasons": ["winter"] },
+        {
+          "itemId": "building.greenhouse",
+          "price": 9000
         }
       ],
       "upgrades": []

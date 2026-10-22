@@ -5,15 +5,15 @@
   "height": 12,
   "rows": [
     "################",
-    "#..............#",
+    "#.l..........l.#",
     "#..ff...oo..ff.#",
     "#..ff...oo..ff.#",
-    "#..............#",
+    "#...l......l...#",
     "#.....==.......#",
     "V.....==.......#",
     "#.....==.......#",
-    "#h.............#",
-    "#..............#",
+    "#hl............#",
+    "#.............l#",
     "#..nbbp......s.#",
     "################"
   ],
@@ -26,6 +26,7 @@
     "n": { "kind": "furniture", "notice": "bulletin" },
     "h": { "kind": "furniture", "notice": "festival" },
     "p": { "kind": "furniture", "notice": "repair" },
+    "l": { "kind": "furniture", "festival": "lantern" },
     "o": { "kind": "water", "festival": "stars" },
     "s": { "kind": "shop", "shop": "night-market" },
     "V": { "kind": "door", "to": "village", "spawn": { "x": 14, "y": 6 } }

@@ -20,7 +20,7 @@
       "name": "作物",
       "phase": "spring",
       "playMinutes": 0.5,
-      "entries": ["crop.dew-grass", "crop.moon-bean", "crop.sweet-radish", "crop.star-pepper", "crop.dusk-potato", "crop.silver-wheat"],
+      "entries": ["crop.dew-grass", "crop.moon-bean", "crop.sweet-radish", "crop.star-pepper", "crop.dusk-potato", "crop.silver-wheat", "crop.golden-rice", "crop.bell-pumpkin", "crop.maple-berry", "crop.snow-radish", "crop.frost-mushroom", "crop.ember-onion"],
       "rewards": [
         { "percent": 25, "gold": 80 },
         { "percent": 50, "items": { "star-string": 1 } },

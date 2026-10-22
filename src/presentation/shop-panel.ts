@@ -58,6 +58,8 @@ export class ShopPanel {
 
     if (shop.stock.length > 0) {
       for (const line of shop.stock) {
+        // 季節進貨：這個季節沒有進貨的東西不列出（見 shops.json 的 seasons）。
+        if (line.seasons && !line.seasons.includes(state.calendar.season)) continue;
         const name = this.nameOf(line.itemId);
         this.addRow(`${name}　${line.price} 金`, '買一個', () =>
           this.onCommand({ type: 'buy', shopId: shop.id, itemId: line.itemId, count: 1 }),

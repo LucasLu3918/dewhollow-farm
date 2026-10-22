@@ -82,8 +82,10 @@ export interface TileDef {
   seasons?: Season[];
   /** 站在它前面按 X 的用途：佈告欄（看今日委託並接取）、信箱（取信）或節慶告示（見 festival.ts）。 */
   notice?: 'bulletin' | 'mailbox' | 'festival' | 'repair';
-  /** 節慶的水池（只在節慶開放時有作用，見 star-fishing.ts）。 */
-  festival?: 'stars';
+  /** 節慶的水池（只在節慶開放時有作用，見 star-fishing.ts）；或暖燈節的燈（見 festival.ts）。 */
+  festival?: 'stars' | 'lantern';
+  /** 溫室的田：不受季節限制（見 greenhouse.ts）。 */
+  greenhouse?: boolean;
 }
 
 export interface MapDef {
@@ -229,6 +231,8 @@ export interface ShopStock {
   price: number;
   /** 節慶攤位才有：每年（每次節慶）最多賣幾個。 */
   limit?: number;
+  /** 只在這些季節進貨（省略為四季都有）；例如秋季的種子只在秋天賣。 */
+  seasons?: Season[];
 }
 
 /** 升級工具到某一階需要的金幣與材料（材料是 物品 id → 數量）。 */

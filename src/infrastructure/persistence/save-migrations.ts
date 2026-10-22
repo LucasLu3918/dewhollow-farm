@@ -41,6 +41,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   16: migrateV16ToV17,
   17: migrateV17ToV18,
   18: migrateV18ToV19,
+  19: migrateV19ToV20,
 };
 
 /**
@@ -221,6 +222,24 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v19 → v20：秋冬內容。溫室是地圖上的改建（旗標，舊存檔還沒有）；豐穗祭的收成比賽從 0 開始；
+ * 主線停在舊存檔的章節，第 4、5 章照常接在後面。不回補舊存檔的收成或點燈。
+ */
+function migrateV19ToV20(raw: unknown): unknown {
+  const parsed = z
+    .object({ schemaVersion: z.literal(19), festival: z.record(z.string(), z.unknown()).optional() })
+    .safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v19 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 20,
+    festival: { ...(parsed.data.festival ?? {}), harvest: { year: 0, count: 0 } },
+  };
 }
 
 /**

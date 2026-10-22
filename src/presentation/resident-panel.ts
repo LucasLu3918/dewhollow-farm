@@ -5,6 +5,7 @@ import { countOf } from '../domain/inventory';
 import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
 import { residentsOn } from '../application/residents';
+import { warmGiftOpen } from '../application/festival';
 
 /**
  * 居民與好感面板（DOM）：每位居民的顆心、今天是否已對話與送禮、喜歡的東西，以及送禮的下拉選單。
@@ -65,7 +66,7 @@ export class ResidentPanel {
       const loves = npc.loves.map((id) => this.index.item(id).name).join('、');
       const status = [
         f.talkedDay === today ? '今天已聊過' : '今天還沒聊',
-        f.giftedDay === today ? '今天已送禮' : '今天還可以送禮',
+        warmGiftOpen(state, this.index, npc.id) ? '暖燈禮物還可以送' : f.giftedDay === today ? '今天已送禮' : '今天還可以送禮',
         here.has(npc.id) ? '現在在這裡' : '現在不在這裡',
       ].join('・');
       const item = this.doc.createElement('li');

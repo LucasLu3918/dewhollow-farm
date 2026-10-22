@@ -51,6 +51,36 @@
       "complete": "橋修好了，湖的那一邊又連起來了。夏天真的來了。",
       "reward": { "gold": 400, "flag": "main:3" },
       "playMinutes": 8
+    },
+    {
+      "id": "autumn-greenhouse",
+      "number": 4,
+      "title": "秋收與溫室",
+      "window": "秋 1–20",
+      "phase": "autumn",
+      "intro": "田裡的收成一年比一年多，榕伯說豐穗祭上大家都會帶來自己的作物。毛毛則想在冬天也種點東西，問你要不要蓋一座溫室。",
+      "steps": [
+        { "hint": "在豐穗祭參加一項活動", "flag": "attended:harvest-feast" },
+        { "hint": "到雜貨店把溫室改建好（9000 金）", "flag": "greenhouse" }
+      ],
+      "complete": "溫室的玻璃在秋陽下閃閃發亮。冬天的田，也可以開始了。",
+      "reward": { "gold": 600, "items": { "seed.snow-radish": 2 }, "flag": "scene:greenhouse-open" },
+      "playMinutes": 8
+    },
+    {
+      "id": "winter-lamps",
+      "number": 5,
+      "title": "冬天的燈",
+      "window": "冬 1–20",
+      "phase": "winter",
+      "intro": "冬夜很長，鎮廣場的人開始掛起小燈。小穗說，暖燈節的晚上把燈全部點亮，大家就會聚在一起，互相送一份禮物。",
+      "steps": [
+        { "hint": "在暖燈節參加一項活動", "flag": "attended:warm-lamp" },
+        { "hint": "點亮廣場上的所有燈", "flag": "lantern:all" }
+      ],
+      "complete": "廣場上的燈全部亮了起來。今年的冬天，比去年暖和。",
+      "reward": { "gold": 800, "flag": "scene:lamplit-plaza" },
+      "playMinutes": 8
     }
   ]
 }

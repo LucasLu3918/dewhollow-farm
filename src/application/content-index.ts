@@ -17,6 +17,7 @@ import type { RepairDef } from '../domain/repairs';
 import type { DailyEventRules, RandomEventDef } from '../domain/random-events';
 import type { DexCategory } from '../domain/collection';
 import type { AchievementDef } from '../domain/achievements';
+import { greenhouseKeysOf } from '../domain/greenhouse';
 
 /**
  * 以 id 快速查找內容。假設內容已由基礎設施層驗證過參照完整性；
@@ -85,6 +86,8 @@ export interface ContentIndex {
   dexCategory(id: string): DexCategory;
   /** 成就（順序與內容檔相同，見 achievements.ts）。 */
   achievements: AchievementDef[];
+  /** 溫室的田（所有地圖上 greenhouse 標記的格子，以田地鍵 `x,y` 表示；見 domain/greenhouse.ts）。 */
+  greenhouse: ReadonlySet<string>;
 }
 
 const NO_BULLETIN: BulletinRules = { postedBy: '鎮公所', dailyCount: 0, daily: [], weekly: [] };
@@ -197,6 +200,7 @@ export function createContentIndex(pack: ContentPack): ContentIndex {
       return found;
     },
     achievements: pack.achievements ?? [],
+    greenhouse: new Set(pack.maps.flatMap((m) => greenhouseKeysOf(m))),
     randomEvents: pack.randomEvents ?? { chance: 0, events: [] },
     randomEvent(id) {
       const found = (pack.randomEvents?.events ?? []).find((e) => e.id === id);

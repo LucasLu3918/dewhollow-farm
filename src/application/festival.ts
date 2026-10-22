@@ -11,6 +11,13 @@ import {
   recordSale,
   soldThisYear,
   contestReached,
+  harvestContestReached,
+  lanternKey,
+  lanternKeysOf,
+  litLanterns,
+  recordHarvest,
+  warmGiftsLeft,
+  WARM_GIFT_LINE,
   type ExchangeContext,
   type FestivalDef,
   type StarExchangeDef,
@@ -122,6 +129,72 @@ export function recordContestCatch(state: GameState, index: ContentIndex): Festi
     messages.push(`釣魚比賽完成！獎勵 ${festival.contest.gold} 金`);
   }
   return { state: next, messages };
+}
+
+/**
+ * 收成比賽（豐穗祭）：節慶當天收成指定的作物，就把收成的數量記下來；累計達到目標且今年還沒領過，發獎勵。
+ * 不會失敗：不是比賽的作物或不是節慶當天，就什麼都不做。
+ */
+export function recordHarvestContest(state: GameState, cropId: string, count: number, index: ContentIndex): FestivalOutcome {
+  const festival = openFestival(index.festivals, state.calendar);
+  const contest = festival?.harvestContest;
+  if (!festival || !contest || contest.cropId !== cropId) return { state, messages: [] };
+  const year = state.calendar.year;
+  let next: GameState = { ...state, festival: { ...state.festival, harvest: recordHarvest(state.festival.harvest, year, count) } };
+  const messages: string[] = [];
+  const key = festivalKey(festival.id, 'contest');
+  if (harvestContestReached(next.festival.harvest, contest) && !doneThisYear(next.festival, key, year)) {
+    next = {
+      ...next,
+      gold: next.gold + contest.gold,
+      festival: markDone(next.festival, key, year),
+      flags: { ...next.flags, [`attended:${festival.id}`]: true },
+    };
+    messages.push(`收成比賽完成！獎勵 ${contest.gold} 金`);
+  }
+  return { state: next, messages };
+}
+
+/**
+ * 暖燈節點燈：站在廣場的燈前按互動。每盞每年一次；點亮發燈的獎勵，全部點亮時再發一次獎勵並設定旗標。
+ * 不花體力與時間。已經點過或不是節慶時間，什麼都不改。
+ */
+export function lightLantern(state: GameState, lampKey: string, index: ContentIndex): Result<FestivalOutcome, string> {
+  const festival = festivalHere(state, index);
+  const lamps = festival?.lanterns;
+  if (!festival || !lamps) return fail('NOT_FESTIVAL');
+  const year = state.calendar.year;
+  const key = lanternKey(festival.id, lampKey);
+  if (doneThisYear(state.festival, key, year)) return fail('ALREADY_LIT');
+
+  let next: GameState = {
+    ...state,
+    gold: state.gold + lamps.gold,
+    festival: markDone(state.festival, key, year),
+    flags: { ...state.flags, [`attended:${festival.id}`]: true },
+  };
+  const messages = [`點亮了一盞燈，獎勵 ${lamps.gold} 金`];
+  const lit = litLanterns(next.festival.done, festival.id, lanternKeysOf(index.map(state.mapId)), year);
+  if (lit >= lamps.count && next.flags[lamps.flag] !== true) {
+    next = { ...next, gold: next.gold + lamps.allGold, flags: { ...next.flags, [lamps.flag]: true } };
+    messages.push(`廣場上全部的燈都亮了！獎勵 ${lamps.allGold} 金`);
+  }
+  return ok({ state: next, messages });
+}
+
+/**
+ * 暖燈禮物：暖燈節當晚、鎮廣場上，指定的居民收禮不受每日一次限制，今年還有次數就算。
+ * 不是這樣的情況就回傳 false，送禮照常走每日一次的規則。
+ */
+export function warmGiftOpen(state: GameState, index: ContentIndex, npcId: string): boolean {
+  const rules = festivalHere(state, index)?.giftExchange;
+  if (!rules || !rules.npcIds.includes(npcId)) return false;
+  return warmGiftsLeft(state.festival.exchanged, state.calendar.year, rules.perYear) > 0;
+}
+
+/** 暖燈禮物用掉一次（今年的計次加一）。 */
+export function recordWarmGift(state: GameState): GameState {
+  return { ...state, festival: { ...state.festival, exchanged: recordExchange(state.festival.exchanged, state.calendar.year, WARM_GIFT_LINE) } };
 }
 
 /** 夜市攤位：現在是不是這個攤位的節慶、而且這次買得下（限量）。回傳失敗代碼，或 null 表示可以買。 */
