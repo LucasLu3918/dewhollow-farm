@@ -1,4 +1,4 @@
-import type { Settings } from '../domain/settings';
+import type { MobileSettings, Settings } from '../domain/settings';
 
 /**
  * 偏好設定的儲存埠（port）。與存檔（SaveRepository）分開：偏好不進存檔，清掉偏好不影響進度。
@@ -11,6 +11,8 @@ export interface SettingsStore {
 }
 
 export type SettingsListener = (settings: Settings) => void;
+
+export type SettingsPatch = Omit<Partial<Settings>, 'mobile'> & { mobile?: Partial<MobileSettings> };
 
 /**
  * 偏好的服務：保存目前的偏好、寫入儲存埠，並通知訂閱者（例如套用字級與色盲模式的 DOM）。
@@ -31,8 +33,12 @@ export class SettingsService {
    * 合併一部分偏好，寫入儲存埠，然後通知訂閱者。
    * 回傳是否寫入成功；寫入失敗時目前這一次的偏好仍然生效（只是重新整理後會回到上次成功的值）。
    */
-  update(patch: Partial<Settings>): boolean {
-    this.current = { ...this.current, ...patch };
+  update(patch: SettingsPatch): boolean {
+    this.current = {
+      ...this.current,
+      ...patch,
+      mobile: patch.mobile ? { ...this.current.mobile, ...patch.mobile } : this.current.mobile,
+    };
     const saved = this.store.set(this.current);
     for (const listener of this.listeners) listener(this.current);
     return saved;

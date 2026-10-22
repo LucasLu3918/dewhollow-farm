@@ -10,6 +10,12 @@ describe('default settings', () => {
     expect(s.colorblind).toBe(false);
     expect(s.effects).toEqual({ shake: true, flash: true, particles: true });
     expect(s.touchControls).toBe('auto');
+    expect(s.mobile).toEqual({
+      handedness: 'right',
+      controlStyle: 'dpad',
+      buttonScale: 'standard',
+      controlsPlacement: 'external',
+    });
   });
 
   it('returns a fresh object each time so callers cannot change the defaults', () => {
@@ -26,18 +32,62 @@ describe('sanitizeSettings', () => {
     expect(sanitizeSettings([1, 2, 3])).toEqual(defaultSettings());
   });
 
-  it('falls back to every default when the schema version is unknown', () => {
-    expect(sanitizeSettings({ schemaVersion: 99, fontSize: 'xlarge' })).toEqual(defaultSettings());
+  it('uses safe defaults for unsupported versions', () => {
+    expect(sanitizeSettings({ schemaVersion: 99, settings: { fontSize: 'xlarge' } })).toEqual(defaultSettings());
     expect(sanitizeSettings({ fontSize: 'xlarge' })).toEqual(defaultSettings());
+  });
+
+  it('migrates v1 and preserves every valid existing preference', () => {
+    const legacy = {
+      schemaVersion: 1,
+      bindings: { ...DEFAULT_BINDINGS, interact: 'e', wear: 'x' },
+      fontSize: 'xlarge',
+      colorblind: true,
+      effects: { shake: false, flash: false, particles: true },
+      touchControls: 'on',
+    };
+
+    expect(sanitizeSettings(legacy)).toEqual({
+      ...defaultSettings(),
+      bindings: legacy.bindings,
+      fontSize: 'xlarge',
+      colorblind: true,
+      effects: legacy.effects,
+      touchControls: 'on',
+    });
+  });
+
+  it('validates mobile fields independently and preserves valid siblings', () => {
+    const settings = sanitizeSettings({
+      schemaVersion: 2,
+      settings: {
+        ...defaultSettings(),
+        mobile: {
+          handedness: 'left',
+          controlStyle: 'future-control',
+          buttonScale: 'large',
+          controlsPlacement: 'overlay',
+        },
+      },
+    });
+
+    expect(settings.mobile).toEqual({
+      handedness: 'left',
+      controlStyle: 'dpad',
+      buttonScale: 'large',
+      controlsPlacement: 'overlay',
+    });
   });
 
   it('keeps the valid fields it can read and defaults the others one by one', () => {
     const s = sanitizeSettings({
       schemaVersion: SETTINGS_SCHEMA_VERSION,
-      fontSize: 'xlarge',
-      colorblind: 'yes',
-      effects: { shake: false, flash: 'nope' },
-      touchControls: 'sometimes',
+      settings: {
+        fontSize: 'xlarge',
+        colorblind: 'yes',
+        effects: { shake: false, flash: 'nope' },
+        touchControls: 'sometimes',
+      },
     });
     expect(s.fontSize).toBe('xlarge');
     expect(s.colorblind).toBe(false);

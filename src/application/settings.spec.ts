@@ -45,6 +45,23 @@ describe('SettingsService', () => {
     expect(service.get().touchControls).toBe('auto');
   });
 
+  it('merges a nested mobile patch without clearing sibling preferences', () => {
+    const start = {
+      ...defaultSettings(),
+      mobile: { ...defaultSettings().mobile, handedness: 'left' as const, buttonScale: 'large' as const },
+    };
+    const service = new SettingsService(memoryStore(start));
+
+    service.update({ mobile: { controlStyle: 'floating-joystick' } });
+
+    expect(service.get().mobile).toEqual({
+      handedness: 'left',
+      controlStyle: 'floating-joystick',
+      buttonScale: 'large',
+      controlsPlacement: 'external',
+    });
+  });
+
   it('stops notifying a listener after it unsubscribes', () => {
     const service = new SettingsService(memoryStore());
     let calls = 0;

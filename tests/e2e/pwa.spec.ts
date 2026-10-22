@@ -7,11 +7,12 @@ import { expect, test, type Page } from '@playwright/test';
  *   npm run build
  *   npm run preview    （4173 埠）
  *   PWA_BASE_URL=http://127.0.0.1:4173 npx playwright test tests/e2e/pwa.spec.ts
- * 這裡寫死 4173（vite preview 的埠）；要換埠請改下面的常數。注意：playwright.config.ts 的 webServer 會另外啟動
- * dev server（5173）；本檔不讀環境變數，因為 tests/ 的 tsconfig 沒有 node 型別。
+ * 預設使用 4173，可用 PWA_BASE_URL 指向隔離的 preview server。注意：playwright.config.ts 的 webServer 會另外啟動
+ * dev server（5173）；環境變數透過可選的 Node process 型別讀取，不需安裝 Node 型別套件。
  */
 
-const BASE = 'http://127.0.0.1:4173';
+const nodeProcess = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process;
+const BASE = nodeProcess?.env?.PWA_BASE_URL ?? 'http://127.0.0.1:4173';
 
 test.use({ baseURL: BASE });
 
