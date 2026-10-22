@@ -7,6 +7,8 @@ import { expect, test, type Page } from '@playwright/test';
 interface Actor {
   id: string;
   busy: boolean;
+  tileX: number;
+  tileY: number;
 }
 
 async function waitForGame(page: Page): Promise<void> {
@@ -17,6 +19,13 @@ async function waitForGame(page: Page): Promise<void> {
 
 async function mapId(page: Page): Promise<string> {
   return page.evaluate(() => window.__dewhollow?.mapId() ?? '');
+}
+
+async function playerPosition(page: Page): Promise<{ x: number; y: number }> {
+  const actors = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
+  const player = actors.find((actor) => actor.id === 'player');
+  if (!player) throw new Error('找不到玩家');
+  return { x: player.tileX, y: player.tileY };
 }
 
 async function walk(page: Page, key: string, steps: number): Promise<void> {
@@ -69,7 +78,10 @@ test('casting at the lake with the rod: a fish bites sometimes, and a quick pres
   }
   if (!bit) test.skip(true, '15 次投竿都沒有上鉤（機率極低），這次略過收線檢查');
 
-  // 上鉤後在時限內按 x 收線。
+  // 上鉤期間方向輸入被閘門擋下，玩家位置不變；互動鍵仍能在時限內收線。
+  const beforeReel = await playerPosition(page);
+  await page.keyboard.press('ArrowDown');
+  expect(await playerPosition(page)).toEqual(beforeReel);
   await page.keyboard.press('x');
   await expect(page.locator('#hud-log')).toContainText('釣到了');
   // 投竿每次給 6 點釣魚經驗，所以技能列上的等級會跟著上升（這裡只檢查它顯示出來）。

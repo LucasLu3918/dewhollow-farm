@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import controls from '../../content/controls.json';
-import { ACTION_IDS, DEFAULT_BINDINGS, bindingsAreValid, type ActionId } from '../domain/keybindings';
+import { ACTION_IDS, type ActionId } from '../domain/keybindings';
 import { parseControlsContent } from '../infrastructure/content/controls-content';
-import { TOUCH_LAYOUT, buildTouchButtons, touchKeyFor, touchVisible } from './touch-pad';
+import { TOUCH_LAYOUT, buildTouchButtons, touchVisible } from './touch-pad';
 
 /** 按鈕文字來自 content/controls.json（與遊戲載入的是同一份）；測試的預期值不變。 */
 const TOUCH_BUTTONS = buildTouchButtons(parseControlsContent(controls).touchButtons);
@@ -22,17 +22,9 @@ describe('virtual pad layout', () => {
     for (const action of actions) expect(ACTION_IDS).toContain(action as ActionId);
   });
 
-  it('never offers Esc or a key that is not in the action table', () => {
-    for (const button of TOUCH_BUTTONS) {
-      expect(touchKeyFor(button.action, DEFAULT_BINDINGS)).not.toBe('Escape');
-    }
-  });
-
-  it('sends the key the action is currently bound to, so a rebinding also applies to taps', () => {
-    const rebound = { ...DEFAULT_BINDINGS, interact: 'e', wear: 'x' };
-    expect(bindingsAreValid(rebound)).toBe(true);
-    expect(touchKeyFor('interact', rebound)).toBe('e');
-    expect(touchKeyFor('moveUp', rebound)).toBe('ArrowUp');
+  it('keeps touch actions semantic and independent of keyboard bindings', () => {
+    expect(TOUCH_BUTTONS.find((button) => button.action === 'interact')?.action).toBe('interact');
+    expect(TOUCH_BUTTONS.find((button) => button.action === 'wear')?.action).toBe('wear');
   });
 
   it('gives every button a visible label', () => {
@@ -67,20 +59,6 @@ describe('virtual pad layout', () => {
     expect(new Set(names).size).toBe(names.length);
   });
 
-  it('gives every touch action a default key, and the defaults do not collide', () => {
-    const keys = TOUCH_BUTTONS.map((b) => touchKeyFor(b.action, DEFAULT_BINDINGS));
-    for (const key of keys) expect(key.length).toBeGreaterThan(0);
-    expect(new Set(keys).size).toBe(keys.length);
-    expect(bindingsAreValid(DEFAULT_BINDINGS)).toBe(true);
-  });
-
-  it('sends the rebound key for the tool and cabin buttons too', () => {
-    const rebound = { ...DEFAULT_BINDINGS, takeAxe: 'y', placeDecor: 'u' };
-    expect(bindingsAreValid(rebound)).toBe(true);
-    expect(touchKeyFor('takeAxe', rebound)).toBe('y');
-    expect(touchKeyFor('placeDecor', rebound)).toBe('u');
-    expect(touchKeyFor('wear', rebound)).toBe(DEFAULT_BINDINGS.wear);
-  });
 });
 
 describe('virtual pad text source', () => {

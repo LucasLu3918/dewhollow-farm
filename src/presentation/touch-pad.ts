@@ -1,10 +1,9 @@
-import type { ActionId, Bindings } from '../domain/keybindings';
+import type { ActionId } from '../domain/keybindings';
 import type { TouchMode } from '../domain/settings';
 
 /**
  * 虛擬按鍵（觸控）的排版與對應（純資料與純函式）。
- * 按下虛擬按鍵時，送出的是「該動作目前綁定的按鍵」，走的是鍵盤同一條路徑（MapScene 的 handleKey），
- * 所以改了按鍵，觸控也跟著改，不另寫一套規則。
+ * 按下虛擬按鍵時直接送出 ActionId，與鍵盤 adapter 共用場景的動作閘門。
  * 按鈕上的文字與完整名稱來自 content/controls.json（由呼叫端傳入），這裡只定義排版與分組。
  */
 
@@ -62,11 +61,6 @@ export function buildTouchButtons(labels: TouchLabels): TouchButton[] {
     const text = labels[entry.action];
     return { action: entry.action, label: text.label, name: text.name, group: entry.group };
   });
-}
-
-/** 這個虛擬按鈕要送出的按鍵（目前綁定的那一個）。 */
-export function touchKeyFor(action: ActionId, bindings: Bindings): string {
-  return bindings[action];
 }
 
 /** 方向按鈕按住時連續移動的間隔（毫秒）：比一格的移動時間稍長，避免排隊。 */

@@ -1,5 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
+interface Actor {
+  id: string;
+  tileX: number;
+  tileY: number;
+}
+
 /**
  * M5c：節慶與夜市。這個檔案已寫好，但這次沒有執行（依照指示避開 5173 port，不跑 npm run test:e2e）。
  * 作法：先存一個新遊戲，改寫存檔裡的日期與位置（春 12 或夏 14），重新讀取，再到鎮廣場操作。
@@ -60,6 +66,13 @@ async function seedAndReload(page: Page, patch: Record<string, unknown>): Promis
   await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
 }
 
+async function playerPosition(page: Page): Promise<{ x: number; y: number }> {
+  const actors = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
+  const player = actors.find((actor) => actor.id === 'player');
+  if (!player) throw new Error('找不到玩家');
+  return { x: player.tileX, y: player.tileY };
+}
+
 test('on the festival day, the notice board in the plaza opens the festival panel with the swaps', async ({ page }) => {
   await waitForGame(page);
   await seedAndReload(page, {
@@ -99,6 +112,9 @@ test('the star pool at night catches a star or lets it slip, and the reel uses o
 
   await page.keyboard.press('x');
   await expect(page.locator('#hud-log')).toContainText('收網');
+  const beforeReel = await playerPosition(page);
+  await page.keyboard.press('ArrowDown');
+  expect(await playerPosition(page)).toEqual(beforeReel);
   await page.keyboard.press('x');
   // 時機可能接到、也可能溜走，兩種都算通過；這裡只確認收網有結果。
   await expect(page.locator('#hud-log')).toContainText(/星河碎片|溜走了/);

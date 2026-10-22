@@ -62,9 +62,10 @@ import type { SettingsService } from '../../application/settings';
 import { actionForKey, type ActionId } from '../../domain/keybindings';
 import { SettingsPanel, type SettingsLabels } from '../settings-panel';
 import { TouchControls } from '../touch-controls';
-import { touchKeyFor, type TouchLabels, type TouchText } from '../touch-pad';
+import type { TouchLabels, TouchText } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
 import type { OpenablePanel } from '../panel-dialog';
+import { gateAction } from '../action-gate';
 
 /** 鍵盤事件與虛擬按鍵共用的形狀：只需要按鍵名稱與 preventDefault。 */
 type KeyLike = Pick<KeyboardEvent, 'key' | 'preventDefault'>;
@@ -288,6 +289,8 @@ export class MapScene extends Phaser.Scene {
   /** 夜釣星星進行中的計時器與甩竿的時刻（一圈的時限，見 star-fishing.ts）。 */
   private starTimer: Phaser.Time.TimerEvent | null = null;
   private starStartedAt = 0;
+  /** 防止鍵盤與觸控在同步套用同一個指令時重複送出動作。 */
+  private playerActionInProgress = false;
   private starMeter!: Phaser.GameObjects.Graphics;
   private fireworkCount = 0;
   /** 雞舍裡的動物圖片，每次重畫時重建。 */
@@ -457,11 +460,9 @@ export class MapScene extends Phaser.Scene {
     camera.centerOn(center.x, center.y);
   }
 
-  /** 虛擬按鍵：送出該動作目前綁定的按鍵，走 handleKey 的同一條路徑（不另寫規則）。改鍵中不作用。 */
+  /** 虛擬按鍵直接送出語意動作；按鍵重綁只影響鍵盤 adapter。 */
   private pressAction(action: ActionId): void {
-    if (this.settingsPanel.isCapturing()) return;
-    const key = touchKeyFor(action, this.deps.settings.get().bindings);
-    void this.handleKey({ key, preventDefault: () => {} });
+    void this.handleAction(action);
   }
 
   /** 目前的效果開關：系統「減少動態」或玩家關掉的效果都不出現（見 accessibility.ts）。 */
@@ -470,105 +471,125 @@ export class MapScene extends Phaser.Scene {
   }
 
   private async handleKey(event: KeyLike): Promise<void> {
-    const { hud, sounds } = this.deps;
     if (this.settingsPanel.isCapturing()) {
       // 正在改鍵：這一下按下的就是新按鍵（Esc 取消，修飾鍵忽略），不觸發任何遊戲動作。
-      event.preventDefault();
+      event?.preventDefault();
       this.settingsPanel.captureKey(event.key);
       return;
     }
     // 按鍵只查偏好的按鍵表（見 domain/keybindings.ts），不寫死字元。
     const action = actionForKey(this.deps.settings.get().bindings, event.key);
+    await this.handleAction(action, event);
+  }
+
+  /** 鍵盤與觸控共用語意動作入口；鍵盤 adapter 保留自訂按鍵與 Esc 語意。 */
+  private async handleAction(action: ActionId | null, event?: KeyLike): Promise<void> {
+    const { hud, sounds } = this.deps;
+    if (this.settingsPanel.isCapturing()) return;
     if (action === 'mute') {
       // 靜音是玩家的偏好，不是遊戲指令，所以不經過應用層。
-      event.preventDefault();
+      event?.preventDefault();
       const muted = sounds.toggleMute();
       hud.messages([muted ? '已靜音（按 M 開啟音效）' : '已開啟音效（按 M 靜音）']);
       return;
     }
     if (action === 'music') {
       // 背景音樂預設不播放，由玩家按 B 開始（瀏覽器要求使用者手勢才能出聲）。
-      event.preventDefault();
+      event?.preventDefault();
       const playing = this.deps.music.toggle();
       hud.messages([playing ? '背景音樂開始播放（按 B 暫停）' : '背景音樂已暫停（按 B 播放）']);
       return;
     }
-    if (this.heartEventPanel.isOpen()) {
-      // 心形事件進行中：只能用面板上的按鈕（頁面與選項），鍵盤不作用。
-      return;
-    }
-    if (this.reelTimer) {
-      // 魚上鉤了：只有互動鍵有用（收線），其餘按鍵等時限過了再說。
-      if (action === 'interact') {
-        event.preventDefault();
-        this.finishReel(true);
-      }
-      return;
-    }
-    if (this.starTimer) {
-      // 星星在水面上走：只有互動鍵有用（收網，量時機），其餘按鍵等時限過了再說。
-      if (action === 'interact') {
-        event.preventDefault();
-        this.finishStar(performance.now() - this.starStartedAt);
-      }
-      return;
-    }
     const openGroup = this.modalGroups.find((group) => group.some((panel) => panel.isOpen()));
-    if (openGroup) {
-      // 櫃檯、廚房、面板、說明頁、存檔槽或設定開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠或 Tab 完成。
-      if (event.key === 'Escape') {
+    if (!action) {
+      // Escape 不一定綁定成遊戲動作；保留鍵盤的原生面板關閉行為。
+      if (openGroup && event?.key === 'Escape') {
         event.preventDefault();
         for (const panel of openGroup) panel.close();
       }
       return;
     }
+    const decision = gateAction(action, {
+      sceneActive: this.scene.isActive(),
+      settingsCapturing: this.settingsPanel.isCapturing(),
+      heartEventOpen: this.heartEventPanel.isOpen(),
+      reelPending: this.reelTimer !== null,
+      starPending: this.starTimer !== null,
+      modalOpen: openGroup !== undefined,
+      actionInProgress: this.playerActionInProgress,
+    }, event?.key === 'Escape');
+    if (decision === 'ignore') return;
+    if (decision === 'close-modal') {
+      event?.preventDefault();
+      for (const panel of openGroup ?? []) panel.close();
+      return;
+    }
+    if (decision === 'finish-reel') {
+      event?.preventDefault();
+      this.finishReel(true);
+      return;
+    }
+    if (decision === 'finish-star') {
+      event?.preventDefault();
+      this.finishStar(performance.now() - this.starStartedAt);
+      return;
+    }
     if (action === 'help') {
       // 說明頁：操作按鍵、版本號、更新日誌與隱私說明；不花體力與時間。
-      event.preventDefault();
+      event?.preventDefault();
       this.deps.help.open();
       return;
     }
     if (action === 'saves') {
       // 存檔槽：讀取、新遊戲、刪除、匯出與匯入；不花體力與時間。
-      event.preventDefault();
+      event?.preventDefault();
       void this.deps.saves.open();
       return;
     }
     if (action === 'settings') {
       // 設定：改按鍵、字級、色盲模式、閃光與震動、觸控；不花體力與時間。
-      event.preventDefault();
+      event?.preventDefault();
       this.settingsPanel.open();
       return;
     }
     if (action === 'skills') {
       // 技能與天賦面板：不花體力與時間，不經過應用層的指令。
-      event.preventDefault();
+      event?.preventDefault();
       this.skillPanel.toggle(this.deps.session.state);
       return;
     }
     if (action === 'residents') {
       // 居民與好感面板：不花體力與時間，不經過應用層的指令。
-      event.preventDefault();
+      event?.preventDefault();
       this.residentPanel.toggle(this.deps.session.state);
       return;
     }
     if (action === 'collection') {
       // 圖鑑與成就面板：不花體力與時間，不經過應用層的指令。
-      event.preventDefault();
+      event?.preventDefault();
       this.collectionPanel.open(this.deps.session.state);
       return;
     }
     if (action === 'quests') {
       // 委託與佈告欄面板：不花體力與時間，不經過應用層的指令。
-      event.preventDefault();
+      event?.preventDefault();
       this.questPanel.toggle(this.deps.session.state);
       return;
     }
     const direction = action ? MOVE_ACTIONS[action] : undefined;
     const command: Command | undefined = direction ? { type: 'move', direction } : action ? COMMAND_ACTIONS[action] : undefined;
     if (!command) return;
-    event.preventDefault();
-    await this.run(command);
+    event?.preventDefault();
+    let run: Promise<void>;
+    try {
+      // run() applies the command synchronously before its first await; keep the gate closed only
+      // across that state transition, not while an automatic save finishes in the background.
+      this.playerActionInProgress = true;
+      run = this.run(command);
+    } finally {
+      this.playerActionInProgress = false;
+    }
+    await run;
   }
 
   /** 魚上鉤：頭上冒出驚嘆號，開始計時。 */
