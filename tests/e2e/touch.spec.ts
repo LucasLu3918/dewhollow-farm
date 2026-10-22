@@ -180,6 +180,56 @@ test.describe('橫式手機（844 x 390，觸控）', () => {
   });
 });
 
+test.describe('MB-08 核心觸控目標尺寸', () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 600 } });
+
+  test('工具、種子、主要動作與可見虛擬動作鍵至少 48px 高', async ({ page }) => {
+    await seedTouchMode(page, 'on');
+    await startGame(page);
+
+    for (const viewport of [{ width: 390, height: 600 }, { width: 844, height: 390 }]) {
+      await page.setViewportSize(viewport);
+      await expect.poll(() => page.evaluate(() => window.matchMedia('(orientation: landscape)').matches))
+        .toBe(viewport.width > viewport.height);
+
+      for (const selector of ['#hud-tool', '#hud-seed', '.status .hud-action']) {
+        const target = page.locator(selector);
+        await expect(target).toBeVisible();
+        const box = await target.boundingBox();
+        expect(box, selector).not.toBeNull();
+        expect(box?.height ?? 0, selector).toBeGreaterThanOrEqual(48);
+      }
+
+      const actionButtons = page.locator('.touch-act .touch-button:visible');
+      await expect(actionButtons.first()).toBeVisible();
+      const count = await actionButtons.count();
+      for (let index = 0; index < count; index += 1) {
+        const box = await actionButtons.nth(index).boundingBox();
+        expect(box, `touch action ${index}`).not.toBeNull();
+        expect(box?.height ?? 0, `touch action ${index}`).toBeGreaterThanOrEqual(48);
+      }
+
+      const moreToggle = page.locator('.touch-more-toggle');
+      const moreToggleBox = await moreToggle.boundingBox();
+      expect(moreToggleBox).not.toBeNull();
+      expect(moreToggleBox?.height ?? 0, 'touch more toggle').toBeGreaterThanOrEqual(48);
+      await moreToggle.dispatchEvent('pointerdown', { pointerId: 78, pointerType: 'touch', button: 0 });
+      await moreToggle.dispatchEvent('pointerup', { pointerId: 78, pointerType: 'touch', button: 0 });
+      const morePanel = page.locator('#touch-more');
+      await expect(morePanel).toBeVisible();
+      const moreButtons = morePanel.locator('.touch-button:visible');
+      for (let index = 0; index < await moreButtons.count(); index += 1) {
+        const box = await moreButtons.nth(index).boundingBox();
+        expect(box, `touch more action ${index}`).not.toBeNull();
+        expect(box?.height ?? 0, `touch more action ${index}`).toBeGreaterThanOrEqual(48);
+      }
+      await moreToggle.dispatchEvent('pointerdown', { pointerId: 79, pointerType: 'touch', button: 0 });
+      await moreToggle.dispatchEvent('pointerup', { pointerId: 79, pointerType: 'touch', button: 0 });
+      await expect(morePanel).toBeHidden();
+    }
+  });
+});
+
 test.describe('虛擬按鍵的顯示設定', () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 

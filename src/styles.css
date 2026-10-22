@@ -854,6 +854,10 @@ a:focus-visible {
  * 所以用 !important 當作下限；主要 HUD 動作另維持 48px，以符合核心觸控目標。
  */
 @media (pointer: coarse) {
+  .status .status-selector {
+    min-height: 48px !important;
+  }
+
   button:not(.touch-button) {
     min-height: 44px !important;
   }
@@ -1122,14 +1126,14 @@ a:focus-visible {
     grid-row: 2;
     display: grid;
     grid-template-columns: repeat(2, 56px);
-    grid-auto-rows: 44px;
+    grid-auto-rows: 48px;
     justify-content: center;
     gap: 6px;
   }
 
   .touch-act .touch-button {
     min-width: 0;
-    min-height: 44px;
+    min-height: 48px;
     width: 56px;
     padding: 0;
     font-size: calc(14px * var(--font-scale));
@@ -1191,7 +1195,7 @@ a:focus-visible {
 
   .touch-more .touch-button {
     min-width: 0;
-    min-height: 44px;
+    min-height: 48px;
     width: 56px;
     padding: 0;
     font-size: calc(14px * var(--font-scale));
