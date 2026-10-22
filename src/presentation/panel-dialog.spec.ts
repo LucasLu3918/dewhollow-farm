@@ -1,9 +1,36 @@
 import { describe, expect, it } from 'vitest';
-import { focusRestoreTarget, nextFocusIndex, restoreDecision, type FocusSlot } from './panel-dialog';
+import { anchorFocusIndex, focusRestoreTarget, nextFocusIndex, restoreDecision, type FocusSlot } from './panel-dialog';
 
 const btn = (key: string | null = null): FocusSlot => ({ key, disabled: false, interactive: true });
 const off = (key: string | null = null): FocusSlot => ({ key, disabled: true, interactive: false });
 const text = (key: string): FocusSlot => ({ key, disabled: false, interactive: false });
+
+describe('anchorFocusIndex（焦點在不可互動的錨點上）', () => {
+  // precedes[i]：可互動清單第 i 個元素在錨點之前（文件順序）。
+  it('forward from an anchor goes to the first interactive element after it', () => {
+    // 清單 [A, B, C]，錨點位於 A 與 B 之間
+    expect(anchorFocusIndex([true, false, false], false)).toBe(1);
+  });
+
+  it('backward from an anchor goes to the last interactive element before it', () => {
+    expect(anchorFocusIndex([true, false, false], true)).toBe(0);
+    expect(anchorFocusIndex([true, true, false], true)).toBe(1);
+  });
+
+  it('forward from an anchor after the last element wraps to the first', () => {
+    expect(anchorFocusIndex([true, true, true], false)).toBe(0);
+  });
+
+  it('backward from an anchor before the first element wraps to the last', () => {
+    expect(anchorFocusIndex([false, false, false], true)).toBe(2);
+    expect(anchorFocusIndex([false, false, false], false)).toBe(0);
+  });
+
+  it('reports no target when the list is empty', () => {
+    expect(anchorFocusIndex([], false)).toBe(-1);
+    expect(anchorFocusIndex([], true)).toBe(-1);
+  });
+});
 
 describe('nextFocusIndex（Tab 循環）', () => {
   it('forward moves one item at a time', () => {

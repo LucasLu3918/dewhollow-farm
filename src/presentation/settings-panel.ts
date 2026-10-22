@@ -152,18 +152,30 @@ export class SettingsPanel {
     if (!result.ok) {
       this.say('無法交換這兩個按鍵。');
       this.render();
+      this.focusRow(pending.action);
       return;
     }
     this.commitBindings(
       result.bindings,
       `已交換「${this.labels[pending.action]}」與「${this.labels[pending.conflict]}」的按鍵。`,
     );
+    this.focusRow(pending.action);
   }
 
   private cancelSwap(): void {
+    const pending = this.pendingSwap;
     this.pendingSwap = null;
     this.say('已取消，按鍵維持原來的設定。');
     this.render();
+    if (pending) this.focusRow(pending.action);
+  }
+
+  /** 交換提示的按鈕隱藏後，焦點回到原本要改鍵的那一列的「改鍵」按鈕。 */
+  private focusRow(action: ActionId): void {
+    const button = Array.from(this.keyList.querySelectorAll<HTMLButtonElement>('button[data-action]')).find(
+      (item) => item.dataset.action === action,
+    );
+    button?.focus();
   }
 
   private restoreDefaults(): void {
@@ -214,8 +226,15 @@ export class SettingsPanel {
     }
   }
 
-  /** 依目前的偏好重畫整個面板（按鍵列表、字級按鈕、勾選框與交換提示）。 */
+  /**
+   * 依目前的偏好重畫整個面板（按鍵列表、字級按鈕、勾選框與交換提示）。
+   * 經過 dialog.redraw：重畫前記下焦點，按鍵列表重建後焦點回到同一個動作的「改鍵」按鈕（data-focus-key）。
+   */
   private render(): void {
+    this.dialog.redraw(() => this.paint());
+  }
+
+  private paint(): void {
     const settings = this.service.get();
     this.keyList.replaceChildren(...ACTION_IDS.map((action) => this.keyRow(action, settings.bindings[action])));
     this.prompt.hidden = this.pendingSwap === null;
@@ -237,11 +256,15 @@ export class SettingsPanel {
     const item = this.doc.createElement('li');
     const name = this.doc.createElement('span');
     name.textContent = this.labels[action];
+    // 列文字可由程式聚焦（不進 Tab 順序）；與「改鍵」按鈕共用同一個焦點鍵，重畫後焦點能回到同一列。
+    name.tabIndex = -1;
+    name.dataset.focusKey = action;
     const current = this.doc.createElement('kbd');
     current.textContent = keyLabel(key);
     const button = this.doc.createElement('button');
     button.type = 'button';
     button.dataset.action = action;
+    button.dataset.focusKey = action;
     const capturingThis = this.capturing === action;
     button.textContent = capturingThis ? '按下新按鍵…' : '改鍵';
     button.setAttribute('aria-label', `改鍵：${this.labels[action]}，目前是 ${keyLabel(key)}`);
