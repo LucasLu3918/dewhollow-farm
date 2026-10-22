@@ -15,6 +15,10 @@ import {
   exchangedThisYear,
   exchangeRefusal,
   recordExchange,
+  recordHarvest,
+  harvestContestReached,
+  litLanterns,
+  warmGiftsLeft,
   type FestivalDef,
   type StarExchangeDef,
 } from './festival';
@@ -159,5 +163,44 @@ describe('star exchange (星河兌換：每項每年有上限)', () => {
     expect(exchangeRefusal(starString, { shards: 9, year: 1, exchanged: used, flagSet: false })).toBe('EXCHANGE_LIMIT');
     expect(exchangeRefusal(starString, { shards: 9, year: 2, exchanged: used, flagSet: false })).toBeNull();
     expect(exchangeRefusal(starSugarRecipe, { shards: 9, year: 1, exchanged: none, flagSet: true })).toBe('ALREADY_UNLOCKED');
+  });
+});
+
+describe('豐穗祭的收成比賽（計數與每年一次）', () => {
+  it('starts with nothing harvested', () => {
+    expect(emptyFestivalState().harvest).toEqual({ year: 0, count: 0 });
+  });
+
+  it('counts harvests within a year and starts over in a new year', () => {
+    let tally = emptyFestivalState().harvest;
+    tally = recordHarvest(tally, 1);
+    tally = recordHarvest(tally, 1);
+    expect(tally).toEqual({ year: 1, count: 2 });
+    expect(recordHarvest(tally, 2)).toEqual({ year: 2, count: 1 });
+  });
+
+  it('is reached when the count hits the target, not before', () => {
+    const rules = { cropId: 'bell-pumpkin', count: 3, gold: 400 };
+    expect(harvestContestReached({ year: 1, count: 2 }, rules)).toBe(false);
+    expect(harvestContestReached({ year: 1, count: 3 }, rules)).toBe(true);
+  });
+});
+
+describe('暖燈節：燈與交換禮物', () => {
+  const done = (keys: string[], year: number): Record<string, number> => Object.fromEntries(keys.map((k) => [`warm-lamp:lantern:${k}`, year]));
+
+  it('counts the lanterns lit this year among the lantern positions only', () => {
+    const lamps = ['2,1', '13,1', '4,4'];
+    expect(litLanterns(done(['2,1', '4,4'], 1), 'warm-lamp', lamps, 1)).toBe(2);
+    expect(litLanterns(done(['2,1', '4,4'], 1), 'warm-lamp', lamps, 2)).toBe(0);
+    expect(litLanterns({ 'sprout:crown': 1, 'warm-lamp:lantern:9,9': 1 }, 'warm-lamp', lamps, 1)).toBe(0);
+  });
+
+  it('counts the warm gifts left this year out of the yearly limit', () => {
+    const none = emptyFestivalState().exchanged;
+    expect(warmGiftsLeft(none, 1, 3)).toBe(3);
+    const used = recordExchange(recordExchange(none, 1, 'warm-gift'), 1, 'warm-gift');
+    expect(warmGiftsLeft(used, 1, 3)).toBe(1);
+    expect(warmGiftsLeft(used, 2, 3)).toBe(3);
   });
 });

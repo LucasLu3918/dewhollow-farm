@@ -23,10 +23,12 @@ describe('節慶與主線的真實內容', () => {
 
   it('has three story chapters in order, each with a reward and at least one step', () => {
     const chapters = shippedPack.chapters ?? [];
-    expect(chapters.map((c) => c.number)).toEqual([1, 2, 3]);
+    expect(chapters.map((c) => c.number)).toEqual([1, 2, 3, 4, 5]);
     for (const chapter of chapters) {
       expect(chapter.steps.length).toBeGreaterThan(0);
-      expect(chapter.reward.flag).toBe(`main:${chapter.number}`);
+      // 第 1–3 章設定 main:N；第 4–5 章（M6）改設場景旗標 scene:*（見 content/main-quest.json）。
+      if (chapter.number <= 3) expect(chapter.reward.flag).toBe(`main:${chapter.number}`);
+      else expect(chapter.reward.flag).toMatch(/^scene:/);
     }
   });
 

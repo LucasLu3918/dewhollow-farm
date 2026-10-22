@@ -4,5 +4,11 @@
   {"id": "sweet-radish", "name": "甜蘿蔔", "seedPrice": 25, "growthDays": 3, "seasons": ["spring", "summer"]},
   {"id": "star-pepper", "name": "星辣椒", "seedPrice": 40, "growthDays": 5, "seasons": ["summer"]},
   {"id": "dusk-potato", "name": "暮光薯", "seedPrice": 70, "growthDays": 8, "seasons": ["autumn"]},
-  {"id": "silver-wheat", "name": "銀穗麥", "seedPrice": 120, "growthDays": 13, "seasons": ["autumn", "winter"]}
+  {"id": "silver-wheat", "name": "銀穗麥", "seedPrice": 120, "growthDays": 13, "seasons": ["autumn", "winter"]},
+  {"id": "golden-rice", "name": "金穗稻", "seedPrice": 50, "growthDays": 9, "seasons": ["autumn"]},
+  {"id": "bell-pumpkin", "name": "鈴鐺南瓜", "seedPrice": 60, "growthDays": 10, "seasons": ["autumn"]},
+  {"id": "maple-berry", "name": "楓紅莓", "seedPrice": 40, "growthDays": 6, "seasons": ["autumn"]},
+  {"id": "snow-radish", "name": "雪白蘿蔔", "seedPrice": 70, "growthDays": 11, "seasons": ["winter"]},
+  {"id": "frost-mushroom", "name": "霜降菇", "seedPrice": 65, "growthDays": 9, "seasons": ["winter"]},
+  {"id": "ember-onion", "name": "炭火蔥", "seedPrice": 50, "growthDays": 6, "seasons": ["winter"]}
 ]

@@ -54,7 +54,9 @@ const tileSchema = z.object({
   spawn: point.optional(),
   requires: requirementSchema.optional(),
   notice: z.enum(['bulletin', 'mailbox', 'festival', 'repair']).optional(),
-  festival: z.enum(['stars']).optional(),
+  festival: z.enum(['stars', 'lantern']).optional(),
+  /** 溫室的田（不受季節限制，見 domain/greenhouse.ts）。 */
+  greenhouse: z.boolean().optional(),
 });
 
 const mapSchema = z.object({
@@ -244,6 +246,8 @@ const shopStockSchema = z.object({
   itemId: z.string().min(1),
   price: z.number().int().positive(),
   limit: z.number().int().positive().optional(),
+  /** 只在這些季節進貨（省略為四季都有）。 */
+  seasons: z.array(z.enum(SEASONS)).min(1).optional(),
 });
 const toolUpgradeSchema = z.object({
   toolId: z.enum(TOOL_IDS),
@@ -526,6 +530,25 @@ const festivalSchema = z.object({
     })
     .optional(),
   exchange: z.array(starExchangeSchema).optional(),
+  /** 收成比賽（豐穗祭）：當天收成指定作物 count 個，完成發 gold。 */
+  harvestContest: z.object({ cropId: z.string().min(1), count: z.number().int().positive().max(99), gold: z.number().int().nonnegative() }).optional(),
+  /** 點燈（暖燈節）：燈的數量、每盞的金幣、全部點亮的金幣與旗標。 */
+  lanterns: z
+    .object({
+      count: z.number().int().positive().max(99),
+      gold: z.number().int().nonnegative(),
+      allGold: z.number().int().nonnegative(),
+      flag: z.string().min(1),
+    })
+    .optional(),
+  /** 交換禮物（暖燈節）：指定居民送禮不受每日一次限制，每年 perYear 次，回禮 receive。 */
+  giftExchange: z
+    .object({
+      npcIds: z.array(z.string().min(1)).min(1),
+      perYear: z.number().int().positive().max(99),
+      receive: z.object({ itemId: z.string().min(1), count: z.number().int().positive() }),
+    })
+    .optional(),
 });
 export const festivalsFileSchema = z.object({
   version: z.literal(1),

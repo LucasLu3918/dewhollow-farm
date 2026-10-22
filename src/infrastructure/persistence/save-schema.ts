@@ -135,6 +135,8 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
     contest: z.object({ year: z.number().int().nonnegative(), caught: z.number().int().nonnegative() }),
     sold: z.object({ year: z.number().int().nonnegative(), counts: z.record(z.string().min(1), z.number().int().positive()) }),
     exchanged: z.object({ year: z.number().int().nonnegative(), counts: z.record(z.string().min(1), z.number().int().positive()) }),
+    /** 收成比賽（豐穗祭）：哪一年、指定作物已收成幾個。 */
+    harvest: z.object({ year: z.number().int().nonnegative(), count: z.number().int().nonnegative() }),
   }),
   /** 夜釣星星是否正在等收網（甩竿後為真）。 */
   starLine: z.boolean(),

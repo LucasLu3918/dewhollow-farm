@@ -68,6 +68,42 @@
       "source": "占位（程式產生）"
     },
     {
+      "id": "crop.golden-rice",
+      "kind": "crop",
+      "color": "#e0b84a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.bell-pumpkin",
+      "kind": "crop",
+      "color": "#e8862a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.maple-berry",
+      "kind": "crop",
+      "color": "#c4453a",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.snow-radish",
+      "kind": "crop",
+      "color": "#f2f0ea",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.frost-mushroom",
+      "kind": "crop",
+      "color": "#b9c7d6",
+      "source": "占位（程式產生）"
+    },
+    {
+      "id": "crop.ember-onion",
+      "kind": "crop",
+      "color": "#d9a35a",
+      "source": "占位（程式產生）"
+    },
+    {
       "id": "player.up",
       "kind": "character",
       "color": "#4a7fd0",

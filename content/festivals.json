@@ -34,6 +34,33 @@
         { "id": "night-canvas", "name": "夜空畫板", "give": { "itemId": "star-shard", "count": 5 }, "receive": { "itemId": "night-canvas", "count": 1 }, "limit": 1, "playMinutes": 1 },
         { "id": "star-sugar-recipe", "name": "星河糖的配方", "give": { "itemId": "star-shard", "count": 4 }, "flag": "recipe:star-sugar", "limit": 1, "playMinutes": 1.5 }
       ]
+    },
+    {
+      "id": "harvest-feast",
+      "name": "豐穗祭",
+      "season": "autumn",
+      "day": 12,
+      "mapId": "plaza",
+      "fromMinute": 0,
+      "playMinutes": 10,
+      "swaps": [
+        { "npcId": "maomao", "give": { "itemId": "crop.maple-berry", "count": 2 }, "receive": { "itemId": "seed.golden-rice", "count": 2 } },
+        { "npcId": "rong-bo", "give": { "itemId": "crop.dusk-potato", "count": 1 }, "receive": { "itemId": "seed.bell-pumpkin", "count": 1 } },
+        { "npcId": "zhi-lan", "give": { "itemId": "crop.silver-wheat", "count": 1 }, "receive": { "itemId": "seed.maple-berry", "count": 2 } },
+        { "npcId": "xiao-sui", "give": { "itemId": "crop.dew-grass", "count": 3 }, "receive": { "itemId": "seed.maple-berry", "count": 1 } }
+      ],
+      "harvestContest": { "cropId": "bell-pumpkin", "count": 6, "gold": 400 }
+    },
+    {
+      "id": "warm-lamp",
+      "name": "暖燈節",
+      "season": "winter",
+      "day": 20,
+      "mapId": "plaza",
+      "fromMinute": 1080,
+      "playMinutes": 12,
+      "lanterns": { "count": 6, "gold": 30, "allGold": 200, "flag": "lantern:all" },
+      "giftExchange": { "npcIds": ["maomao", "zhi-lan"], "perYear": 3, "receive": { "itemId": "seed.ember-onion", "count": 1 } }
     }
   ]
 }

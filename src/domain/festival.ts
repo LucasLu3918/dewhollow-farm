@@ -1,9 +1,37 @@
 import type { Calendar, Season } from './calendar';
+import type { MapDef } from './content';
+import { plotKey } from './farm';
 
 /**
  * 節慶（M5c）：日期、地點與開放時段的判斷，以及「每年每項活動一次」的紀錄。
  * 活動的數值與文字在 content/festivals.json；這裡只做判斷，不寫死任何數字。
  */
+
+/** 豐穗祭的收成比賽：當天收成指定的作物，累計到 count 個就完成（每年一次獎勵）。 */
+export interface HarvestContestRules {
+  cropId: string;
+  count: number;
+  gold: number;
+}
+
+/** 暖燈節的點燈：廣場上的燈（tile.festival 為 lantern）每盞每年點一次；全部點亮發 allGold 並設定 flag。 */
+export interface LanternRules {
+  /** 要點亮的燈數（應等於地圖上燈的格數）。 */
+  count: number;
+  gold: number;
+  allGold: number;
+  flag: string;
+}
+
+/** 暖燈節的交換禮物：指定居民送禮不受每日一次限制，每年最多 perYear 次；每次收到回禮 receive。 */
+export interface GiftExchangeRules {
+  npcIds: string[];
+  perYear: number;
+  receive: { itemId: string; count: number };
+}
+
+/** 暖燈禮物在 festival.exchanged 裡的鍵（與星河兌換共用同一份每年計次）。 */
+export const WARM_GIFT_LINE = 'warm-gift';
 
 /** 種子交換：每位居民每年一次，玩家付出 give，拿到 receive。 */
 export interface SeedSwapDef {
@@ -65,6 +93,12 @@ export interface FestivalDef {
   stars?: FestivalStarRules;
   /** 星河兌換的項目（見 StarExchangeDef）。 */
   exchange?: StarExchangeDef[];
+  /** 收成比賽（豐穗祭）。 */
+  harvestContest?: HarvestContestRules;
+  /** 點燈（暖燈節）。 */
+  lanterns?: LanternRules;
+  /** 交換禮物（暖燈節）。 */
+  giftExchange?: GiftExchangeRules;
 }
 
 export interface FestivalState {
@@ -74,8 +108,10 @@ export interface FestivalState {
   contest: { year: number; caught: number };
   /** 夜市攤位：哪一年、各物品已售出的數量。跨年會重新計數。 */
   sold: { year: number; counts: Record<string, number> };
-  /** 星河兌換：哪一年、各項已兌換的次數。跨年會重新計數（碎片本身不會）。 */
+  /** 星河兌換：哪一年、各項已兌換的次數。跨年會重新計數（碎片本身不會）。暖燈禮物也記在這裡（WARM_GIFT_LINE）。 */
   exchanged: { year: number; counts: Record<string, number> };
+  /** 收成比賽（豐穗祭）：哪一年、指定作物已收成幾個。跨年會重新計數。 */
+  harvest: { year: number; count: number };
 }
 
 export function emptyFestivalState(): FestivalState {
@@ -84,6 +120,7 @@ export function emptyFestivalState(): FestivalState {
     contest: { year: 0, caught: 0 },
     sold: { year: 0, counts: {} },
     exchanged: { year: 0, counts: {} },
+    harvest: { year: 0, count: 0 },
   };
 }
 
@@ -143,6 +180,41 @@ export function exchangedThisYear(exchanged: FestivalState['exchanged'], year: n
 export function recordExchange(exchanged: FestivalState['exchanged'], year: number, lineId: string): FestivalState['exchanged'] {
   const base = exchanged.year === year ? exchanged.counts : {};
   return { year, counts: { ...base, [lineId]: (base[lineId] ?? 0) + 1 } };
+}
+
+/** 收成比賽多收了 amount 個指定的作物；跨年時從頭重新計。 */
+export function recordHarvest(harvest: FestivalState['harvest'], year: number, amount = 1): FestivalState['harvest'] {
+  return harvest.year === year ? { year, count: harvest.count + amount } : { year, count: amount };
+}
+
+export function harvestContestReached(harvest: FestivalState['harvest'], rules: HarvestContestRules): boolean {
+  return harvest.count >= rules.count;
+}
+
+/** 廣場上所有燈的格子（以 `x,y` 表示）。 */
+export function lanternKeysOf(map: MapDef): string[] {
+  const keys: string[] = [];
+  map.rows.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) {
+      if (map.legend[row.charAt(x)]?.festival === 'lantern') keys.push(plotKey(x, y));
+    }
+  });
+  return keys;
+}
+
+/** 燈的紀錄鍵（每盞一個）。 */
+export function lanternKey(festivalId: string, lampKey: string): string {
+  return festivalKey(festivalId, 'lantern', lampKey);
+}
+
+/** 今年已經點亮的燈數（只算給定的燈格子）。 */
+export function litLanterns(done: FestivalState['done'], festivalId: string, lampKeys: readonly string[], year: number): number {
+  return lampKeys.filter((key) => done[lanternKey(festivalId, key)] === year).length;
+}
+
+/** 今年還能送幾次暖燈禮物（每年 perYear 次，與星河兌換共用同一份計次）。 */
+export function warmGiftsLeft(exchanged: FestivalState['exchanged'], year: number, perYear: number): number {
+  return Math.max(0, perYear - exchangedThisYear(exchanged, year, WARM_GIFT_LINE));
 }
 
 export interface ExchangeContext {

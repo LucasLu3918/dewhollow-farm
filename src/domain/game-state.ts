@@ -27,7 +27,7 @@ import { noEvent, type TodayEvent } from './random-events';
 import { emptyCollection, type CollectionState } from './collection';
 import { emptyAchievements, type AchievementState } from './achievements';
 
-export const SAVE_SCHEMA_VERSION = 19;
+export const SAVE_SCHEMA_VERSION = 20;
 
 export interface PlayerState extends Point {
   facing: Direction;

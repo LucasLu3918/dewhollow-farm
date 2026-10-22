@@ -61,6 +61,23 @@ export function festivalProblems(pack: ContentPack): string[] {
         problems.push(`${owner} 的地點 ${festival.mapId} 沒有星星水池（festival: stars）`);
       }
     }
+    if (festival.harvestContest) {
+      const contest = festival.harvestContest;
+      const crop = pack.crops.find((c) => c.id === contest.cropId);
+      if (!crop) problems.push(`${owner} 的收成比賽作物 ${contest.cropId} 不存在`);
+      else if (!crop.seasons.includes(festival.season)) problems.push(`${owner} 的收成比賽作物 ${contest.cropId} 在${festival.season}種不了`);
+    }
+    if (festival.lanterns) {
+      const lamps = map.rows.join('').split('').filter((ch) => map.legend[ch]?.festival === 'lantern').length;
+      if (lamps !== festival.lanterns.count) problems.push(`${owner} 的燈有 ${festival.lanterns.count} 盞，但地點 ${festival.mapId} 上有 ${lamps} 盞燈（festival: lantern）`);
+    }
+    if (festival.giftExchange) {
+      const gift = festival.giftExchange;
+      for (const npcId of gift.npcIds) {
+        if (!npcIds.has(npcId)) problems.push(`${owner} 的交換禮物居民 ${npcId} 不存在`);
+      }
+      if (!itemIds.has(gift.receive.itemId)) problems.push(`${owner} 的交換禮物回禮 ${gift.receive.itemId} 不存在`);
+    }
     if (festival.shop !== undefined) {
       const shop = shops.get(festival.shop);
       if (!shop) problems.push(`${owner} 的攤位 ${festival.shop} 不存在`);
@@ -120,6 +137,8 @@ export function storyProblems(pack: ContentPack): string[] {
     ...(pack.quests?.defs ?? []).flatMap((q) => (q.reward.flag ? [q.reward.flag] : [])),
     ...chapters.flatMap((c) => (c.reward.flag ? [c.reward.flag] : [])),
     ...[...festivalIds].map((id) => `attended:${id}`),
+    // 暖燈節點亮全部的燈時設定的旗標（見 domain/festival.ts 的 LanternRules）。
+    ...(pack.festivals ?? []).flatMap((f) => (f.lanterns ? [f.lanterns.flag] : [])),
   ]);
 
   chapters.forEach((chapter, index) => {
