@@ -602,6 +602,10 @@ export class MapScene extends Phaser.Scene {
     try {
       const outcome = await session.dispatch(command);
       hud.messages(outcome.messages);
+      // 買或升級的結果也送到商店面板的結果行：面板開著時，底部的訊息列在手機上可能看不到。
+      if (command.type === 'buy' || command.type === 'upgrade') {
+        this.shopPanel.showMessage(outcome.messages.join('　'), outcome.events.some((event) => event.type === 'refused'));
+      }
       if (command.type === 'cycleTool' || command.type === 'cycleSeed') sounds.play('click');
       this.playEvents(outcome.events, before, plotsBefore, inventoryBefore);
     } catch (error) {

@@ -20,10 +20,9 @@ import { passDays, startJob, takeReady } from '../domain/processing';
 import { fertilizedSkillTuning } from '../domain/fertilizer';
 import { biteChanceFor } from '../domain/fishing';
 import { dailyCare, feedAll, growWool, milkQuality, newAnimal, petAnimal, produceEggs, productQuality, shearAt, slotsOf, woolReady, type Animal, type FlockId } from '../domain/animals';
-import { expansionRefusal, HOUSE_FULL_FLAG, HOUSE_FULL_MAP_ID, HOUSE_MAP_ID, HOUSE_WING_FLAG, HOUSE_WING_MAP_ID, resolveDestination } from '../domain/house';
+import { HOUSE_FULL_FLAG, HOUSE_FULL_MAP_ID, HOUSE_MAP_ID, HOUSE_WING_FLAG, HOUSE_WING_MAP_ID, resolveDestination } from '../domain/house';
 import { carryDecor, decorAt, placementRefusal, PLAYER_WEARER, type DecorPlacement } from '../domain/decor';
-import { boughtThisWeek, merchantOpen, weekStartOf, weekStock } from '../domain/traveling-merchant';
-import { onSale } from '../domain/shop-stock';
+import { boughtThisWeek, weekStartOf } from '../domain/traveling-merchant';
 import { requirementMet } from '../domain/unlock';
 import type { Quality } from '../domain/items';
 import { energyCostFor, toolForAction, TIER_NAMES, TOOL_NAMES } from '../domain/tools';
@@ -33,7 +32,8 @@ import { applySellBonus, biteBonusPoints, dishEnergyBonus, extraYieldChance, rol
 import type { ContentIndex } from './content-index';
 import { acceptQuest, collectMail, currentBoard, deliverLetters, recordQuestEvent, refreshBoard, settleQuests, shortfallOf, submitQuest } from './quests';
 import { observeProgress } from './collection';
-import { festivalCrown, festivalHere, festivalSwap, lightLantern, recordContestCatch, recordHarvestContest, recordStallSale, recordWarmGift, stallRefusal, starExchange, warmGiftOpen, type FestivalOutcome } from './festival';
+import { buyRefusal, missingMaterials, unitPriceOf, upgradeRecipe, upgradeRefusal } from './purchase-check';
+import { festivalCrown, festivalHere, festivalSwap, lightLantern, recordContestCatch, recordHarvestContest, recordStallSale, recordWarmGift, starExchange, warmGiftOpen, type FestivalOutcome } from './festival';
 import { plantableIn, survivesSeasonChange } from '../domain/greenhouse';
 import { settleStory, storyObjective } from './story';
 import { donateToRepair } from './repairs';
@@ -1019,22 +1019,15 @@ function facingShop(state: GameState, index: ContentIndex, shopId: string): bool
 
 function buy(state: GameState, command: Extract<Command, { type: 'buy' }>, index: ContentIndex): CommandOutcome {
   if (!facingShop(state, index, command.shopId)) return reply(state, [messageFor('NOT_AT_SHOP')], [refused('NOT_AT_SHOP')]);
-  // 旅行商人的貨架每週輪換，走自己的規則（週五、六開門、每週每件有上限）。
-  if (index.shop(command.shopId).rotating) return buyFromMerchant(state, command.itemId, command.count, index);
-  const line = index.shop(command.shopId).stock.find((s) => s.itemId === command.itemId);
-  if (!line) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
-  // 季節進貨：秋季的種子只在秋天賣，換季後下架（shops.json 的 seasons，見 domain/shop-stock.ts）。
-  if (!onSale(line, state.calendar.season)) {
-    return reply(state, [messageFor('NOT_IN_STOCK_SEASON')], [refused('NOT_IN_STOCK_SEASON')]);
-  }
-  // 節慶攤位：只在節慶開著時能買，有限量的物品不能超過今年的數量（見 festival.ts）。
-  const closed = stallRefusal(state, index, command.shopId, command.itemId, command.count);
-  if (closed) return reply(state, [messageFor(closed)], [refused(closed)]);
-  const cost = line.price * command.count;
-  if (state.gold < cost) return reply(state, [messageFor('NO_GOLD')], [refused('NO_GOLD')]);
-  if (command.itemId.startsWith('animal.')) return buyAnimal(state, command.itemId.slice('animal.'.length), cost, command.count, index);
-  if (command.itemId.startsWith('building.')) return remodel(state, command.itemId, cost, command.count, index);
-  if (command.itemId.startsWith('recipe.')) return learnRecipe(state, command.itemId, cost, command.count, index);
+  // 能不能買（貨架、季節、節慶攤位、金幣、背包或各類商品自己的條件、旅行商人的週限額）都在 purchase-check.ts，商店面板也用它。
+  const refusal = buyRefusal(state, index, command.shopId, command.itemId, command.count);
+  if (refusal) return reply(state, [messageFor(refusal)], [refused(refusal)]);
+  const cost = unitPriceOf(state, index, command.shopId, command.itemId) * command.count;
+  // 旅行商人的貨架每週輪換，走自己的規則（扣款、記下這一週買了幾個）。
+  if (index.shop(command.shopId).rotating) return buyFromMerchant(state, command.itemId, command.count, cost, index);
+  if (command.itemId.startsWith('animal.')) return buyAnimal(state, command.itemId.slice('animal.'.length), cost, index);
+  if (command.itemId.startsWith('building.')) return remodel(state, command.itemId, cost, index);
+  if (command.itemId.startsWith('recipe.')) return learnRecipe(state, command.itemId, cost, index);
   const stored = addItem(state.inventory, index.item(command.itemId), command.count);
   if (!stored.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
   const name = index.item(command.itemId).name;
@@ -1043,22 +1036,13 @@ function buy(state: GameState, command: Extract<Command, { type: 'buy' }>, index
 }
 
 /**
- * 向旅行商人買（見 domain/traveling-merchant.ts）：只在週五、週六開門；貨架是這一週的；
- * 每週每件最多 perItemWeekly 個（週五與週六共用）。扣金幣、放進背包，不花體力與時間。
+ * 向旅行商人買（見 domain/traveling-merchant.ts）：能不能買（週五、週六、每週每件上限、金幣）已在 buy() 之前由 purchase-check.ts 判斷。
+ * 這裡只扣金幣、放進背包、記下這一週買了幾個；不花體力與時間。
  */
-function buyFromMerchant(state: GameState, itemId: string, count: number, index: ContentIndex): CommandOutcome {
-  const rules = index.merchant;
+function buyFromMerchant(state: GameState, itemId: string, count: number, cost: number, index: ContentIndex): CommandOutcome {
   const daysPerSeason = index.tuning.time.daysPerSeason;
-  if (!rules || !merchantOpen(rules, state.calendar, daysPerSeason)) {
-    return reply(state, [messageFor('MERCHANT_AWAY')], [refused('MERCHANT_AWAY')]);
-  }
-  const line = weekStock(rules, state.calendar, daysPerSeason).find((l) => l.itemId === itemId);
-  if (!line) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
   const bought = boughtThisWeek(state.merchant, state.calendar, daysPerSeason);
   const had = bought[itemId] ?? 0;
-  if (had + count > rules.perItemWeekly) return reply(state, [messageFor('MERCHANT_LIMIT')], [refused('MERCHANT_LIMIT')]);
-  const cost = line.price * count;
-  if (state.gold < cost) return reply(state, [messageFor('NO_GOLD')], [refused('NO_GOLD')]);
   const stored = addItem(state.inventory, index.item(itemId), count);
   if (!stored.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
   const next: GameState = {
@@ -1151,21 +1135,16 @@ function takeOff(state: GameState, index: ContentIndex): CommandOutcome {
 
 function upgrade(state: GameState, command: Extract<Command, { type: 'upgrade' }>, index: ContentIndex): CommandOutcome {
   if (!facingShop(state, index, command.shopId)) return reply(state, [messageFor('NOT_AT_SHOP')], [refused('NOT_AT_SHOP')]);
-  const tiers = index.tuning.tools.tiers;
+  // 能不能升級（工具階級、這家店的配方、金幣、材料）都在 purchase-check.ts 判斷，商店面板也用它。
+  const recipe = upgradeRecipe(state, index, command.shopId, command.toolId);
+  const refusal = upgradeRefusal(state, index, command.shopId, command.toolId);
+  if (refusal || !recipe) {
+    const reason = refusal ?? 'NOT_FOR_SALE';
+    // 材料不夠時，把還缺的列出來。
+    const short = reason === 'NO_MATERIAL' && recipe ? `：還差 ${missingMaterials(state, index, recipe.items).join('、')}` : '';
+    return reply(state, [`${messageFor(reason)}${short}`], [refused(reason)]);
+  }
   const next = state.toolTiers[command.toolId] + 1;
-  if (next >= tiers.length) return reply(state, [messageFor('TIER_MAX')], [refused('TIER_MAX')]);
-  const recipe = index.shop(command.shopId).upgrades.find((u) => u.toolId === command.toolId && u.tier === next);
-  if (!recipe) return reply(state, [messageFor('NOT_FOR_SALE')], [refused('NOT_FOR_SALE')]);
-  if (state.gold < recipe.gold) return reply(state, [messageFor('NO_GOLD')], [refused('NO_GOLD')]);
-
-  const missing: string[] = [];
-  for (const [itemId, count] of Object.entries(recipe.items)) {
-    const have = countOf(state.inventory, itemId);
-    if (have < count) missing.push(`${index.item(itemId).name} × ${count - have}`);
-  }
-  if (missing.length > 0) {
-    return reply(state, [`${messageFor('NO_MATERIAL')}：還差 ${missing.join('、')}`], [refused('NO_MATERIAL')]);
-  }
 
   let inventory = state.inventory;
   for (const [itemId, count] of Object.entries(recipe.items)) {
@@ -1192,18 +1171,6 @@ function gainXp(skills: SkillXp, action: ActionKind, index: ContentIndex): Skill
   return { ...skills, [skill]: skills[skill] + amount };
 }
 
-/** 雞舍在地圖 coop 上、牛舍在地圖 cowbarn 上；座位數就是那棟建築能養的動物數。 */
-const COOP_ID = 'coop';
-const COWBARN_ID = 'cowbarn';
-/** 羊圈在牧草地（地圖 pasture 的 flock 為 sheep，座位是它的 slot 格）。 */
-const SHEEP_PEN_ID = 'pasture';
-/** 牛舍改建的旗標（店家賣的 building.cowbarn 會把它設為真）；沒改建前買不到牛，牛舍的門也開不了。 */
-const COWBARN_FLAG = 'cowbarn';
-
-function seatsIn(index: ContentIndex, mapId: string): number {
-  return slotsOf(index.map(mapId)).length;
-}
-
 /** 這棟建築住的是哪一群動物（地圖的 flock）；沒有動物的地圖回傳 null。 */
 function flockAt(state: GameState, index: ContentIndex): FlockId | null {
   return index.map(state.mapId).flock ?? null;
@@ -1221,40 +1188,32 @@ function withHerd(state: GameState, flock: FlockId, herd: Animal[]): GameState {
   return { ...state, animals: herd };
 }
 
-function buyAnimal(state: GameState, kind: string, cost: number, count: number, index: ContentIndex): CommandOutcome {
+/** 買動物的效果（能不能買、座位夠不夠，已在 purchase-check.ts 判斷）：雞放進雞舍、羊牽進羊圈、牛牽進牛舍。 */
+function buyAnimal(state: GameState, kind: string, cost: number, index: ContentIndex): CommandOutcome {
   const def = index.animal(kind);
-  if (count !== 1) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
   if (def.milk) return buyCow(state, kind, cost, index);
   if (def.wool) return buySheep(state, kind, cost, index);
-  if (state.animals.length >= seatsIn(index, COOP_ID)) return reply(state, [messageFor('NO_ROOM')], [refused('NO_ROOM')]);
   return reply({ ...state, gold: state.gold - cost, animals: [...state.animals, newAnimal(kind)] }, [`買了一隻${def.name}，放進雞舍`]);
 }
 
-/** 羊住在牧草地的羊圈（座位數就是牧草地的座位）；不需要改建，買了就牽進羊圈，羊毛從 0 天開始長。 */
+/** 羊住在牧草地的羊圈；不需要改建，買了就牽進羊圈，羊毛從 0 天開始長。 */
 function buySheep(state: GameState, kind: string, cost: number, index: ContentIndex): CommandOutcome {
   const def = index.animal(kind);
-  if (state.sheep.length >= seatsIn(index, SHEEP_PEN_ID)) return reply(state, [messageFor('NO_SHEEP_ROOM')], [refused('NO_SHEEP_ROOM')]);
   const sheep: Animal = { ...newAnimal(kind), woolDays: 0 };
   return reply({ ...state, gold: state.gold - cost, sheep: [...state.sheep, sheep] }, [`買了一隻${def.name}，牽進牧草地的羊圈`]);
 }
 
-/** 牛要牛舍已經改建、而且還有座位才能買；牛舍改建後才有座位。 */
+/** 牛舍改建後才買得到牛（旗標與座位都在 purchase-check.ts 判斷）。 */
 function buyCow(state: GameState, kind: string, cost: number, index: ContentIndex): CommandOutcome {
   const def = index.animal(kind);
-  if (state.flags[COWBARN_FLAG] !== true) return reply(state, [messageFor('NO_BARN')], [refused('NO_BARN')]);
-  if (state.cows.length >= seatsIn(index, COWBARN_ID)) return reply(state, [messageFor('NO_COW_ROOM')], [refused('NO_COW_ROOM')]);
   return reply({ ...state, gold: state.gold - cost, cows: [...state.cows, newAnimal(kind)] }, [`買了一頭${def.name}，牽進牛舍`]);
 }
 
 /**
  * 改建店家賣的建築（itemId 為 building.<旗標>）：花金幣，把旗標設為真；不進背包。只能改建一次。
  */
-function remodel(state: GameState, itemId: string, cost: number, count: number, index: ContentIndex): CommandOutcome {
+function remodel(state: GameState, itemId: string, cost: number, index: ContentIndex): CommandOutcome {
   const flag = itemId.slice('building.'.length);
-  if (count !== 1) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
-  // 小屋擴建：只買一次，第二次要先有第一次（見 domain/house.ts）。其他改建只看是否已經有了。
-  const blocked = expansionRefusal(state.flags, flag);
-  if (blocked) return reply(state, [messageFor(blocked)], [refused(blocked)]);
   const name = index.item(itemId).name;
   const expanded: GameState = { ...state, gold: state.gold - cost, flags: { ...state.flags, [flag]: true } };
   const carried = carryHouseDecor(expanded, flag, index);
@@ -1291,11 +1250,9 @@ function carryHouseDecor(state: GameState, flag: string, index: ContentIndex): R
  * 買一份配方（店家賣的 recipe.<id>）：不進背包，把旗標 recipe:<id> 設為真，之後工作台才能做它（見 craft）。
  * 只能學一次；學會的配方不因換季消失。
  */
-function learnRecipe(state: GameState, itemId: string, cost: number, count: number, index: ContentIndex): CommandOutcome {
+function learnRecipe(state: GameState, itemId: string, cost: number, index: ContentIndex): CommandOutcome {
   const recipeId = itemId.slice('recipe.'.length);
   const flag = `recipe:${recipeId}`;
-  if (count !== 1) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
-  if (state.flags[flag]) return reply(state, [messageFor('ALREADY_OWNED')], [refused('ALREADY_OWNED')]);
   const name = index.item(itemId).name;
   return reply({ ...state, gold: state.gold - cost, flags: { ...state.flags, [flag]: true } }, [`學會了${name.replace(/配方$/, '')}，花了 ${cost} 金`]);
 }
