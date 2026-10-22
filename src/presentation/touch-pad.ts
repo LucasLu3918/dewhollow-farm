@@ -5,42 +5,63 @@ import type { TouchMode } from '../domain/settings';
  * 虛擬按鍵（觸控）的排版與對應（純資料與純函式）。
  * 按下虛擬按鍵時，送出的是「該動作目前綁定的按鍵」，走的是鍵盤同一條路徑（MapScene 的 handleKey），
  * 所以改了按鍵，觸控也跟著改，不另寫一套規則。
+ * 按鈕上的文字與完整名稱來自 content/controls.json（由呼叫端傳入），這裡只定義排版與分組。
  */
 
-export interface TouchButton {
-  action: ActionId;
+/**
+ * move 是方向鍵組（十字排列，按住會連續移動）；act 是動作鍵組；
+ * tool 是直接拿工具與小屋動作（擺放、穿上、脫下）的組。
+ */
+export type TouchGroup = 'move' | 'act' | 'tool';
+
+/** 虛擬按鍵的排版：哪個動作放在哪一組，陣列順序即畫面順序。 */
+export const TOUCH_LAYOUT = [
+  { action: 'moveUp', group: 'move' },
+  { action: 'moveLeft', group: 'move' },
+  { action: 'moveRight', group: 'move' },
+  { action: 'moveDown', group: 'move' },
+  { action: 'interact', group: 'act' },
+  { action: 'cycleTool', group: 'act' },
+  { action: 'cycleSeed', group: 'act' },
+  { action: 'skills', group: 'act' },
+  { action: 'residents', group: 'act' },
+  { action: 'collection', group: 'act' },
+  { action: 'quests', group: 'act' },
+  { action: 'manualSave', group: 'act' },
+  { action: 'takeAxe', group: 'tool' },
+  { action: 'takePick', group: 'tool' },
+  { action: 'takeRod', group: 'tool' },
+  { action: 'takeSickle', group: 'tool' },
+  { action: 'placeDecor', group: 'tool' },
+  { action: 'wear', group: 'tool' },
+  { action: 'takeOff', group: 'tool' },
+] as const satisfies readonly { action: ActionId; group: TouchGroup }[];
+
+/** 出現在虛擬按鍵上的動作。 */
+export type TouchAction = (typeof TOUCH_LAYOUT)[number]['action'];
+
+/** 單一虛擬按鍵的文字：short label 與給螢幕閱讀器的完整名稱。 */
+export interface TouchText {
   /** 按鈕上的文字（功能名稱，不寫按鍵字母，改鍵後也不會不一致）。 */
   label: string;
   /** 給螢幕閱讀器的名稱。 */
   name: string;
-  /**
-   * move 是方向鍵組（十字排列，按住會連續移動）；act 是動作鍵組；
-   * tool 是直接拿工具與小屋動作（擺放、穿上、脫下）的組。
-   */
-  group: 'move' | 'act' | 'tool';
 }
 
-export const TOUCH_BUTTONS: readonly TouchButton[] = [
-  { action: 'moveUp', label: '↑', name: '向上移動', group: 'move' },
-  { action: 'moveLeft', label: '←', name: '向左移動', group: 'move' },
-  { action: 'moveRight', label: '→', name: '向右移動', group: 'move' },
-  { action: 'moveDown', label: '↓', name: '向下移動', group: 'move' },
-  { action: 'interact', label: '互動', name: '互動', group: 'act' },
-  { action: 'cycleTool', label: '工具', name: '切換工具', group: 'act' },
-  { action: 'cycleSeed', label: '種子', name: '切換種子', group: 'act' },
-  { action: 'skills', label: '技能', name: '技能與天賦', group: 'act' },
-  { action: 'residents', label: '居民', name: '居民與好感', group: 'act' },
-  { action: 'collection', label: '圖鑑', name: '圖鑑與成就', group: 'act' },
-  { action: 'quests', label: '委託', name: '委託與佈告欄', group: 'act' },
-  { action: 'manualSave', label: '存檔', name: '手動存檔', group: 'act' },
-  { action: 'takeAxe', label: '斧', name: '拿取斧頭', group: 'tool' },
-  { action: 'takePick', label: '鎬', name: '拿取鎬子', group: 'tool' },
-  { action: 'takeRod', label: '釣', name: '拿取釣竿', group: 'tool' },
-  { action: 'takeSickle', label: '鐮', name: '拿取鐮刀', group: 'tool' },
-  { action: 'placeDecor', label: '擺放', name: '在小屋擺放裝飾', group: 'tool' },
-  { action: 'wear', label: '穿', name: '穿上衣服或帽子', group: 'tool' },
-  { action: 'takeOff', label: '脫', name: '脫下衣服或帽子', group: 'tool' },
-];
+export type TouchLabels = Readonly<Record<TouchAction, TouchText>>;
+
+export interface TouchButton extends TouchText {
+  action: TouchAction;
+  group: TouchGroup;
+}
+
+/** 依排版與文字組出每個虛擬按鈕（順序同 TOUCH_LAYOUT）。 */
+export function buildTouchButtons(labels: TouchLabels): TouchButton[] {
+  return TOUCH_LAYOUT.map((entry) => {
+    const text = labels[entry.action];
+    return { action: entry.action, label: text.label, name: text.name, group: entry.group };
+  });
+}
 
 /** 這個虛擬按鈕要送出的按鍵（目前綁定的那一個）。 */
 export function touchKeyFor(action: ActionId, bindings: Bindings): string {

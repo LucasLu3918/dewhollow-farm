@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_BINDINGS, assignKey } from '../domain/keybindings';
-import { controlsHint } from './controls-hint';
+import controls from '../../content/controls.json';
+import { DEFAULT_BINDINGS, assignKey, type Bindings } from '../domain/keybindings';
+import { parseControlsContent } from '../infrastructure/content/controls-content';
+import { controlsHint as renderHint } from './controls-hint';
+
+/** 文字來自 content/controls.json（與遊戲載入的是同一份）；測試的預期字串不變。 */
+const content = parseControlsContent(controls);
+
+function controlsHint(bindings: Bindings): string {
+  return renderHint(bindings, content.hintLabels, content.hintText);
+}
 
 const DEFAULT_HINT =
   '方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · A/P/R/G 拿斧頭/鎬/釣竿/鐮刀 · V/E/Q 小屋擺放/穿/脫 · K 技能與天賦 · F 居民與好感 · I 圖鑑 · J 委託與佈告欄 · S 存檔 · L 存檔槽 · O 設定 · B 背景音樂 · M 靜音 · ? 說明（以上為目前的按鍵，可在設定中改）';
@@ -58,6 +67,13 @@ describe('controlsHint after rebinding', () => {
   it('shows a space key as the word Space', () => {
     const text = controlsHint(rebind('interact', ' '));
     expect(text).toContain('Space 互動');
+  });
+});
+
+describe('controlsHint takes its words from the labels it is given', () => {
+  it('shows a changed label from the table instead of a fixed word', () => {
+    const labels = { ...content.hintLabels, interact: '撿起' };
+    expect(renderHint(DEFAULT_BINDINGS, labels, content.hintText)).toContain('X 撿起');
   });
 });
 

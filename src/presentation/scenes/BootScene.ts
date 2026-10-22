@@ -34,6 +34,7 @@ export interface BootDeps {
   help: HelpPanel;
   saves: SavePanel;
   settings: SettingsService;
+  controls: MapSceneDeps['controls'];
 }
 
 /**
@@ -86,6 +87,7 @@ export class BootScene extends Phaser.Scene {
       help: this.deps.help,
       saves: this.deps.saves,
       settings: this.deps.settings,
+      controls: this.deps.controls,
     };
     this.scene.start('map', sceneDeps);
   }

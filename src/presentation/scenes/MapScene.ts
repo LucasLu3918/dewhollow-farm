@@ -59,9 +59,9 @@ import type { RenderCompatInfo } from '../render-compat';
 import type { View } from '../walk-pose';
 import type { SettingsService } from '../../application/settings';
 import { actionForKey, type ActionId } from '../../domain/keybindings';
-import { SettingsPanel } from '../settings-panel';
+import { SettingsPanel, type SettingsLabels } from '../settings-panel';
 import { TouchControls } from '../touch-controls';
-import { touchKeyFor } from '../touch-pad';
+import { touchKeyFor, type TouchLabels } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
 import type { OpenablePanel } from '../panel-dialog';
 
@@ -92,6 +92,8 @@ export interface MapSceneDeps {
   saves: SavePanel;
   /** 玩家偏好（按鍵、字級、閃光與震動等），不進存檔。 */
   settings: SettingsService;
+  /** 操作說明的文字（設定面板的動作名稱、虛擬按鍵的文字），來自 content/controls.json。 */
+  controls: { settingsLabels: SettingsLabels; touchButtons: TouchLabels };
 }
 
 /** 動作 → 移動方向（按鍵由偏好的按鍵表決定，見 handleKey）。 */
@@ -304,10 +306,10 @@ export class MapScene extends Phaser.Scene {
 
   init(deps: MapSceneDeps): void {
     this.deps = deps;
-    this.settingsPanel = new SettingsPanel(document, deps.settings);
+    this.settingsPanel = new SettingsPanel(document, deps.settings, deps.controls.settingsLabels);
     deps.hud.bindSettings(() => this.settingsPanel.open());
     // 虛擬按鍵（觸控）：按鈕本身掛在 DOM 上，顯示與否由 apply-settings.ts 決定。
-    new TouchControls(document, (action) => this.pressAction(action));
+    new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons);
     this.shopPanel = new ShopPanel(document, deps.index, (command) => void this.run(command));
     this.kitchenPanel = new KitchenPanel(document, deps.index, (command) => void this.run(command));
     this.workshopPanel = new WorkshopPanel(document, deps.index, (command) => void this.run(command));
