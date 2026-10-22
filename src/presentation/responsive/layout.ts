@@ -26,8 +26,12 @@ const MIN_CAMERA_VIEW = { width: 160, height: 120 };
 export function layoutFor(metrics: ViewportMetrics, placement: ControlsPlacement): ResponsiveLayout {
   const host = metrics.host;
   const orientation: ResponsiveOrientation = metrics.layoutViewport.width >= metrics.layoutViewport.height ? 'landscape' : 'portrait';
-  const visible = localRect(intersectRects(host, metrics.visualViewport), host);
-  const safe = insetRect(visible, metrics.safeInsets);
+  const layoutSafeBounds = insetRect(
+    { x: 0, y: 0, width: metrics.layoutViewport.width, height: metrics.layoutViewport.height },
+    metrics.safeInsets,
+  );
+  const visibleGlobal = intersectRects(intersectRects(host, metrics.visualViewport), layoutSafeBounds);
+  const safe = localRect(visibleGlobal, host);
   let safeRect = safe;
   let controlsRects: Rect[] = [];
 

@@ -2,13 +2,35 @@ import { expect, test, type Page } from '@playwright/test';
 
 const SETTINGS_KEY = 'dewhollow-farm.settings';
 
-async function seed(page: Page, placement: 'external' | 'overlay'): Promise<void> {
-  await page.addInitScript(({ key, controlsPlacement }) => {
+declare global {
+  interface Window {
+    __setPointerCoarse?(coarse: boolean): void;
+  }
+}
+
+async function seed(page: Page, placement: 'external' | 'overlay', touchControls: 'auto' | 'on' = 'on'): Promise<void> {
+  await page.addInitScript(({ key, controlsPlacement, touchControls }) => {
     window.localStorage.setItem(key, JSON.stringify({
       schemaVersion: 2,
-      settings: { touchControls: 'on', mobile: { controlsPlacement } },
+      settings: { touchControls, mobile: { controlsPlacement } },
     }));
-  }, { key: SETTINGS_KEY, controlsPlacement: placement });
+  }, { key: SETTINGS_KEY, controlsPlacement: placement, touchControls });
+}
+
+async function fakePointerCapabilities(page: Page, coarse: boolean, touchPoints: number): Promise<void> {
+  await page.addInitScript(({ initialCoarse, points }) => {
+    const nativeMatchMedia = window.matchMedia.bind(window);
+    const coarseQuery = nativeMatchMedia('(pointer: coarse)');
+    let currentCoarse = initialCoarse;
+    Object.defineProperty(coarseQuery, 'matches', { configurable: true, get: () => currentCoarse });
+    window.matchMedia = (query: string): MediaQueryList =>
+      query === '(pointer: coarse)' ? coarseQuery : nativeMatchMedia(query);
+    Object.defineProperty(Navigator.prototype, 'maxTouchPoints', { configurable: true, get: () => points });
+    window.__setPointerCoarse = (value: boolean): void => {
+      currentCoarse = value;
+      coarseQuery.dispatchEvent(new Event('change'));
+    };
+  }, { initialCoarse: coarse, points: touchPoints });
 }
 
 async function start(page: Page): Promise<void> {
@@ -19,6 +41,25 @@ async function start(page: Page): Promise<void> {
 
 test.describe('響應式版面整合', () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test('auto shows controls on a hybrid device with touch points and a fine primary pointer', async ({ page }) => {
+    await seed(page, 'external', 'auto');
+    await fakePointerCapabilities(page, false, 2);
+    await start(page);
+    await expect(page.locator('#touch-controls')).toBeVisible();
+  });
+
+  test('auto visibility follows pointer media-query changes without changing settings', async ({ page }) => {
+    await seed(page, 'external', 'auto');
+    await fakePointerCapabilities(page, false, 0);
+    await start(page);
+    const pad = page.locator('#touch-controls');
+    await expect(pad).toBeHidden();
+    await page.evaluate(() => window.__setPointerCoarse?.(true));
+    await expect(pad).toBeVisible();
+    await page.evaluate(() => window.__setPointerCoarse?.(false));
+    await expect(pad).toBeHidden();
+  });
 
   test('轉向十次時不重建世界、不改遊戲狀態，開啟面板和文字輸入也維持穩定', async ({ page }) => {
     await seed(page, 'external');

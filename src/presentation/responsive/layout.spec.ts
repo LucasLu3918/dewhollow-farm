@@ -41,7 +41,7 @@ describe('layoutFor', () => {
     }, 'external');
     expect(layout.orientation).toBe('landscape');
     expect(layout.keyboardOpen).toBe(true);
-    expect(layout.safeRect.height).toBe(136);
+    expect(layout.safeRect.height).toBe(156);
   });
 
   it('keeps the entire world safe with external controls and reserves bottom space for portrait overlays', () => {
@@ -52,6 +52,15 @@ describe('layoutFor', () => {
     expect(overlay.controlsRects).toHaveLength(1);
     expect(overlay.safeRect.height).toBeLessThan(external.safeRect.height);
     expect(overlay.cssTokens['--responsive-camera-height']).toBe(`${overlay.safeRect.height}px`);
+  });
+
+  it('does not subtract safe insets twice when the host already sits inside the global safe bounds', () => {
+    const result = layoutFor({
+      ...base,
+      safeInsets: { top: 24, right: 16, bottom: 20, left: 16 },
+      host: { x: 16, y: 24, width: 358, height: 800 },
+    }, 'external');
+    expect(result.safeRect).toEqual({ x: 0, y: 0, width: 358, height: 800 });
   });
 
   it('reserves left and right control columns in landscape overlay mode', () => {

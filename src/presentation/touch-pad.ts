@@ -66,9 +66,9 @@ export function buildTouchButtons(labels: TouchLabels): TouchButton[] {
 /** 方向按鈕按住時連續移動的間隔（毫秒）：比一格的移動時間稍長，避免排隊。 */
 export const TOUCH_REPEAT_MS = 150;
 
-/** 虛擬按鍵要不要顯示：auto 只在觸控裝置（pointer: coarse）顯示，on 一律顯示，off 一律隱藏。 */
-export function touchVisible(mode: TouchMode, coarsePointer: boolean): boolean {
+/** 虛擬按鍵要不要顯示：auto 遇到粗指標或任一觸控點顯示，on 一律顯示，off 一律隱藏。 */
+export function touchVisible(mode: TouchMode, coarsePointer: boolean, touchPoints = 0): boolean {
   if (mode === 'on') return true;
   if (mode === 'off') return false;
-  return coarsePointer;
+  return coarsePointer || touchPoints > 0;
 }

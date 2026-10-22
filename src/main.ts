@@ -58,7 +58,7 @@ import type { SaveRepository } from './application/ports';
 import { SaveSlotService, slotFromQuery } from './application/save-slots';
 import { SettingsService } from './application/settings';
 import { LocalSettingsStore } from './infrastructure/persistence/local-settings-store';
-import { applySettings, isCoarsePointer } from './presentation/apply-settings';
+import { applySettings } from './presentation/apply-settings';
 import { controlsHint } from './presentation/controls-hint';
 import { loadContent } from './infrastructure/content/load-content';
 import { parseControlsContent } from './infrastructure/content/controls-content';
@@ -122,11 +122,13 @@ async function bootstrap(): Promise<void> {
   });
   const applyPreferences = (): void => {
     const current = settings.get();
-    applySettings(document, current, isCoarsePointer());
+    const pointers = responsive.get().pointer;
+    applySettings(document, current, pointers.coarse, pointers.touchPoints);
     hud.setColorblind(current.colorblind);
   };
   applyPreferences();
   settings.onChange(applyPreferences);
+  responsive.subscribe(applyPreferences);
   // 操作提示依目前的按鍵產生；開機時套用一次，改鍵後 SettingsService 會通知訂閱者，提示列跟著更新。
   const showControlsHint = (): void => hud.setControlsHint(controlsHint(settings.get().bindings, controls.hintLabels, controls.hintText));
   showControlsHint();
