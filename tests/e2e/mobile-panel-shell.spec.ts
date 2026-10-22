@@ -22,6 +22,20 @@ test.describe('MB-07 compact HUD and shared panel shell', () => {
     await expect(page.locator('#hud-log')).toContainText('開墾了一塊田');
   });
 
+  test('primary action remains at least 48 CSS pixels high in portrait and low-height landscape', async ({ page }) => {
+    await start(page);
+    for (const viewport of [{ width: 390, height: 600 }, { width: 844, height: 390 }]) {
+      await page.setViewportSize(viewport);
+      const action = page.locator('#hud-action');
+      await expect(action).toBeVisible();
+      const bounds = await action.boundingBox();
+      expect(bounds, `${viewport.width}×${viewport.height} primary action bounds`).not.toBeNull();
+      expect(bounds!.height).toBeGreaterThanOrEqual(48);
+      expect(bounds!.y).toBeGreaterThanOrEqual(0);
+      expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(viewport.height + 1);
+    }
+  });
+
   test('focus remains trapped and returns to the opener; settings scroll and focus survive rotation', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 600 });
     await start(page);
