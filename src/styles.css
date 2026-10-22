@@ -673,6 +673,183 @@ a:focus-visible {
 }
 
 /*
+ * 觸控裝置：操作提示（#hud-hint）是給鍵盤看的，改用虛擬按鍵時隱藏；說明頁仍有完整按鍵說明。
+ */
+@media (pointer: coarse) {
+  #hud-hint {
+    display: none;
+  }
+}
+
+/*
+ * 直式手機（寬度 600px 以內）的首屏版面，由上到下：狀態列（主要資訊在前，次要資訊與按鈕在後）→ 遊戲畫面 → 虛擬按鍵。
+ * 訊息疊在遊戲畫面上緣（同一格），只顯示最近兩則、單行省略；沒有訊息時不佔位置。
+ * 這裡的 orientation 與下方的橫式規則互斥，不會疊在一起。
+ */
+@media (max-width: 600px) and (orientation: portrait) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  .status {
+    grid-column: 1;
+    grid-row: 1;
+    gap: 4px 10px;
+    padding: 8px 10px;
+    font-size: calc(13px * var(--font-scale));
+  }
+
+  /* 技能等級列：手機上隱藏，改從虛擬按鍵的「技能」打開技能與天賦；hud.ts 仍會更新它的文字（K 鍵與點擊不變）。 */
+  #hud-skills {
+    display: none;
+  }
+
+  /* 主要資訊依序排在前面；工具、種子、評級與礦坑狀態縮小、改成次要色，接在後面；按鈕獨占最後一行。 */
+  #hud-day {
+    order: 1;
+  }
+
+  #hud-clock {
+    order: 2;
+  }
+
+  #hud-weather {
+    order: 3;
+  }
+
+  #hud-gold {
+    order: 4;
+  }
+
+  .status .energy {
+    order: 5;
+  }
+
+  .status .energy-track {
+    width: 64px;
+  }
+
+  #hud-rating,
+  #hud-seed,
+  #hud-mine {
+    font-size: calc(12px * var(--font-scale));
+    color: var(--muted);
+  }
+
+  #hud-rating {
+    order: 6;
+  }
+
+  #hud-tool {
+    order: 7;
+  }
+
+  #hud-seed {
+    order: 8;
+  }
+
+  #hud-mine {
+    order: 9;
+  }
+
+  .status-actions {
+    order: 10;
+    flex: 1 1 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
+  .stage {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  /* 訊息列：疊在遊戲畫面上緣（與遊戲畫面同一格），不擋點擊（pointer-events: none），aria-live 仍在 DOM 裡。 */
+  .panel {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    z-index: 1;
+    margin: 6px 6px 0;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--surface-dialog) 80%, transparent);
+    pointer-events: none;
+  }
+
+  .panel:has(> .log:empty) {
+    padding: 0;
+    background: none;
+  }
+
+  .panel #hud-hint {
+    display: none;
+  }
+
+  .log {
+    min-height: 0;
+    font-size: calc(13px * var(--font-scale));
+  }
+
+  .log li {
+    padding: 1px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .log li:not(:nth-last-child(-n + 2)) {
+    display: none;
+  }
+
+  /*
+   * 虛擬按鍵：左邊方向鍵（十字，置中）、右邊動作鍵（兩欄），工具鍵獨立一整列（四欄）。
+   * 每顆都是 56px 高的觸控目標，寬度用格子撐開，375px 內不溢出、不水平捲動。
+   */
+  .touch-controls {
+    grid-column: 1;
+    grid-row: 3;
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 8px 12px;
+    align-items: center;
+  }
+
+  .touch-move {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+  }
+
+  .touch-act {
+    grid-column: 2;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    justify-content: stretch;
+    max-width: none;
+  }
+
+  .touch-tool {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .touch-act .touch-button,
+  .touch-tool .touch-button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/*
  * 橫式的手機或平板（高度不足）：方向鍵在遊戲區左側、動作鍵在右側，遊戲區維持在中間，不會蓋住角色。
  * 虛擬按鍵的容器改為 display: contents，讓兩組按鍵直接成為 .app 的格子。
  */
@@ -715,6 +892,21 @@ a:focus-visible {
   }
 
   .touch-act .touch-button {
+    min-width: 0;
+    min-height: 44px;
+    width: 56px;
+    padding: 0;
+    font-size: calc(14px * var(--font-scale));
+  }
+
+  /* 工具組：明確放在第三列（整列置中），不讓它自動落到方向鍵或動作鍵的格子。 */
+  .touch-tool {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-content: center;
+  }
+
+  .touch-tool .touch-button {
     min-width: 0;
     min-height: 44px;
     width: 56px;
