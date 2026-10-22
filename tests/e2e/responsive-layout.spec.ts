@@ -114,6 +114,19 @@ test.describe('響應式版面整合', () => {
     expect(overlayStage && overlayPad && overlayPad.y < overlayStage.y + overlayStage.height).toBe(true);
     const layout = await page.evaluate(() => window.__dewhollow?.responsiveLayout());
     expect(layout?.safeRect.height).toBeLessThan(layout?.worldRect.height ?? 0);
+    const safeRect = layout?.safeRect;
+    const controlRect = layout?.controlsRects[0];
+    expect(safeRect && controlRect).toBeTruthy();
+    const overlaps = safeRect && controlRect &&
+      safeRect.x < controlRect.x + controlRect.width && safeRect.x + safeRect.width > controlRect.x &&
+      safeRect.y < controlRect.y + controlRect.height && safeRect.y + safeRect.height > controlRect.y;
+    expect(overlaps).toBe(false);
+    const camera = await page.evaluate(() => ({
+      top: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--responsive-camera-y')),
+      height: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--responsive-camera-height')),
+    }));
+    expect(camera.top).toBeCloseTo(safeRect?.y ?? 0, 1);
+    expect(camera.height).toBeCloseTo(safeRect?.height ?? 0, 1);
     await expect(page.locator('#settings-placement')).toHaveValue('overlay');
   });
 });
