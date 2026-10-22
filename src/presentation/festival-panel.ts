@@ -50,6 +50,10 @@ export class FestivalPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     this.list.replaceChildren();
     const here = festivalHere(state, this.index);
     const open = openFestival(this.index.festivals, state.calendar);

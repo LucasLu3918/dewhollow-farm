@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { nextFocusIndex, restoreDecision } from './panel-dialog';
+import { focusRestoreTarget, nextFocusIndex, restoreDecision, type FocusSlot } from './panel-dialog';
+
+const btn = (key: string | null = null): FocusSlot => ({ key, disabled: false, interactive: true });
+const off = (key: string | null = null): FocusSlot => ({ key, disabled: true, interactive: false });
+const text = (key: string): FocusSlot => ({ key, disabled: false, interactive: false });
 
 describe('nextFocusIndex（Tab 循環）', () => {
   it('forward moves one item at a time', () => {
@@ -57,5 +61,54 @@ describe('restoreDecision（焦點還原）', () => {
 
   it('leaves focus alone while another modal stays open and focus was not in the closed one', () => {
     expect(restoreDecision({ modalsLeft: 1, focusWasInside: false, returnTargetUsable: true })).toBe('none');
+  });
+});
+
+describe('focusRestoreTarget（重畫後的焦點還原）', () => {
+  it('prefers the interactive element with the same key over the index', () => {
+    const slots = [btn('a'), btn('b'), btn('c')];
+    expect(focusRestoreTarget({ key: 'c', interactiveIndex: 0 }, slots, true)).toEqual({ kind: 'slot', index: 2 });
+  });
+
+  it('falls back to the same interactive index when the key is gone', () => {
+    const slots = [btn('a'), btn('x'), btn('y')];
+    expect(focusRestoreTarget({ key: 'gone', interactiveIndex: 1 }, slots, true)).toEqual({ kind: 'slot', index: 1 });
+  });
+
+  it('falls back to the title only when there is no interactive element to land on', () => {
+    expect(focusRestoreTarget({ key: null, interactiveIndex: -1 }, [], true)).toEqual({ kind: 'title' });
+  });
+
+  it('never chooses a disabled button, even when its key matches', () => {
+    const slots = [off('a'), btn('b')];
+    expect(focusRestoreTarget({ key: 'a', interactiveIndex: 0 }, slots, true)).toEqual({ kind: 'slot', index: 1 });
+  });
+
+  it('moves to the text of the same row when its button became disabled', () => {
+    const slots = [text('a'), off('a'), btn('b')];
+    expect(focusRestoreTarget({ key: 'a', interactiveIndex: 0 }, slots, true)).toEqual({ kind: 'slot', index: 0 });
+  });
+
+  it('picks the next interactive element by index when the disabled row has no text anchor', () => {
+    const slots = [btn('b'), off('a'), btn('c')];
+    expect(focusRestoreTarget({ key: 'a', interactiveIndex: 1 }, slots, true)).toEqual({ kind: 'slot', index: 2 });
+  });
+
+  it('clamps the index to the last interactive element when the list got shorter', () => {
+    const slots = [btn('a')];
+    expect(focusRestoreTarget({ key: null, interactiveIndex: 4 }, slots, true)).toEqual({ kind: 'slot', index: 0 });
+  });
+
+  it('goes to the title when the list has no interactive element', () => {
+    expect(focusRestoreTarget({ key: null, interactiveIndex: 0 }, [off(), text('a')], true)).toEqual({ kind: 'title' });
+  });
+
+  it('does nothing when there are no candidates and no title', () => {
+    expect(focusRestoreTarget({ key: 'a', interactiveIndex: 0 }, [], false)).toEqual({ kind: 'none' });
+    expect(focusRestoreTarget({ key: null, interactiveIndex: -1 }, [], false)).toEqual({ kind: 'none' });
+  });
+
+  it('does nothing when focus was not inside the panel before the redraw', () => {
+    expect(focusRestoreTarget(null, [btn('a')], true)).toEqual({ kind: 'none' });
   });
 });

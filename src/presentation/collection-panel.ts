@@ -47,6 +47,10 @@ export class CollectionPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     this.list.replaceChildren();
     const found = new Set(state.collection.found);
     const total = this.index.dexCategories.reduce((sum, c) => sum + c.entries.length, 0);

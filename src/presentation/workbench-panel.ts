@@ -46,6 +46,10 @@ export class WorkbenchPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     this.funds.textContent = `背包：${state.inventory.stacks.length} / ${state.inventory.capacity} 格`;
     this.list.replaceChildren();
     for (const recipe of this.index.craftingRecipes) {

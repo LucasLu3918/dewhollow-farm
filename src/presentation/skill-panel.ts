@@ -105,6 +105,10 @@ export class SkillPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     const { unlockLevel } = this.index.talents;
     this.summary.textContent = `技能到 ${unlockLevel} 級就能從兩個天賦裡選一個，每項技能只能選一次；天賦不會改變體力消耗。`;
     this.list.replaceChildren();

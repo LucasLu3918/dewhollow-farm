@@ -62,6 +62,10 @@ export class LegacyPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     const text = this.index.legacy;
     const rating = farmRating(state, this.ratingSource);
     const percent = (value: number) => `${Math.round(value * 100)}%`;
