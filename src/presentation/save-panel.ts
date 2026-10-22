@@ -1,5 +1,6 @@
 import type { SaveRecord } from '../application/ports';
 import { slotActions, slotLabel, type SaveSlotService, type SlotAction, type SlotSummary } from '../application/save-slots';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 存檔槽面板（DOM）：三格存檔的列表與操作。
@@ -40,7 +41,7 @@ export class SavePanel {
   private readonly list: HTMLElement;
   private readonly message: HTMLElement;
   private readonly fileInput: HTMLInputElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
   /** 正在等待第二次確認的動作（畫面狀態，不是遊戲狀態）。 */
   private pending: { slot: string; action: SlotAction } | null = null;
   /** 正在等待選擇匯入檔案的格子。 */
@@ -54,6 +55,7 @@ export class SavePanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#save-panel');
+    this.dialog = new PanelDialog(this.root);
     this.list = required(doc, '#save-list');
     this.message = required(doc, '#save-message');
     required(doc, '#save-close').addEventListener('click', () => this.close());
@@ -66,22 +68,23 @@ export class SavePanel {
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   async open(): Promise<void> {
-    this.open_ = true;
-    this.root.hidden = false;
+    // 先開啟（記下焦點、移入面板）再等清單，等待期間鍵盤仍視為面板開著。
+    this.dialog.open();
     this.pending = null;
     this.setMessage(this.options.persistent ? '' : '這個瀏覽器無法使用 IndexedDB，存檔槽不能使用。');
     await this.refresh();
+    // 清單出現後，把焦點移到第一個按鈕（剛開啟時清單還是空的）。
+    this.dialog.focusInitial();
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
     this.pending = null;
     this.importTarget = null;
+    this.dialog.close();
   }
 
   private async refresh(): Promise<void> {

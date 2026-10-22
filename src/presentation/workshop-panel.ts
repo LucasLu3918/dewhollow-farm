@@ -3,6 +3,7 @@ import { takeReady } from '../domain/processing';
 import { levelOf } from '../domain/skills';
 import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 加工台面板（DOM）：列出加工配方（放入）、正在加工的批次與已完成的成品（取回）。
@@ -13,7 +14,7 @@ export class WorkshopPanel {
   private readonly root: HTMLElement;
   private readonly funds: HTMLElement;
   private readonly list: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
 
   constructor(
     doc: Document,
@@ -22,28 +23,27 @@ export class WorkshopPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#workshop-panel');
+    this.dialog = new PanelDialog(this.root);
     this.funds = required(doc, '#workshop-funds');
     this.list = required(doc, '#workshop-list');
     required(doc, '#workshop-close').addEventListener('click', () => this.close());
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   open(state: GameState): void {
-    this.open_ = true;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   refresh(state: GameState): void {
-    if (this.open_) this.render(state);
+    if (this.dialog.isOpen()) this.render(state);
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

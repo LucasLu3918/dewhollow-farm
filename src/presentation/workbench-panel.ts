@@ -2,6 +2,7 @@ import type { GameState } from '../domain/game-state';
 import { levelOf, SKILL_NAMES, type SkillId } from '../domain/skills';
 import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 工作台面板（DOM）：列出合成配方、需要的材料與解鎖條件。按鈕只送出指令；
@@ -12,7 +13,7 @@ export class WorkbenchPanel {
   private readonly root: HTMLElement;
   private readonly funds: HTMLElement;
   private readonly list: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
 
   constructor(
     doc: Document,
@@ -21,28 +22,27 @@ export class WorkbenchPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#workbench-panel');
+    this.dialog = new PanelDialog(this.root);
     this.funds = required(doc, '#workbench-funds');
     this.list = required(doc, '#workbench-list');
     required(doc, '#workbench-close').addEventListener('click', () => this.close());
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   open(state: GameState): void {
-    this.open_ = true;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   refresh(state: GameState): void {
-    if (this.open_) this.render(state);
+    if (this.dialog.isOpen()) this.render(state);
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

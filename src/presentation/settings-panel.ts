@@ -3,6 +3,7 @@ import { ACTION_IDS, assignKey, bindableKeyProblem, keyLabel, normalizeKey, rese
 import { FONT_SIZES, TOUCH_MODES, type FontSize, type Settings, type TouchMode } from '../domain/settings';
 import { FONT_SIZE_LABELS } from './accessibility';
 import { prefersReducedMotion } from './motion';
+import { PanelDialog } from './panel-dialog';
 
 /** 設定面板裡每個動作的名稱（給玩家看；按鍵本身由 domain 的表決定）。 */
 export const ACTION_LABELS: Record<ActionId, string> = {
@@ -58,7 +59,7 @@ export class SettingsPanel {
   private readonly particles: HTMLInputElement;
   private readonly reduced: HTMLElement;
   private readonly touch: HTMLSelectElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
   private capturing: ActionId | null = null;
   private pendingSwap: { action: ActionId; key: string; conflict: ActionId } | null = null;
 
@@ -67,6 +68,7 @@ export class SettingsPanel {
     private readonly service: SettingsService,
   ) {
     this.root = required(doc, '#settings-panel');
+    this.dialog = new PanelDialog(this.root);
     this.keyList = required(doc, '#settings-keys');
     this.message = required(doc, '#settings-message');
     this.prompt = required(doc, '#settings-prompt');
@@ -105,20 +107,18 @@ export class SettingsPanel {
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   open(): void {
-    this.open_ = true;
-    this.root.hidden = false;
     this.render();
+    this.dialog.open();
   }
 
   close(): void {
-    this.open_ = false;
     this.capturing = null;
     this.pendingSwap = null;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   isCapturing(): boolean {
