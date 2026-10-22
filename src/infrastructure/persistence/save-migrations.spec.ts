@@ -53,6 +53,20 @@ describe('migrateState v1 → v2', () => {
     }
   });
 
+  it('treats a plot saved without dryDays as having no dry days yet, and keeps the rest of the plot', () => {
+    const migrated = migrateState(
+      v1State({
+        plots: {
+          '4,4': { watered: false, crop: null },
+          '4,3': { watered: true, crop: { cropId: 'moon-bean', growthDays: 1 } },
+        },
+      }),
+      context,
+    ) as { plots: Record<string, Record<string, unknown>> };
+    expect(migrated.plots['4,4']).toEqual({ watered: false, crop: null, dryDays: 0 });
+    expect(migrated.plots['4,3']).toEqual({ watered: true, crop: { cropId: 'moon-bean', growthDays: 1 }, dryDays: 0 });
+  });
+
   it('splits a stack that is larger than the stack limit', () => {
     const migrated = migrateState(v1State({ bag: { seeds: {}, crops: { 'sweet-radish': 120 } } }), context) as {
       inventory: { stacks: { count: number }[] };
@@ -97,6 +111,17 @@ describe('migrateState version handling', () => {
     expect(() => migrateState({}, context)).toThrow('缺少存檔版本');
     expect(() => migrateState({ schemaVersion: 0 }, context)).toThrow(SaveFormatError);
     expect(() => migrateState('nope', context)).toThrow(SaveFormatError);
+  });
+
+  it('lists every damaged field in a v1 state, not only the first one', () => {
+    try {
+      migrateState(v1State({ gold: -5, bag: { seeds: { 'moon-bean': -1 }, crops: {} } }), context);
+      throw new Error('should have thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(SaveFormatError);
+      expect((error as Error).message).toContain('gold');
+      expect((error as Error).message).toContain('bag.seeds.moon-bean');
+    }
   });
 
   it('reports where a damaged v1 state is wrong instead of guessing', () => {

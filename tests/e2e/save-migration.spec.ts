@@ -90,6 +90,20 @@ test('loads a v1 save and rewrites it as the current version on the next save', 
   });
 });
 
+test('loads a v1 save whose plots have no dryDays field, as the old game wrote them', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#game canvas')).toBeVisible();
+  const oldPlots = {
+    ...V1_RECORD,
+    state: { ...V1_RECORD.state, plots: { '4,4': { watered: false, crop: null }, '4,3': { watered: true, crop: { cropId: 'moon-bean', growthDays: 1 } } } },
+  };
+  await putRecord(page, oldPlots);
+
+  await page.reload();
+  await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
+  await expect(page.locator('#hud-log')).not.toContainText('無法讀取存檔');
+});
+
 test('shows a real error and keeps the save when it is from a newer game version', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();

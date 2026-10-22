@@ -70,11 +70,30 @@ function versionOf(raw: unknown): number {
   return version;
 }
 
+/**
+ * v1 的田地可能沒有 dryDays（那時還沒有乾旱天數）：缺的視為 0，其餘欄位照原樣交給 v1 格式檢查。
+ * 不改動輸入物件，回傳新的物件。
+ */
+function withDryDaysDefault(raw: unknown): unknown {
+  if (typeof raw !== 'object' || raw === null || !('plots' in raw)) return raw;
+  const { plots } = raw;
+  if (typeof plots !== 'object' || plots === null) return raw;
+  const filled = Object.fromEntries(
+    Object.entries(plots).map(([key, plot]) => [
+      key,
+      typeof plot === 'object' && plot !== null && !('dryDays' in plot) ? { ...plot, dryDays: 0 } : plot,
+    ]),
+  );
+  return { ...raw, plots: filled };
+}
+
 /** v1 → v2：背包改為通用物品堆疊、出貨箱改為物品條目、新增遊玩時數。 */
 function migrateV1ToV2(raw: unknown, context: MigrationContext): unknown {
-  const parsed = gameStateV1Schema.safeParse(raw);
+  const parsed = gameStateV1Schema.safeParse(withDryDaysDefault(raw));
   if (!parsed.success) {
-    throw new SaveFormatError(`存檔 v1 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+    // 一次列出所有有問題的欄位（最多 5 個），方便對照舊存檔，不必重試一次只看到一個。
+    const listed = parsed.error.issues.slice(0, 5).map((issue) => describeIssue(issue));
+    throw new SaveFormatError(`存檔 v1 格式錯誤於 ${listed.join('；')}`);
   }
   const { bag, shipBox, ...rest }: GameStateV1 = parsed.data;
 
