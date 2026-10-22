@@ -36,6 +36,8 @@ import plaza from '../../content/maps/plaza.json';
 import forest from '../../content/maps/forest.json';
 import lake from '../../content/maps/lake.json';
 import house from '../../content/maps/house.json';
+import houseWing from '../../content/maps/house-wing.json';
+import houseFull from '../../content/maps/house-full.json';
 import mineEntrance from '../../content/maps/mine-entrance.json';
 import coop from '../../content/maps/coop.json';
 import pasture from '../../content/maps/pasture.json';
@@ -58,7 +60,7 @@ const { pack } = loadContent({
   randomEvents,
   collection,
   achievements,
-  maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+  maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,

@@ -290,7 +290,7 @@ describe('星河兌換：夜市用星河碎片換物品', () => {
 
   it('兌換配方的旗標：換到之前工作台做不了星河糖，換到之後就做得出來', () => {
     const before = run(withItems(game({ ...BENCH }), { mint: 2, hay: 1 }), { type: 'craft', recipeId: 'star-sugar' });
-    expect(before.messages).toEqual(['還沒有這個配方，要先在夜市的星河兌換換到']);
+    expect(before.messages).toEqual(['還沒有這個配方，要先找到或買到它']);
     expect(countOf(before.state.inventory, 'star-sugar')).toBe(0);
 
     const exchanged = run(withItems(game({ ...MARKET }), { 'star-shard': 4 }), { type: 'starExchange', lineId: 'star-sugar-recipe' });

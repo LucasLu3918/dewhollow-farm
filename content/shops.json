@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "櫃檯放在地圖上（tile.kind 為 shop，tile.shop 指向這裡的 id）。鐵匠的升級需要銅礦石，礦坑完成前買不到，這是有意的。雜貨店的 building.cowbarn 是牛舍改建（花金幣、只能買一次），改建後才買得到牛（animal.cow）。夜市攤位（night-market）只在節慶開放時買得到（festival 指向 festivals.json），每項有 limit 的數量限制，每年重算。",
+  "note": "櫃檯放在地圖上（tile.kind 為 shop，tile.shop 指向這裡的 id）。鐵匠的升級需要銅礦石，礦坑完成前買不到，這是有意的。雜貨店的 building.cowbarn 是牛舍改建（花金幣、只能買一次），改建後才買得到牛（animal.cow）。羊（animal.sheep，600 金）不需要改建，買了牽進牧草地的羊圈。小屋擴建是 building.house-wing（3000 金，東側一間房）與 building.house-full（8000 金，廚房與工作台，要先有前者），各只買一次。recipe.<id> 是配方，買了就學會（旗標 recipe:<id>，不進背包）。seasons 是季節進貨：只在那些季節上架，換季後下架（夏季的遮陽帽配方、秋季的木材補充）。夜市攤位（night-market）只在節慶開放時買得到（festival 指向 festivals.json），每項有 limit 的數量限制，每年重算。",
   "shops": [
     {
       "id": "general",
@@ -43,7 +43,12 @@
         {
           "itemId": "building.greenhouse",
           "price": 9000
-        }
+        },
+        { "itemId": "animal.sheep", "price": 600, "playMinutes": 2 },
+        { "itemId": "building.house-wing", "price": 3000, "playMinutes": 3 },
+        { "itemId": "building.house-full", "price": 8000, "playMinutes": 3 },
+        { "itemId": "recipe.sun-hat", "price": 180, "seasons": ["summer"], "playMinutes": 1 },
+        { "itemId": "wood", "price": 12, "seasons": ["autumn"] }
       ],
       "upgrades": []
     },

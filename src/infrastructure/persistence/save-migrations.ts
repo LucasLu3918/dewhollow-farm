@@ -42,6 +42,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   17: migrateV17ToV18,
   18: migrateV18ToV19,
   19: migrateV19ToV20,
+  20: migrateV20ToV21,
 };
 
 /**
@@ -222,6 +223,19 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v20 → v21：羊與布、小屋擴建、商店季節限定。舊存檔沒有羊（羊圈是空的），小屋擴建的旗標也還沒有（不補）；
+ * 季節限定的商品不需要購買紀錄（配方的旗標與木材都是一次性或不限量的）。
+ */
+function migrateV20ToV21(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(20) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v20 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  // 舊存檔沒有 sheep 欄位就是空的羊圈；已經有（例如手動編輯過的測試存檔）就照原樣保留，之後由 schema 檢查。
+  return { ...(raw as Record<string, unknown>), schemaVersion: 21, sheep: (raw as { sheep?: unknown }).sheep ?? [] };
 }
 
 /**

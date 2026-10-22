@@ -11,6 +11,8 @@ import type { ContentIndex } from '../../src/application/content-index';
 import { Bot, SECONDS_PER_ACTION, SECONDS_PER_STEP } from './bot';
 import { isMineMap, kindAt, mapOrNull, passable, tilesWhere, type Pos } from './world';
 import { tileAt } from '../../src/domain/world';
+import { expansionRefusal, houseMapIdFor } from '../../src/domain/house';
+import { onSale } from '../../src/domain/shop-stock';
 import type { MapDef } from '../../src/domain/content';
 import { shippedIndex, shippedPack } from './shipped-content';
 
@@ -40,6 +42,8 @@ export interface DayRecord {
   animals: number;
   /** 牛舍的牛數。 */
   cows: number;
+  /** 羊圈的羊數。 */
+  sheep: number;
   /** 當天結束時，估計累計的真實遊玩分鐘。 */
   minutes: number;
   refusals: Record<string, number>;
@@ -95,6 +99,7 @@ export function simulate(totalDays: number, seed = 7, index: ContentIndex = ship
       tiers: { ...s.toolTiers },
       animals: s.animals.length,
       cows: s.cows.length,
+      sheep: s.sheep.length,
       minutes,
       refusals: { ...stats.refusals },
     };
@@ -148,6 +153,13 @@ function milestonesOf(s: GameState, record: DayRecord, index: ContentIndex): str
   if (s.flags.greenhouse) out.push('溫室改建');
   if (s.festival.done['harvest-feast:contest'] !== undefined) out.push('豐穗祭：收成比賽完成');
   if (s.flags['lantern:all']) out.push('暖燈：廣場的燈全部點亮');
+  // M6 之後的羊與布、小屋擴建、季節限定的配方（見 content/shops.json）。
+  if (s.sheep.length > 0) out.push('第一隻羊');
+  if (s.inventory.stacks.some((st) => st.itemId === 'cloth') || s.processing.some((job) => job.recipeId === 'weave-cloth')) out.push('第一批布');
+  if (s.inventory.stacks.some((st) => st.itemId === 'clothes')) out.push('第一件衣服（合成）');
+  if (s.flags['house-wing']) out.push('小屋擴建：東側一間房');
+  if (s.flags['house-full']) out.push('小屋擴建：廚房與工作台');
+  if (s.flags['recipe:sun-hat']) out.push('遮陽帽配方（夏季進貨）');
 
   // M5d：圖鑑、成就、委託、主線、節慶、心形事件、修復、信件、隨機事件，以及行事曆上的日子（見 freshness.spec.ts）。
   for (const id of s.achievements.unlocked) out.push(`成就：${index.achievements.find((a) => a.id === id)?.name ?? id}`);
@@ -196,6 +208,7 @@ function playDay(bot: Bot, index: ContentIndex): void {
   villageTrip(bot, index);
   coopCare(bot, index);
   cowCare(bot, index);
+  sheepCare(bot, index);
   pastureWork(bot, index);
   forestWork(bot, index);
   mineWork(bot, index);
@@ -288,7 +301,25 @@ function farmWork(bot: Bot, index: ContentIndex): void {
   }
 }
 
-/** 村莊：雜貨店買種子與乾草、買雞；鐵匠依序升級。 */
+/** 羊圈：先餵乾草（乾草槽在牧草地），再逐隻羊先摸一下、再剪毛（羊毛長好才剪得到）。 */
+function sheepCare(bot: Bot, index: ContentIndex): void {
+  if (bot.state.sheep.length === 0) return;
+  const pasture = mapOrNull(index, 'pasture');
+  if (!pasture) return;
+  if (countOf(bot.state.inventory, 'hay') > 0) {
+    bot.actOn(tilesWhere(bot.state, pasture, (kind) => kind === 'trough'), { type: 'interact' });
+  }
+  const seats = tilesWhere(bot.state, pasture, (_k, t) => !!t.slot);
+  seats.slice(0, bot.state.sheep.length).forEach((seat) => {
+    bot.actOn([seat], { type: 'interact' }); // 摸
+    bot.actOn([seat], { type: 'interact' }); // 剪（羊毛長好才成功）
+  });
+}
+
+/** 小屋的擴建與季節限定的配方（見 shops.json）：金幣夠（留一點給種子與乾草）就買，每樣只買一次。 */
+const HOUSE_STEPS = ['building.house-wing', 'building.house-full'] as const;
+
+/** 村莊：雜貨店買種子與乾草、買雞、買牛與羊；鐵匠依序升級；小屋擴建與夏季的遮陽帽配方。 */
 function villageTrip(bot: Bot, index: ContentIndex): void {
   const village = mapOrNull(index, 'village');
   if (!village) return;
@@ -304,8 +335,8 @@ function villageTrip(bot: Bot, index: ContentIndex): void {
     if (line) toBuy.seed = Math.min(wantSeeds, Math.floor(bot.state.gold / line.price));
   }
   const hayPrice = general.stock.find((l) => l.itemId === 'hay')?.price ?? 0;
-  // 每座有動物的建築（雞舍、牛舍）每天要一包乾草。
-  const barns = (bot.state.animals.length > 0 ? 1 : 0) + (bot.state.cows.length > 0 ? 1 : 0);
+  // 每座有動物的建築（雞舍、牛舍、羊圈）每天要一包乾草。
+  const barns = (bot.state.animals.length > 0 ? 1 : 0) + (bot.state.cows.length > 0 ? 1 : 0) + (bot.state.sheep.length > 0 ? 1 : 0);
   if (barns > 0 && countOf(bot.state.inventory, 'hay') < 2 && hayPrice > 0) toBuy.hay = 2;
   const chickenLine = general.stock.find((l) => l.itemId === 'animal.chicken');
   const seats = bot.state.animals.length < 3 && chickenLine && bot.state.gold >= chickenLine.price + 20;
@@ -324,6 +355,27 @@ function villageTrip(bot: Bot, index: ContentIndex): void {
   const barnSeats = tilesWhere(bot.state, index.map('cowbarn'), (_k, t) => !!t.slot).length;
   if (cowLine && bot.state.flags.cowbarn && bot.state.cows.length < barnSeats && bot.state.gold >= cowLine.price + COW_RESERVE) {
     bot.actOn(counters('general'), { type: 'buy', shopId: 'general', itemId: 'animal.cow', count: 1 });
+  }
+
+  // 羊圈：羊不需要改建，座位由牧草地的座位決定（3 個）。
+  const sheepLine = general.stock.find((l) => l.itemId === 'animal.sheep');
+  const penSeats = tilesWhere(bot.state, index.map('pasture'), (_k, t) => !!t.slot).length;
+  if (sheepLine && bot.state.sheep.length < penSeats && bot.state.gold >= sheepLine.price + COW_RESERVE) {
+    bot.actOn(counters('general'), { type: 'buy', shopId: 'general', itemId: 'animal.sheep', count: 1 });
+  }
+
+  // 小屋擴建：每次擴建只買一次，第二次要先有第一次（expansionRefusal 判斷）。
+  for (const itemId of HOUSE_STEPS) {
+    const line = general.stock.find((l) => l.itemId === itemId);
+    const flag = itemId.slice('building.'.length);
+    if (!line || expansionRefusal(bot.state.flags, flag) !== null || bot.state.gold < line.price + COW_RESERVE) continue;
+    bot.actOn(counters('general'), { type: 'buy', shopId: 'general', itemId, count: 1 });
+  }
+
+  // 夏季的遮陽帽配方：季節限定，只在夏天的貨架上（換季後就買不到），學會一次。
+  const hatLine = general.stock.find((l) => l.itemId === 'recipe.sun-hat');
+  if (hatLine && onSale(hatLine, bot.state.calendar.season) && !bot.state.flags['recipe:sun-hat'] && bot.state.gold >= hatLine.price + COW_RESERVE) {
+    bot.actOn(counters('general'), { type: 'buy', shopId: 'general', itemId: 'recipe.sun-hat', count: 1 });
   }
 
   // 鐵匠：依序升級（只在材料與金幣都夠時才去櫃檯前，免得白走）。
@@ -364,9 +416,9 @@ function cowCare(bot: Bot, index: ContentIndex): void {
   });
 }
 
-/** 牧草地：有牛時割牧草得乾草（用鐮刀，體力沿用砍樹的基礎值）；乾草夠了就不去割。 */
+/** 牧草地：有牛或羊時割牧草得乾草（用鐮刀，體力沿用砍樹的基礎值）；乾草夠了就不去割。 */
 function pastureWork(bot: Bot, index: ContentIndex): void {
-  if (bot.state.cows.length === 0) return;
+  if (bot.state.cows.length === 0 && bot.state.sheep.length === 0) return;
   const pasture = mapOrNull(index, 'pasture');
   if (!pasture) return;
   const enough = 4;
@@ -496,7 +548,8 @@ function lakeWork(bot: Bot, index: ContentIndex): void {
 
 /** 小屋：加工機（先收成品再放入）、廚房（做菜、低體力時吃）。 */
 function houseWork(bot: Bot, index: ContentIndex): void {
-  const house = index.map('house');
+  // 小屋的格局依擴建進度而定（house、house-wing、house-full）。
+  const house = index.map(houseMapIdFor(bot.state.flags));
   const workshop = tilesWhere(bot.state, house, (kind) => kind === 'workshop');
   if (takeReady(bot.state.processing).ready.length > 0) bot.actOn(workshop, { type: 'collectProcessing' });
 
@@ -554,7 +607,7 @@ function shipping(bot: Bot, index: ContentIndex): void {
 }
 
 function sleep(bot: Bot, index: ContentIndex): void {
-  const house = index.map('house');
+  const house = index.map(houseMapIdFor(bot.state.flags));
   const bed = tilesWhere(bot.state, house, (kind) => kind === 'bed');
   bot.actOn(bed, { type: 'interact' });
 }

@@ -9,7 +9,7 @@ import type { MineRules } from './mine';
 import type { AnimalDef, FlockId } from './animals';
 import type { Requirement } from './unlock';
 
-export type { AnimalDef, MilkDef } from './animals';
+export type { AnimalDef, MilkDef, WoolDef } from './animals';
 
 export interface Point {
   x: number;
@@ -75,7 +75,7 @@ export interface TileDef {
   requires?: Requirement;
   /** 僅櫃檯會用到：屬於哪一家店（見 shops.json）。 */
   shop?: string;
-  /** 雞舍或牛舍的座位：動物坐在這裡。 */
+  /** 雞舍、牛舍或羊圈的座位：動物坐在這裡。 */
   slot?: boolean;
   /** 採集點：採到的物品（省略為野薄荷）與能採的季節（省略為四季皆可）。 */
   item?: string;
@@ -233,6 +233,8 @@ export interface ShopStock {
   limit?: number;
   /** 只在這些季節進貨（省略為四季都有）；例如秋季的種子只在秋天賣。 */
   seasons?: Season[];
+  /** 內容時數的估計（分鐘）：只有要計入春夏時數的商品才有（見 playtime-content.spec.ts）。 */
+  playMinutes?: number;
 }
 
 /** 升級工具到某一階需要的金幣與材料（材料是 物品 id → 數量）。 */

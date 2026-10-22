@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "圖鑑（M5d）：七類，每類的條目是物品 id（魚、作物、礦物、野菜與花、料理、加工品、動物）。首次取得才計入（釣到、收成、採到、做出、買到飼養）。每類達到 25／50／75／100% 的門檻給獎勵（金錢、裝飾、稱號）；門檻向上取整。圖鑑碎片（dexFragments）是委託的獎勵，不計入條目。playMinutes 為內容時數的估計。文字為本專案原創。",
+  "note": "圖鑑（M5d）：八類，每類的條目是物品 id（魚、作物、礦物、野菜與花、料理、加工品、動物、服飾）。服飾（M6 羊與布之後新增）收的是衣服與遮陽帽。首次取得才計入（釣到、收成、採到、做出、買到飼養）。每類達到 25／50／75／100% 的門檻給獎勵（金錢、裝飾、稱號）；門檻向上取整。圖鑑碎片（dexFragments）是委託的獎勵，不計入條目。playMinutes 為內容時數的估計。文字為本專案原創。",
   "categories": [
     {
       "id": "fish",
@@ -72,7 +72,7 @@
       "name": "加工品",
       "phase": "summer",
       "playMinutes": 0.5,
-      "entries": ["pickle-bean", "dried-mint", "pickle-radish", "dried-carp", "dried-bass", "butter", "cheese"],
+      "entries": ["pickle-bean", "dried-mint", "pickle-radish", "dried-carp", "dried-bass", "butter", "cheese", "cloth"],
       "rewards": [
         { "percent": 25, "gold": 80 },
         { "percent": 50, "gold": 150 },
@@ -85,12 +85,25 @@
       "name": "動物",
       "phase": "spring",
       "playMinutes": 0.5,
-      "entries": ["animal.chicken", "animal.cow"],
+      "entries": ["animal.chicken", "animal.cow", "animal.sheep"],
       "rewards": [
         { "percent": 25, "gold": 100 },
         { "percent": 50, "gold": 150 },
         { "percent": 75, "gold": 200 },
         { "percent": 100, "title": "牧場主人", "gold": 250 }
+      ]
+    },
+    {
+      "id": "clothing",
+      "name": "服飾",
+      "phase": "summer",
+      "playMinutes": 0.5,
+      "entries": ["clothes", "sun-hat"],
+      "rewards": [
+        { "percent": 25, "gold": 100 },
+        { "percent": 50, "items": { "star-string": 1 } },
+        { "percent": 75, "gold": 150 },
+        { "percent": 100, "title": "衣櫃的主人", "gold": 200 }
       ]
     }
   ]

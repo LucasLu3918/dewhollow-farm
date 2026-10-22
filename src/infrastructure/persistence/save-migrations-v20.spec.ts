@@ -24,9 +24,9 @@ function v19State(overrides: Record<string, unknown> = {}): Record<string, unkno
 }
 
 describe('migrateState v19 → v20（秋冬：溫室、豐穗祭、暖燈節、主線第 4–5 章）', () => {
-  it('bumps the save to version 20', () => {
+  it('bumps the save to the current version (21, see save-migrations-v21.spec.ts)', () => {
     const migrated = migrateState(v19State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(20);
+    expect(migrated.schemaVersion).toBe(21);
   });
 
   it('starts the harvest contest with nothing harvested', () => {
@@ -64,8 +64,8 @@ describe('migrateState v19 → v20（秋冬：溫室、豐穗祭、暖燈節、�
     expect(before).toEqual(snapshot);
   });
 
-  it('a state from a version newer than 20 is still refused', () => {
-    expect(() => migrateState({ schemaVersion: 21 }, context)).toThrow(SaveFormatError);
+  it('a state from a version newer than 21 is still refused', () => {
+    expect(() => migrateState({ schemaVersion: 22 }, context)).toThrow(SaveFormatError);
   });
 
   it('a v19 save without a festival record gets an empty harvest tally (the other records are not invented)', () => {

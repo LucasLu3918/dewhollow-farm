@@ -381,6 +381,24 @@
       "kind": "object",
       "color": "#f7e7a1",
       "source": "占位（程式產生）：物品目前沒有圖示，這筆只登錄來源（奶油）"
+    },
+    {
+      "id": "animal.sheep",
+      "kind": "object",
+      "color": "#fbfaf4",
+      "source": "占位（程式產生）：羊的圖由 src/presentation/animal-art.ts 用 Graphics 畫成（與雞、牛相同做法）"
+    },
+    {
+      "id": "item.wool",
+      "kind": "object",
+      "color": "#e6e1d3",
+      "source": "占位（程式產生）：物品目前沒有圖示，這筆只登錄來源（羊毛）"
+    },
+    {
+      "id": "item.cloth",
+      "kind": "object",
+      "color": "#c9b79c",
+      "source": "占位（程式產生）：物品目前沒有圖示，這筆只登錄來源（布）"
     }
   ]
 }

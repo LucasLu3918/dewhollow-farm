@@ -6,8 +6,8 @@ import type { Quality } from './items';
  * 心情 0 到 10：摸過加一，沒餵飽減一；心情 5 以上的動物有機會出優良的產物，9 以上有機會出精良的牛奶。
  */
 
-/** 動物住在哪一種建築：雞舍（animals）或牛舍（cows）。地圖上的 flock 欄位指定，見 content/maps。 */
-export type FlockId = 'animals' | 'cows';
+/** 動物住在哪一種建築：雞舍（animals）、牛舍（cows）或牧草地的羊圈（sheep）。地圖上的 flock 欄位指定，見 content/maps。 */
+export type FlockId = 'animals' | 'cows' | 'sheep';
 
 export interface Animal {
   kind: string;
@@ -16,11 +16,21 @@ export interface Animal {
   /** 今天已經擠過奶（只有牛會用到；雞的這個欄位一直是 false）。 */
   milked: boolean;
   mood: number;
+  /** 羊毛長了幾天（只有羊會用到，見 growWool）；到了 AnimalDef.wool.everyDays 就能剪。 */
+  woolDays?: number;
 }
 
 /** 擠奶的設定：奶的物品，以及心情夠高時出優良與精良奶的機率（0 到 1，精良的機率不大於優良）。 */
 export interface MilkDef {
   item: string;
+  goodChance: number;
+  fineChance: number;
+}
+
+/** 產毛的設定：每隔幾天（餵飽的天數）長好一次羊毛，剪下一個羊毛；品質的機率與奶相同。 */
+export interface WoolDef {
+  item: string;
+  everyDays: number;
   goodChance: number;
   fineChance: number;
 }
@@ -33,6 +43,8 @@ export interface AnimalDef {
   eggQuality?: number;
   /** 產奶的動物：每天要擠一次（見 milkQuality）。 */
   milk?: MilkDef;
+  /** 產毛的動物：羊毛長好後要剪（見 growWool、shearAt）。 */
+  wool?: WoolDef;
 }
 
 export const MOOD_MIN = 0;
@@ -84,13 +96,40 @@ export function produceEggs(
 }
 
 /**
- * 擠奶的品質：心情 9 以上且 r 小於 fineChance 是精良；心情 5 以上且 r 小於 goodChance 是優良；其餘是普通。
- * 心情越高，出好奶的機會越大（與雞蛋相同，用同一個隨機數判斷）。
+ * 產物的品質（奶與羊毛共用）：心情 9 以上且 r 小於 fineChance 是精良；心情 5 以上且 r 小於 goodChance 是優良；其餘是普通。
+ * 心情越高，出好東西的機會越大（與雞蛋相同，用同一個隨機數判斷）。
  */
-export function milkQuality(mood: number, r: number, milk: MilkDef): Quality {
-  if (mood >= FINE_FROM && r < milk.fineChance) return 'fine';
-  if (mood >= HAPPY_FROM && r < milk.goodChance) return 'good';
+export function productQuality(mood: number, r: number, chances: { goodChance: number; fineChance: number }): Quality {
+  if (mood >= FINE_FROM && r < chances.fineChance) return 'fine';
+  if (mood >= HAPPY_FROM && r < chances.goodChance) return 'good';
   return 'normal';
+}
+
+/** 擠奶的品質（見 productQuality）。 */
+export function milkQuality(mood: number, r: number, milk: MilkDef): Quality {
+  return productQuality(mood, r, milk);
+}
+
+/**
+ * 睡醒時羊毛長一天：餵飽的羊 +1 天，最多到 everyDays（長好就停）；沒餵飽的羊不長。
+ * 要放在 dailyCare 之前呼叫（dailyCare 會清掉餵飽的紀錄）。
+ */
+export function growWool(flock: readonly Animal[], everyDays: number): Animal[] {
+  return flock.map((animal) => {
+    const days = animal.woolDays ?? 0;
+    return { ...animal, woolDays: animal.fed ? Math.min(everyDays, days + 1) : days };
+  });
+}
+
+/** 羊毛是否長好（可以剪）。 */
+export function woolReady(animal: Animal, everyDays: number): boolean {
+  return (animal.woolDays ?? 0) >= everyDays;
+}
+
+/** 剪第 slot 隻羊的毛：羊毛從 0 天重新長（位置不存在就什麼都不做；是否長好由呼叫端先檢查）。 */
+export function shearAt(flock: readonly Animal[], slot: number): Animal[] {
+  if (slot < 0 || slot >= flock.length) return [...flock];
+  return flock.map((animal, i) => (i === slot ? { ...animal, woolDays: 0 } : animal));
 }
 
 /** 睡醒時的照顧結算：摸過的加一點心情，沒餵飽的減一點；餵飽、摸過與擠奶的紀錄當天重置。 */

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "合成配方（小屋的工作台 T）。材料不足或技能不夠就做不了。output 是產物（item 與數量）；effect 是效果：flag 只能做一次，bagSlots 增加背包格數（最多 max 次）。unlock 是解鎖條件：技能等級（skill + level），或旗標（flag，例如星河糖由夜市的星河兌換解鎖）。playMinutes 是內容時數的估計（見 docs/PLAYTIME_PLAN.md）。",
+  "note": "合成配方（小屋的工作台 T）。材料不足或技能不夠就做不了。output 是產物（item 與數量）；effect 是效果：flag 只能做一次，bagSlots 增加背包格數（最多 max 次）。unlock 是解鎖條件：技能等級（skill + level），或旗標（flag，例如星河糖由夜市的星河兌換解鎖；遮陽帽由雜貨店的夏季配方解鎖）。playMinutes 是內容時數的估計（見 docs/PLAYTIME_PLAN.md）。",
   "recipes": [
     {
       "id": "sprinkler",
@@ -235,6 +235,38 @@
         "flag": "blueprint:fountain"
       },
       "playMinutes": 2
+    },
+    {
+      "id": "clothes",
+      "name": "衣服",
+      "ingredients": {
+        "cloth": 2
+      },
+      "output": {
+        "item": "clothes",
+        "count": 1
+      },
+      "unlock": {
+        "skill": "farming",
+        "level": 3
+      },
+      "playMinutes": 1.5
+    },
+    {
+      "id": "sun-hat",
+      "name": "遮陽帽",
+      "ingredients": {
+        "flower-summer": 2,
+        "hay": 2
+      },
+      "output": {
+        "item": "sun-hat",
+        "count": 1
+      },
+      "unlock": {
+        "flag": "recipe:sun-hat"
+      },
+      "playMinutes": 1.5
     }
   ]
 }

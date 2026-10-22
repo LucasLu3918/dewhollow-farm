@@ -3,6 +3,7 @@ import { TIER_NAMES, TOOL_NAMES, type ToolId } from '../domain/tools';
 import { countOf } from '../domain/inventory';
 import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
+import { onSale } from '../domain/shop-stock';
 
 /**
  * 商店面板（DOM）：只負責把貨架與升級項目列出來，按鈕送出指令；
@@ -58,8 +59,8 @@ export class ShopPanel {
 
     if (shop.stock.length > 0) {
       for (const line of shop.stock) {
-        // 季節進貨：這個季節沒有進貨的東西不列出（見 shops.json 的 seasons）。
-        if (line.seasons && !line.seasons.includes(state.calendar.season)) continue;
+        // 季節進貨：這個季節沒有進貨的東西不列出（見 shops.json 的 seasons、domain/shop-stock.ts）。
+        if (!onSale(line, state.calendar.season)) continue;
         const name = this.nameOf(line.itemId);
         this.addRow(`${name}　${line.price} 金`, '買一個', () =>
           this.onCommand({ type: 'buy', shopId: shop.id, itemId: line.itemId, count: 1 }),

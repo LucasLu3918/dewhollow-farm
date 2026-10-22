@@ -94,12 +94,17 @@ export function festivalProblems(pack: ContentPack): string[] {
     }
   }
   // 合成配方用旗標解鎖的，必須有星河兌換會設定它，否則永遠做不了。
-  // 修復的獎勵旗標也能解鎖配方（例如春季修復給的噴泉圖紙）。
+  // 修復的獎勵旗標也能解鎖配方（例如春季修復給的噴泉圖紙）；商店賣的配方（recipe.<id>）設定 recipe:<id>。
   const repairFlags = (pack.repairs ?? []).flatMap((r) => r.reward.flags ?? []);
-  const exchangeFlags = new Set([...festivals.flatMap((f) => (f.exchange ?? []).flatMap((line) => (line.flag ? [line.flag] : []))), ...repairFlags]);
+  const shopRecipeFlags = pack.shops.flatMap((s) => s.stock.filter((l) => l.itemId.startsWith('recipe.')).map((l) => `recipe:${l.itemId.slice('recipe.'.length)}`));
+  const exchangeFlags = new Set([
+    ...festivals.flatMap((f) => (f.exchange ?? []).flatMap((line) => (line.flag ? [line.flag] : []))),
+    ...repairFlags,
+    ...shopRecipeFlags,
+  ]);
   for (const recipe of pack.crafting) {
     if (recipe.unlock && 'flag' in recipe.unlock && !exchangeFlags.has(recipe.unlock.flag)) {
-      problems.push(`合成配方 ${recipe.id} 的解鎖旗標 ${recipe.unlock.flag} 沒有任何兌換來源（星河兌換或修復）`);
+      problems.push(`合成配方 ${recipe.id} 的解鎖旗標 ${recipe.unlock.flag} 沒有任何兌換來源（星河兌換、修復或商店）`);
     }
   }
 

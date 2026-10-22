@@ -3,6 +3,7 @@ import type { GameState } from '../../src/domain/game-state';
 import { isWalkable, tileAt } from '../../src/domain/world';
 import { changeAt, effectiveKind } from '../../src/domain/world-changes';
 import { mineId, mineLayerOf } from '../../src/domain/mine';
+import { resolveDestination } from '../../src/domain/house';
 import type { ContentIndex } from '../../src/application/content-index';
 import { requirementMet } from '../../src/domain/unlock';
 import { residentAt } from '../../src/application/residents';
@@ -49,7 +50,7 @@ export function landingOf(state: GameState, index: ContentIndex, map: MapDef, x:
   if (!tile || !tile.to) return null;
   const cleared = tile.kind === 'cave' && changeAt(state.worldChanges, map.id, x, y) === 'cleared';
   if (!(tile.kind === 'door' || tile.kind === 'stairs' || cleared)) return null;
-  let destinationId = tile.to;
+  let destinationId = resolveDestination(tile.to, state.flags);
   if (tile.kind === 'cave' && destinationId === mineId(1) && state.mineCheckpoint > 1) {
     destinationId = mineId(state.mineCheckpoint);
   }

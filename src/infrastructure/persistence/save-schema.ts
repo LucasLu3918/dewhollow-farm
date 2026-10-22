@@ -52,6 +52,8 @@ const animal = z.object({
   petted: z.boolean(),
   milked: z.boolean(),
   mood: z.number().int().min(0).max(10),
+  /** 羊毛長了幾天（只有羊有；沒有這個欄位就是還沒開始長）。 */
+  woolDays: z.number().int().nonnegative().optional(),
 });
 
 /** 目前版本的存檔 schema。版本升級時凍結舊版（見 save-schema-v1.ts）並在 save-migrations.ts 加遷移。 */
@@ -94,9 +96,10 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
     cooking: z.string().min(1).optional(),
   }),
   fishing: z.object({ fishId: z.string().min(1) }).nullable(),
-  /** 雞舍的雞與牛舍的牛：餵飽、摸過、擠過奶（牛）與心情；牛舍是否改建在 flags.cowbarn。 */
+  /** 雞舍的雞、牛舍的牛與羊圈的羊：餵飽、摸過、擠過奶（牛）、羊毛長了幾天（羊）與心情；牛舍是否改建在 flags.cowbarn。 */
   animals: z.array(animal),
   cows: z.array(animal),
+  sheep: z.array(animal),
   processing: z.array(z.object({ recipeId: z.string().min(1), daysLeft: z.number().int().nonnegative() })),
   /** 居民好感：點數與今日紀錄（對話、送禮的總天數；沒有紀錄是 null）。 */
   friendship: z.record(
