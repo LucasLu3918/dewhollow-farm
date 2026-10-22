@@ -1,5 +1,20 @@
 import type { GameState } from '../domain/game-state';
-import { CROWN_RECIPE, doneThisYear, festivalKey, markDone, openFestival, recordCatch, recordSale, soldThisYear, contestReached, type FestivalDef } from '../domain/festival';
+import {
+  CROWN_RECIPE,
+  doneThisYear,
+  exchangeRefusal,
+  festivalKey,
+  markDone,
+  openFestival,
+  recordCatch,
+  recordExchange,
+  recordSale,
+  soldThisYear,
+  contestReached,
+  type ExchangeContext,
+  type FestivalDef,
+  type StarExchangeDef,
+} from '../domain/festival';
 import { addItem, countOf, removeItem } from '../domain/inventory';
 import { fail, ok, type Result } from '../domain/result';
 import type { ContentIndex } from './content-index';
@@ -119,6 +134,66 @@ export function stallRefusal(state: GameState, index: ContentIndex, shopId: stri
   if (line?.limit === undefined) return null;
   const sold = soldThisYear(state.festival.sold, state.calendar.year, itemId);
   return sold + count > line.limit ? 'SOLD_OUT' : null;
+}
+
+/** 星河兌換的項目（節慶當天、在鎮廣場才有）；找不到就是 null。 */
+function exchangeLine(state: GameState, index: ContentIndex, lineId: string): StarExchangeDef | null {
+  const festival = festivalHere(state, index);
+  return festival?.exchange?.find((line) => line.id === lineId) ?? null;
+}
+
+function exchangeContext(state: GameState, line: StarExchangeDef): ExchangeContext {
+  return {
+    shards: countOf(state.inventory, line.give.itemId),
+    year: state.calendar.year,
+    exchanged: state.festival.exchanged,
+    flagSet: line.flag !== undefined && state.flags[line.flag] === true,
+  };
+}
+
+/**
+ * 星河兌換的拒絕原因（失敗代碼），或 null 表示可以換。節慶面板也用它決定按鈕與說明文字。
+ * 不是節慶時間、不在鎮廣場、沒有這一項，都會拒絕。
+ */
+export function starExchangeRefusal(state: GameState, index: ContentIndex, lineId: string): string | null {
+  if (!festivalHere(state, index)) return 'NOT_FESTIVAL';
+  const line = exchangeLine(state, index, lineId);
+  if (!line) return 'NO_EXCHANGE';
+  return exchangeRefusal(line, exchangeContext(state, line));
+}
+
+/**
+ * 星河兌換：付出碎片（或別的素材），換到物品或解鎖旗標。每項每年有上限；碎片跨年保留。
+ * 不花體力與時間。拒絕時什麼都不會被扣。
+ */
+export function starExchange(state: GameState, lineId: string, index: ContentIndex): Result<FestivalOutcome, string> {
+  const festival = festivalHere(state, index);
+  if (!festival) return fail('NOT_FESTIVAL');
+  const line = festival.exchange?.find((l) => l.id === lineId);
+  if (!line) return fail('NO_EXCHANGE');
+  const refusal = exchangeRefusal(line, exchangeContext(state, line));
+  if (refusal) return fail(refusal);
+
+  const taken = removeItem(state.inventory, line.give.itemId, line.give.count);
+  if (!taken.ok) return fail('NOT_ENOUGH_SHARDS');
+  let inventory = taken.value;
+  if (line.receive) {
+    const stored = addItem(inventory, index.item(line.receive.itemId), line.receive.count);
+    if (!stored.ok) return fail('BAG_FULL');
+    inventory = stored.value;
+  }
+  const year = state.calendar.year;
+  const next: GameState = {
+    ...state,
+    inventory,
+    festival: { ...state.festival, exchanged: recordExchange(state.festival.exchanged, year, line.id) },
+    flags: { ...state.flags, ...(line.flag !== undefined ? { [line.flag]: true } : {}), [`attended:${festival.id}`]: true },
+  };
+  const give = `${index.item(line.give.itemId).name} × ${line.give.count}`;
+  const message = line.receive
+    ? `星河兌換：給出 ${give}，得到 ${index.item(line.receive.itemId).name} × ${line.receive.count}`
+    : `星河兌換：給出 ${give}，${line.name}已經解鎖`;
+  return ok({ state: next, messages: [message] });
 }
 
 /** 攤位成交後記下賣了幾個（只有有限量的物品才記）。 */

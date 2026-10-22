@@ -38,6 +38,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   13: migrateV13ToV14,
   14: migrateV14ToV15,
   15: migrateV15ToV16,
+  16: migrateV16ToV17,
 };
 
 /**
@@ -218,6 +219,21 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v16 → v17：星河兌換的紀錄（今年還沒有兌換過）。碎片是背包裡的素材，本來就跨年保留，不需要遷移。
+ */
+function migrateV16ToV17(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(16), festival: z.record(z.string(), z.unknown()) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v16 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 17,
+    festival: { ...parsed.data.festival, exchanged: { year: 0, counts: {} } },
+  };
 }
 
 /**

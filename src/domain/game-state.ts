@@ -23,7 +23,7 @@ import type { LetterStatus } from './mail';
 import { emptyFestivalState, type FestivalState } from './festival';
 import { emptyStory, type StoryState } from './story';
 
-export const SAVE_SCHEMA_VERSION = 16;
+export const SAVE_SCHEMA_VERSION = 17;
 
 export interface PlayerState extends Point {
   facing: Direction;

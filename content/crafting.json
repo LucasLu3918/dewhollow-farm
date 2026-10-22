@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "合成配方（小屋的工作台 T）。材料不足或技能不夠就做不了。output 是產物（item 與數量）；effect 是效果：flag 只能做一次，bagSlots 增加背包格數（最多 max 次）。unlock 是解鎖條件（技能等級）。playMinutes 是內容時數的估計（見 docs/PLAYTIME_PLAN.md）。",
+  "note": "合成配方（小屋的工作台 T）。材料不足或技能不夠就做不了。output 是產物（item 與數量）；effect 是效果：flag 只能做一次，bagSlots 增加背包格數（最多 max 次）。unlock 是解鎖條件：技能等級（skill + level），或旗標（flag，例如星河糖由夜市的星河兌換解鎖）。playMinutes 是內容時數的估計（見 docs/PLAYTIME_PLAN.md）。",
   "recipes": [
     {
       "id": "sprinkler",
@@ -203,6 +203,22 @@
         "level": 1
       },
       "playMinutes": 1
+    },
+    {
+      "id": "star-sugar",
+      "name": "星河糖",
+      "ingredients": {
+        "mint": 2,
+        "hay": 1
+      },
+      "output": {
+        "item": "star-sugar",
+        "count": 2
+      },
+      "unlock": {
+        "flag": "recipe:star-sugar"
+      },
+      "playMinutes": 1.5
     }
   ]
 }

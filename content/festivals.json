@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "節慶（M5c）。日期、地點與開放時段由 src/domain/festival.ts 判斷；這裡只放活動的數值與文字。每項活動每年只算一次（紀錄用年份）。swaps 的居民要正好在鎮廣場才能交換（看他的行程）。stars 是夜市的釣星星：收網區間與星河碎片。playMinutes 為內容時數的估計。文字為本專案原創。",
+  "note": "節慶（M5c）。日期、地點與開放時段由 src/domain/festival.ts 判斷；這裡只放活動的數值與文字。每項活動每年只算一次（紀錄用年份）。swaps 的居民要正好在鎮廣場才能交換（看他的行程）。stars 是夜市的釣星星：收網區間與星河碎片。exchange 是夜市的星河兌換：用付出的物品換到物品或解鎖旗標，每項每年最多 limit 次（碎片跨年保留，但兌換次數每年重算）。playMinutes 為內容時數的估計。文字為本專案原創。",
   "festivals": [
     {
       "id": "sprout",
@@ -28,7 +28,12 @@
       "fromMinute": 1080,
       "playMinutes": 10,
       "shop": "night-market",
-      "stars": { "cycleMs": 1600, "zone": { "from": 0.6, "to": 0.7 }, "itemId": "star-shard" }
+      "stars": { "cycleMs": 1600, "zone": { "from": 0.6, "to": 0.7 }, "itemId": "star-shard" },
+      "exchange": [
+        { "id": "star-string", "name": "星空燈串", "give": { "itemId": "star-shard", "count": 3 }, "receive": { "itemId": "star-string", "count": 1 }, "limit": 1, "playMinutes": 1 },
+        { "id": "night-canvas", "name": "夜空畫板", "give": { "itemId": "star-shard", "count": 5 }, "receive": { "itemId": "night-canvas", "count": 1 }, "limit": 1, "playMinutes": 1 },
+        { "id": "star-sugar-recipe", "name": "星河糖的配方", "give": { "itemId": "star-shard", "count": 4 }, "flag": "recipe:star-sugar", "limit": 1, "playMinutes": 1.5 }
+      ]
     }
   ]
 }
