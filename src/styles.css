@@ -285,6 +285,15 @@ a:focus-visible {
   touch-action: none;
 }
 
+#touch-controls[data-control-style='floating-joystick'] .touch-move::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: -12px;
+  border-radius: 50%;
+  touch-action: none;
+}
+
 #touch-controls[data-control-style='fixed-joystick'] .touch-move > .touch-button,
 #touch-controls[data-control-style='floating-joystick'] .touch-move > .touch-button {
   display: none;
@@ -944,7 +953,7 @@ a:focus-visible {
     max-width: none;
   }
 
-  #touch-controls[data-handedness='left'] .touch-move { grid-column: 3; }
+  #touch-controls[data-handedness='left'] .touch-move { grid-column: 2; }
   #touch-controls[data-handedness='left'] .touch-act { grid-column: 1; }
 
   .touch-more {

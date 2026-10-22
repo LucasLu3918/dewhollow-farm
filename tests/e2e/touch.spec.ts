@@ -221,6 +221,20 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
     expect(saved.settings.mobile).toMatchObject({ controlStyle: 'dpad', handedness: 'left' });
   });
 
+  test('left-handed portrait controls stay within the viewport', async ({ page }) => {
+    await seedMobileControls(page, 'dpad', 'left');
+    await startGame(page);
+    const move = await page.locator('.touch-move').boundingBox();
+    const actions = await page.locator('.touch-act').boundingBox();
+    const viewportWidth = await page.evaluate(() => window.innerWidth);
+    expect(move).not.toBeNull();
+    expect(actions).not.toBeNull();
+    expect((actions?.x ?? Infinity) < (move?.x ?? -Infinity)).toBe(true);
+    expect((move?.x ?? 0) + (move?.width ?? 0)).toBeLessThanOrEqual(viewportWidth);
+    expect((actions?.x ?? 0) + (actions?.width ?? 0)).toBeLessThanOrEqual(viewportWidth);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+
   test('floating joystick moves on cardinal axes and stops on pointer cancellation', async ({ page }) => {
     await seedMobileControls(page, 'floating-joystick');
     await startGame(page);
@@ -229,14 +243,24 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
     const box = await pad.boundingBox();
     expect(box).not.toBeNull();
     const center = { x: (box?.x ?? 0) + (box?.width ?? 0) / 2, y: (box?.y ?? 0) + (box?.height ?? 0) / 2 };
-    const send = (type: string, x: number, y: number) => pad.dispatchEvent(type, {
-      pointerId: 31,
+    const send = (type: string, x: number, y: number, pointerId = 31) => pad.dispatchEvent(type, {
+      pointerId,
       pointerType: 'touch',
       bubbles: true,
       cancelable: true,
       clientX: x,
       clientY: y,
     });
+    const joystickBase = page.locator('.touch-joystick-base');
+    expect(await pad.evaluate((element) => getComputedStyle(element, '::before').width)).toBe('168px');
+    await send('pointerdown', box!.x + 20, box!.y + 20, 30);
+    const firstBase = await joystickBase.evaluate((element) => ({ left: element.style.left, top: element.style.top }));
+    await send('pointercancel', box!.x + 20, box!.y + 20, 30);
+    await send('pointerdown', box!.x + 124, box!.y + 124, 32);
+    const secondBase = await joystickBase.evaluate((element) => ({ left: element.style.left, top: element.style.top }));
+    expect(firstBase).not.toEqual(secondBase);
+    await send('pointercancel', box!.x + 124, box!.y + 124, 32);
+
     await send('pointerdown', center.x, center.y);
     await send('pointermove', center.x + 58, center.y);
     await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(before.x);

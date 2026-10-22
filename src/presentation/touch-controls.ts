@@ -20,6 +20,7 @@ const MOVE_DIRECTION: Partial<Record<ActionId, Direction>> = {
 
 const JOYSTICK_SIZE = 144;
 const JOYSTICK_RADIUS = JOYSTICK_SIZE / 2 - 24;
+const FLOATING_ACTIVATION_OUTSET = 12;
 
 interface PointerGesture {
   kind: 'move-button' | 'action-button' | 'joystick';
@@ -208,8 +209,16 @@ export class TouchControls {
     this.capture(this.movePad, event.pointerId);
     if (this.joystickStyle === 'floating-joystick') {
       const radius = JOYSTICK_SIZE / 2;
-      const x = clamp(event.clientX - rect.left, radius, Math.max(radius, rect.width - radius));
-      const y = clamp(event.clientY - rect.top, radius, Math.max(radius, rect.height - radius));
+      const x = clamp(
+        event.clientX - rect.left,
+        radius - FLOATING_ACTIVATION_OUTSET,
+        rect.width + FLOATING_ACTIVATION_OUTSET - radius,
+      );
+      const y = clamp(
+        event.clientY - rect.top,
+        radius - FLOATING_ACTIVATION_OUTSET,
+        rect.height + FLOATING_ACTIVATION_OUTSET - radius,
+      );
       this.joystickBase.style.left = `${x}px`;
       this.joystickBase.style.top = `${y}px`;
       this.joystickBase.classList.add('is-active');
