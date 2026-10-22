@@ -60,6 +60,8 @@
     "water": "澆水",
     "fertilize": "施肥",
     "alreadyPlanted": "作物已經種植",
+    "alreadyTilled": "這塊田已經開墾",
+    "alreadyFertilized": "這塊田已經施肥",
     "plant": "播種",
     "nothing": "沒有可互動的目標"
   },

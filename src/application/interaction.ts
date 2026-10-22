@@ -14,13 +14,13 @@ export type InteractionLabelKey =
   | 'mine' | 'castStar' | 'lightLantern' | 'fish' | 'feedAnimals' | 'kitchen' | 'workshop'
   | 'workbench' | 'petAnimal' | 'openCave' | 'sleep' | 'ship' | 'mineLocked' | 'shop'
   | 'forage' | 'chop' | 'cutGrass' | 'harvest' | 'till' | 'noSoil' | 'water' | 'fertilize'
-  | 'alreadyPlanted' | 'plant' | 'nothing';
+  | 'alreadyPlanted' | 'alreadyTilled' | 'alreadyFertilized' | 'plant' | 'nothing';
 
 export const INTERACTION_LABEL_KEYS: readonly InteractionLabelKey[] = [
   'talk', 'pickUpDecor', 'bulletin', 'mailbox', 'festival', 'repair', 'legacy', 'mine', 'castStar',
   'lightLantern', 'fish', 'feedAnimals', 'kitchen', 'workshop', 'workbench', 'petAnimal', 'openCave',
   'sleep', 'ship', 'mineLocked', 'shop', 'forage', 'chop', 'cutGrass', 'harvest', 'till', 'noSoil',
-  'water', 'fertilize', 'alreadyPlanted', 'plant', 'nothing',
+  'water', 'fertilize', 'alreadyPlanted', 'alreadyTilled', 'alreadyFertilized', 'plant', 'nothing',
 ];
 
 export type InteractionAction =
@@ -91,10 +91,13 @@ export function resolveInteraction(state: GameState, index: ContentIndex): Inter
     if (plot?.crop && isRipe(plot.crop, index.crop(plot.crop.cropId).growthDays)) {
       return descriptor('workPlot', 'harvest', target, { plotKey: key });
     }
-    if (state.tool === 'hoe') return descriptor('workPlot', 'till', target, { plotKey: key });
+    if (state.tool === 'hoe') {
+      return descriptor('workPlot', plot ? 'alreadyTilled' : 'till', target, { plotKey: key });
+    }
     if (!plot) return descriptor('workPlot', 'noSoil', target, { plotKey: key });
     if (state.tool === 'can') return descriptor('workPlot', 'water', target, { plotKey: key });
     if (plot.crop && state.tool === 'seedbag') {
+      if (plot.fertilizer) return descriptor('workPlot', 'alreadyFertilized', target, { plotKey: key });
       const hasFertilizer = countOf(state.inventory, 'fertilizer-fine') + countOf(state.inventory, 'fertilizer-basic') > 0;
       return descriptor('workPlot', hasFertilizer ? 'fertilize' : 'alreadyPlanted', target, { plotKey: key });
     }

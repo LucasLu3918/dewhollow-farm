@@ -384,6 +384,18 @@ describe('shared interaction query', () => {
       inventory: bagOf([{ itemId: 'fertilizer-basic', quality: 'normal', count: 1 }]),
       plots: { '1,1': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 } } },
     }), probe)).toMatchObject({ action: 'workPlot', labelKey: 'fertilize' });
+
+    const tilled = probeState({ tool: 'hoe', plots: { '1,1': { watered: false, dryDays: 0, crop: null } } });
+    expect(resolveInteraction(tilled, probe)).toMatchObject({ action: 'workPlot', labelKey: 'alreadyTilled' });
+    expect(executeCommand(tilled, { type: 'interact' }, probe).events).toContainEqual({ type: 'refused', reason: 'ALREADY_TILLED' });
+
+    const fertilized = probeState({
+      tool: 'seedbag',
+      inventory: bagOf([{ itemId: 'fertilizer-basic', quality: 'normal', count: 1 }]),
+      plots: { '1,1': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 }, fertilizer: 'basic' } },
+    });
+    expect(resolveInteraction(fertilized, probe)).toMatchObject({ action: 'workPlot', labelKey: 'alreadyFertilized' });
+    expect(executeCommand(fertilized, { type: 'interact' }, probe).events).toContainEqual({ type: 'refused', reason: 'ALREADY_FERTILIZED' });
   });
 });
 
