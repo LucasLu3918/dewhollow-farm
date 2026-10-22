@@ -97,9 +97,9 @@ export function resolveInteraction(state: GameState, index: ContentIndex): Inter
     if (!plot) return descriptor('workPlot', 'noSoil', target, { plotKey: key });
     if (state.tool === 'can') return descriptor('workPlot', 'water', target, { plotKey: key });
     if (plot.crop && state.tool === 'seedbag') {
-      if (plot.fertilizer) return descriptor('workPlot', 'alreadyFertilized', target, { plotKey: key });
       const hasFertilizer = countOf(state.inventory, 'fertilizer-fine') + countOf(state.inventory, 'fertilizer-basic') > 0;
-      return descriptor('workPlot', hasFertilizer ? 'fertilize' : 'alreadyPlanted', target, { plotKey: key });
+      if (!hasFertilizer) return descriptor('workPlot', 'alreadyPlanted', target, { plotKey: key });
+      return descriptor('workPlot', plot.fertilizer ? 'alreadyFertilized' : 'fertilize', target, { plotKey: key });
     }
     return descriptor('workPlot', 'plant', target, { plotKey: key });
   }
