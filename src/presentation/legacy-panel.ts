@@ -4,6 +4,7 @@ import type { ContentIndex } from '../application/content-index';
 import { farmRating, type RatingSource } from '../application/rating';
 import { cropPriceBonusPercent, legacyRefusal, resetRefusal } from '../domain/legacy';
 import { SEASON_NAMES } from '../domain/calendar';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 床邊的公告（DOM）：農場評級、豐收重置與傳承。
@@ -15,7 +16,7 @@ export class LegacyPanel {
   private readonly root: HTMLElement;
   private readonly summary: HTMLElement;
   private readonly list: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
   /** 正在等待第二次確認的動作（畫面狀態，不是遊戲狀態）。 */
   private pending: 'reset' | 'legacy' | null = null;
   /** 傳承時輸入的新名字（關掉面板前保留）。 */
@@ -29,6 +30,7 @@ export class LegacyPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#legacy-panel');
+    this.dialog = new PanelDialog(this.root);
     this.summary = required(doc, '#legacy-summary');
     this.list = required(doc, '#legacy-list');
     this.ratingSource = {
@@ -41,24 +43,22 @@ export class LegacyPanel {
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   open(state: GameState): void {
-    this.open_ = true;
     this.pending = null;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   refresh(state: GameState): void {
-    if (this.open_) this.render(state);
+    if (this.dialog.isOpen()) this.render(state);
   }
 
   close(): void {
-    this.open_ = false;
     this.pending = null;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

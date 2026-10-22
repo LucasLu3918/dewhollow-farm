@@ -8,6 +8,32 @@
   --line: #2f4537;
   /* 字級倍率（標準 1、大 1.25、特大 1.5），由設定套用，見 accessibility.ts。 */
   --font-scale: 1;
+
+  /* 操作按鈕：外框、底色、按下與選取狀態。 */
+  --action-border: #7fae6b;
+  --action-fill: #2f4a33;
+  --action-fill-translucent: rgba(47, 74, 51, 0.85);
+  --action-pressed: #3f6446;
+  --action-active: #5b8c4e;
+
+  /* 表面：對話框（商店、說明、設定、存檔）、畫面區、凹陷的井（能量條）與鍵帽／下拉選單底。 */
+  --surface-dialog: #1f2b20;
+  --surface-dialog-ink: #f2efe6;
+  --surface-stage: #1d2a1f;
+  --surface-well: #0d1510;
+  --surface-inset: #1a2a1e;
+  --shadow-dialog: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --divider: rgba(255, 255, 255, 0.12);
+
+  /* 其他語意色：能量條填色、焦點框。 */
+  --energy-fill: #6fbf73;
+  --focus-ring: var(--accent);
+
+  /* 圓角四級：小（鍵帽、小選單）、中（按鈕）、大（面板與對話框）、膠囊（能量條）。 */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-pill: 99px;
 }
 
 * {
@@ -21,6 +47,17 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC', system-ui, sans-serif;
   line-height: 1.6;
   font-size: calc(16px * var(--font-scale));
+}
+
+/* 鍵盤焦點：統一的焦點框，只在鍵盤操作時出現（:focus-visible）。 */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* 安全區域（瀏覽器的瀏海、圓角與底部橫條）：至少留 16px 的邊界。 */
@@ -44,7 +81,7 @@ body {
   padding: 10px 12px;
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .status #hud-clock,
@@ -78,8 +115,8 @@ body {
   display: inline-block;
   width: 80px;
   height: 8px;
-  background: #0d1510;
-  border-radius: 99px;
+  background: var(--surface-well);
+  border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
@@ -87,15 +124,15 @@ body {
   display: block;
   height: 100%;
   width: 100%;
-  background: #6fbf73;
+  background: var(--energy-fill);
   transition: width 0.2s;
 }
 
 .stage {
   width: 100%;
   aspect-ratio: 4 / 3;
-  background: #1d2a1f;
-  border-radius: 10px;
+  background: var(--surface-stage);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--line);
 }
@@ -168,9 +205,9 @@ body {
   min-width: 56px;
   min-height: 56px;
   padding: 0 10px;
-  border-radius: 12px;
-  border: 1px solid #7fae6b;
-  background: rgba(47, 74, 51, 0.85);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--action-border);
+  background: var(--action-fill-translucent);
   color: var(--ink);
   font: inherit;
   font-size: calc(15px * var(--font-scale));
@@ -180,7 +217,7 @@ body {
 }
 
 .touch-button:active {
-  background: #3f6446;
+  background: var(--action-pressed);
 }
 
 .touch-act .touch-button {
@@ -190,7 +227,7 @@ body {
 .panel {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   padding: 10px 14px;
 }
 
@@ -226,10 +263,10 @@ body {
   max-height: 80vh;
   overflow: auto;
   padding: 16px;
-  border-radius: 12px;
-  background: #1f2b20;
-  color: #f2efe6;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius-lg);
+  background: var(--surface-dialog);
+  color: var(--surface-dialog-ink);
+  box-shadow: var(--shadow-dialog);
   z-index: 10;
 }
 
@@ -260,18 +297,32 @@ body {
   justify-content: space-between;
   gap: 8px;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid var(--divider);
+}
+
+/*
+ * 共用按鈕外觀：商店、狀態列、存檔、設定的按鈕都用這組外框、底色與圓角，
+ * 尺寸與字級則在下方各自的選擇器中設定。
+ */
+.shop-list button,
+.shop-panel #shop-close,
+.shop-panel > button,
+.save-actions button,
+.settings-choices button,
+.settings-prompt button,
+.status-button {
+  border: 1px solid var(--action-border);
+  border-radius: var(--radius-md);
+  background: var(--action-fill);
+  color: inherit;
+  cursor: pointer;
 }
 
 .shop-list button,
-.shop-panel #shop-close {
+.shop-panel #shop-close,
+.shop-panel > button {
   min-height: 36px;
   padding: 0 12px;
-  border-radius: 8px;
-  border: 1px solid #7fae6b;
-  background: #2f4a33;
-  color: inherit;
-  cursor: pointer;
 }
 
 /* 狀態列的設定、存檔、說明按鈕與版本號。 */
@@ -286,13 +337,9 @@ body {
 .status-button {
   min-height: 28px;
   padding: 0 10px;
-  border-radius: 6px;
-  border: 1px solid #7fae6b;
-  background: #2f4a33;
-  color: inherit;
+  border-radius: var(--radius-sm);
   font: inherit;
   font-size: calc(13px * var(--font-scale));
-  cursor: pointer;
 }
 
 /* 有新版本時的提示按鈕：用強調色，讓玩家看得到。 */
@@ -305,16 +352,6 @@ body {
   font-size: calc(12px * var(--font-scale));
   color: var(--muted);
   font-variant-numeric: tabular-nums;
-}
-
-.shop-panel > button {
-  min-height: 36px;
-  padding: 0 12px;
-  border-radius: 8px;
-  border: 1px solid #7fae6b;
-  background: #2f4a33;
-  color: inherit;
-  cursor: pointer;
 }
 
 /* 存檔槽列表：每格一段，操作按鈕排在下面。 */
@@ -348,11 +385,6 @@ body {
 .save-actions button {
   min-height: 34px;
   padding: 0 10px;
-  border-radius: 8px;
-  border: 1px solid #7fae6b;
-  background: #2f4a33;
-  color: inherit;
-  cursor: pointer;
 }
 
 .save-message {
@@ -397,9 +429,9 @@ body {
 .help-controls kbd {
   min-width: 96px;
   padding: 0 6px;
-  border-radius: 5px;
-  border: 1px solid #7fae6b;
-  background: #1a2a1e;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--action-border);
+  background: var(--surface-inset);
   font-family: inherit;
   text-align: center;
 }
@@ -439,9 +471,9 @@ body {
 .settings-keys kbd {
   min-width: 48px;
   padding: 0 6px;
-  border-radius: 5px;
-  border: 1px solid #7fae6b;
-  background: #1a2a1e;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--action-border);
+  background: var(--surface-inset);
   font-family: inherit;
   text-align: center;
 }
@@ -456,17 +488,12 @@ body {
 .settings-prompt button {
   min-height: 36px;
   padding: 0 12px;
-  border-radius: 8px;
-  border: 1px solid #7fae6b;
-  background: #2f4a33;
-  color: inherit;
   font: inherit;
   font-size: calc(14px * var(--font-scale));
-  cursor: pointer;
 }
 
 .settings-choices button[aria-pressed='true'] {
-  background: #5b8c4e;
+  background: var(--action-active);
   font-weight: 700;
   outline: 2px solid var(--accent);
 }
@@ -489,9 +516,9 @@ body {
   font: inherit;
   font-size: calc(14px * var(--font-scale));
   color: inherit;
-  background: #1a2a1e;
-  border: 1px solid #7fae6b;
-  border-radius: 6px;
+  background: var(--surface-inset);
+  border: 1px solid var(--action-border);
+  border-radius: var(--radius-sm);
   padding: 0 6px;
 }
 
@@ -505,7 +532,7 @@ body {
   margin: 0 0 12px;
   padding: 10px;
   border: 1px solid var(--accent);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -540,6 +567,17 @@ body {
   .shop-panel > button,
   .settings-choices button {
     min-height: 40px;
+  }
+}
+
+/*
+ * 觸控裝置（粗指標）：一般文字按鈕至少 44px 高。虛擬按鍵（.touch-button）已是 56px，不在此列。
+ * 這裡的 min-height 必須蓋過各按鈕的個別高度（例如 #shop-close 與 .save-actions button），
+ * 所以用 !important 當作下限；數值 44px 也大於窄螢幕規則的 40px，兩者不衝突。
+ */
+@media (pointer: coarse) {
+  button:not(.touch-button) {
+    min-height: 44px !important;
   }
 }
 

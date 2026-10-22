@@ -5,6 +5,7 @@ import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
 import { onSale } from '../domain/shop-stock';
 import { boughtThisWeek, merchantOpen, weekStock } from '../domain/traveling-merchant';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 商店面板（DOM）：只負責把貨架與升級項目列出來，按鈕送出指令；
@@ -16,6 +17,7 @@ export class ShopPanel {
   private readonly title: HTMLElement;
   private readonly funds: HTMLElement;
   private readonly list: HTMLElement;
+  private readonly dialog: PanelDialog;
   private shopId: string | null = null;
 
   constructor(
@@ -25,6 +27,7 @@ export class ShopPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#shop-panel');
+    this.dialog = new PanelDialog(this.root);
     this.title = required(doc, '#shop-title');
     this.funds = required(doc, '#shop-funds');
     this.list = required(doc, '#shop-list');
@@ -32,13 +35,13 @@ export class ShopPanel {
   }
 
   isOpen(): boolean {
-    return this.shopId !== null;
+    return this.dialog.isOpen();
   }
 
   open(shopId: string, state: GameState): void {
     this.shopId = shopId;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   /** 每次指令之後重新畫一次，金幣與貨架才會是最新的。 */
@@ -48,7 +51,7 @@ export class ShopPanel {
 
   close(): void {
     this.shopId = null;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

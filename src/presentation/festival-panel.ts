@@ -6,6 +6,7 @@ import { residentsOn } from '../application/residents';
 import { CROWN_RECIPE, doneThisYear, exchangedThisYear, festivalKey, lanternKeysOf, litLanterns, openFestival, warmGiftsLeft, type FestivalDef } from '../domain/festival';
 import { countOf } from '../domain/inventory';
 import { SEASON_NAMES } from '../domain/calendar';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 節慶告示的面板（DOM）：今天的節慶、種子交換、花冠製作、釣魚比賽的進度。
@@ -16,7 +17,7 @@ export class FestivalPanel {
   private readonly root: HTMLElement;
   private readonly summary: HTMLElement;
   private readonly list: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
 
   constructor(
     doc: Document,
@@ -25,28 +26,27 @@ export class FestivalPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#festival-panel');
+    this.dialog = new PanelDialog(this.root);
     this.summary = required(doc, '#festival-summary');
     this.list = required(doc, '#festival-list');
     required(doc, '#festival-close').addEventListener('click', () => this.close());
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   open(state: GameState): void {
-    this.open_ = true;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   refresh(state: GameState): void {
-    if (this.open_) this.render(state);
+    if (this.dialog.isOpen()) this.render(state);
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

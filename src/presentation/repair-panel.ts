@@ -4,6 +4,7 @@ import type { ContentIndex } from '../application/content-index';
 import { countOf } from '../domain/inventory';
 import { SEASON_NAMES } from '../domain/calendar';
 import { donationCap, donationRefusal, goalProgress, recordOf, seasonOpen, type RepairDef } from '../domain/repairs';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 修復告示的面板（DOM）：廣場「修復委員會」的每項修復、進度與捐獻按鈕。
@@ -14,7 +15,7 @@ export class RepairPanel {
   private readonly root: HTMLElement;
   private readonly summary: HTMLElement;
   private readonly list: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
 
   constructor(
     doc: Document,
@@ -23,28 +24,27 @@ export class RepairPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#repair-panel');
+    this.dialog = new PanelDialog(this.root);
     this.summary = required(doc, '#repair-summary');
     this.list = required(doc, '#repair-list');
     required(doc, '#repair-close').addEventListener('click', () => this.close());
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   open(state: GameState): void {
-    this.open_ = true;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   refresh(state: GameState): void {
-    if (this.open_) this.render(state);
+    if (this.dialog.isOpen()) this.render(state);
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

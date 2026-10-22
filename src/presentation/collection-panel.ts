@@ -3,6 +3,7 @@ import type { ContentIndex } from '../application/content-index';
 import { categoryCount, claimKey, DEX_PERCENTS, thresholdOf, type DexCategory } from '../domain/collection';
 import { conditionMet, type AchievementDef } from '../domain/achievements';
 import { achievementContext } from '../application/collection';
+import { PanelDialog } from './panel-dialog';
 
 /**
  * 圖鑑與成就的面板（DOM，按 I 開關）：每一類的已發現條目與下一個門檻、七類的獎勵、成就與稱號。
@@ -14,7 +15,7 @@ export class CollectionPanel {
   private readonly root: HTMLElement;
   private readonly summary: HTMLElement;
   private readonly list: HTMLElement;
-  private open_ = false;
+  private readonly dialog: PanelDialog;
 
   constructor(
     doc: Document,
@@ -22,28 +23,27 @@ export class CollectionPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#collection-panel');
+    this.dialog = new PanelDialog(this.root);
     this.summary = required(doc, '#collection-summary');
     this.list = required(doc, '#collection-list');
     required(doc, '#collection-close').addEventListener('click', () => this.close());
   }
 
   isOpen(): boolean {
-    return this.open_;
+    return this.dialog.isOpen();
   }
 
   open(state: GameState): void {
-    this.open_ = true;
-    this.root.hidden = false;
     this.render(state);
+    this.dialog.open();
   }
 
   refresh(state: GameState): void {
-    if (this.open_) this.render(state);
+    if (this.dialog.isOpen()) this.render(state);
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
+    this.dialog.close();
   }
 
   private render(state: GameState): void {

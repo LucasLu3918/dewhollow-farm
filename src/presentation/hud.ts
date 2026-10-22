@@ -29,6 +29,7 @@ export class Hud {
   private readonly mine: HTMLElement;
   private readonly version: HTMLElement;
   private readonly log: HTMLElement;
+  private readonly hint: HTMLElement;
 
   constructor(doc: Document) {
     this.doc = doc;
@@ -45,6 +46,12 @@ export class Hud {
     this.mine = required(doc, '#hud-mine');
     this.version = required(doc, '#hud-version');
     this.log = required(doc, '#hud-log');
+    this.hint = required(doc, '#hud-hint');
+  }
+
+  /** 底部的操作提示（由 controls-hint.ts 依目前的按鍵產生）。 */
+  setControlsHint(text: string): void {
+    this.hint.textContent = text;
   }
 
   /** 狀態列上的版本號（例如 v0.1.0）；點了說明頁可看到完整的更新日誌。 */
