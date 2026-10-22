@@ -29,6 +29,12 @@ describe('parseControlsContent with shipped content', () => {
     expect(parsed.hintText.note).toBe('（以上為目前的按鍵，可在設定中改）');
   });
 
+  it('keeps original interaction wording separate from stable descriptor keys', () => {
+    const parsed = parseControlsContent(controls);
+    expect(parsed.interactionLabels.harvest).toBe('收成');
+    expect(parsed.interactionLabels.nothing).toBe('沒有可互動的目標');
+  });
+
   it('keeps the settings action names unchanged', () => {
     const parsed = parseControlsContent(controls);
     expect(parsed.settingsLabels.interact).toBe('互動、收割、與居民說話、收線');
@@ -48,6 +54,12 @@ describe('parseControlsContent rejects broken content', () => {
     const raw = copy();
     delete raw.settingsLabels?.mute;
     expect(() => parseControlsContent(raw)).toThrow('設定面板的動作名稱缺少動作 mute');
+  });
+
+  it('names a missing interaction descriptor label', () => {
+    const raw = copy();
+    delete raw.interactionLabels?.harvest;
+    expect(() => parseControlsContent(raw)).toThrow('互動提示文字缺少動作 harvest');
   });
 
   it('names the touch button that is missing', () => {
