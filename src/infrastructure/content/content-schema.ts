@@ -534,19 +534,12 @@ export const festivalsFileSchema = z.object({
 });
 
 /** 社區修復（見 domain/repairs.ts 與 content/repairs.json）。 */
-const repairGoalSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal('kinds'),
-    pool: z.array(z.string().min(1)).min(1),
-    count: z.number().int().positive().max(99),
-    each: z.number().int().positive().max(5),
-  }),
-  z.object({
-    type: z.literal('total'),
-    pool: z.array(z.string().min(1)).min(1),
-    count: z.number().int().positive().max(99),
-  }),
-]);
+const repairGoalSchema = z.object({
+  type: z.literal('kinds'),
+  pool: z.array(z.string().min(1)).min(1),
+  count: z.number().int().positive().max(99),
+  each: z.number().int().positive().max(5),
+});
 const repairSchema = z.object({
   id: z.string().min(1),
   season: z.enum(SEASONS),
@@ -641,6 +634,49 @@ export const lettersFileSchema = z.object({
   version: z.literal(1),
   note: z.string().optional(),
   letters: z.array(letterSchema),
+});
+
+/** 圖鑑（見 domain/collection.ts 與 content/collection.json）。 */
+const dexRewardSchema = z.object({
+  percent: z.union([z.literal(25), z.literal(50), z.literal(75), z.literal(100)]),
+  gold: z.number().int().nonnegative().optional(),
+  items: z.record(z.string().min(1), z.number().int().positive()).optional(),
+  title: z.string().min(1).optional(),
+});
+const dexCategorySchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  phase: z.enum(SEASONS),
+  playMinutes: z.number().positive().max(60),
+  entries: z.array(z.string().min(1)).min(1),
+  rewards: z.array(dexRewardSchema),
+});
+export const collectionFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  categories: z.array(dexCategorySchema),
+});
+
+/** 成就（見 domain/achievements.ts 與 content/achievements.json）。 */
+const achievementConditionSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('counter'), key: z.string().min(1), min: z.number().int().positive() }),
+  z.object({ type: z.literal('flag'), flag: z.string().min(1) }),
+  z.object({ type: z.literal('dex'), category: z.string().min(1), count: z.number().int().positive() }),
+  z.object({ type: z.literal('hearts'), min: z.number().int().min(1).max(10), scope: z.enum(['any', 'all']) }),
+]);
+const achievementSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  condition: achievementConditionSchema,
+  reward: z.object({ gold: z.number().int().nonnegative().optional(), title: z.string().min(1).optional() }),
+  phase: z.enum(SEASONS),
+  playMinutes: z.number().positive().max(60),
+});
+export const achievementsFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  achievements: z.array(achievementSchema),
 });
 
 export const cropsFileSchema = z.array(cropSchema);

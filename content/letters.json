@@ -121,6 +121,24 @@
       "playMinutes": 0.5,
       "due": { "season": "summer", "day": 9 },
       "unlock": { "hearts": { "npcId": "xiao-sui", "hearts": 2 } }
+    },
+    {
+      "id": "a-gan-market-summer",
+      "from": "a-gan",
+      "title": "夜市的貨單",
+      "body": ["星河夜市要開了，我把攤位的貨單寫在信紙背面。", "星河碎片換來的東西，每一樣都限量，記得早點來。"],
+      "phase": "summer",
+      "playMinutes": 0.5,
+      "due": { "season": "summer", "day": 17 }
+    },
+    {
+      "id": "rong-bo-summer-report",
+      "from": "rong-bo",
+      "title": "夏季結算",
+      "body": ["夏天快過完了，修復委員會要把這個季節的成果寫成報告。", "湖畔修復的進度，委員會會貼在廣場的告示上，有空去看看。"],
+      "phase": "summer",
+      "playMinutes": 0.5,
+      "due": { "season": "summer", "day": 20 }
     }
   ]
 }

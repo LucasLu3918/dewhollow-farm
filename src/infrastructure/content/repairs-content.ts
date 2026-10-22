@@ -32,11 +32,8 @@ export function repairProblems(pack: ContentPack): string[] {
       if (!itemIds.has(itemId)) problems.push(`${owner} 的候選物品 ${itemId} 不存在`);
     }
     const distinct = new Set(repair.goal.pool).size;
-    if (repair.goal.type === 'kinds' && repair.goal.count > distinct) {
+    if (repair.goal.count > distinct) {
       problems.push(`${owner} 要的種類 ${repair.goal.count} 比候選 ${distinct} 種還多`);
-    }
-    if (repair.goal.type === 'total' && repair.goal.count > repair.goal.pool.length * 99) {
-      problems.push(`${owner} 的數量 ${repair.goal.count} 超出可捐的範圍`);
     }
   }
   return problems;

@@ -7,13 +7,10 @@ import type { Calendar, Season } from './calendar';
  */
 
 /**
- * 修復目標：
- * - kinds：候選清單裡不同的物品，每一種各捐到 each 件，共 count 種（例如春季的花與野菜）。
- * - total：候選清單裡的物品加總到 count 件，種類不限（例如湖畔修復的魚）。
+ * 修復目標：候選清單裡不同的物品，每一種各捐到 each 件，共 count 種。
+ * 春季是十種花與野菜各一件；夏季是八種不同的魚各一條（同一種魚捐再多也只算一種）。
  */
-export type RepairGoal =
-  | { type: 'kinds'; pool: string[]; count: number; each: number }
-  | { type: 'total'; pool: string[]; count: number };
+export type RepairGoal = { type: 'kinds'; pool: string[]; count: number; each: number };
 
 export interface RepairReward {
   gold?: number;
@@ -58,12 +55,8 @@ export function recordOf(state: RepairState, id: string, year: number): RepairRe
 
 /** 目標的進度：已達到的數量與目標數量。 */
 export function goalProgress(goal: RepairGoal, donated: Record<string, number>): RepairProgress {
-  if (goal.type === 'kinds') {
-    const kinds = goal.pool.filter((itemId) => (donated[itemId] ?? 0) >= goal.each).length;
-    return { value: Math.min(kinds, goal.count), target: goal.count };
-  }
-  const total = goal.pool.reduce((sum, itemId) => sum + (donated[itemId] ?? 0), 0);
-  return { value: Math.min(total, goal.count), target: goal.count };
+  const kinds = goal.pool.filter((itemId) => (donated[itemId] ?? 0) >= goal.each).length;
+  return { value: Math.min(kinds, goal.count), target: goal.count };
 }
 
 export function goalMet(goal: RepairGoal, donated: Record<string, number>): boolean {
@@ -74,9 +67,7 @@ export function goalMet(goal: RepairGoal, donated: Record<string, number>): bool
 /** 這一項物品還能再捐幾件（不在候選清單、或目標已經達到就是 0）。 */
 export function donationCap(goal: RepairGoal, donated: Record<string, number>, itemId: string): number {
   if (!goal.pool.includes(itemId) || goalMet(goal, donated)) return 0;
-  if (goal.type === 'kinds') return Math.max(0, goal.each - (donated[itemId] ?? 0));
-  const total = goal.pool.reduce((sum, id) => sum + (donated[id] ?? 0), 0);
-  return Math.max(0, goal.count - total);
+  return Math.max(0, goal.each - (donated[itemId] ?? 0));
 }
 
 /**

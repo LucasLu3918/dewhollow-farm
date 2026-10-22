@@ -15,6 +15,8 @@ import type { FestivalDef } from '../domain/festival';
 import type { StoryChapter } from '../domain/story';
 import type { RepairDef } from '../domain/repairs';
 import type { DailyEventRules, RandomEventDef } from '../domain/random-events';
+import type { DexCategory } from '../domain/collection';
+import type { AchievementDef } from '../domain/achievements';
 
 /**
  * 以 id 快速查找內容。假設內容已由基礎設施層驗證過參照完整性；
@@ -78,6 +80,11 @@ export interface ContentIndex {
   /** 隨機事件的機率與候選（見 random-events.ts）。 */
   randomEvents: DailyEventRules;
   randomEvent(id: string): RandomEventDef;
+  /** 圖鑑的類別（順序與內容檔相同，見 collection.ts）。 */
+  dexCategories: DexCategory[];
+  dexCategory(id: string): DexCategory;
+  /** 成就（順序與內容檔相同，見 achievements.ts）。 */
+  achievements: AchievementDef[];
 }
 
 const NO_BULLETIN: BulletinRules = { postedBy: '鎮公所', dailyCount: 0, daily: [], weekly: [] };
@@ -183,6 +190,13 @@ export function createContentIndex(pack: ContentPack): ContentIndex {
       if (!found) throw new Error(`找不到修復：${id}`);
       return found;
     },
+    dexCategories: pack.collection ?? [],
+    dexCategory(id) {
+      const found = (pack.collection ?? []).find((c) => c.id === id);
+      if (!found) throw new Error(`找不到圖鑑類別：${id}`);
+      return found;
+    },
+    achievements: pack.achievements ?? [],
     randomEvents: pack.randomEvents ?? { chance: 0, events: [] },
     randomEvent(id) {
       const found = (pack.randomEvents?.events ?? []).find((e) => e.id === id);

@@ -85,7 +85,8 @@ describe('花園修復（春）完成', () => {
     }
     expect(state.flags['repair:garden']).toBe(true);
     expect(state.flags['blueprint:fountain']).toBe(true);
-    expect(state.gold).toBe(gold + 300);
+    // 300 金是花園修復的獎勵；另外 100 金是「花園修復」成就（M5d）。
+    expect(state.gold).toBe(gold + 300 + 100);
     expect(state.repairs.garden?.done).toBe(true);
     expect(last?.messages.join('\n')).toContain('修復完成');
   });
@@ -105,22 +106,32 @@ describe('花園修復（春）完成', () => {
   });
 });
 
+const LAKE_FISH = ['fish.carp', 'fish.crucian', 'fish.bass', 'fish.reed-catfish', 'fish.silver-minnow', 'fish.mossy-perch', 'fish.veil-bream', 'fish.pebble-loach'];
+
 describe('湖畔修復（夏）完成與主線第 3 章', () => {
-  it('捐滿 8 條魚就完成：設定湖畔橋與湖畔小屋的旗標', () => {
-    let state = withItems(game({ ...SUMMER_PLAZA }), { 'fish.carp': 5, 'fish.bass': 3 });
-    state = run(state, { type: 'donate', repairId: 'lake', itemId: 'fish.carp', count: 5 }).state;
+  it('八種不同的魚各捐一條就完成：設定湖畔橋與湖畔小屋的旗標', () => {
+    let state = withItems(game({ ...SUMMER_PLAZA }), Object.fromEntries(LAKE_FISH.map((id) => [id, 1])));
+    for (const itemId of LAKE_FISH.slice(0, 7)) state = run(state, { type: 'donate', repairId: 'lake', itemId, count: 1 }).state;
     expect(state.flags['repair:lake-bridge']).toBeUndefined();
-    state = run(state, { type: 'donate', repairId: 'lake', itemId: 'fish.bass', count: 3 }).state;
+    state = run(state, { type: 'donate', repairId: 'lake', itemId: 'fish.pebble-loach', count: 1 }).state;
     expect(state.flags['repair:lake-bridge']).toBe(true);
     expect(state.flags['repair:lake-house']).toBe(true);
   });
 
+  it('同一種魚只能捐一條，多的拒絕（不會用八條同一種湊數）', () => {
+    const start = withItems(game({ ...SUMMER_PLAZA }), { 'fish.carp': 3 });
+    const out = run(start, { type: 'donate', repairId: 'lake', itemId: 'fish.carp', count: 2 });
+    expect(out.events).toContainEqual({ type: 'refused', reason: 'REPAIR_ENOUGH' });
+    expect(countOf(out.state.inventory, 'fish.carp')).toBe(3);
+  });
+
   it('修好湖畔橋後，主線第 3 章（已參加萌芽祭）自動完成，進到第 4 章之前的章節', () => {
-    const start = withItems(
+    let state = withItems(
       game({ ...SUMMER_PLAZA, story: { chapter: 3 }, flags: { 'attended:sprout': true }, gold: 0 }),
-      { 'fish.carp': 8 },
+      Object.fromEntries(LAKE_FISH.map((id) => [id, 1])),
     );
-    const out = run(start, { type: 'donate', repairId: 'lake', itemId: 'fish.carp', count: 8 });
+    for (const itemId of LAKE_FISH.slice(0, 7)) state = run(state, { type: 'donate', repairId: 'lake', itemId, count: 1 }).state;
+    const out = run(state, { type: 'donate', repairId: 'lake', itemId: 'fish.pebble-loach', count: 1 });
     expect(out.state.story.chapter).toBe(4);
     expect(out.state.flags['main:3']).toBe(true);
     expect(out.messages.join('\n')).toContain('主線第 3 章完成');

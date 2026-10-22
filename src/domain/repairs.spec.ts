@@ -14,7 +14,9 @@ import {
 
 const FLOWERS = ['mushroom', 'berry', 'flower-spring', 'flower-summer', 'herb', 'fern-shoot', 'flower-bell', 'creek-celery', 'flower-night', 'pine-nut'];
 const KINDS_GOAL: RepairGoal = { type: 'kinds', pool: FLOWERS, count: 10, each: 1 };
-const TOTAL_GOAL: RepairGoal = { type: 'total', pool: ['fish.carp', 'fish.crucian', 'fish.bass'], count: 8 };
+/** 湖畔修復：八種不同的魚，每種各一條。 */
+const LAKE_FISH = ['fish.carp', 'fish.crucian', 'fish.bass', 'fish.reed-catfish', 'fish.silver-minnow', 'fish.mossy-perch', 'fish.veil-bream', 'fish.pebble-loach'];
+const LAKE_GOAL: RepairGoal = { type: 'kinds', pool: LAKE_FISH, count: 8, each: 1 };
 
 const garden: RepairDef = {
   id: 'garden',
@@ -24,6 +26,17 @@ const garden: RepairDef = {
   done: '花園亮起來了。',
   goal: KINDS_GOAL,
   reward: { gold: 300, flags: ['repair:garden'] },
+  playMinutes: 10,
+};
+
+const lake: RepairDef = {
+  id: 'lake',
+  season: 'summer',
+  name: '湖畔修復',
+  request: '請捐出八種不同的魚。',
+  done: '橋修好了。',
+  goal: LAKE_GOAL,
+  reward: { gold: 400, flags: ['repair:lake-bridge'] },
   playMinutes: 10,
 };
 
@@ -48,11 +61,16 @@ describe('修復目標的進度（kinds：不同種類各捐到 each 件）', ()
   });
 });
 
-describe('修復目標的進度（total：候選清單裡的東西加總到 count）', () => {
-  it('種類不限，加總到 count 就完成', () => {
-    expect(goalMet(TOTAL_GOAL, { 'fish.carp': 3, 'fish.bass': 4 })).toBe(false);
-    expect(goalMet(TOTAL_GOAL, { 'fish.carp': 3, 'fish.bass': 3, 'fish.crucian': 2 })).toBe(true);
-    expect(goalProgress(TOTAL_GOAL, { 'fish.carp': 3, 'fish.bass': 3, 'fish.crucian': 2 })).toEqual({ value: 8, target: 8 });
+describe('湖畔修復的目標：八種不同的魚，各 1 條（不再是種類不限的八條）', () => {
+  it('八種魚各一條就完成；少一種不算', () => {
+    const seven = Object.fromEntries(LAKE_FISH.slice(0, 7).map((id) => [id, 1]));
+    expect(goalProgress(LAKE_GOAL, seven)).toEqual({ value: 7, target: 8 });
+    expect(goalMet(LAKE_GOAL, seven)).toBe(false);
+    expect(goalMet(LAKE_GOAL, { ...seven, 'fish.pebble-loach': 1 })).toBe(true);
+  });
+
+  it('同一種魚釣到好幾條也只算一種', () => {
+    expect(goalProgress(LAKE_GOAL, { 'fish.carp': 5, 'fish.bass': 3 })).toEqual({ value: 2, target: 8 });
   });
 });
 
@@ -63,9 +81,11 @@ describe('捐獻的上限與拒絕', () => {
     expect(donationCap(KINDS_GOAL, {}, 'carp')).toBe(0);
   });
 
-  it('total：只能捐到還差的數量', () => {
-    expect(donationCap(TOTAL_GOAL, { 'fish.carp': 5 }, 'fish.carp')).toBe(3);
-    expect(donationCap(TOTAL_GOAL, { 'fish.carp': 5, 'fish.bass': 3 }, 'fish.bass')).toBe(0);
+  it('湖畔修復：每種魚只能捐一條，不在八種裡的魚不收', () => {
+    expect(donationCap(LAKE_GOAL, {}, 'fish.carp')).toBe(1);
+    expect(donationCap(LAKE_GOAL, { 'fish.carp': 1 }, 'fish.carp')).toBe(0);
+    expect(donationRefusal(lake, recordOf({}, 'lake', 1), 'fish.carp', 2)).toBe('REPAIR_ENOUGH');
+    expect(donationRefusal(lake, recordOf({}, 'lake', 1), 'crop.moon-bean', 1)).toBe('NOT_REPAIR_ITEM');
   });
 
   it('不在季節內、已完成、不在候選、超過上限的捐獻都被拒絕，並給出失敗代碼', () => {

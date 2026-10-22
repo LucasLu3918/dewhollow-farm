@@ -28,6 +28,7 @@ import type { ActionKind } from '../domain/tuning';
 import { applySellBonus, biteBonusPoints, dishEnergyBonus, extraYieldChance, rollExtraYield, sellBonusPercent } from '../domain/talents';
 import type { ContentIndex } from './content-index';
 import { acceptQuest, collectMail, currentBoard, deliverLetters, recordQuestEvent, refreshBoard, settleQuests, shortfallOf, submitQuest } from './quests';
+import { observeProgress } from './collection';
 import { festivalCrown, festivalHere, festivalSwap, recordContestCatch, recordStallSale, stallRefusal, starExchange, type FestivalOutcome } from './festival';
 import { settleStory, storyObjective } from './story';
 import { donateToRepair } from './repairs';
@@ -111,7 +112,9 @@ export type GameEvent =
   /** 夜釣星星甩竿成功：畫面開始星星的時機小遊戲，按 X 時送出 catchStar。 */
   | { type: 'starLine' }
   /** 站在修復告示前按互動：畫面打開修復面板（不花體力與時間）。 */
-  | { type: 'repairOpened' };
+  | { type: 'repairOpened' }
+  /** 合成成功（供圖鑑與成就計數，見 application/collection.ts）。 */
+  | { type: 'crafted'; recipeId: string };
 
 export type ActionFeedback = 'till' | 'water' | 'plant' | 'harvest' | 'ship' | 'chop' | 'forage' | 'mine' | 'fish';
 
@@ -215,15 +218,16 @@ function reply(state: GameState, messages: string[] = [], events: GameEvent[] = 
 
 /**
  * 執行一個指令，然後檢查委託：目標已達到（好感、收成、出貨…）的委託在這裡自動完成，並把完成的訊息接在後面。
+ * 最後觀察圖鑑與成就（發現條目、推進計數、發獎勵，見 application/collection.ts）。
  */
 export function executeCommand(current: GameState, command: Command, index: ContentIndex): CommandOutcome {
   const outcome = executeCore(current, command, index);
   const settled = settleQuests(outcome.state, index);
   // 主線：步驟達成就發獎勵、推進章節（見 story.ts）。
   const story = settleStory(settled.state, index);
-  const extra = [...settled.messages, ...story.messages];
-  if (extra.length === 0) return outcome;
-  return { ...outcome, state: story.state, messages: [...outcome.messages, ...extra] };
+  const progressed = observeProgress(current, story.state, outcome.events, index);
+  const extra = [...settled.messages, ...story.messages, ...progressed.messages];
+  return { ...outcome, state: progressed.state, messages: [...outcome.messages, ...extra] };
 }
 
 function executeCore(current: GameState, command: Command, index: ContentIndex): CommandOutcome {
@@ -1260,7 +1264,7 @@ function craft(state: GameState, recipeId: string, index: ContentIndex): Command
   let next: GameState = { ...state, inventory };
   if (effect?.type === 'flag') next = { ...next, flags: { ...next.flags, [effect.flag]: true } };
   if (effect?.type === 'bagSlots') next = { ...next, inventory: { ...next.inventory, capacity: next.inventory.capacity + effect.slots } };
-  return reply(next, [`做好了${recipe.name}`]);
+  return reply(next, [`做好了${recipe.name}`], [{ type: 'crafted', recipeId: recipe.id }]);
 }
 
 /** 吃一道料理：回復它的體力，但不會超過上限；吃掉一份。 */

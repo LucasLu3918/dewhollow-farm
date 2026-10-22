@@ -41,12 +41,15 @@ import {
   mainQuestFileSchema,
   repairsFileSchema,
   randomEventsFileSchema,
+  collectionFileSchema,
+  achievementsFileSchema,
   type MusicFile,
   type SoundsFile,
   type TerrainFile,
 } from './content-schema';
 import { festivalProblems, storyProblems } from './festival-content';
 import { randomEventProblems, repairProblems } from './repairs-content';
+import { achievementProblems, collectionProblems } from './collection-content';
 import type { StoryChapter } from '../../domain/story';
 
 export interface RawContentFiles {
@@ -58,6 +61,10 @@ export interface RawContentFiles {
   repairs?: unknown;
   /** 隨機事件（content/events-random.json）。測試用的最小內容可以省略（視為沒有隨機事件）。 */
   randomEvents?: unknown;
+  /** 圖鑑類別（content/collection.json）。測試用的最小內容可以省略（視為沒有圖鑑）。 */
+  collection?: unknown;
+  /** 成就（content/achievements.json）。測試用的最小內容可以省略（視為沒有成就）。 */
+  achievements?: unknown;
   crops: unknown;
   npcs: unknown;
   /** 居民行程（content/schedules.json）。 */
@@ -147,6 +154,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const mainQuest = mainQuestFileSchema.parse(raw.mainQuest ?? { version: 1, chapters: [] });
   const repairs = repairsFileSchema.parse(raw.repairs ?? { version: 1, repairs: [] });
   const randomEvents = randomEventsFileSchema.parse(raw.randomEvents ?? { version: 1, chance: 0, events: [] });
+  const collection = collectionFileSchema.parse(raw.collection ?? { version: 1, categories: [] });
+  const achievements = achievementsFileSchema.parse(raw.achievements ?? { version: 1, achievements: [] });
 
   const pack: ContentPack = {
     crops,
@@ -174,6 +183,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     chapters: mainQuest.chapters as StoryChapter[],
     repairs: repairs.repairs,
     randomEvents: { chance: randomEvents.chance, events: randomEvents.events },
+    collection: collection.categories,
+    achievements: achievements.achievements,
   };
   const problems = [
     ...validateCrossReferences(pack, assets),
@@ -183,6 +194,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     ...storyProblems(pack),
     ...repairProblems(pack),
     ...randomEventProblems(pack),
+    ...collectionProblems(pack),
+    ...achievementProblems(pack),
     ...rigProblems(rigs, assets),
     ...companionProblems(companions, rigs, pack),
     ...toolProblems(tools, assets),

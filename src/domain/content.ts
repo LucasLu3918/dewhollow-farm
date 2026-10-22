@@ -109,6 +109,8 @@ import type { FestivalDef } from './festival';
 import type { StoryChapter } from './story';
 import type { RepairDef } from './repairs';
 import type { DailyEventRules } from './random-events';
+import type { DexCategory } from './collection';
+import type { AchievementDef } from './achievements';
 
 export type { ScheduleDef, ScheduleEntry, PeriodRules, Period } from './schedule';
 export type { HeartEventDef, HeartEventOption, HeartEmote } from './heart-events';
@@ -163,6 +165,10 @@ export interface ContentPack {
   repairs?: RepairDef[];
   /** 隨機事件（見 random-events.ts 與 content/events-random.json）。測試用的最小內容可以省略。 */
   randomEvents?: DailyEventRules;
+  /** 圖鑑類別（見 collection.ts 與 content/collection.json）。測試用的最小內容可以省略。 */
+  collection?: DexCategory[];
+  /** 成就（見 achievements.ts 與 content/achievements.json）。測試用的最小內容可以省略。 */
+  achievements?: AchievementDef[];
 }
 
 export interface RecipeDef {

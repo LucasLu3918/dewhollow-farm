@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "湖裡的魚（月鏡湖畔）。seasons 是有這種魚的季節；weight 是同一季節中被釣到的相對機率。",
+  "note": "湖裡的魚（月鏡湖畔）。seasons 是有這種魚的季節；weight 是同一季節中被釣到的相對機率。M5d：新增五種春夏的魚，八種都在夏天的湖裡釣得到（湖畔修復要八種不同的魚各一條）。魚名與文字為本專案原創。",
   "fish": [
     {
       "id": "carp",
@@ -34,6 +34,54 @@
         "summer"
       ],
       "weight": 1
+    },
+    {
+      "id": "reed-catfish",
+      "name": "蘆影鯰",
+      "sellPrice": 40,
+      "seasons": [
+        "spring",
+        "summer"
+      ],
+      "weight": 3
+    },
+    {
+      "id": "silver-minnow",
+      "name": "銀絲鰷",
+      "sellPrice": 22,
+      "seasons": [
+        "spring",
+        "summer"
+      ],
+      "weight": 4
+    },
+    {
+      "id": "mossy-perch",
+      "name": "苔紋鱖",
+      "sellPrice": 75,
+      "seasons": [
+        "summer"
+      ],
+      "weight": 1
+    },
+    {
+      "id": "veil-bream",
+      "name": "霞尾魴",
+      "sellPrice": 35,
+      "seasons": [
+        "summer"
+      ],
+      "weight": 2
+    },
+    {
+      "id": "pebble-loach",
+      "name": "礫石鰍",
+      "sellPrice": 28,
+      "seasons": [
+        "spring",
+        "summer"
+      ],
+      "weight": 3
     }
   ]
 }

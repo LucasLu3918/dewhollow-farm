@@ -144,7 +144,45 @@ function milestonesOf(s: GameState, record: DayRecord, index: ContentIndex): str
   if (s.inventory.capacity > index.tuning.inventory.capacity) out.push('木箱（合成）');
   if (s.inventory.stacks.some((st) => st.itemId.startsWith('fertilizer-'))) out.push('肥料（合成）');
   if (s.flags.bobber) out.push('浮標（合成）');
+
+  // M5d：圖鑑、成就、委託、主線、節慶、心形事件、修復、信件、隨機事件，以及行事曆上的日子（見 freshness.spec.ts）。
+  for (const id of s.achievements.unlocked) out.push(`成就：${index.achievements.find((a) => a.id === id)?.name ?? id}`);
+  for (const key of s.collection.claimed) {
+    const [categoryId, percent] = key.split(':');
+    const category = index.dexCategories.find((c) => c.id === categoryId);
+    if (category) out.push(`圖鑑：${category.name} ${percent}%`);
+  }
+  for (const [id, quest] of Object.entries(s.quests)) {
+    if (quest.status === 'done') out.push(`委託：${index.quest(id).title}`);
+  }
+  for (const chapter of index.chapters) {
+    if (s.story.chapter > chapter.number) out.push(`主線第 ${chapter.number} 章：${chapter.title}`);
+  }
+  for (const festival of index.festivals) {
+    if (s.flags[`attended:${festival.id}`]) out.push(`節慶：${festival.name}`);
+    if (festivalDay(festival, index) === record.day) out.push(`節慶日：${festival.name}`);
+  }
+  for (const id of s.heartEvents) out.push(`心形事件：${id}`);
+  for (const repair of index.repairs) {
+    if (s.repairs[repair.id]?.done) out.push(`修復：${repair.name}`);
+  }
+  for (const letter of index.letters) {
+    if (s.mail[letter.id]) out.push(`信件：${letter.title}`);
+  }
+  if (s.dailyEvent.id !== null && s.dailyEvent.day === record.day) {
+    out.push(`隨機事件：${index.randomEvent(s.dailyEvent.id).name}`);
+  }
+  if (record.day > 1 && (record.day - 1) % index.tuning.time.daysPerSeason === 0) {
+    out.push(`季節更替：${SEASON_NAME[s.calendar.season]}`);
+  }
   return out;
+}
+
+const SEASON_NAME = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' } as const;
+
+/** 節慶當天的總天數（第幾天；從第 1 天算起）。 */
+function festivalDay(festival: { season: 'spring' | 'summer' | 'autumn' | 'winter'; day: number }, index: ContentIndex): number {
+  return totalDay({ year: 1, season: festival.season, day: festival.day, minuteOfDay: 0 }, index.tuning.time.daysPerSeason);
 }
 
 // ---- 一天的行程 ----

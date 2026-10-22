@@ -149,6 +149,17 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   ),
   /** 今天的隨機事件（day 為事件那天的總天數；id 為 null 表示今天沒有事件）。 */
   dailyEvent: z.object({ day: z.number().int().nonnegative(), id: z.string().min(1).nullable() }),
+  /** 圖鑑：已發現的條目（物品 id）與已領過的門檻獎勵（`類別:門檻`）。 */
+  collection: z.object({
+    found: z.array(z.string().min(1)),
+    claimed: z.array(z.string().min(1)),
+  }),
+  /** 成就：已達成的成就 id、計數器（事件次數）與稱號。 */
+  achievements: z.object({
+    unlocked: z.array(z.string().min(1)),
+    counters: z.record(z.string().min(1), z.number().int().nonnegative()),
+    titles: z.array(z.string().min(1)),
+  }),
   mineSeed: z.number().int().nonnegative().max(4294967295),
   /** 礦坑沒有底，檢查點可以是任何正整數層（見 domain/mine.ts）。 */
   mineCheckpoint: z.number().int().min(1),

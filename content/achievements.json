@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "note": "成就（M5d）：春夏可達的 20 個。條件種類：counter（計數器：harvest 收成、ship 出貨、gift 送禮、quest 完成委託、craft 合成，由指令事件推進）、flag（旗標）、dex（圖鑑類別的條目數）、hearts（好感，scope any 或 all）。每個成就只給一次；獎勵是金錢與（選填）稱號。playMinutes 為內容時數的估計。名稱與文字為本專案原創。",
+  "achievements": [
+    { "id": "first-harvest", "name": "第一次收成", "description": "收成一次作物。", "condition": { "type": "counter", "key": "harvest", "min": 1 }, "reward": { "gold": 50 }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "harvest-30", "name": "豐收的手", "description": "收成作物 30 次（每塊田算一次）。", "condition": { "type": "counter", "key": "harvest", "min": 30 }, "reward": { "gold": 300 }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "first-catch", "name": "第一條魚", "description": "在湖裡釣到一條魚。", "condition": { "type": "dex", "category": "fish", "count": 1 }, "reward": { "gold": 50 }, "phase": "summer", "playMinutes": 0.5 },
+    { "id": "fish-half", "name": "湖畔的熟客", "description": "魚的圖鑑達到 50%（4 種）。", "condition": { "type": "dex", "category": "fish", "count": 4 }, "reward": { "gold": 150, "title": "湖畔的熟客" }, "phase": "summer", "playMinutes": 0.5 },
+    { "id": "fish-all", "name": "魚種收齊", "description": "八種魚都釣過。", "condition": { "type": "dex", "category": "fish", "count": 8 }, "reward": { "gold": 500 }, "phase": "summer", "playMinutes": 0.5 },
+    { "id": "forage-all", "name": "山野通", "description": "野菜與花的圖鑑達到 100%。", "condition": { "type": "dex", "category": "forage", "count": 11 }, "reward": { "gold": 200, "title": "山野通" }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "first-gift", "name": "第一份心意", "description": "送給居民一件東西。", "condition": { "type": "counter", "key": "gift", "min": 1 }, "reward": { "gold": 30 }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "gift-10", "name": "送禮的人", "description": "送禮 10 次。", "condition": { "type": "counter", "key": "gift", "min": 10 }, "reward": { "gold": 200 }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "hearts-all-2", "name": "大家的朋友", "description": "每一位居民都到了 2 顆心。", "condition": { "type": "hearts", "min": 2, "scope": "all" }, "reward": { "gold": 200, "title": "大家的朋友" }, "phase": "summer", "playMinutes": 0.5 },
+    { "id": "first-quest", "name": "第一件委託", "description": "完成一件委託。", "condition": { "type": "counter", "key": "quest", "min": 1 }, "reward": { "gold": 50 }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "quest-10", "name": "可靠的幫手", "description": "完成 10 件委託。", "condition": { "type": "counter", "key": "quest", "min": 10 }, "reward": { "gold": 300, "title": "可靠的幫手" }, "phase": "summer", "playMinutes": 0.5 },
+    { "id": "first-sale", "name": "第一次出貨", "description": "把作物放進出貨箱。", "condition": { "type": "counter", "key": "ship", "min": 1 }, "reward": { "gold": 20 }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "ship-30", "name": "出貨老手", "description": "出貨 30 次。", "condition": { "type": "counter", "key": "ship", "min": 30 }, "reward": { "gold": 250 }, "phase": "summer", "playMinutes": 0.5 },
+    { "id": "first-craft", "name": "第一次合成", "description": "在工作台合成一件東西。", "condition": { "type": "counter", "key": "craft", "min": 1 }, "reward": { "gold": 40 }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "first-dish", "name": "第一道料理", "description": "做出一道料理。", "condition": { "type": "dex", "category": "dishes", "count": 1 }, "reward": { "gold": 30 }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "first-batch", "name": "第一批加工", "description": "做出一件加工品。", "condition": { "type": "dex", "category": "processed", "count": 1 }, "reward": { "gold": 30 }, "phase": "summer", "playMinutes": 0.5 },
+    { "id": "sprout-festival", "name": "萌芽祭的參加者", "description": "參加萌芽祭的一項活動。", "condition": { "type": "flag", "flag": "attended:sprout" }, "reward": { "gold": 150 }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "repair-garden", "name": "花園修復", "description": "完成春季的花園修復。", "condition": { "type": "flag", "flag": "repair:garden" }, "reward": { "gold": 100, "title": "修復委員" }, "phase": "spring", "playMinutes": 0.5 },
+    { "id": "repair-lake", "name": "湖畔的橋", "description": "完成夏季的湖畔修復。", "condition": { "type": "flag", "flag": "repair:lake-bridge" }, "reward": { "gold": 400 }, "phase": "summer", "playMinutes": 0.5 },
+    { "id": "main-3", "name": "夏天真的來了", "description": "完成主線第 3 章。", "condition": { "type": "flag", "flag": "main:3" }, "reward": { "gold": 200 }, "phase": "summer", "playMinutes": 0.5 }
+  ]
+}

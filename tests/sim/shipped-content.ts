@@ -10,6 +10,8 @@ import festivals from '../../content/festivals.json';
 import mainQuest from '../../content/main-quest.json';
 import repairs from '../../content/repairs.json';
 import randomEvents from '../../content/events-random.json';
+import collection from '../../content/collection.json';
+import achievements from '../../content/achievements.json';
 import start from '../../content/start.json';
 import tuning from '../../content/tuning.json';
 import assets from '../../content/assets.json';
@@ -54,6 +56,8 @@ const { pack } = loadContent({
   mainQuest,
   repairs,
   randomEvents,
+  collection,
+  achievements,
   maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
