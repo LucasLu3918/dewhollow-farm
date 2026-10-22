@@ -8,12 +8,14 @@ import { pendingTalentSkills } from './skill-panel';
 import { farmRating } from '../application/rating';
 import { NO_RATING } from '../domain/rating';
 import { mineStatusLabel } from './mine-status';
+import { levelMarker } from './accessibility';
 
 const LOG_LIMIT = 6;
 
 /** DOM 版 HUD：只負責把狀態呈現到頁面上，不含任何規則。 */
 export class Hud {
   private readonly doc: Document;
+  private colorblind = false;
   private readonly clock: HTMLElement;
   private readonly day: HTMLElement;
   private readonly weather: HTMLElement;
@@ -85,6 +87,16 @@ export class Hud {
     required(this.doc, '#hud-saves').addEventListener('click', onSaves);
   }
 
+  /** 狀態列的「設定」按鈕（鍵盤的 O 也一樣）。 */
+  bindSettings(onOpen: () => void): void {
+    required(this.doc, '#hud-settings').addEventListener('click', onOpen);
+  }
+
+  /** 色盲模式：訊息前面加上 ✕ 或 ✓ 的文字標記（見 accessibility.ts）。 */
+  setColorblind(on: boolean): void {
+    this.colorblind = on;
+  }
+
   messages(lines: readonly string[]): void {
     for (const line of lines) this.append(line, 'info');
   }
@@ -95,7 +107,7 @@ export class Hud {
 
   private append(text: string, level: 'info' | 'error'): void {
     const item = document.createElement('li');
-    item.textContent = text;
+    item.textContent = levelMarker(level, this.colorblind) + text;
     item.className = level;
     this.log.append(item);
     while (this.log.children.length > LOG_LIMIT) this.log.firstElementChild?.remove();

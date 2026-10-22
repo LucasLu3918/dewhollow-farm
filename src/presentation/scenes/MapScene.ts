@@ -57,6 +57,15 @@ import { prefersReducedMotion } from '../motion';
 import { nextPetTile, placeBeside } from '../pet-follow';
 import type { RenderCompatInfo } from '../render-compat';
 import type { View } from '../walk-pose';
+import type { SettingsService } from '../../application/settings';
+import { actionForKey, type ActionId } from '../../domain/keybindings';
+import { SettingsPanel } from '../settings-panel';
+import { TouchControls } from '../touch-controls';
+import { touchKeyFor } from '../touch-pad';
+import { reducedEffects } from '../accessibility';
+
+/** 鍵盤事件與虛擬按鍵共用的形狀：只需要按鍵名稱與 preventDefault。 */
+type KeyLike = Pick<KeyboardEvent, 'key' | 'preventDefault'>;
 
 export interface MapSceneDeps {
   session: GameSession;
@@ -80,28 +89,32 @@ export interface MapSceneDeps {
   /** 說明頁（? 鍵）與存檔槽（L 鍵）；打開時遊戲的按鍵只用來關閉（Esc）。 */
   help: HelpPanel;
   saves: SavePanel;
+  /** 玩家偏好（按鍵、字級、閃光與震動等），不進存檔。 */
+  settings: SettingsService;
 }
 
-const MOVE_KEYS: Record<string, Direction> = {
-  ArrowUp: 'up',
-  ArrowDown: 'down',
-  ArrowLeft: 'left',
-  ArrowRight: 'right',
+/** 動作 → 移動方向（按鍵由偏好的按鍵表決定，見 handleKey）。 */
+const MOVE_ACTIONS: Partial<Record<ActionId, Direction>> = {
+  moveUp: 'up',
+  moveDown: 'down',
+  moveLeft: 'left',
+  moveRight: 'right',
 };
 
-const COMMAND_KEYS: Record<string, Command> = {
-  x: { type: 'interact' },
-  z: { type: 'cycleTool' },
-  c: { type: 'cycleSeed' },
-  a: { type: 'takeTool', tool: 'axe' },
-  p: { type: 'takeTool', tool: 'pick' },
-  r: { type: 'takeTool', tool: 'rod' },
-  g: { type: 'takeTool', tool: 'sickle' },
-  s: { type: 'manualSave' },
-  // 小屋：v 擺一件裝飾（面前的空地板）、e 穿上衣服或帽子、q 脫下（收回裝飾用 x）。
-  v: { type: 'placeDecor' },
-  e: { type: 'wear' },
-  q: { type: 'takeOff' },
+/** 動作 → 遊戲指令。 */
+const COMMAND_ACTIONS: Partial<Record<ActionId, Command>> = {
+  interact: { type: 'interact' },
+  cycleTool: { type: 'cycleTool' },
+  cycleSeed: { type: 'cycleSeed' },
+  takeAxe: { type: 'takeTool', tool: 'axe' },
+  takePick: { type: 'takeTool', tool: 'pick' },
+  takeRod: { type: 'takeTool', tool: 'rod' },
+  takeSickle: { type: 'takeTool', tool: 'sickle' },
+  manualSave: { type: 'manualSave' },
+  // 小屋：擺一件裝飾（面前的空地板）、穿上衣服或帽子、脫下（收回裝飾用互動鍵）。
+  placeDecor: { type: 'placeDecor' },
+  wear: { type: 'wear' },
+  takeOff: { type: 'takeOff' },
 };
 
 const MOVE_DURATION_MS = 110;
@@ -275,6 +288,8 @@ export class MapScene extends Phaser.Scene {
   private onKeyDown = (event: KeyboardEvent): void => {
     void this.handleKey(event);
   };
+  /** 設定面板（改按鍵、字級、閃光與震動、觸控）。 */
+  private settingsPanel!: SettingsPanel;
 
   constructor() {
     super('map');
@@ -282,6 +297,10 @@ export class MapScene extends Phaser.Scene {
 
   init(deps: MapSceneDeps): void {
     this.deps = deps;
+    this.settingsPanel = new SettingsPanel(document, deps.settings);
+    deps.hud.bindSettings(() => this.settingsPanel.open());
+    // 虛擬按鍵（觸控）：按鈕本身掛在 DOM 上，顯示與否由 apply-settings.ts 決定。
+    new TouchControls(document, (action) => this.pressAction(action));
     this.shopPanel = new ShopPanel(document, deps.index, (command) => void this.run(command));
     this.kitchenPanel = new KitchenPanel(document, deps.index, (command) => void this.run(command));
     this.workshopPanel = new WorkshopPanel(document, deps.index, (command) => void this.run(command));
@@ -380,16 +399,36 @@ export class MapScene extends Phaser.Scene {
     camera.centerOn(center.x, center.y);
   }
 
-  private async handleKey(event: KeyboardEvent): Promise<void> {
+  /** 虛擬按鍵：送出該動作目前綁定的按鍵，走 handleKey 的同一條路徑（不另寫規則）。改鍵中不作用。 */
+  private pressAction(action: ActionId): void {
+    if (this.settingsPanel.isCapturing()) return;
+    const key = touchKeyFor(action, this.deps.settings.get().bindings);
+    void this.handleKey({ key, preventDefault: () => {} });
+  }
+
+  /** 目前的效果開關：系統「減少動態」或玩家關掉的效果都不出現（見 accessibility.ts）。 */
+  private effectGates() {
+    return reducedEffects(prefersReducedMotion(), this.deps.settings.get().effects);
+  }
+
+  private async handleKey(event: KeyLike): Promise<void> {
     const { hud, sounds } = this.deps;
-    if (event.key.toLowerCase() === 'm') {
+    if (this.settingsPanel.isCapturing()) {
+      // 正在改鍵：這一下按下的就是新按鍵（Esc 取消，修飾鍵忽略），不觸發任何遊戲動作。
+      event.preventDefault();
+      this.settingsPanel.captureKey(event.key);
+      return;
+    }
+    // 按鍵只查偏好的按鍵表（見 domain/keybindings.ts），不寫死字元。
+    const action = actionForKey(this.deps.settings.get().bindings, event.key);
+    if (action === 'mute') {
       // 靜音是玩家的偏好，不是遊戲指令，所以不經過應用層。
       event.preventDefault();
       const muted = sounds.toggleMute();
       hud.messages([muted ? '已靜音（按 M 開啟音效）' : '已開啟音效（按 M 靜音）']);
       return;
     }
-    if (event.key.toLowerCase() === 'b') {
+    if (action === 'music') {
       // 背景音樂預設不播放，由玩家按 B 開始（瀏覽器要求使用者手勢才能出聲）。
       event.preventDefault();
       const playing = this.deps.music.toggle();
@@ -401,16 +440,16 @@ export class MapScene extends Phaser.Scene {
       return;
     }
     if (this.reelTimer) {
-      // 魚上鉤了：只有 x 有用（收線），其餘按鍵等時限過了再說。
-      if (event.key.toLowerCase() === 'x') {
+      // 魚上鉤了：只有互動鍵有用（收線），其餘按鍵等時限過了再說。
+      if (action === 'interact') {
         event.preventDefault();
         this.finishReel(true);
       }
       return;
     }
     if (this.starTimer) {
-      // 星星在水面上走：只有 x 有用（收網，量時機），其餘按鍵等時限過了再說。
-      if (event.key.toLowerCase() === 'x') {
+      // 星星在水面上走：只有互動鍵有用（收網，量時機），其餘按鍵等時限過了再說。
+      if (action === 'interact') {
         event.preventDefault();
         this.finishStar(performance.now() - this.starStartedAt);
       }
@@ -434,53 +473,60 @@ export class MapScene extends Phaser.Scene {
       }
       return;
     }
-    if (this.deps.help.isOpen() || this.deps.saves.isOpen()) {
-      // 說明頁或存檔槽開著時，按鍵只用來離開（Esc），其餘都在面板上用滑鼠完成。
+    if (this.deps.help.isOpen() || this.deps.saves.isOpen() || this.settingsPanel.isOpen()) {
+      // 說明頁、存檔槽或設定開著時，按鍵只用來離開（Esc），其餘都在面板上用滑鼠完成。
       if (event.key === 'Escape') {
         event.preventDefault();
         this.deps.help.close();
         this.deps.saves.close();
+        this.settingsPanel.close();
       }
       return;
     }
-    if (event.key === '?') {
+    if (action === 'help') {
       // 說明頁：操作按鍵、版本號、更新日誌與隱私說明；不花體力與時間。
       event.preventDefault();
       this.deps.help.open();
       return;
     }
-    if (event.key.toLowerCase() === 'l') {
+    if (action === 'saves') {
       // 存檔槽：讀取、新遊戲、刪除、匯出與匯入；不花體力與時間。
       event.preventDefault();
       void this.deps.saves.open();
       return;
     }
-    if (event.key.toLowerCase() === 'k') {
+    if (action === 'settings') {
+      // 設定：改按鍵、字級、色盲模式、閃光與震動、觸控；不花體力與時間。
+      event.preventDefault();
+      this.settingsPanel.open();
+      return;
+    }
+    if (action === 'skills') {
       // 技能與天賦面板：不花體力與時間，不經過應用層的指令。
       event.preventDefault();
       this.skillPanel.toggle(this.deps.session.state);
       return;
     }
-    if (event.key.toLowerCase() === 'f') {
+    if (action === 'residents') {
       // 居民與好感面板：不花體力與時間，不經過應用層的指令。
       event.preventDefault();
       this.residentPanel.toggle(this.deps.session.state);
       return;
     }
-    if (event.key.toLowerCase() === 'i') {
+    if (action === 'collection') {
       // 圖鑑與成就面板：不花體力與時間，不經過應用層的指令。
       event.preventDefault();
       this.collectionPanel.open(this.deps.session.state);
       return;
     }
-    if (event.key.toLowerCase() === 'j') {
+    if (action === 'quests') {
       // 委託與佈告欄面板：不花體力與時間，不經過應用層的指令。
       event.preventDefault();
       this.questPanel.toggle(this.deps.session.state);
       return;
     }
-    const direction = MOVE_KEYS[event.key];
-    const command = direction ? ({ type: 'move', direction } as const) : COMMAND_KEYS[event.key.toLowerCase()];
+    const direction = action ? MOVE_ACTIONS[action] : undefined;
+    const command: Command | undefined = direction ? { type: 'move', direction } : action ? COMMAND_ACTIONS[action] : undefined;
     if (!command) return;
     event.preventDefault();
     await this.run(command);
@@ -536,6 +582,7 @@ export class MapScene extends Phaser.Scene {
     const state = session.state;
     const open = openFestival(index.festivals, state.calendar);
     if (!open?.stars || state.mapId !== open.mapId) return;
+    if (!this.effectGates().particles) return;
     this.fireworkCount += 1;
     const x = (2 + Math.random() * 12) * TILE_SIZE;
     const y = (1 + Math.random() * 3) * TILE_SIZE;
@@ -580,7 +627,7 @@ export class MapScene extends Phaser.Scene {
       if (event.type === 'acted') {
         this.playAction(event, plotsBefore, inventoryBefore);
       } else if (event.type === 'slept') {
-        sleepEffect(this, this.deps.session.state.player.x, this.deps.session.state.player.y);
+        sleepEffect(this, this.deps.session.state.player.x, this.deps.session.state.player.y, this.effectGates().flash);
         this.deps.sounds.play('sleep');
         this.log('slept');
       } else if (event.type === 'talked') {
@@ -639,7 +686,7 @@ export class MapScene extends Phaser.Scene {
     const env: FootstepEnv = { touchesWater: touchesWater(neighbors), weather: state.weather, season: state.calendar.season };
     const style = this.terrainByKind.get(footstepKind(terrain, env));
     if (!style) return;
-    footstepDust(this, x, y, style.footstep.dust);
+    footstepDust(this, x, y, style.footstep.dust, this.effectGates().particles);
     this.deps.sounds.play(style.footstep.sound);
     this.log(`step:${style.kind}`);
   }
@@ -654,14 +701,15 @@ export class MapScene extends Phaser.Scene {
       return;
     }
     const reduced = prefersReducedMotion();
+    const gates = this.effectGates();
     const key = plotKey(event.x, event.y);
     const impact = (): void => {
       if (this.heldPlots.delete(key)) this.drawPlots(); // 命中：這一格才更新成動作後的樣子
       this.log(`effect:${event.action}`);
       this.deps.sounds.play(ACTION_SOUND[event.action]);
       if (event.action === 'harvest') this.pickUp(event.x, event.y, plotsBefore);
-      playActionEffect(this, event.action, event.x, event.y);
-      if (event.action === 'till' && !reduced) {
+      playActionEffect(this, event.action, event.x, event.y, gates.particles);
+      if (event.action === 'till' && gates.shake) {
         this.cameras.main.shake(90, 0.003);
         this.log('shake');
       }
@@ -689,7 +737,7 @@ export class MapScene extends Phaser.Scene {
     const impact = (): void => {
       this.log(`effect:${event.action}`);
       this.deps.sounds.play(ACTION_SOUND[event.action]);
-      playActionEffect(this, event.action, event.x, event.y);
+      playActionEffect(this, event.action, event.x, event.y, this.effectGates().particles);
     };
     this.rig.squash();
     if (prefersReducedMotion()) {
@@ -1076,7 +1124,7 @@ export class MapScene extends Phaser.Scene {
   private drawWeather(weather: Weather, time: number): void {
     this.weatherGfx.clear();
     const kind = particleKind(weather);
-    if (!kind) return;
+    if (!kind || !this.effectGates().particles) return;
     const base = weather === 'storm' ? 70 : kind === 'streak' ? 46 : 30;
     const count = prefersReducedMotion() ? Math.ceil(base / 4) : base;
     for (let i = 0; i < count; i += 1) {
