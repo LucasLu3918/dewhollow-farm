@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "note": "旅行商人（P0，帆）：每週五、六在鎮廣場的櫃檯（plaza 的 m）出現，weekdays 的 0 為週一。貨架每週輪換：以那一週週一的年、季、日為種子，從候選抽 slots 範圍內的件數（候選不足時全部上架），同一週結果相同。seasons 以該週週一的季節為準。每週每件最多買 perItemWeekly 個（週五與週六共用）。購買不花體力與時間。價格高於雜貨店與夜市在別處的售價；候選不包含行商商隊（隨機事件 caravan，週五、六送魚餌與肥料）送的東西，兩者不重複。playMinutes 是第一次逛到旅行商人的內容時數估計（見 docs/PLAYTIME_PLAN.md）。文字為本專案原創。",
+  "weekdays": [4, 5],
+  "slots": { "min": 3, "max": 4 },
+  "perItemWeekly": 2,
+  "playMinutes": 2,
+  "candidates": [
+    { "itemId": "seed.moon-bean", "price": 40, "seasons": ["spring"] },
+    { "itemId": "seed.sweet-radish", "price": 45, "seasons": ["spring", "summer"] },
+    { "itemId": "seed.star-pepper", "price": 90, "seasons": ["summer"] },
+    { "itemId": "seed.dusk-potato", "price": 120, "seasons": ["autumn"] },
+    { "itemId": "seed.silver-wheat", "price": 200, "seasons": ["autumn", "winter"] },
+    { "itemId": "star-string", "price": 260 },
+    { "itemId": "night-canvas", "price": 320 }
+  ]
+}

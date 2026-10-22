@@ -20,7 +20,9 @@ import { passDays, startJob, takeReady } from '../domain/processing';
 import { fertilizedSkillTuning } from '../domain/fertilizer';
 import { biteChanceFor } from '../domain/fishing';
 import { dailyCare, feedAll, growWool, milkQuality, newAnimal, petAnimal, produceEggs, productQuality, shearAt, slotsOf, woolReady, type Animal, type FlockId } from '../domain/animals';
-import { expansionRefusal, resolveDestination } from '../domain/house';
+import { expansionRefusal, HOUSE_FULL_FLAG, HOUSE_FULL_MAP_ID, HOUSE_MAP_ID, HOUSE_WING_FLAG, HOUSE_WING_MAP_ID, resolveDestination } from '../domain/house';
+import { carryDecor, decorAt, placementRefusal, PLAYER_WEARER, type DecorPlacement } from '../domain/decor';
+import { boughtThisWeek, merchantOpen, weekStartOf, weekStock } from '../domain/traveling-merchant';
 import { onSale } from '../domain/shop-stock';
 import { requirementMet } from '../domain/unlock';
 import type { Quality } from '../domain/items';
@@ -84,6 +86,12 @@ export type Command =
   | { type: 'castStar' }
   /** 星星收網：elapsedMs 是甩竿後到按下的毫秒數；null 表示時限內沒按。只有甩竿後才有效。 */
   | { type: 'catchStar'; elapsedMs: number | null }
+  /** 在小屋裡面對空的地板擺一件裝飾（不指定物品時擺背包裡第一件可以擺的）。不花體力與時間。收回見 interact。 */
+  | { type: 'placeDecor'; itemId?: string }
+  /** 穿上衣服或帽子（不指定時穿背包裡第一件可以穿的）；身上原本的那件回到背包。不花體力與時間。 */
+  | { type: 'wear'; itemId?: string }
+  /** 脫下身上的衣服或帽子，回到背包。 */
+  | { type: 'takeOff' }
   | { type: 'manualSave' };
 
 export type GameEvent =
@@ -213,6 +221,19 @@ const FAILURE_MESSAGES: Record<string, string> = {
   REPAIR_ENOUGH: '這一項已經捐夠了，換別的東西吧',
   ALREADY_LIT: '這盞燈今年已經點過了',
   NOT_IN_STOCK_SEASON: '雜貨店這個季節還沒進這批貨',
+  MERCHANT_AWAY: '旅行商人只在週五、週六的鎮廣場出現',
+  MERCHANT_LIMIT: '旅行商人這週已經賣給你這件的上限了',
+  NO_DECOR: '背包裡沒有可以擺的裝飾',
+  NOT_FLOOR: '這裡不能擺裝飾（要擺在空的地板上）',
+  OCCUPIED: '這一格已經擺了東西',
+  BLOCKS_PATH: '這裡擺了會擋住走路的路，床、櫃檯或門會走不到',
+  SPAWN: '門口這一格要留著走路',
+  NOT_IN_HOUSE: '裝飾只能擺在小屋裡',
+  NOT_DECOR_HERE: '這裡沒有擺放的裝飾',
+  NO_WEARABLE: '背包裡沒有可以穿的衣服',
+  NOT_WEARABLE: '這件東西穿不了',
+  ALREADY_WEARING: '身上已經穿著這件了',
+  NOT_WORN: '身上沒有穿東西',
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
@@ -301,6 +322,12 @@ function executeCore(current: GameState, command: Command, index: ContentIndex):
       return acceptQuestCommand(state, command.questId, index);
     case 'submitQuest':
       return submitQuestCommand(state, command.questId, index);
+    case 'placeDecor':
+      return placeDecor(state, command.itemId, index);
+    case 'wear':
+      return wear(state, command.itemId, index);
+    case 'takeOff':
+      return takeOff(state, index);
     case 'manualSave':
       return reply(state, [], [{ type: 'saveRequested' }]);
   }
@@ -313,7 +340,9 @@ function move(state: GameState, direction: Direction, index: ContentIndex): Comm
   const tile = tileAt(map, target.x, target.y);
   const kind = kindAt(state, map, target.x, target.y);
 
-  if (!tile || !kind || residentAt(state, index, target.x, target.y) || !isWalkable(kind)) {
+  // 擺好的裝飾擋住路（見 domain/decor.ts）。
+  const blockedByDecor = decorAt(state.decor[state.mapId], target.x, target.y) !== undefined;
+  if (!tile || !kind || residentAt(state, index, target.x, target.y) || !isWalkable(kind) || blockedByDecor) {
     return reply({ ...state, player: facing });
   }
 
@@ -356,6 +385,8 @@ function interact(state: GameState, index: ContentIndex): CommandOutcome {
   const target = neighbor(state.player, state.player.facing);
   const resident = residentAt(state, index, target.x, target.y);
   if (resident) return talk(state, resident.npcId, index);
+  // 面對擺好的裝飾按互動：收回背包（見 pickUpDecor）。
+  if (decorAt(state.decor[state.mapId], target.x, target.y)) return pickUpDecor(state, index);
 
   const tile = tileAt(map, target.x, target.y);
   if (!tile) return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
@@ -961,6 +992,8 @@ function facingShop(state: GameState, index: ContentIndex, shopId: string): bool
 
 function buy(state: GameState, command: Extract<Command, { type: 'buy' }>, index: ContentIndex): CommandOutcome {
   if (!facingShop(state, index, command.shopId)) return reply(state, [messageFor('NOT_AT_SHOP')], [refused('NOT_AT_SHOP')]);
+  // 旅行商人的貨架每週輪換，走自己的規則（週五、六開門、每週每件有上限）。
+  if (index.shop(command.shopId).rotating) return buyFromMerchant(state, command.itemId, command.count, index);
   const line = index.shop(command.shopId).stock.find((s) => s.itemId === command.itemId);
   if (!line) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
   // 季節進貨：秋季的種子只在秋天賣，換季後下架（shops.json 的 seasons，見 domain/shop-stock.ts）。
@@ -980,6 +1013,113 @@ function buy(state: GameState, command: Extract<Command, { type: 'buy' }>, index
   const name = index.item(command.itemId).name;
   const sold = recordStallSale(state, index, command.shopId, command.itemId, command.count);
   return reply({ ...sold, gold: state.gold - cost, inventory: stored.value }, [`買了 ${name} × ${command.count}，花了 ${cost} 金`]);
+}
+
+/**
+ * 向旅行商人買（見 domain/traveling-merchant.ts）：只在週五、週六開門；貨架是這一週的；
+ * 每週每件最多 perItemWeekly 個（週五與週六共用）。扣金幣、放進背包，不花體力與時間。
+ */
+function buyFromMerchant(state: GameState, itemId: string, count: number, index: ContentIndex): CommandOutcome {
+  const rules = index.merchant;
+  const daysPerSeason = index.tuning.time.daysPerSeason;
+  if (!rules || !merchantOpen(rules, state.calendar, daysPerSeason)) {
+    return reply(state, [messageFor('MERCHANT_AWAY')], [refused('MERCHANT_AWAY')]);
+  }
+  const line = weekStock(rules, state.calendar, daysPerSeason).find((l) => l.itemId === itemId);
+  if (!line) return reply(state, [messageFor('NOT_SOLD')], [refused('NOT_SOLD')]);
+  const bought = boughtThisWeek(state.merchant, state.calendar, daysPerSeason);
+  const had = bought[itemId] ?? 0;
+  if (had + count > rules.perItemWeekly) return reply(state, [messageFor('MERCHANT_LIMIT')], [refused('MERCHANT_LIMIT')]);
+  const cost = line.price * count;
+  if (state.gold < cost) return reply(state, [messageFor('NO_GOLD')], [refused('NO_GOLD')]);
+  const stored = addItem(state.inventory, index.item(itemId), count);
+  if (!stored.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
+  const next: GameState = {
+    ...state,
+    gold: state.gold - cost,
+    inventory: stored.value,
+    merchant: { week: weekStartOf(state.calendar, daysPerSeason), bought: { ...bought, [itemId]: had + count } },
+  };
+  return reply(next, [`向旅行商人買了 ${index.item(itemId).name} × ${count}，花了 ${cost} 金`]);
+}
+
+/** 背包裡第一件可以擺的裝飾（裝飾但不能穿）。 */
+function firstPlaceable(state: GameState, index: ContentIndex): string | undefined {
+  return state.inventory.stacks.find((stack) => {
+    const item = index.item(stack.itemId);
+    return item.kind === 'decor' && !item.wearable;
+  })?.itemId;
+}
+
+/**
+ * 在小屋裡面對空的地板擺一件裝飾：不能擋住服務點的動線、不能擺在門口（見 domain/decor.ts）。
+ * 成功才從背包拿走；失敗時說明原因，什麼都不變。不花體力與時間。
+ */
+function placeDecor(state: GameState, itemId: string | undefined, index: ContentIndex): CommandOutcome {
+  const choice = itemId ?? firstPlaceable(state, index);
+  if (!choice || countOf(state.inventory, choice) < 1) return reply(state, [messageFor('NO_DECOR')], [refused('NO_DECOR')]);
+  const item = index.item(choice);
+  if (item.kind !== 'decor' || item.wearable) return reply(state, [messageFor('NO_DECOR')], [refused('NO_DECOR')]);
+  const target = neighbor(state.player, state.player.facing);
+  const placed = state.decor[state.mapId] ?? [];
+  const refusal = placementRefusal(index.map(state.mapId), placed, target);
+  if (refusal) return reply(state, [messageFor(refusal)], [refused(refusal)]);
+  const taken = removeItem(state.inventory, choice, 1);
+  if (!taken.ok) return reply(state, [messageFor('NO_DECOR')], [refused('NO_DECOR')]);
+  const next: GameState = {
+    ...state,
+    inventory: taken.value,
+    decor: { ...state.decor, [state.mapId]: [...placed, { itemId: choice, x: target.x, y: target.y }] },
+  };
+  return reply(next, [`擺好了${item.name}`]);
+}
+
+/** 收回面前擺好的裝飾（回到背包；背包放不下就留在原地）。 */
+function pickUpDecor(state: GameState, index: ContentIndex): CommandOutcome {
+  const target = neighbor(state.player, state.player.facing);
+  const placed = state.decor[state.mapId] ?? [];
+  const found = decorAt(placed, target.x, target.y);
+  if (!found) return reply(state, [messageFor('NOT_DECOR_HERE')], [refused('NOT_DECOR_HERE')]);
+  const stored = addItem(state.inventory, index.item(found.itemId), 1);
+  if (!stored.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
+  const rest: DecorPlacement[] = placed.filter((piece) => piece !== found);
+  return reply(
+    { ...state, inventory: stored.value, decor: { ...state.decor, [state.mapId]: rest } },
+    [`收回了${index.item(found.itemId).name}`],
+  );
+}
+
+/**
+ * 穿上衣服或帽子（每個角色只穿一件）：身上原本的那件回到背包；放不下就不換，身上的不變。不花體力與時間。
+ */
+function wear(state: GameState, itemId: string | undefined, index: ContentIndex): CommandOutcome {
+  const choice = itemId ?? state.inventory.stacks.find((stack) => index.item(stack.itemId).wearable)?.itemId;
+  if (!choice || countOf(state.inventory, choice) < 1) return reply(state, [messageFor('NO_WEARABLE')], [refused('NO_WEARABLE')]);
+  const item = index.item(choice);
+  if (!item.wearable) return reply(state, [messageFor('NOT_WEARABLE')], [refused('NOT_WEARABLE')]);
+  const worn = state.wearing[PLAYER_WEARER];
+  if (worn === choice) return reply(state, [messageFor('ALREADY_WEARING')], [refused('ALREADY_WEARING')]);
+  const taken = removeItem(state.inventory, choice, 1);
+  if (!taken.ok) return reply(state, [messageFor('NO_WEARABLE')], [refused('NO_WEARABLE')]);
+  let inventory = taken.value;
+  if (worn) {
+    const back = addItem(inventory, index.item(worn), 1);
+    if (!back.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
+    inventory = back.value;
+  }
+  const next: GameState = { ...state, inventory, wearing: { ...state.wearing, [PLAYER_WEARER]: choice } };
+  return reply(next, [worn ? `換上了${item.name}，${index.item(worn).name}收回背包` : `穿上了${item.name}`]);
+}
+
+/** 脫下身上的東西，回到背包（放不下就脫不下）。 */
+function takeOff(state: GameState, index: ContentIndex): CommandOutcome {
+  const worn = state.wearing[PLAYER_WEARER];
+  if (!worn) return reply(state, [messageFor('NOT_WORN')], [refused('NOT_WORN')]);
+  const stored = addItem(state.inventory, index.item(worn), 1);
+  if (!stored.ok) return reply(state, [messageFor('BAG_FULL')], [refused('BAG_FULL')]);
+  const wearing = { ...state.wearing };
+  delete wearing[PLAYER_WEARER];
+  return reply({ ...state, inventory: stored.value, wearing }, [`脫下了${index.item(worn).name}`]);
 }
 
 function upgrade(state: GameState, command: Extract<Command, { type: 'upgrade' }>, index: ContentIndex): CommandOutcome {
@@ -1089,7 +1229,35 @@ function remodel(state: GameState, itemId: string, cost: number, count: number, 
   const blocked = expansionRefusal(state.flags, flag);
   if (blocked) return reply(state, [messageFor(blocked)], [refused(blocked)]);
   const name = index.item(itemId).name;
-  return reply({ ...state, gold: state.gold - cost, flags: { ...state.flags, [flag]: true } }, [`${name}完成，花了 ${cost} 金`]);
+  const expanded: GameState = { ...state, gold: state.gold - cost, flags: { ...state.flags, [flag]: true } };
+  const carried = carryHouseDecor(expanded, flag, index);
+  if (!carried.ok) return reply(state, [messageFor(carried.reason)], [refused(carried.reason)]);
+  const returned = carried.value.returned > 0 ? `，${carried.value.returned} 件裝飾放不下新房間，已放回背包` : '';
+  return reply(carried.value.state, [`${name}完成，花了 ${cost} 金${returned}`]);
+}
+
+/** 小屋擴建時，擺好的裝飾搬進新的房間：放得下的留下，放不下的放回背包（背包放不下就不擴建）。 */
+const HOUSE_CARRY: Record<string, { from: string; to: string }> = {
+  [HOUSE_WING_FLAG]: { from: HOUSE_MAP_ID, to: HOUSE_WING_MAP_ID },
+  [HOUSE_FULL_FLAG]: { from: HOUSE_WING_MAP_ID, to: HOUSE_FULL_MAP_ID },
+};
+
+function carryHouseDecor(state: GameState, flag: string, index: ContentIndex): Result<{ state: GameState; returned: number }, string> {
+  const move = HOUSE_CARRY[flag];
+  if (!move) return ok({ state, returned: 0 });
+  const placed = state.decor[move.from] ?? [];
+  if (placed.length === 0) return ok({ state, returned: 0 });
+  const { kept, displaced } = carryDecor(index.map(move.to), placed);
+  let inventory = state.inventory;
+  for (const piece of displaced) {
+    const back = addItem(inventory, index.item(piece.itemId), 1);
+    if (!back.ok) return fail('BAG_FULL');
+    inventory = back.value;
+  }
+  return ok({
+    state: { ...state, inventory, decor: { ...state.decor, [move.from]: [], [move.to]: kept } },
+    returned: displaced.length,
+  });
 }
 
 /**

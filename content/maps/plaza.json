@@ -12,7 +12,7 @@
     "#.....==.......#",
     "V.....==.......#",
     "#.....==.......#",
-    "#hl............#",
+    "#hl...........m#",
     "#.............l#",
     "#..nbbp......s.#",
     "################"
@@ -29,6 +29,7 @@
     "l": { "kind": "furniture", "festival": "lantern" },
     "o": { "kind": "water", "festival": "stars" },
     "s": { "kind": "shop", "shop": "night-market" },
+    "m": { "kind": "shop", "shop": "traveling-merchant" },
     "V": { "kind": "door", "to": "village", "spawn": { "x": 14, "y": 6 } }
   },
   "spawn": { "x": 2, "y": 6 }

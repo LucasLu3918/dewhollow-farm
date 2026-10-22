@@ -11,6 +11,8 @@ import letters from '../content/letters.json';
 import festivals from '../content/festivals.json';
 import collection from '../content/collection.json';
 import achievements from '../content/achievements.json';
+import merchant from '../content/traveling-merchant.json';
+import decor from '../content/decor.json';
 import mainQuest from '../content/main-quest.json';
 import repairs from '../content/repairs.json';
 import randomEvents from '../content/events-random.json';
@@ -65,7 +67,7 @@ import { AudioOutput } from './presentation/audio/audio-output';
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
-  const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+  const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, merchant, decor, maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
   const index = createContentIndex(loaded.pack);
   // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
   const audio = new AudioOutput();

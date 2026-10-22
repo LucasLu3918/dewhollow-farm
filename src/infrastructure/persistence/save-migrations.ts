@@ -43,6 +43,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   18: migrateV18ToV19,
   19: migrateV19ToV20,
   20: migrateV20ToV21,
+  21: migrateV21ToV22,
 };
 
 /**
@@ -223,6 +224,24 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v21 → v22：裝飾擺放（每個房間的裝飾位置）、服飾穿戴（每個角色穿的一件）、旅行商人本週的購買數量。
+ * 舊存檔沒有擺過裝飾、沒有穿過衣服，也還沒買過旅行商人的東西，所以三者都從空開始。
+ */
+function migrateV21ToV22(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(21) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v21 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 22,
+    decor: {},
+    wearing: {},
+    merchant: { week: 0, bought: {} },
+  };
 }
 
 /**

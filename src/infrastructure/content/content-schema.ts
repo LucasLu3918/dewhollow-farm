@@ -57,6 +57,8 @@ const tileSchema = z.object({
   festival: z.enum(['stars', 'lantern']).optional(),
   /** 溫室的田（不受季節限制，見 domain/greenhouse.ts）。 */
   greenhouse: z.boolean().optional(),
+  /** 衣櫃（穿戴的服務點，動線要走得到，見 domain/decor.ts）。 */
+  wardrobe: z.boolean().optional(),
 });
 
 const mapSchema = z.object({
@@ -232,13 +234,17 @@ export const mineFileSchema = z.object({
 export const itemsFileSchema = z.object({
   version: z.literal(1),
   items: z.array(
-    z.object({
-      id: z.string().min(1),
-      name: z.string().min(1),
-      kind: z.enum(['material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft', 'building', 'decor', 'recipe']),
-      maxStack: z.number().int().positive(),
-      sellPrice: z.number().int().nonnegative().optional(),
-    }),
+    z
+      .object({
+        id: z.string().min(1),
+        name: z.string().min(1),
+        kind: z.enum(['material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft', 'building', 'decor', 'recipe']),
+        maxStack: z.number().int().positive(),
+        sellPrice: z.number().int().nonnegative().optional(),
+        /** 能穿在身上（衣服、遮陽帽）；只有裝飾能穿。 */
+        wearable: z.boolean().optional(),
+      })
+      .refine((item) => !item.wearable || item.kind === 'decor', '只有裝飾（decor）能穿'),
   ),
 });
 
@@ -361,10 +367,41 @@ export const shopsFileSchema = z.object({
       id: z.string().min(1),
       name: z.string().min(1),
       festival: z.string().min(1).optional(),
+      /** 貨架每週輪換（旅行商人）：stock 必須是空的，貨架由 traveling-merchant.json 決定。 */
+      rotating: z.boolean().optional(),
       stock: z.array(shopStockSchema),
       upgrades: z.array(toolUpgradeSchema),
     }),
   ),
+});
+
+/** 旅行商人（見 domain/traveling-merchant.ts 與 content/traveling-merchant.json）。 */
+export const merchantFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  weekdays: z.array(z.number().int().min(0).max(6)).min(1),
+  slots: z
+    .object({ min: z.number().int().positive().max(20), max: z.number().int().positive().max(20) })
+    .refine((s) => s.min <= s.max, '名額的最小值不可大於最大值'),
+  perItemWeekly: z.number().int().positive().max(99),
+  playMinutes: z.number().positive().max(60),
+  candidates: z
+    .array(
+      z.object({
+        itemId: z.string().min(1),
+        price: z.number().int().positive(),
+        seasons: z.array(z.enum(SEASONS)).min(1).optional(),
+      }),
+    )
+    .min(1),
+});
+
+/** 裝飾與服飾的時數估計（見 domain/decor.ts 與 content/decor.json）。 */
+export const decorFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  placeMinutes: z.number().positive().max(60),
+  wearMinutes: z.number().positive().max(60),
 });
 /** 技能天賦（見 domain/talents.ts 與 content/talents.json）。 */
 const talentEffectSchema = z.discriminatedUnion('type', [

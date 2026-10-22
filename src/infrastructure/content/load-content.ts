@@ -43,6 +43,8 @@ import {
   randomEventsFileSchema,
   collectionFileSchema,
   achievementsFileSchema,
+  merchantFileSchema,
+  decorFileSchema,
   type MusicFile,
   type SoundsFile,
   type TerrainFile,
@@ -50,6 +52,7 @@ import {
 import { festivalProblems, storyProblems } from './festival-content';
 import { randomEventProblems, repairProblems } from './repairs-content';
 import { achievementProblems, collectionProblems } from './collection-content';
+import { housePathProblems, merchantProblems } from './merchant-content';
 import type { StoryChapter } from '../../domain/story';
 
 export interface RawContentFiles {
@@ -65,6 +68,10 @@ export interface RawContentFiles {
   collection?: unknown;
   /** 成就（content/achievements.json）。測試用的最小內容可以省略（視為沒有成就）。 */
   achievements?: unknown;
+  /** 旅行商人（content/traveling-merchant.json）。測試用的最小內容可以省略（視為沒有旅行商人）。 */
+  merchant?: unknown;
+  /** 裝飾與服飾的時數（content/decor.json）。測試用的最小內容可以省略。 */
+  decor?: unknown;
   crops: unknown;
   npcs: unknown;
   /** 居民行程（content/schedules.json）。 */
@@ -156,6 +163,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const randomEvents = randomEventsFileSchema.parse(raw.randomEvents ?? { version: 1, chance: 0, events: [] });
   const collection = collectionFileSchema.parse(raw.collection ?? { version: 1, categories: [] });
   const achievements = achievementsFileSchema.parse(raw.achievements ?? { version: 1, achievements: [] });
+  const merchant = raw.merchant === undefined ? undefined : merchantFileSchema.parse(raw.merchant);
+  const decor = raw.decor === undefined ? undefined : decorFileSchema.parse(raw.decor);
 
   const pack: ContentPack = {
     crops,
@@ -185,6 +194,14 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     randomEvents: { chance: randomEvents.chance, events: randomEvents.events },
     collection: collection.categories,
     achievements: achievements.achievements,
+    merchant: merchant && {
+      weekdays: merchant.weekdays,
+      slots: merchant.slots,
+      perItemWeekly: merchant.perItemWeekly,
+      playMinutes: merchant.playMinutes,
+      candidates: merchant.candidates,
+    },
+    decor: decor && { placeMinutes: decor.placeMinutes, wearMinutes: decor.wearMinutes },
   };
   const problems = [
     ...validateCrossReferences(pack, assets),
@@ -196,6 +213,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     ...randomEventProblems(pack),
     ...collectionProblems(pack),
     ...achievementProblems(pack),
+    ...merchantProblems(pack),
+    ...housePathProblems(pack),
     ...rigProblems(rigs, assets),
     ...companionProblems(companions, rigs, pack),
     ...toolProblems(tools, assets),

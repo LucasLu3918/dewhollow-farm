@@ -39,6 +39,8 @@ import type { Weather } from '../../domain/weather';
 import { RENDER_COMPAT_KEY } from '../apply-render-compat';
 import { CharacterRig, type RigDebugInfo } from '../character-rig';
 import { centerOf, standOf } from '../layout';
+import { PLAYER_WEARER } from '../../domain/decor';
+import { decorColorOf, wearColorOf } from '../decor-style';
 import { emotesForEvent, type EmoteKind } from '../emote-defs';
 import { playEmote, type EmoteHandle } from '../emote';
 import { footstepDust, pickupFlight, playActionEffect, shipFlight, sleepEffect, type ShipIcon } from '../effects';
@@ -90,6 +92,10 @@ const COMMAND_KEYS: Record<string, Command> = {
   r: { type: 'takeTool', tool: 'rod' },
   g: { type: 'takeTool', tool: 'sickle' },
   s: { type: 'manualSave' },
+  // 小屋：v 擺一件裝飾（面前的空地板）、e 穿上衣服或帽子、q 脫下（收回裝飾用 x）。
+  v: { type: 'placeDecor' },
+  e: { type: 'wear' },
+  q: { type: 'takeOff' },
 };
 
 const MOVE_DURATION_MS = 110;
@@ -104,6 +110,8 @@ const REACT_DURATION_MS = 320;
 const DEPTH_RESIDENT = 5;
 const DEPTH_FOLLOWER = 9;
 const DEPTH_PLAYER = 10;
+/** 擺在地板上的裝飾：在地板之上、動物之下。 */
+const DEPTH_DECOR = 3;
 /** 天色與天氣的遮罩、粒子，在世界之上、HUD（DOM）之下。 */
 const DEPTH_SKY = 40;
 /** 收線的時限（毫秒）：魚上鉤後要在這段時間內按 x。 */
@@ -245,6 +253,9 @@ export class MapScene extends Phaser.Scene {
   private fireworkCount = 0;
   /** 雞舍裡的動物圖片，每次重畫時重建。 */
   private animalSprites: Phaser.GameObjects.Image[] = [];
+  /** 小屋擺好的裝飾（色塊）與玩家頭上的服飾小圖示（見 syncDecor、syncWearing）。 */
+  private decorSprites: Phaser.GameObjects.Rectangle[] = [];
+  private wearBadge: Phaser.GameObjects.Rectangle | null = null;
   /** 魚上鉤後等待收線的計時器（時限內按 x 就釣到，逾時魚跑掉）。 */
   private reelTimer: Phaser.Time.TimerEvent | null = null;
   private shownSeason: Season | null = null;
@@ -733,6 +744,8 @@ export class MapScene extends Phaser.Scene {
     this.deps.music.update(state.calendar.season, state.calendar.minuteOfDay, state.weather);
     this.syncWorldTiles();
     this.syncAnimals(state.mapId);
+    this.syncDecor(state.mapId);
+    this.syncWearing();
     this.syncResidents();
     this.drawPlots();
     this.movePlayer(state.player.x, state.player.y);
@@ -811,6 +824,41 @@ export class MapScene extends Phaser.Scene {
         .setDepth(6);
       this.animalSprites.push(sprite);
     });
+  }
+
+  /** 小屋裡擺好的裝飾：每件一個色塊（占位，顏色見 decor-style.ts）；每次重畫時重建，件數很少。 */
+  private syncDecor(mapId: string): void {
+    for (const sprite of this.decorSprites) sprite.destroy();
+    this.decorSprites = [];
+    for (const piece of this.deps.session.state.decor[mapId] ?? []) {
+      const center = centerOf(piece.x, piece.y);
+      const block = this.add
+        .rectangle(center.x, center.y, TILE_SIZE * 0.7, TILE_SIZE * 0.7, decorColorOf(piece.itemId))
+        .setStrokeStyle(2, 0x3a2a1a)
+        .setDepth(DEPTH_DECOR);
+      this.decorSprites.push(block);
+    }
+  }
+
+  /** 玩家身上穿的衣服或帽子：頭上一個小色塊（占位），跟著角色走（見 update）。穿戴不影響規則。 */
+  private syncWearing(): void {
+    const worn = this.deps.session.state.wearing[PLAYER_WEARER];
+    if (!worn) {
+      this.wearBadge?.destroy();
+      this.wearBadge = null;
+      return;
+    }
+    if (!this.wearBadge) {
+      this.wearBadge = this.add.rectangle(0, 0, TILE_SIZE * 0.35, TILE_SIZE * 0.2, wearColorOf(worn)).setDepth(DEPTH_PLAYER + 1);
+    }
+    this.wearBadge.setFillStyle(wearColorOf(worn));
+    this.moveWearBadge();
+  }
+
+  private moveWearBadge(): void {
+    if (!this.wearBadge) return;
+    const head = this.headOf(this.rig);
+    this.wearBadge.setPosition(head.x, head.y - TILE_SIZE * 0.4);
   }
 
   /** 玩家造成的地圖變化（砍樹、採野薄荷、隔日恢復）即時反映到每一格的圖片上。 */
@@ -977,6 +1025,7 @@ export class MapScene extends Phaser.Scene {
   override update(time: number, delta: number): void {
     this.updateSky(time);
     this.rig.update(delta);
+    this.moveWearBadge();
     for (const rig of this.npcRigs.values()) rig.update(delta);
     for (const state of this.companions.values()) state.rig.update(delta);
     this.drawStarMeter();

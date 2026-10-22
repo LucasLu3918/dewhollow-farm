@@ -12,6 +12,8 @@ import repairs from '../../content/repairs.json';
 import randomEvents from '../../content/events-random.json';
 import collection from '../../content/collection.json';
 import achievements from '../../content/achievements.json';
+import merchant from '../../content/traveling-merchant.json';
+import decor from '../../content/decor.json';
 import start from '../../content/start.json';
 import tuning from '../../content/tuning.json';
 import assets from '../../content/assets.json';
@@ -60,6 +62,8 @@ const { pack } = loadContent({
   randomEvents,
   collection,
   achievements,
+  merchant,
+  decor,
   maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
