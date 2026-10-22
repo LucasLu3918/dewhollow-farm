@@ -13,8 +13,11 @@ export interface TouchButton {
   label: string;
   /** 給螢幕閱讀器的名稱。 */
   name: string;
-  /** move 是方向鍵組（十字排列，按住會連續移動）；act 是動作鍵組。 */
-  group: 'move' | 'act';
+  /**
+   * move 是方向鍵組（十字排列，按住會連續移動）；act 是動作鍵組；
+   * tool 是直接拿工具與小屋動作（擺放、穿上、脫下）的組。
+   */
+  group: 'move' | 'act' | 'tool';
 }
 
 export const TOUCH_BUTTONS: readonly TouchButton[] = [
@@ -30,6 +33,13 @@ export const TOUCH_BUTTONS: readonly TouchButton[] = [
   { action: 'collection', label: '圖鑑', name: '圖鑑與成就', group: 'act' },
   { action: 'quests', label: '委託', name: '委託與佈告欄', group: 'act' },
   { action: 'manualSave', label: '存檔', name: '手動存檔', group: 'act' },
+  { action: 'takeAxe', label: '斧', name: '拿取斧頭', group: 'tool' },
+  { action: 'takePick', label: '鎬', name: '拿取鎬子', group: 'tool' },
+  { action: 'takeRod', label: '釣', name: '拿取釣竿', group: 'tool' },
+  { action: 'takeSickle', label: '鐮', name: '拿取鐮刀', group: 'tool' },
+  { action: 'placeDecor', label: '擺放', name: '在小屋擺放裝飾', group: 'tool' },
+  { action: 'wear', label: '穿', name: '穿上衣服或帽子', group: 'tool' },
+  { action: 'takeOff', label: '脫', name: '脫下衣服或帽子', group: 'tool' },
 ];
 
 /** 這個虛擬按鈕要送出的按鍵（目前綁定的那一個）。 */

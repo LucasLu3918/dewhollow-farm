@@ -13,7 +13,7 @@ export class TouchControls {
     const root = doc.querySelector<HTMLElement>('#touch-controls');
     if (!root) throw new Error('頁面缺少必要元素 #touch-controls');
     root.replaceChildren();
-    for (const group of ['move', 'act'] as const) {
+    for (const group of ['move', 'act', 'tool'] as const) {
       const wrap = doc.createElement('div');
       wrap.className = `touch-group touch-${group}`;
       for (const entry of TOUCH_BUTTONS.filter((b) => b.group === group)) {
