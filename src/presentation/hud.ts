@@ -176,6 +176,8 @@ export class Hud {
         if (event.pointerId !== heldPointer) suppressClickFor(event.pointerId);
         return;
       }
+      // A cancelled gesture cannot emit its pending click; allow the browser's reused ID to start fresh.
+      suppressedClicks.delete(event.pointerId);
       heldPointer = event.pointerId;
       try { this.mainAction.setPointerCapture(event.pointerId); } catch { /* Synthetic or detached target. */ }
       timer = window.setTimeout(() => {

@@ -79,6 +79,45 @@ async function verifyMultiPointerClicksAreSuppressed(page: Page, order: 'seconda
   expect(await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0)).toBe(baseline.till);
 }
 
+async function verifyCancelledPointerCanShortPressAgain(page: Page, cancelBy: 'pointercancel' | 'blur'): Promise<void> {
+  await start(page);
+  await moveToEmptyField(page);
+  await enableContinuousActions(page);
+  await page.evaluate(() => {
+    const button = document.querySelector<HTMLButtonElement>('#hud-action')!;
+    const bounds = button.getBoundingClientRect();
+    button.dispatchEvent(new PointerEvent('pointerdown', {
+      pointerId: 61, pointerType: 'touch', button: 0, clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2, bubbles: true,
+    }));
+  });
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? false)).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0)).toBe(1);
+  await page.evaluate((reason) => {
+    if (reason === 'blur') {
+      window.dispatchEvent(new Event('blur'));
+      return;
+    }
+    document.querySelector<HTMLButtonElement>('#hud-action')!.dispatchEvent(new PointerEvent('pointercancel', {
+      pointerId: 61, pointerType: 'touch', bubbles: true,
+    }));
+  }, cancelBy);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? true)).toBe(false);
+  const refusedBefore = await page.evaluate(() => window.__dewhollow?.soundLog().filter((id) => id === 'refuse').length ?? 0);
+  await page.evaluate(() => {
+    const button = document.querySelector<HTMLButtonElement>('#hud-action')!;
+    const bounds = button.getBoundingClientRect();
+    const init = (type: string) => new PointerEvent(type, {
+      pointerId: 61, pointerType: 'touch', button: 0, clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2, bubbles: true, cancelable: true,
+    });
+    button.dispatchEvent(init('pointerdown'));
+    button.dispatchEvent(init('pointerup'));
+    button.dispatchEvent(init('click'));
+  });
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.soundLog().filter((id) => id === 'refuse').length ?? 0)).toBe(refusedBefore + 1);
+}
+
 async function saveGame(page: Page): Promise<void> {
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
@@ -188,6 +227,14 @@ test.describe('可取消的長按連續農務', () => {
 
   test('owner click 先到時也不讓 secondary click dispatch', async ({ page }) => {
     await verifyMultiPointerClicksAreSuppressed(page, 'owner-first');
+  });
+
+  test('pointercancel 後相同 pointerId 可立即短按', async ({ page }) => {
+    await verifyCancelledPointerCanShortPressAgain(page, 'pointercancel');
+  });
+
+  test('blur 後相同 pointerId 可立即短按', async ({ page }) => {
+    await verifyCancelledPointerCanShortPressAgain(page, 'blur');
   });
 
   test('持續移動會重新查詢面前田地；舊田不重做且新田可執行', async ({ page }) => {
