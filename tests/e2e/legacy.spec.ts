@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * 床邊的公告：農場評級、豐收重置（第 2 年春季第 1 天）與傳承（主線第 5 章完成後）。
- * 存檔是一份 v23 的存檔，站在小屋的 (3,2) 面向上方的公告 (3,1)，按 X 打開面板。
+ * 存檔是一份 v23 的存檔，站在小屋的 (2,2) 面向左邊的公告 (1,2)（床的正下方），按 X 打開面板。
  * 兩個動作都要按兩次（第一次只顯示說明，第二次才確認）。
  * 注意：這份測試需要在本機 5173 port 執行 playwright，本次任務未執行（見交付報告）。
  */
@@ -19,7 +19,7 @@ function record(overrides: Record<string, unknown>): Record<string, unknown> {
       energy: { current: 100, max: 100 },
       gold: 900,
       mapId: 'house',
-      player: { x: 3, y: 2, facing: 'up' },
+      player: { x: 2, y: 2, facing: 'left' },
       plots: {},
       inventory: { capacity: 24, stacks: [{ itemId: 'hay', quality: 'normal', count: 2 }] },
       shipBox: { entries: [] },

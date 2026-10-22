@@ -9,10 +9,11 @@ import { shippedIndex, shippedPack } from '../../tests/sim/shipped-content';
 
 /**
  * M6：農場評級的收入、豐收重置與傳承（使用真實內容，見 tests/sim/shipped-content.ts）。
- * 公告在小屋（house）的 (3,1)，站在它下面的 (3,2) 面向上（notice: legacy）。
+ * 公告在小屋（house）的 (1,2)，床的正下方（notice: legacy）；站在它右邊的 (2,2) 面向左。
+ * 公告不放在床的右邊 (3,1)，那一格是既有的路線，會擋住收成與出貨的端到端測試。
  */
 
-const NOTICE_SIDE = { x: 3, y: 2, facing: 'up' as const };
+const NOTICE_SIDE = { x: 2, y: 2, facing: 'left' as const };
 const BED_SIDE = { x: 2, y: 1, facing: 'left' as const };
 const YEAR_TWO_MORNING = { year: 2, season: 'spring' as const, day: 1, minuteOfDay: 360 };
 const CROP = 'crop.sweet-radish';
