@@ -16,6 +16,8 @@ export interface SessionOptions {
   restored?: boolean;
   /** 時鐘，單位毫秒；測試時可注入假時鐘。 */
   now?: () => number;
+  /** 遊戲版本號，每次存檔都會寫進紀錄（見 SaveRecord.gameVersion）。 */
+  gameVersion?: string;
 }
 
 /**
@@ -26,6 +28,7 @@ export class GameSession {
   private current: GameState;
   private readonly slot: string;
   private readonly now: () => number;
+  private readonly gameVersion: string | undefined;
   readonly restored: boolean;
 
   /** 本次開啟前已累計的遊玩秒數，與 activeMs 相加後寫入存檔。 */
@@ -45,6 +48,7 @@ export class GameSession {
     this.slot = options.slot ?? DEFAULT_SLOT;
     this.restored = options.restored ?? false;
     this.now = options.now ?? Date.now;
+    this.gameVersion = options.gameVersion;
     this.baseSeconds = initial.playtimeSeconds;
     this.lastActivityAt = this.now();
   }
@@ -95,6 +99,7 @@ export class GameSession {
       slot: this.slot,
       savedAt: new Date(this.now()).toISOString(),
       state: this.current,
+      ...(this.gameVersion !== undefined ? { gameVersion: this.gameVersion } : {}),
     });
   }
 

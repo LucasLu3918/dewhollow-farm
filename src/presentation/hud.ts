@@ -13,6 +13,7 @@ const LOG_LIMIT = 6;
 
 /** DOM 版 HUD：只負責把狀態呈現到頁面上，不含任何規則。 */
 export class Hud {
+  private readonly doc: Document;
   private readonly clock: HTMLElement;
   private readonly day: HTMLElement;
   private readonly weather: HTMLElement;
@@ -24,9 +25,11 @@ export class Hud {
   private readonly tool: HTMLElement;
   private readonly seed: HTMLElement;
   private readonly mine: HTMLElement;
+  private readonly version: HTMLElement;
   private readonly log: HTMLElement;
 
   constructor(doc: Document) {
+    this.doc = doc;
     this.clock = required(doc, '#hud-clock');
     this.day = required(doc, '#hud-day');
     this.weather = required(doc, '#hud-weather');
@@ -38,7 +41,13 @@ export class Hud {
     this.tool = required(doc, '#hud-tool');
     this.seed = required(doc, '#hud-seed');
     this.mine = required(doc, '#hud-mine');
+    this.version = required(doc, '#hud-version');
     this.log = required(doc, '#hud-log');
+  }
+
+  /** 狀態列上的版本號（例如 v0.1.0）；點了說明頁可看到完整的更新日誌。 */
+  setVersion(version: string): void {
+    this.version.textContent = `v${version}`;
   }
 
   update(state: GameState, pack: ContentPack): void {
@@ -68,6 +77,12 @@ export class Hud {
   /** 點技能列就打開技能與天賦面板（鍵盤的 K 也一樣）。 */
   bindSkills(onOpen: () => void): void {
     this.skills.addEventListener('click', onOpen);
+  }
+
+  /** 狀態列的「說明」與「存檔」按鈕（鍵盤的 ? 與 L 也一樣）。 */
+  bindDialogs(onHelp: () => void, onSaves: () => void): void {
+    required(this.doc, '#hud-help').addEventListener('click', onHelp);
+    required(this.doc, '#hud-saves').addEventListener('click', onSaves);
   }
 
   messages(lines: readonly string[]): void {

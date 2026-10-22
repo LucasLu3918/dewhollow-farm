@@ -32,6 +32,10 @@ export class IndexedDbSaveRepository implements SaveRepository {
       await this.db.saves.put(structuredClone(record));
     });
   }
+
+  async delete(slot: string): Promise<void> {
+    await this.db.saves.delete(slot);
+  }
 }
 
 /** 瀏覽器是否提供 IndexedDB；不提供時由組裝點決定降級方式。 */

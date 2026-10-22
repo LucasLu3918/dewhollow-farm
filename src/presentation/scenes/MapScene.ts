@@ -11,6 +11,8 @@ import type { ToolDef, ToolManifest } from '../../infrastructure/assets/tool-man
 import type { RigDef, RigManifest } from '../../infrastructure/assets/rig-manifest';
 import type { TerrainDef } from '../../infrastructure/content/content-schema';
 import type { Hud } from '../hud';
+import type { HelpPanel } from '../help-panel';
+import type { SavePanel } from '../save-panel';
 import { cameraBounds, deadzoneOf } from '../camera';
 import { TILE_SIZE, VIEW_SIZE } from '../constants';
 import { nightAlpha, particleKind, particlePosition, seasonGrassTint, weatherDim } from '../atmosphere';
@@ -75,6 +77,9 @@ export interface MapSceneDeps {
   music: MusicPlayer;
   /** 各種地形的腳步（塵土顏色與音效），來自 content/terrain.json。 */
   terrain: TerrainDef[];
+  /** 說明頁（? 鍵）與存檔槽（L 鍵）；打開時遊戲的按鍵只用來關閉（Esc）。 */
+  help: HelpPanel;
+  saves: SavePanel;
 }
 
 const MOVE_KEYS: Record<string, Direction> = {
@@ -427,6 +432,27 @@ export class MapScene extends Phaser.Scene {
         this.collectionPanel.close();
         this.legacyPanel.close();
       }
+      return;
+    }
+    if (this.deps.help.isOpen() || this.deps.saves.isOpen()) {
+      // 說明頁或存檔槽開著時，按鍵只用來離開（Esc），其餘都在面板上用滑鼠完成。
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.deps.help.close();
+        this.deps.saves.close();
+      }
+      return;
+    }
+    if (event.key === '?') {
+      // 說明頁：操作按鍵、版本號、更新日誌與隱私說明；不花體力與時間。
+      event.preventDefault();
+      this.deps.help.open();
+      return;
+    }
+    if (event.key.toLowerCase() === 'l') {
+      // 存檔槽：讀取、新遊戲、刪除、匯出與匯入；不花體力與時間。
+      event.preventDefault();
+      void this.deps.saves.open();
       return;
     }
     if (event.key.toLowerCase() === 'k') {

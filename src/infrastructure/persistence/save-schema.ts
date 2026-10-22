@@ -195,6 +195,8 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
 const recordSchema = z.object({
   slot: z.string().min(1),
   savedAt: z.string().min(1),
+  /** 寫入這份存檔的遊戲版本號；舊存檔沒有就省略，不視為錯誤。 */
+  gameVersion: z.string().min(1).optional(),
   state: z.unknown(),
 });
 
@@ -212,5 +214,11 @@ export function parseSaveRecord(raw: unknown, context: MigrationContext): SaveRe
   if (!state.success) {
     throw new SaveFormatError(`存檔內容格式錯誤於 ${describeIssue(state.error.issues[0])}`);
   }
-  return { slot: envelope.data.slot, savedAt: envelope.data.savedAt, state: state.data };
+  const { gameVersion } = envelope.data;
+  return {
+    slot: envelope.data.slot,
+    savedAt: envelope.data.savedAt,
+    state: state.data,
+    ...(gameVersion !== undefined ? { gameVersion } : {}),
+  };
 }
