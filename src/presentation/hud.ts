@@ -87,6 +87,13 @@ export class Hud {
     required(this.doc, '#hud-saves').addEventListener('click', onSaves);
   }
 
+  /** 有新版本可用時顯示更新按鈕；按下後才套用（先存檔，見 service-worker.ts），不會自動打斷遊戲。 */
+  showUpdate(onApply: () => void): void {
+    const button = required<HTMLButtonElement>(this.doc, '#hud-update');
+    button.hidden = false;
+    button.addEventListener('click', onApply, { once: true });
+  }
+
   /** 狀態列的「設定」按鈕（鍵盤的 O 也一樣）。 */
   bindSettings(onOpen: () => void): void {
     required(this.doc, '#hud-settings').addEventListener('click', onOpen);

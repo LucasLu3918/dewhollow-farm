@@ -1,0 +1,33 @@
+{
+  "name": "晨露農場",
+  "short_name": "晨露",
+  "description": "原創農場生活網頁遊戲。可安裝到主畫面，離線也能玩；存檔只存在這個瀏覽器。",
+  "lang": "zh-TW",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1d2a1f",
+  "theme_color": "#7fae6b",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

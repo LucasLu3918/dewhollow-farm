@@ -201,7 +201,8 @@ describe('shipped assets', () => {
   });
 
   it('records where each real asset came from, including the model and seed', () => {
-    for (const asset of manifest.assets.filter((a) => a.file)) {
+    // 程式產生的圖示（PWA）沒有模型與 seed，來源寫明產生的程式即可（見 pwa-assets.spec.ts）。
+    for (const asset of manifest.assets.filter((a) => a.file && !a.source.startsWith('程式產生'))) {
       expect(asset.source, asset.id).toMatch(/Z-Image Turbo/);
       expect(asset.source, asset.id).toMatch(/seed \d+/);
     }
