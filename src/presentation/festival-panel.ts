@@ -1,9 +1,9 @@
 import type { GameState } from '../domain/game-state';
-import type { Command } from '../application/game-commands';
+import { messageFor, type Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
-import { festivalHere } from '../application/festival';
+import { festivalHere, starExchangeRefusal } from '../application/festival';
 import { residentsOn } from '../application/residents';
-import { CROWN_RECIPE, doneThisYear, festivalKey, openFestival, type FestivalDef } from '../domain/festival';
+import { CROWN_RECIPE, doneThisYear, exchangedThisYear, festivalKey, openFestival, type FestivalDef } from '../domain/festival';
 import { countOf } from '../domain/inventory';
 import { SEASON_NAMES } from '../domain/calendar';
 
@@ -65,6 +65,24 @@ export class FestivalPanel {
     if (here.contest) this.contestSection(state, here);
     if (here.shop) this.heading('夜市攤位：到廣場右下角的櫃檯（攤位）買，每項有限量。');
     if (here.stars) this.heading('釣星星：到廣場左上角的水池前甩竿（按 X），等星星經過時再按 X 收網。');
+    if (here.exchange) this.starExchangeSection(state, here);
+  }
+
+  /** 星河兌換：能不能換、為什麼不能換都由應用層決定（starExchangeRefusal）；這裡只顯示。 */
+  private starExchangeSection(state: GameState, festival: FestivalDef): void {
+    this.heading('星河兌換：用星河碎片換限定物品或解鎖配方，每項每年有上限。碎片跨年保留。');
+    for (const line of festival.exchange ?? []) {
+      const give = `${this.index.item(line.give.itemId).name} × ${line.give.count}（有 ${countOf(state.inventory, line.give.itemId)}）`;
+      const get = line.receive ? `換 ${this.index.item(line.receive.itemId).name} × ${line.receive.count}` : '解鎖這項配方';
+      const left = Math.max(0, line.limit - exchangedThisYear(state.festival.exchanged, state.calendar.year, line.id));
+      const refusal = starExchangeRefusal(state, this.index, line.id);
+      const note = refusal ? `（${messageFor(refusal)}）` : '';
+      this.item(`${line.name}：給出 ${give}，${get}；今年還可換 ${left} 次${note}`, {
+        label: '兌換',
+        disabled: refusal !== null,
+        onClick: () => this.onCommand({ type: 'starExchange', lineId: line.id }),
+      });
+    }
   }
 
   private summaryText(state: GameState, open: FestivalDef | null, here: FestivalDef | null): string {

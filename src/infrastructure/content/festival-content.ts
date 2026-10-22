@@ -24,6 +24,8 @@ export function festivalProblems(pack: ContentPack): string[] {
   ]);
   const seen = new Set<string>();
   const dates = new Set<string>();
+  const exchangeIds = new Set<string>();
+  const recipeFlags = new Set(pack.crafting.flatMap((r) => (r.unlock && 'flag' in r.unlock ? [r.unlock.flag] : [])));
 
   for (const festival of festivals) {
     const owner = `節慶 ${festival.id}`;
@@ -63,6 +65,22 @@ export function festivalProblems(pack: ContentPack): string[] {
       const shop = shops.get(festival.shop);
       if (!shop) problems.push(`${owner} 的攤位 ${festival.shop} 不存在`);
       else if (shop.festival !== festival.id) problems.push(`${owner} 的攤位 ${festival.shop} 沒有標記屬於這個節慶`);
+    }
+    for (const line of festival.exchange ?? []) {
+      const lineOwner = `${owner} 的兌換 ${line.id}`;
+      if (exchangeIds.has(line.id)) problems.push(`星河兌換 id 重複：${line.id}（紀錄是每年每項一次，id 要全域唯一）`);
+      exchangeIds.add(line.id);
+      for (const itemId of [line.give.itemId, line.receive?.itemId]) {
+        if (itemId !== undefined && !itemIds.has(itemId)) problems.push(`${lineOwner} 的物品 ${itemId} 不存在`);
+      }
+      if (line.flag !== undefined && !recipeFlags.has(line.flag)) problems.push(`${lineOwner} 的旗標 ${line.flag} 沒有任何配方使用`);
+    }
+  }
+  // 合成配方用旗標解鎖的，必須有星河兌換會設定它，否則永遠做不了。
+  const exchangeFlags = new Set(festivals.flatMap((f) => (f.exchange ?? []).flatMap((line) => (line.flag ? [line.flag] : []))));
+  for (const recipe of pack.crafting) {
+    if (recipe.unlock && 'flag' in recipe.unlock && !exchangeFlags.has(recipe.unlock.flag)) {
+      problems.push(`合成配方 ${recipe.id} 的解鎖旗標 ${recipe.unlock.flag} 沒有任何兌換來源（星河兌換）`);
     }
   }
 

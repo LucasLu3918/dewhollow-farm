@@ -12,7 +12,11 @@ import {
   contestReached,
   recordSale,
   soldThisYear,
+  exchangedThisYear,
+  exchangeRefusal,
+  recordExchange,
   type FestivalDef,
+  type StarExchangeDef,
 } from './festival';
 
 const sprout: FestivalDef = {
@@ -113,5 +117,47 @@ describe('night market stock (夜市攤位的數量限制)', () => {
     expect(soldThisYear(sold, 1, 'lantern')).toBe(0);
     expect(soldThisYear(sold, 2, 'bait')).toBe(0);
     expect(recordSale(sold, 2, 'bait', 1)).toEqual({ year: 2, counts: { bait: 1 } });
+  });
+});
+
+describe('star exchange (星河兌換：每項每年有上限)', () => {
+  const starString: StarExchangeDef = {
+    id: 'star-string',
+    name: '星空燈串',
+    give: { itemId: 'star-shard', count: 3 },
+    receive: { itemId: 'star-string', count: 1 },
+    limit: 1,
+    playMinutes: 1,
+  };
+  const starSugarRecipe: StarExchangeDef = {
+    id: 'star-sugar-recipe',
+    name: '星河糖的配方',
+    give: { itemId: 'star-shard', count: 4 },
+    flag: 'recipe:star-sugar',
+    limit: 1,
+    playMinutes: 1.5,
+  };
+
+  it('counts exchanges per line within a year and starts over in a new year', () => {
+    let tally = emptyFestivalState().exchanged;
+    tally = recordExchange(tally, 1, 'star-string');
+    expect(exchangedThisYear(tally, 1, 'star-string')).toBe(1);
+    expect(exchangedThisYear(tally, 1, 'night-canvas')).toBe(0);
+    expect(exchangedThisYear(tally, 2, 'star-string')).toBe(0);
+    expect(recordExchange(tally, 2, 'star-string')).toEqual({ year: 2, counts: { 'star-string': 1 } });
+  });
+
+  it('starts with nothing exchanged', () => {
+    expect(emptyFestivalState().exchanged).toEqual({ year: 0, counts: {} });
+  });
+
+  it('refuses when the shards are short, the yearly limit is reached, or the recipe is already unlocked', () => {
+    const none = emptyFestivalState().exchanged;
+    expect(exchangeRefusal(starString, { shards: 2, year: 1, exchanged: none, flagSet: false })).toBe('NOT_ENOUGH_SHARDS');
+    expect(exchangeRefusal(starString, { shards: 3, year: 1, exchanged: none, flagSet: false })).toBeNull();
+    const used = recordExchange(none, 1, 'star-string');
+    expect(exchangeRefusal(starString, { shards: 9, year: 1, exchanged: used, flagSet: false })).toBe('EXCHANGE_LIMIT');
+    expect(exchangeRefusal(starString, { shards: 9, year: 2, exchanged: used, flagSet: false })).toBeNull();
+    expect(exchangeRefusal(starSugarRecipe, { shards: 9, year: 1, exchanged: none, flagSet: true })).toBe('ALREADY_UNLOCKED');
   });
 });

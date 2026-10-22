@@ -223,3 +223,86 @@ describe('主線：章節推進', () => {
     expect(run(done, { type: 'manualSave' }).state.story.chapter).toBe(3);
   });
 });
+
+describe('星河兌換：夜市用星河碎片換物品', () => {
+  // 夏 14 夜裡的鎮廣場：夜市開著，兌換攤位在節慶面板上（不必站在哪裡）。
+  const MARKET = { mapId: 'plaza', calendar: at('summer', 14, 1200), weather: 'sunny' as const };
+  // 小屋的工作台 (4,1)，站在 (4,2) 面向上方。
+  const BENCH = { mapId: 'house', player: { x: 4, y: 2, facing: 'up' as const } };
+
+  it('用碎片換裝飾：碎片扣掉、物品進背包，今年的次數記下來', () => {
+    const start = withItems(game({ ...MARKET }), { 'star-shard': 5 });
+    const out = run(start, { type: 'starExchange', lineId: 'star-string' });
+    expect(countOf(out.state.inventory, 'star-shard')).toBe(2);
+    expect(countOf(out.state.inventory, 'star-string')).toBe(1);
+    expect(out.state.festival.exchanged).toEqual({ year: 1, counts: { 'star-string': 1 } });
+    expect(out.messages.join('\n')).toContain('星空燈串');
+  });
+
+  it('碎片不夠時不兌換，碎片與物品都不變，並說明原因', () => {
+    const start = withItems(game({ ...MARKET }), { 'star-shard': 2 });
+    const out = run(start, { type: 'starExchange', lineId: 'star-string' });
+    expect(out.messages).toEqual(['星河碎片不夠']);
+    expect(countOf(out.state.inventory, 'star-shard')).toBe(2);
+    expect(countOf(out.state.inventory, 'star-string')).toBe(0);
+    expect(out.events).toContainEqual({ type: 'refused', reason: 'NOT_ENOUGH_SHARDS' });
+  });
+
+  it('同一項今年只能換一次：達上限時說明且不扣碎片；明年又能換', () => {
+    const once = run(withItems(game({ ...MARKET }), { 'star-shard': 9 }), { type: 'starExchange', lineId: 'star-string' }).state;
+    const again = run(once, { type: 'starExchange', lineId: 'star-string' });
+    expect(again.messages).toEqual(['這項今年已經換過了']);
+    expect(countOf(again.state.inventory, 'star-shard')).toBe(6);
+    const nextYear = run({ ...again.state, calendar: at('summer', 14, 1200, 2) }, { type: 'starExchange', lineId: 'star-string' });
+    expect(countOf(nextYear.state.inventory, 'star-string')).toBe(2);
+    expect(countOf(nextYear.state.inventory, 'star-shard')).toBe(3);
+  });
+
+  it('碎片跨年保留：換年後碎片還在，之後可以拿去換別的', () => {
+    const once = run(withItems(game({ ...MARKET }), { 'star-shard': 9 }), { type: 'starExchange', lineId: 'star-string' }).state;
+    const nextYear = { ...once, calendar: at('spring', 1, 600, 2) };
+    expect(countOf(nextYear.inventory, 'star-shard')).toBe(6);
+    const later = run({ ...nextYear, calendar: at('summer', 14, 1200, 2) }, { type: 'starExchange', lineId: 'night-canvas' });
+    expect(countOf(later.state.inventory, 'night-canvas')).toBe(1);
+    expect(countOf(later.state.inventory, 'star-shard')).toBe(1);
+  });
+
+  it('兌換不花體力與時間', () => {
+    const start = withItems(game({ ...MARKET }), { 'star-shard': 5 });
+    const after = run(start, { type: 'starExchange', lineId: 'star-string' }).state;
+    expect(after.energy).toEqual(start.energy);
+    expect(after.calendar).toEqual(start.calendar);
+  });
+
+  it('不是夜市的時間（白天）或不在鎮廣場，兌換不了', () => {
+    const day = run(withItems(game({ ...MARKET, calendar: at('summer', 14, 600) }), { 'star-shard': 9 }), { type: 'starExchange', lineId: 'star-string' });
+    expect(day.messages).toEqual(['現在沒有這個節慶活動（要在節慶當天的鎮廣場）']);
+    const elsewhere = run(withItems(game({ ...MARKET, mapId: 'farm' }), { 'star-shard': 9 }), { type: 'starExchange', lineId: 'star-string' });
+    expect(elsewhere.messages).toEqual(['現在沒有這個節慶活動（要在節慶當天的鎮廣場）']);
+  });
+
+  it('沒有這一項兌換的話，回報找不到', () => {
+    const out = run(withItems(game({ ...MARKET }), { 'star-shard': 9 }), { type: 'starExchange', lineId: 'nothing' });
+    expect(out.messages).toEqual(['沒有這項兌換']);
+  });
+
+  it('兌換配方的旗標：換到之前工作台做不了星河糖，換到之後就做得出來', () => {
+    const before = run(withItems(game({ ...BENCH }), { mint: 2, hay: 1 }), { type: 'craft', recipeId: 'star-sugar' });
+    expect(before.messages).toEqual(['還沒有這個配方，要先在夜市的星河兌換換到']);
+    expect(countOf(before.state.inventory, 'star-sugar')).toBe(0);
+
+    const exchanged = run(withItems(game({ ...MARKET }), { 'star-shard': 4 }), { type: 'starExchange', lineId: 'star-sugar-recipe' });
+    expect(exchanged.state.flags['recipe:star-sugar']).toBe(true);
+    expect(countOf(exchanged.state.inventory, 'star-shard')).toBe(0);
+
+    const again = run(withItems({ ...exchanged.state, ...MARKET, calendar: at('summer', 14, 1200, 2) }, { 'star-shard': 4 }), {
+      type: 'starExchange',
+      lineId: 'star-sugar-recipe',
+    });
+    expect(again.messages).toEqual(['這份配方已經解鎖過了']);
+    expect(countOf(again.state.inventory, 'star-shard')).toBe(4);
+
+    const made = run(addTo({ ...exchanged.state, ...BENCH, calendar: at('spring', 2, 600) }, { mint: 2, hay: 1 }), { type: 'craft', recipeId: 'star-sugar' });
+    expect(countOf(made.state.inventory, 'star-sugar')).toBe(2);
+  });
+});

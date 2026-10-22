@@ -233,7 +233,7 @@ export const itemsFileSchema = z.object({
     z.object({
       id: z.string().min(1),
       name: z.string().min(1),
-      kind: z.enum(['material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft', 'building']),
+      kind: z.enum(['material', 'forage', 'ore', 'fish', 'animal', 'dish', 'processed', 'craft', 'building', 'decor']),
       maxStack: z.number().int().positive(),
       sellPrice: z.number().int().nonnegative().optional(),
     }),
@@ -278,7 +278,12 @@ export const craftingFileSchema = z.object({
         ingredients: z.record(z.string().min(1), z.number().int().positive()),
         output: z.object({ item: z.string().min(1), count: z.number().int().positive() }).optional(),
         effect: craftEffectSchema.optional(),
-        unlock: z.object({ skill: z.enum(SKILL_IDS), level: z.number().int().min(0).max(10) }).optional(),
+        unlock: z
+          .union([
+            z.object({ skill: z.enum(SKILL_IDS), level: z.number().int().min(0).max(10) }),
+            z.object({ flag: z.string().min(1) }),
+          ])
+          .optional(),
         playMinutes: z.number().positive().max(60),
       }),
     )
@@ -487,6 +492,18 @@ const festivalSwapSchema = z.object({
   give: z.object({ itemId: z.string().min(1), count: z.number().int().positive() }),
   receive: z.object({ itemId: z.string().min(1), count: z.number().int().positive() }),
 });
+/** 星河兌換：付出的物品換到物品或解鎖旗標（至少要有一個），每年最多 limit 次。 */
+const starExchangeSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    give: z.object({ itemId: z.string().min(1), count: z.number().int().positive() }),
+    receive: z.object({ itemId: z.string().min(1), count: z.number().int().positive() }).optional(),
+    flag: z.string().min(1).optional(),
+    limit: z.number().int().positive().max(99),
+    playMinutes: z.number().positive().max(60),
+  })
+  .refine((line) => line.receive !== undefined || line.flag !== undefined, '星河兌換要換到物品或解鎖旗標（至少一個）');
 const festivalSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -508,6 +525,7 @@ const festivalSchema = z.object({
       itemId: z.string().min(1),
     })
     .optional(),
+  exchange: z.array(starExchangeSchema).optional(),
 });
 export const festivalsFileSchema = z.object({
   version: z.literal(1),

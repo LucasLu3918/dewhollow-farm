@@ -186,7 +186,10 @@ export interface ProcessingDef {
 /** 合成的效果：flag 只能做一次（例如灑水器）；bagSlots 增加背包格數，最多 max 次（木箱）。 */
 export type CraftEffect = { type: 'flag'; flag: string } | { type: 'bagSlots'; slots: number; max: number };
 
-/** 合成配方（工作台）。產物與效果至少要有一個；unlock 省略表示一開始就能做。 */
+/**
+ * 合成配方（工作台）。產物與效果至少要有一個；unlock 省略表示一開始就能做。
+ * unlock 有兩種：技能等級（skill + level），或旗標（flag，例如夜市的星河兌換解鎖的配方）。
+ */
 export interface CraftingRecipeDef {
   id: string;
   name: string;
@@ -194,7 +197,7 @@ export interface CraftingRecipeDef {
   ingredients: Record<string, number>;
   output?: { item: string; count: number };
   effect?: CraftEffect;
-  unlock?: { skill: string; level: number };
+  unlock?: { skill: string; level: number } | { flag: string };
   /** 內容時數的估計（分鐘），見 docs/PLAYTIME_PLAN.md。 */
   playMinutes: number;
 }

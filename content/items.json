@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "不是作物衍生的物品（作物與種子由 crops.json 產生）。kind processed 是加工機的成品（見 processing.json）；kind craft 是合成的成品（見 crafting.json）。木材、石頭、乾草、銅礦石沒有售價：是合成與升級的材料，不能出貨。銀礦石與金礦石是深層礦坑（見 mine.json）的礦石，有售價。kind building（building.<旗標>）是店家賣的建築改建（見 shops.json），只出現在貨架上，不進背包。",
+  "note": "不是作物衍生的物品（作物與種子由 crops.json 產生）。kind processed 是加工機的成品（見 processing.json）；kind craft 是合成的成品（見 crafting.json）。木材、石頭、乾草、銅礦石沒有售價：是合成與升級的材料，不能出貨。銀礦石與金礦石是深層礦坑（見 mine.json）的礦石，有售價。kind building（building.<旗標>）是店家賣的建築改建（見 shops.json），只出現在貨架上，不進背包。kind decor 是裝飾（星河兌換得到，沒有售價、不能出貨，擺放系統之後才做）。",
   "items": [
     {
       "id": "wood",
@@ -251,6 +251,25 @@
       "name": "星河碎片",
       "kind": "material",
       "maxStack": 99
+    },
+    {
+      "id": "star-string",
+      "name": "星空燈串",
+      "kind": "decor",
+      "maxStack": 20
+    },
+    {
+      "id": "night-canvas",
+      "name": "夜空畫板",
+      "kind": "decor",
+      "maxStack": 20
+    },
+    {
+      "id": "star-sugar",
+      "name": "星河糖",
+      "kind": "craft",
+      "maxStack": 99,
+      "sellPrice": 45
     }
   ]
 }

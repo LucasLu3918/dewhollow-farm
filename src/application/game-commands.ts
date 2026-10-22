@@ -28,7 +28,7 @@ import type { ActionKind } from '../domain/tuning';
 import { applySellBonus, biteBonusPoints, dishEnergyBonus, extraYieldChance, rollExtraYield, sellBonusPercent } from '../domain/talents';
 import type { ContentIndex } from './content-index';
 import { acceptQuest, collectMail, currentBoard, deliverLetters, recordQuestEvent, refreshBoard, settleQuests, shortfallOf, submitQuest } from './quests';
-import { festivalCrown, festivalHere, festivalSwap, recordContestCatch, recordStallSale, stallRefusal, type FestivalOutcome } from './festival';
+import { festivalCrown, festivalHere, festivalSwap, recordContestCatch, recordStallSale, stallRefusal, starExchange, type FestivalOutcome } from './festival';
 import { settleStory, storyObjective } from './story';
 import { festivalOnDay } from '../domain/festival';
 import { starCatchHit } from '../domain/star-fishing';
@@ -70,6 +70,8 @@ export type Command =
   | { type: 'festivalSwap'; npcId: string }
   /** 節慶的花冠製作：節慶當天在鎮廣場，用合成配方的材料（不花體力與時間）。 */
   | { type: 'festivalCrown' }
+  /** 夜市的星河兌換：用星河碎片換物品或解鎖配方，每項每年有上限（不花體力與時間，見 festival.ts）。 */
+  | { type: 'starExchange'; lineId: string }
   /** 夜釣星星：站在節慶水池前甩竿（耗釣魚的體力與時間），之後等 catchStar。 */
   | { type: 'castStar' }
   /** 星星收網：elapsedMs 是甩竿後到按下的毫秒數；null 表示時限內沒按。只有甩竿後才有效。 */
@@ -182,6 +184,11 @@ const FAILURE_MESSAGES: Record<string, string> = {
   NOT_STAR_TIME: '星星要等夜市開始、晚上才會出現在水池裡',
   NOT_AT_POOL: '要站在星星水池前面才能釣星星',
   NO_STAR_LINE: '還沒有甩竿，不能收網',
+  NO_EXCHANGE: '沒有這項兌換',
+  NOT_ENOUGH_SHARDS: '星河碎片不夠',
+  EXCHANGE_LIMIT: '這項今年已經換過了',
+  ALREADY_UNLOCKED: '這份配方已經解鎖過了',
+  NOT_UNLOCKED: '還沒有這個配方，要先在夜市的星河兌換換到',
 };
 
 const NOTHING_HERE = '這裡沒有可以互動的東西';
@@ -220,6 +227,8 @@ function executeCore(current: GameState, command: Command, index: ContentIndex):
       return festivalCommand(state, festivalSwap(state, command.npcId, index));
     case 'festivalCrown':
       return festivalCommand(state, festivalCrown(state, index));
+    case 'starExchange':
+      return festivalCommand(state, starExchange(state, command.lineId, index));
     case 'castStar':
       return castStar(state, index);
     case 'catchStar':
@@ -471,7 +480,8 @@ function finish(
   return reply(result.value, [successMessage], events);
 }
 
-function messageFor(reason: string): string {
+/** 失敗代碼的說明文字（節慶面板也用它說明按鈕為什麼不能按）。 */
+export function messageFor(reason: string): string {
   return FAILURE_MESSAGES[reason] ?? reason;
 }
 
@@ -1198,8 +1208,11 @@ function craft(state: GameState, recipeId: string, index: ContentIndex): Command
   if (!facingWorkbench(state, index)) return reply(state, [messageFor('NOT_AT_WORKBENCH')], [refused('NOT_AT_WORKBENCH')]);
   const recipe = index.craftingRecipe(recipeId);
   const unlock = recipe.unlock;
-  if (unlock && levelOf(state.skills[unlock.skill as SkillId], index.tuning.skills.thresholds) < unlock.level) {
+  if (unlock && 'skill' in unlock && levelOf(state.skills[unlock.skill as SkillId], index.tuning.skills.thresholds) < unlock.level) {
     return reply(state, [messageFor('LOCKED')], [refused('LOCKED')]);
+  }
+  if (unlock && 'flag' in unlock && state.flags[unlock.flag] !== true) {
+    return reply(state, [messageFor('NOT_UNLOCKED')], [refused('NOT_UNLOCKED')]);
   }
   const effect = recipe.effect;
   if (effect?.type === 'flag' && state.flags[effect.flag]) return reply(state, [messageFor('ALREADY_OWNED')], [refused('ALREADY_OWNED')]);

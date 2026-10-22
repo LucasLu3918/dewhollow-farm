@@ -478,7 +478,8 @@ function houseWork(bot: Bot, index: ContentIndex): void {
   // 工作台：能做的合成配方都做（效果型的只做一次；木箱做到上限為止）。
   const bench = tilesWhere(bot.state, house, (kind) => kind === 'workbench');
   for (const recipe of index.craftingRecipes) {
-    const unlocked = !recipe.unlock || levelOf(bot.state.skills[recipe.unlock.skill as SkillId], index.tuning.skills.thresholds) >= recipe.unlock.level;
+    const unlock = recipe.unlock;
+    const unlocked = !unlock || ('skill' in unlock ? levelOf(bot.state.skills[unlock.skill as SkillId], index.tuning.skills.thresholds) >= unlock.level : bot.state.flags[unlock.flag] === true);
     const held = Object.entries(recipe.ingredients).every(([item, n]) => countOf(bot.state.inventory, item) >= n);
     if (!unlocked || !held) continue;
     if (recipe.effect?.type === 'flag' && bot.state.flags[recipe.effect.flag]) continue;

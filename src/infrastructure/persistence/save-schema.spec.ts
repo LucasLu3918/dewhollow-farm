@@ -135,7 +135,7 @@ describe('save schema with an old save', () => {
 
   it('loads a v1 save as a current-version state', () => {
     const { state } = parseSaveRecord(record(v1), context);
-    expect(state.schemaVersion).toBe(16);
+    expect(state.schemaVersion).toBe(17);
     expect(state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
     expect(state.playtimeSeconds).toBe(0);
     expect(state.calendar.day).toBe(2);

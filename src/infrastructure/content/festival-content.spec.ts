@@ -30,6 +30,18 @@ describe('節慶與主線的真實內容', () => {
     }
   });
 
+  it('the night market has star exchange lines: two decorations for shards, and a recipe unlock', () => {
+    const exchange = shippedPack.festivals?.find((f) => f.id === 'starmarket')?.exchange ?? [];
+    expect(exchange.length).toBeGreaterThanOrEqual(3);
+    expect(exchange.every((line) => line.give.itemId === 'star-shard')).toBe(true);
+    const decor = exchange.filter((line) => {
+      const item = shippedPack.items.find((i) => i.id === line.receive?.itemId);
+      return item?.kind === 'decor';
+    });
+    expect(decor.length).toBeGreaterThanOrEqual(2);
+    expect(exchange.some((line) => line.flag?.startsWith('recipe:'))).toBe(true);
+  });
+
   it('chapter 3 waits on the lake bridge flag that M5d sets', () => {
     const third = shippedPack.chapters?.find((c) => c.number === 3);
     expect(third?.steps.some((s) => 'flag' in s && s.flag === 'lakeBridge')).toBe(true);
@@ -65,6 +77,23 @@ describe('節慶內容的檢查會抓到錯誤', () => {
     expect(storyProblems({ ...shippedPack, chapters }).join('\n')).toContain('沒有任何來源');
     const quests = (chapters.map((c) => c)).map((c) => (c.number === 2 ? { ...c, steps: [{ hint: 'x', quest: 'no-such-quest' }] } : c));
     expect(storyProblems({ ...shippedPack, chapters: quests }).join('\n')).toContain('委託 no-such-quest 不存在');
+  });
+
+  it('a star exchange that gives an unknown item is reported', () => {
+    const market = shippedPack.festivals!.find((f) => f.id === 'starmarket')!;
+    const exchange = [{ id: 'bad', name: '壞掉的兌換', give: { itemId: 'star-shard', count: 1 }, receive: { itemId: 'nothing', count: 1 }, limit: 1, playMinutes: 1 }];
+    expect(festivalProblems(withFestivals(shippedPack, [sprout(), { ...market, exchange }])).join('\n')).toContain('的物品 nothing 不存在');
+  });
+
+  it('a star exchange flag that no recipe uses is reported', () => {
+    const market = shippedPack.festivals!.find((f) => f.id === 'starmarket')!;
+    const exchange = [{ id: 'bad', name: '壞掉的兌換', give: { itemId: 'star-shard', count: 1 }, flag: 'nobody-uses', limit: 1, playMinutes: 1 }];
+    expect(festivalProblems(withFestivals(shippedPack, [sprout(), { ...market, exchange }])).join('\n')).toContain('沒有任何配方使用');
+  });
+
+  it('a recipe unlocked by a flag that no star exchange grants is reported', () => {
+    const crafting = shippedPack.crafting.map((r) => (r.id === 'star-sugar' ? { ...r, unlock: { flag: 'lost-flag' } } : r));
+    expect(festivalProblems({ ...shippedPack, crafting }).join('\n')).toContain('沒有任何兌換來源');
   });
 
   it('chapters out of order are reported', () => {

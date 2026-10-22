@@ -27,6 +27,24 @@ export interface FestivalStarRules {
   itemId: string;
 }
 
+/**
+ * 星河兌換（夜市）：用付出的物品（星河碎片）換到物品，或解鎖一個旗標（例如合成配方的解鎖）。
+ * 每項每年最多兌換 limit 次；碎片是背包的素材，跨年保留。
+ */
+export interface StarExchangeDef {
+  id: string;
+  name: string;
+  give: { itemId: string; count: number };
+  /** 換到的物品；省略表示只解鎖旗標。 */
+  receive?: { itemId: string; count: number };
+  /** 兌換後設為真的旗標（合成配方的 unlock.flag）。 */
+  flag?: string;
+  /** 每年最多兌換幾次。 */
+  limit: number;
+  /** 內容時數的估計（分鐘）。 */
+  playMinutes: number;
+}
+
 export interface FestivalDef {
   id: string;
   name: string;
@@ -45,6 +63,8 @@ export interface FestivalDef {
   crown?: { gold: number };
   contest?: FestivalContestRules;
   stars?: FestivalStarRules;
+  /** 星河兌換的項目（見 StarExchangeDef）。 */
+  exchange?: StarExchangeDef[];
 }
 
 export interface FestivalState {
@@ -54,10 +74,17 @@ export interface FestivalState {
   contest: { year: number; caught: number };
   /** 夜市攤位：哪一年、各物品已售出的數量。跨年會重新計數。 */
   sold: { year: number; counts: Record<string, number> };
+  /** 星河兌換：哪一年、各項已兌換的次數。跨年會重新計數（碎片本身不會）。 */
+  exchanged: { year: number; counts: Record<string, number> };
 }
 
 export function emptyFestivalState(): FestivalState {
-  return { done: {}, contest: { year: 0, caught: 0 }, sold: { year: 0, counts: {} } };
+  return {
+    done: {},
+    contest: { year: 0, caught: 0 },
+    sold: { year: 0, counts: {} },
+    exchanged: { year: 0, counts: {} },
+  };
 }
 
 /** 花冠製作用的合成配方（content/crafting.json）。 */
@@ -107,4 +134,33 @@ export function soldThisYear(sold: FestivalState['sold'], year: number, itemId: 
 export function recordSale(sold: FestivalState['sold'], year: number, itemId: string, count: number): FestivalState['sold'] {
   const base = sold.year === year ? sold.counts : {};
   return { year, counts: { ...base, [itemId]: (base[itemId] ?? 0) + count } };
+}
+
+export function exchangedThisYear(exchanged: FestivalState['exchanged'], year: number, lineId: string): number {
+  return exchanged.year === year ? (exchanged.counts[lineId] ?? 0) : 0;
+}
+
+export function recordExchange(exchanged: FestivalState['exchanged'], year: number, lineId: string): FestivalState['exchanged'] {
+  const base = exchanged.year === year ? exchanged.counts : {};
+  return { year, counts: { ...base, [lineId]: (base[lineId] ?? 0) + 1 } };
+}
+
+export interface ExchangeContext {
+  /** 背包裡付出的物品有幾個。 */
+  shards: number;
+  year: number;
+  exchanged: FestivalState['exchanged'];
+  /** 兌換要解鎖的旗標是否已經為真。 */
+  flagSet: boolean;
+}
+
+/**
+ * 星河兌換的拒絕原因（失敗代碼），或 null 表示可以換。順序：今年已換滿、已解鎖過、碎片不夠。
+ * 拒絕時不扣任何東西。
+ */
+export function exchangeRefusal(line: StarExchangeDef, ctx: ExchangeContext): string | null {
+  if (exchangedThisYear(ctx.exchanged, ctx.year, line.id) >= line.limit) return 'EXCHANGE_LIMIT';
+  if (line.flag !== undefined && ctx.flagSet) return 'ALREADY_UNLOCKED';
+  if (ctx.shards < line.give.count) return 'NOT_ENOUGH_SHARDS';
+  return null;
 }

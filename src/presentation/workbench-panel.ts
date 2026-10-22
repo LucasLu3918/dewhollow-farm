@@ -53,11 +53,14 @@ export class WorkbenchPanel {
         .map(([itemId, count]) => `${this.index.item(itemId).name} × ${count}`)
         .join('、');
       const notes: string[] = [];
-      if (recipe.unlock) {
+      if (recipe.unlock && 'skill' in recipe.unlock) {
         const skill = recipe.unlock.skill as SkillId;
         if (levelOf(state.skills[skill], this.index.tuning.skills.thresholds) < recipe.unlock.level) {
           notes.push(`需要${SKILL_NAMES[skill]} ${recipe.unlock.level} 級`);
         }
+      }
+      if (recipe.unlock && 'flag' in recipe.unlock && state.flags[recipe.unlock.flag] !== true) {
+        notes.push('還沒解鎖（夜市的星河兌換）');
       }
       if (recipe.effect?.type === 'flag' && state.flags[recipe.effect.flag]) notes.push('已經有了');
       const suffix = notes.length > 0 ? `（${notes.join('；')}）` : '';
