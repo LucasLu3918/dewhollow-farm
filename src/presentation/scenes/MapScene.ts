@@ -450,10 +450,11 @@ export class MapScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener('keydown', this.onKeyDown);
       this.continuousFarmActions.stop('scene-shutdown');
-      // Settle action promises and apply any already-dispatched impact before Phaser kills scene tweens.
-      this.rig.destroy();
-      this.clearActors();
-      for (const state of this.companions.values()) state.rig.destroy();
+      // Phaser may already have removed the DisplayList; settle animation promises without drawing shutdown impacts.
+      this.rig.shutdown();
+      for (const rig of this.npcRigs.values()) if (rig instanceof CharacterRig) rig.shutdown();
+      for (const state of this.companions.values()) state.rig.shutdown();
+      this.npcRigs.clear();
       this.companions.clear();
       this.disposeMainActionHold?.();
       this.disposeMainActionHold = null;

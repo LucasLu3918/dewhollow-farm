@@ -84,4 +84,61 @@ describe('CharacterRig shutdown lifecycle', () => {
 
     expect(impact).not.toHaveBeenCalled();
   });
+
+  it('settles an active swing on scene shutdown without invoking presentation impact', async () => {
+    const impact = vi.fn(() => { throw new Error('display list is already closed'); });
+    let resolveCompletion!: () => void;
+    const completion = new Promise<void>((resolve) => { resolveCompletion = resolve; });
+    const stopTween = vi.fn();
+    const character = rigWithLifecycleState({
+      action: {
+        tween: { stop: stopTween },
+        image: { setVisible: vi.fn() },
+        fired: false,
+        onImpact: impact,
+        onComplete: resolveCompletion,
+      },
+    });
+
+    character.shutdown();
+
+    await expect(completion).resolves.toBeUndefined();
+    expect(impact).not.toHaveBeenCalled();
+    expect(stopTween).toHaveBeenCalledOnce();
+  });
+
+  it('settles a queued swing on scene shutdown without applying its impact', async () => {
+    const impact = vi.fn(() => { throw new Error('display list is already closed'); });
+    let resolveCompletion!: () => void;
+    const completion = new Promise<void>((resolve) => { resolveCompletion = resolve; });
+    const stopWalk = vi.fn();
+    const character = rigWithLifecycleState({
+      walk: { stop: stopWalk },
+      queued: { onImpact: impact, onComplete: resolveCompletion },
+    });
+
+    character.shutdown();
+
+    await expect(completion).resolves.toBeUndefined();
+    expect(impact).not.toHaveBeenCalled();
+    expect(stopWalk).toHaveBeenCalledOnce();
+  });
+
+  it('settles the active completion even if queued cleanup throws', async () => {
+    let resolveCompletion!: () => void;
+    const completion = new Promise<void>((resolve) => { resolveCompletion = resolve; });
+    const character = rigWithLifecycleState({
+      action: {
+        tween: { stop: vi.fn() },
+        image: { setVisible: vi.fn() },
+        fired: false,
+        onImpact: vi.fn(),
+        onComplete: resolveCompletion,
+      },
+      queued: { onImpact: vi.fn(), onComplete: () => { throw new Error('cleanup failed'); } },
+    });
+
+    expect(() => character.shutdown()).toThrow('cleanup failed');
+    await expect(completion).resolves.toBeUndefined();
+  });
 });

@@ -279,6 +279,29 @@ export class CharacterRig {
     this.root.destroy(true);
   }
 
+  /** Scene shutdown may run after Phaser has torn down the display list; settle promises without visual impacts. */
+  shutdown(): void {
+    const queued = this.queued;
+    this.queued = undefined;
+    const action = this.action;
+    this.action = undefined;
+    const walk = this.walk;
+    this.walk = undefined;
+    this.target = undefined;
+    this.toolState = null;
+
+    try {
+      action?.tween?.stop();
+      walk?.stop();
+    } finally {
+      try {
+        queued?.onComplete();
+      } finally {
+        action?.onComplete();
+      }
+    }
+  }
+
   /** 這一種骨架在走路循環某一刻的姿勢。 */
   private poseAt(step: number, u: number): WalkPose {
     switch (this.rig.kind) {
