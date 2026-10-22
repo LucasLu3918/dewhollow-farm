@@ -22,6 +22,20 @@ export function nextFocusIndex(count: number, current: number, backwards: boolea
   return backwards ? (current - 1 + count) % count : (current + 1) % count;
 }
 
+/**
+ * 焦點在不可互動的錨點上（例如商店列的文字，tabindex -1）時，Tab 循環的下一個索引。
+ * precedes[i] 表示可互動清單的第 i 個元素在文件順序中位於錨點之前（由 compareDocumentPosition 得到）。
+ * 清單依文件順序排列，所以 true 會連續出現在前面；forward 取錨點之後的第一個，backward 取錨點之前的最後一個，
+ * 超出範圍時循環（之後沒有了就回到第一個，之前沒有了就到最後一個）。清單為空時回傳 -1。
+ */
+export function anchorFocusIndex(precedes: readonly boolean[], backwards: boolean): number {
+  const count = precedes.length;
+  if (count === 0) return -1;
+  const before = precedes.filter(Boolean).length;
+  if (backwards) return before > 0 ? before - 1 : count - 1;
+  return before < count ? before : 0;
+}
+
 export type RestoreDecision = 'return' | 'top' | 'none';
 
 /**
@@ -164,22 +178,34 @@ export class PanelDialog implements OpenablePanel {
 
   private restoreFocus(memory: FocusMemory | null): void {
     if (!this.open_ || memory === null) return;
-    if (this.root.contains(this.root.ownerDocument.activeElement)) return;
+    // 焦點若落在已隱藏的元素上（例如交換提示的按鈕被隱藏），視同已經遺失。
+    const active = this.root.ownerDocument.activeElement;
+    if (active && this.root.contains(active) && active.closest('[hidden]') === null) return;
     const slots = slotsIn(this.root);
     const target = focusRestoreTarget(memory, slots.map(describeSlot), this.title !== null);
     if (target.kind === 'slot') slots[target.index]?.focus();
     else if (target.kind === 'title') this.title?.focus();
   }
 
-  /** 焦點陷阱用：在面板內循環一步。 */
+  /**
+   * 焦點陷阱用：在面板內循環一步。焦點在可互動元素上時依清單位置前進／後退；
+   * 焦點在不可互動的錨點（列文字、標題）上時，依文件順序從錨點之後（Tab）或之前（Shift+Tab）接續。
+   */
   cycleFocus(backwards: boolean): void {
+    const doc = this.root.ownerDocument;
     const items = focusablesIn(this.root);
     if (items.length === 0) {
       this.title?.focus();
       return;
     }
-    const current = items.indexOf(this.root.ownerDocument.activeElement as HTMLElement);
-    items[nextFocusIndex(items.length, current, backwards)]?.focus();
+    const active = doc.activeElement;
+    const current = items.indexOf(active as HTMLElement);
+    if (current >= 0 || !(active instanceof HTMLElement) || !this.root.contains(active)) {
+      items[nextFocusIndex(items.length, current, backwards)]?.focus();
+      return;
+    }
+    const precedes = items.map((item) => (active.compareDocumentPosition(item) & Node.DOCUMENT_POSITION_PRECEDING) !== 0);
+    items[anchorFocusIndex(precedes, backwards)]?.focus();
   }
 }
 
