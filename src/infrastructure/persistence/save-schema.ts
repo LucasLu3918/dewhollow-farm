@@ -165,6 +165,18 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
     counters: z.record(z.string().min(1), z.number().int().nonnegative()),
     titles: z.array(z.string().min(1)),
   }),
+  /** 小屋裡擺的裝飾，依房間（地圖 id）記位置。 */
+  decor: z.record(
+    z.string().min(1),
+    z.array(z.object({ itemId: z.string().min(1), x: z.number().int().nonnegative(), y: z.number().int().nonnegative() })),
+  ),
+  /** 身上穿的衣服或帽子，依角色 id 記（沒有這一角色的紀錄就是沒穿）。 */
+  wearing: z.record(z.string().min(1), z.string().min(1)),
+  /** 旅行商人本週的購買數量（week 為那一週週一的總天數）。 */
+  merchant: z.object({
+    week: z.number().int().nonnegative(),
+    bought: z.record(z.string().min(1), z.number().int().positive()),
+  }),
   mineSeed: z.number().int().nonnegative().max(4294967295),
   /** 礦坑沒有底，檢查點可以是任何正整數層（見 domain/mine.ts）。 */
   mineCheckpoint: z.number().int().min(1),

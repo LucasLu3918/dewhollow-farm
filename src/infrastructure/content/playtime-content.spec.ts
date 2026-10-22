@@ -31,6 +31,12 @@ function unitsOf(pack: ContentPack): Unit[] {
   for (const r of pack.crafting) units.push({ label: `合成 ${r.id}`, minutes: r.playMinutes, seasons: null });
   for (const a of pack.achievements ?? []) units.push({ label: `成就 ${a.id}`, minutes: a.playMinutes, seasons: [a.phase] });
   for (const c of pack.collection ?? []) units.push({ label: `圖鑑 ${c.id}`, minutes: c.playMinutes, seasons: [c.phase] });
+  // 旅行商人（週五、六，春夏的稀有種子與裝飾）：第一次逛到貨架的時數；裝飾與服飾：第一次擺放、第一次穿上。
+  if (pack.merchant) units.push({ label: '旅行商人', minutes: pack.merchant.playMinutes, seasons: ['spring', 'summer'] });
+  if (pack.decor) {
+    units.push({ label: '裝飾擺放', minutes: pack.decor.placeMinutes, seasons: null });
+    units.push({ label: '服飾穿戴', minutes: pack.decor.wearMinutes, seasons: null });
+  }
   // 商店的第一次購買（羊、小屋擴建、季節限定的配方）：只有標了 playMinutes 的商品才計入。
   for (const shop of pack.shops) {
     for (const line of shop.stock) {

@@ -53,6 +53,13 @@
       "upgrades": []
     },
     {
+      "id": "traveling-merchant",
+      "name": "旅行商人",
+      "rotating": true,
+      "stock": [],
+      "upgrades": []
+    },
+    {
       "id": "night-market",
       "name": "星河夜市攤位",
       "festival": "starmarket",

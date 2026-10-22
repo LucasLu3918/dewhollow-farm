@@ -4,7 +4,7 @@ import { sellPriceOf } from './pricing';
 /**
  * 種子與作物由作物衍生；木材、野薄荷、礦石是獨立定義的（content/items.json）。
  * building 是店家賣的建築改建（例如牛舍），只出現在貨架上，不會進背包。
- * decor 是裝飾（星河兌換或合成得到，沒有售價、不能出貨；擺放系統之後才做）。
+ * decor 是裝飾（星河兌換、旅行商人或合成得到，沒有售價、不能出貨；可以在小屋擺放，見 decor.ts）。
  * recipe 是配方（商店賣的，買了就學會，只出現在貨架上，不進背包）。
  */
 export type ItemKind = 'seed' | 'crop' | 'material' | 'forage' | 'ore' | 'fish' | 'animal' | 'dish' | 'processed' | 'craft' | 'building' | 'decor' | 'recipe';
@@ -25,6 +25,8 @@ export interface ItemDef {
   sellPrice?: number;
   /** 種子與作物對應的作物 id。 */
   cropId?: string;
+  /** 能穿在角色身上（衣服、遮陽帽）；只有裝飾能穿，每個角色同時只穿一件（見 application/game-commands.ts 的 wear）。 */
+  wearable?: boolean;
 }
 
 /** 背包與出貨箱中的一疊物品。同一個物品與品質的組合只會合併成一疊（超過上限才拆）。 */

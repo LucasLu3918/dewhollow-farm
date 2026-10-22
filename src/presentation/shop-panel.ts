@@ -4,6 +4,7 @@ import { countOf } from '../domain/inventory';
 import type { Command } from '../application/game-commands';
 import type { ContentIndex } from '../application/content-index';
 import { onSale } from '../domain/shop-stock';
+import { boughtThisWeek, merchantOpen, weekStock } from '../domain/traveling-merchant';
 
 /**
  * 商店面板（DOM）：只負責把貨架與升級項目列出來，按鈕送出指令；
@@ -57,7 +58,9 @@ export class ShopPanel {
     this.funds.textContent = `你的金幣：${state.gold}　木材：${countOf(state.inventory, 'wood')}　銅礦石：${countOf(state.inventory, 'copper-ore')}`;
     this.list.replaceChildren();
 
-    if (shop.stock.length > 0) {
+    if (shop.rotating) {
+      this.renderMerchant(state, shop.id);
+    } else if (shop.stock.length > 0) {
       for (const line of shop.stock) {
         // 季節進貨：這個季節沒有進貨的東西不列出（見 shops.json 的 seasons、domain/shop-stock.ts）。
         if (!onSale(line, state.calendar.season)) continue;
@@ -85,6 +88,28 @@ export class ShopPanel {
       const empty = this.doc.createElement('li');
       empty.textContent = '目前沒有可以買或可以升級的東西';
       this.list.append(empty);
+    }
+  }
+
+  /**
+   * 旅行商人：週五、六才有貨架（這一週的貨，見 domain/traveling-merchant.ts）；每件顯示本週還可以買幾個。
+   * 能不能買、買幾個，都由應用層判斷，這裡只列出來。
+   */
+  private renderMerchant(state: GameState, shopId: string): void {
+    const rules = this.index.merchant;
+    const daysPerSeason = this.index.tuning.time.daysPerSeason;
+    if (!rules || !merchantOpen(rules, state.calendar, daysPerSeason)) {
+      const note = this.doc.createElement('li');
+      note.textContent = '旅行商人只在週五、週六的鎮廣場出現';
+      this.list.append(note);
+      return;
+    }
+    const bought = boughtThisWeek(state.merchant, state.calendar, daysPerSeason);
+    for (const line of weekStock(rules, state.calendar, daysPerSeason)) {
+      const left = rules.perItemWeekly - (bought[line.itemId] ?? 0);
+      this.addRow(`${this.nameOf(line.itemId)}　${line.price} 金（本週還可買 ${left} 個）`, '買一個', () =>
+        this.onCommand({ type: 'buy', shopId, itemId: line.itemId, count: 1 }),
+      );
     }
   }
 

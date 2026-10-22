@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "note": "裝飾與服飾（見 domain/decor.ts）。裝飾在小屋的空地板上擺放，每格一件，不能擋住床、工作台、廚房、加工台、信箱、衣櫃與門的動線；只改變畫面與圖鑑，不影響體力與時間。衣服與遮陽帽可以穿在角色身上，每個角色只穿一件。placeMinutes 與 wearMinutes 是第一次擺放、第一次穿上的內容時數估計（見 docs/PLAYTIME_PLAN.md）。",
+  "placeMinutes": 1,
+  "wearMinutes": 0.5
+}

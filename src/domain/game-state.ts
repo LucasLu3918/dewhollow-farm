@@ -26,8 +26,10 @@ import type { RepairState } from './repairs';
 import { noEvent, type TodayEvent } from './random-events';
 import { emptyCollection, type CollectionState } from './collection';
 import { emptyAchievements, type AchievementState } from './achievements';
+import { emptyMerchantLog, type MerchantLog } from './traveling-merchant';
+import type { DecorPlacement } from './decor';
 
-export const SAVE_SCHEMA_VERSION = 21;
+export const SAVE_SCHEMA_VERSION = 22;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -98,6 +100,12 @@ export interface GameState {
   collection: CollectionState;
   /** 成就：已達成的成就、計數器與稱號（見 achievements.ts）。 */
   achievements: AchievementState;
+  /** 小屋裡擺的裝飾，依房間（地圖 id）記位置（見 decor.ts）；只改變畫面與圖鑑。 */
+  decor: Record<string, DecorPlacement[]>;
+  /** 身上穿的衣服或帽子，依角色 id 記（每個角色只穿一件；目前只有玩家，見 decor.ts 的 PLAYER_WEARER）。 */
+  wearing: Record<string, string>;
+  /** 旅行商人本週的購買數量（見 traveling-merchant.ts）。 */
+  merchant: MerchantLog;
   /** 礦坑的種子：同一個種子每一層的樣子都一樣。 */
   mineSeed: number;
   /** 最深到過的檢查點層數（從入口下來會直接到這裡）；至少是第 1 層。 */
@@ -166,6 +174,9 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     dailyEvent: noEvent(),
     collection: emptyCollection(),
     achievements: emptyAchievements(),
+    decor: {},
+    wearing: {},
+    merchant: emptyMerchantLog(),
     mineSeed: advanceRng(seed >>> 0),
     mineCheckpoint: 1,
     selectedSeed: selectedSeed.id,

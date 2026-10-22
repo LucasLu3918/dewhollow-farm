@@ -86,6 +86,8 @@ export interface TileDef {
   festival?: 'stars' | 'lantern';
   /** 溫室的田：不受季節限制（見 greenhouse.ts）。 */
   greenhouse?: boolean;
+  /** 衣櫃：穿戴的服務點，動線要走得到（見 decor.ts）。 */
+  wardrobe?: boolean;
 }
 
 export interface MapDef {
@@ -113,6 +115,8 @@ import type { RepairDef } from './repairs';
 import type { DailyEventRules } from './random-events';
 import type { DexCategory } from './collection';
 import type { AchievementDef } from './achievements';
+import type { MerchantRules } from './traveling-merchant';
+import type { DecorRules } from './decor';
 
 export type { ScheduleDef, ScheduleEntry, PeriodRules, Period } from './schedule';
 export type { HeartEventDef, HeartEventOption, HeartEmote } from './heart-events';
@@ -145,6 +149,10 @@ export interface ContentPack {
   /** 加工機的配方（醃漬、烘乾）。 */
   processing: ProcessingDef[];
   shops: ShopDef[];
+  /** 旅行商人的規則與候選（見 traveling-merchant.ts 與 content/traveling-merchant.json）。測試用的最小內容可以省略。 */
+  merchant?: MerchantRules;
+  /** 裝飾與服飾的時數估計（見 decor.ts 與 content/decor.json）。測試用的最小內容可以省略。 */
+  decor?: DecorRules;
   /** 技能天賦（見 talents.ts 與 content/talents.json）。 */
   talents: TalentSet;
   /** 礦坑的深層規則（第 41 層起，見 mine.ts 與 content/mine.json）。 */
@@ -252,4 +260,6 @@ export interface ShopDef {
   upgrades: ToolUpgrade[];
   /** 只在這個節慶開放時能買（省略為隨時開放）。 */
   festival?: string;
+  /** 貨架每週輪換（旅行商人）：貨架由 traveling-merchant.ts 決定，stock 是空的。 */
+  rotating?: boolean;
 }
