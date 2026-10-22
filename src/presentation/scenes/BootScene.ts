@@ -10,6 +10,8 @@ import type { ContentPack, Direction } from '../../domain/content';
 import type { TerrainDef } from '../../infrastructure/content/content-schema';
 import type { SoundPlayer } from '../audio/sound-player';
 import type { MusicPlayer } from '../audio/music-player';
+import type { HelpPanel } from '../help-panel';
+import type { SavePanel } from '../save-panel';
 import { registerEmoteTextures } from '../emote';
 import { registerAnimalTextures } from '../animal-art';
 import { MapScene, type MapSceneDeps } from './MapScene';
@@ -28,6 +30,8 @@ export interface BootDeps {
   index: ContentIndex;
   pack: ContentPack;
   hud: Hud;
+  help: HelpPanel;
+  saves: SavePanel;
 }
 
 /**
@@ -77,6 +81,8 @@ export class BootScene extends Phaser.Scene {
       sounds: this.deps.sounds,
       music: this.deps.music,
       terrain: this.deps.terrain,
+      help: this.deps.help,
+      saves: this.deps.saves,
     };
     this.scene.start('map', sceneDeps);
   }

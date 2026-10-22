@@ -149,3 +149,19 @@ describe('save schema with an old save', () => {
     expect(parsed.savedAt).toBe('2026-10-21T00:00:00.000Z');
   });
 });
+
+describe('save record game version', () => {
+  it('keeps the game version written on the record', () => {
+    const parsed = parseSaveRecord({ ...record(createNewGame(pack, 1)), gameVersion: '0.1.0' }, context);
+    expect(parsed.gameVersion).toBe('0.1.0');
+  });
+
+  it('accepts a record without a game version (saves from before it was written) and leaves it out', () => {
+    const parsed = parseSaveRecord(record(createNewGame(pack, 1)), context);
+    expect(parsed.gameVersion).toBeUndefined();
+  });
+
+  it('rejects an empty game version string', () => {
+    expect(() => parseSaveRecord({ ...record(createNewGame(pack, 1)), gameVersion: '' }, context)).toThrow(SaveFormatError);
+  });
+});

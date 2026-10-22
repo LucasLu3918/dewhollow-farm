@@ -36,6 +36,8 @@ import recipes from '../content/recipes.json';
 import processing from '../content/processing.json';
 import crafting from '../content/crafting.json';
 import talents from '../content/talents.json';
+import changelog from '../content/changelog.json';
+import help from '../content/help.json';
 import forest from '../content/maps/forest.json';
 import lake from '../content/maps/lake.json';
 import house from '../content/maps/house.json';
@@ -52,10 +54,17 @@ import { createContentIndex } from './application/content-index';
 import { NO_LEGACY } from './domain/legacy';
 import { GameSession } from './application/game-session';
 import type { SaveRepository } from './application/ports';
+import { SaveSlotService, slotFromQuery } from './application/save-slots';
 import { loadContent } from './infrastructure/content/load-content';
+import { parseChangelog, parseHelpContent } from './infrastructure/content/info-content';
 import { MemorySaveRepository } from './infrastructure/persistence/memory-save-repository';
 import { IndexedDbSaveRepository, hasIndexedDb } from './infrastructure/persistence/indexeddb-save-repository';
+import { parseSaveRecord } from './infrastructure/persistence/save-schema';
+import type { MigrationContext } from './infrastructure/persistence/save-migrations';
 import { Hud } from './presentation/hud';
+import { HelpPanel } from './presentation/help-panel';
+import { SavePanel } from './presentation/save-panel';
+import { GAME_VERSION } from './version';
 import { BootScene } from './presentation/scenes/BootScene';
 import { MapScene } from './presentation/scenes/MapScene';
 import { applyRenderCompat } from './presentation/apply-render-compat';
@@ -75,26 +84,60 @@ async function bootstrap(): Promise<void> {
   // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
   const audio = new AudioOutput();
 
+  hud.setVersion(GAME_VERSION);
+  const migration: MigrationContext = {
+    inventoryCapacity: loaded.pack.tuning.inventory.capacity,
+    daysPerSeason: loaded.pack.tuning.time.daysPerSeason,
+    wakeMinute: loaded.pack.tuning.time.wakeMinute,
+    playerName: (loaded.pack.legacy ?? NO_LEGACY).defaultPlayerName,
+  };
+  const persistent = hasIndexedDb();
   let repository: SaveRepository;
-  if (hasIndexedDb()) {
-    repository = new IndexedDbSaveRepository({
-      inventoryCapacity: loaded.pack.tuning.inventory.capacity,
-      daysPerSeason: loaded.pack.tuning.time.daysPerSeason,
-      wakeMinute: loaded.pack.tuning.time.wakeMinute,
-      playerName: (loaded.pack.legacy ?? NO_LEGACY).defaultPlayerName,
-    });
+  if (persistent) {
+    repository = new IndexedDbSaveRepository(migration);
   } else {
     repository = new MemorySaveRepository();
     hud.error('這個瀏覽器無法使用 IndexedDB，存檔只會保留在本頁面，重新整理後會遺失。');
   }
 
-  let session: GameSession;
+  // 存檔槽由網址決定（?slot=slot-2），沒有或不合法就是第一格；換格就是重新載入頁面。
+  const slot = slotFromQuery(window.location.search);
+  let session: GameSession | null = null;
   try {
-    session = await GameSession.open(loaded.pack, index, repository, Math.floor(Math.random() * 2 ** 32));
+    session = await GameSession.open(loaded.pack, index, repository, Math.floor(Math.random() * 2 ** 32), slot, { gameVersion: GAME_VERSION });
   } catch (error) {
+    // 存檔損毀時原檔保留（不覆寫）；玩家可以在存檔槽裡改讀其他格，或刪除、匯入這一格。
     hud.error(`無法讀取存檔：${error instanceof Error ? error.message : String(error)}`);
+  }
+
+  const ratingSource = {
+    rating: index.rating,
+    dexCategories: index.dexCategories,
+    npcIds: index.npcs.map((n) => n.id),
+    friendship: index.friendship,
+  };
+  const saves = new SavePanel(document, {
+    service: new SaveSlotService({ repository, parse: (raw) => parseSaveRecord(raw, migration), rating: ratingSource, gameVersion: GAME_VERSION }),
+    currentSlot: slot,
+    persistent,
+    // 離開目前的存檔前先存檔（沒有進行中的遊戲，例如損毀時，就什麼也不做）。
+    beforeLeave: async () => {
+      if (session) await session.save();
+    },
+    navigate: (target) => window.location.assign(`${window.location.pathname}?slot=${target}`),
+  });
+  const helpPanel = new HelpPanel(document, parseHelpContent(help), parseChangelog(changelog), GAME_VERSION);
+  hud.bindDialogs(
+    () => helpPanel.toggle(),
+    () => void saves.open(),
+  );
+
+  if (!session) {
+    // 讀不開這一格：直接打開存檔槽，讓玩家選別的格子或處理這一格（遊戲本身還沒有開始）。
+    void saves.open();
     return;
   }
+  const started: GameSession = session;
 
   const game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -113,10 +156,12 @@ async function bootstrap(): Promise<void> {
         sounds: new SoundPlayer(loaded.sounds, audio),
         music: new MusicPlayer(loaded.music, audio),
         terrain: loaded.terrain.terrains,
-        session,
+        session: started,
         index,
         pack: loaded.pack,
         hud,
+        help: helpPanel,
+        saves,
       }),
       new MapScene(),
     ],

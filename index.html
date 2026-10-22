@@ -22,6 +22,11 @@
         <span id="hud-tool">鋤頭</span>
         <span id="hud-seed"></span>
         <span id="hud-mine" aria-label="礦坑狀態"></span>
+        <span class="status-actions">
+          <button id="hud-saves" class="status-button" type="button" aria-label="存檔槽，可讀取、新遊戲、刪除、匯出與匯入（或按 L）">存檔</button>
+          <button id="hud-help" class="status-button" type="button" aria-label="說明、操作按鍵、更新日誌與隱私說明（或按 ?）">說明</button>
+          <span id="hud-version" class="version"></span>
+        </span>
       </header>
       <div id="game" class="stage"></div>
       <section id="shop-panel" class="shop-panel" aria-labelledby="shop-title" hidden>
@@ -104,6 +109,23 @@
         <ul id="collection-list" class="shop-list"></ul>
         <button id="collection-close" type="button">離開（Esc）</button>
       </section>
+      <section id="save-panel" class="shop-panel save-panel" aria-labelledby="save-title" hidden>
+        <header>
+          <h2 id="save-title">存檔槽</h2>
+          <p id="save-note">三格存檔各自保存一份農場。讀取另一格前會先存檔目前的進度。</p>
+        </header>
+        <p id="save-message" class="save-message" role="status"></p>
+        <ul id="save-list" class="shop-list"></ul>
+        <button id="save-close" type="button">關閉（Esc）</button>
+      </section>
+      <section id="help-panel" class="shop-panel help-panel" aria-labelledby="help-title" hidden>
+        <header>
+          <h2 id="help-title">說明</h2>
+          <p id="help-version"></p>
+        </header>
+        <div id="help-body"></div>
+        <button id="help-close" type="button">關閉（? 或 Esc）</button>
+      </section>
       <section id="legacy-panel" class="shop-panel" aria-labelledby="legacy-title" hidden>
         <div>
           <h2 id="legacy-title">床邊的公告</h2>
@@ -122,7 +144,7 @@
       </section>
       <section class="panel" aria-label="訊息">
         <ul id="hud-log" class="log" aria-live="polite"></ul>
-        <p class="help">方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · A 斧頭 · P 鎬 · R 釣竿 · G 鐮刀 · K 技能與天賦 · F 居民與好感 · J 委託與佈告欄 · S 存檔 · B 背景音樂 · M 靜音</p>
+        <p class="help">方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · A 斧頭 · P 鎬 · R 釣竿 · G 鐮刀 · K 技能與天賦 · F 居民與好感 · J 委託與佈告欄 · S 存檔 · L 存檔槽 · B 背景音樂 · M 靜音 · ? 說明</p>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

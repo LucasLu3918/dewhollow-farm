@@ -12,4 +12,8 @@ export class MemorySaveRepository implements SaveRepository {
   async save(record: SaveRecord): Promise<void> {
     this.records.set(record.slot, structuredClone(record));
   }
+
+  async delete(slot: string): Promise<void> {
+    this.records.delete(slot);
+  }
 }

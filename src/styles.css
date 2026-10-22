@@ -187,3 +187,138 @@ body {
   cursor: pointer;
 }
 
+/* 狀態列的存檔、說明按鈕與版本號。 */
+.status-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.status-button {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid #7fae6b;
+  background: #2f4a33;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.version {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.shop-panel > button {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #7fae6b;
+  background: #2f4a33;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* 存檔槽列表：每格一段，操作按鈕排在下面。 */
+.save-slot {
+  display: block;
+  padding: 10px 0;
+}
+
+.save-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.save-detail {
+  margin: 2px 0 8px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.save-detail.error,
+.save-message.error {
+  color: var(--error);
+}
+
+.save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.save-actions button {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #7fae6b;
+  background: #2f4a33;
+  color: inherit;
+  cursor: pointer;
+}
+
+.save-message {
+  min-height: 1.6em;
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+/* 說明頁：寬一點，讓按鍵與更新日誌不擠。 */
+.help-panel {
+  width: min(92vw, 560px);
+}
+
+.help-section {
+  margin-bottom: 14px;
+}
+
+.help-section h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.help-section h4 {
+  margin: 10px 0 4px;
+  font-size: 14px;
+}
+
+.help-controls {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+.help-controls li {
+  display: flex;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.help-controls kbd {
+  min-width: 96px;
+  padding: 0 6px;
+  border-radius: 5px;
+  border: 1px solid #7fae6b;
+  background: #1a2a1e;
+  font-family: inherit;
+  text-align: center;
+}
+
+.help-changes {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.help-section p {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+

@@ -82,12 +82,28 @@ describe('GameSession', () => {
     expect((await repo.load('slot-1'))?.state.calendar.day).toBe(2);
   });
 
+  it('writes the game version onto the save record', async () => {
+    const repo = new MemorySaveRepository();
+    const session = new GameSession(createNewGame(pack, 1), index, repo, { gameVersion: '0.1.0' });
+    await session.save();
+    expect((await repo.load('slot-1'))?.gameVersion).toBe('0.1.0');
+  });
+
+  it('saves into the slot it was opened with', async () => {
+    const repo = new MemorySaveRepository();
+    const session = await GameSession.open(pack, index, repo, 1, 'slot-3');
+    await session.save();
+    expect((await repo.load('slot-3'))?.slot).toBe('slot-3');
+    expect(await repo.load('slot-1')).toBeNull();
+  });
+
   it('reports a real storage error instead of hiding it', async () => {
     const failing: SaveRepository = {
       load: async () => null,
       save: async (_record: SaveRecord) => {
         throw new Error('QuotaExceededError');
       },
+      delete: async () => {},
     };
     const session = await GameSession.open(pack, index, failing, 1);
     await expect(session.save()).rejects.toThrow('QuotaExceededError');
@@ -99,6 +115,7 @@ describe('GameSession', () => {
       save: async () => {
         throw new Error('QuotaExceededError');
       },
+      delete: async () => {},
     };
     const session = sessionAt({ x: 2, y: 1, facing: 'left' }, failing, 'house');
     const outcome = await session.dispatch({ type: 'interact' });
