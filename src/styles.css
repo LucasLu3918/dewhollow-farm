@@ -398,6 +398,36 @@ a:focus-visible {
   width: min(92vw, 560px);
 }
 
+/* 說明頁標題列：標題與版本號在左，右上角的 × 關閉鈕對齊標題的第一行。 */
+.help-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.help-header > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.help-x {
+  flex: 0 0 auto;
+  width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  font-size: calc(24px * var(--font-scale));
+  line-height: 1;
+  color: var(--surface-dialog-ink);
+  background: var(--action-fill);
+  border: 1px solid var(--action-border);
+  border-radius: var(--radius-md);
+}
+
+.help-x:active {
+  background: var(--action-pressed);
+}
+
 .help-section {
   margin-bottom: 14px;
 }
