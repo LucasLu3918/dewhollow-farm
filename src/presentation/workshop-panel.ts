@@ -47,6 +47,10 @@ export class WorkshopPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     const level = levelOf(state.skills.cooking, this.index.tuning.skills.thresholds);
     const slots = this.index.tuning.processing.slots;
     this.funds.textContent = `加工中：${state.processing.length} / ${slots} 批　烹飪等級：${level}`;

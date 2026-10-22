@@ -15,6 +15,8 @@ interface RowAction {
   text: string;
   name: string;
   reason: string | null;
+  /** 這一列的焦點鍵（data-focus-key）：重畫後焦點回到同一項商品或同一件工具的升級。 */
+  key: string;
   onClick: () => void;
 }
 
@@ -79,6 +81,10 @@ export class ShopPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     if (this.shopId === null) return;
     const shop = this.index.shop(this.shopId);
     this.title.textContent = shop.name;
@@ -96,6 +102,7 @@ export class ShopPanel {
           text: '買一個',
           name: `買一個 ${name}`,
           reason: reasonText(buyRefusal(state, this.index, shop.id, line.itemId, 1)),
+          key: `buy:${line.itemId}`,
           onClick: () => this.onCommand({ type: 'buy', shopId: shop.id, itemId: line.itemId, count: 1 }),
         });
       }
@@ -113,6 +120,7 @@ export class ShopPanel {
         text: '升級',
         name: `升級 ${TOOL_NAMES[tool]} 到 ${TIER_NAMES[next]}級`,
         reason: this.upgradeReason(state, recipe, upgradeRefusal(state, this.index, shop.id, tool)),
+        key: `upgrade:${tool}`,
         onClick: () => this.onCommand({ type: 'upgrade', shopId: shop.id, toolId: tool }),
       });
     }
@@ -145,6 +153,7 @@ export class ShopPanel {
         text: '買一個',
         name: `買 ${name}`,
         reason: reasonText(buyRefusal(state, this.index, shopId, line.itemId, 1)),
+        key: `buy:${line.itemId}`,
         onClick: () => this.onCommand({ type: 'buy', shopId, itemId: line.itemId, count: 1 }),
       });
     }
@@ -166,10 +175,14 @@ export class ShopPanel {
     const item = this.doc.createElement('li');
     const text = this.doc.createElement('span');
     text.textContent = label;
+    // 列文字可由程式聚焦（不進 Tab 順序）：按鈕停用時焦點落在同一列的文字上，而不是掉到 body。
+    text.tabIndex = -1;
+    text.dataset.focusKey = action.key;
     const button = this.doc.createElement('button');
     button.type = 'button';
     button.textContent = action.text;
     button.setAttribute('aria-label', action.name);
+    button.dataset.focusKey = action.key;
     item.append(text, button);
     if (action.reason !== null) {
       // 不能買：按鈕停用，原因寫在列裡，並用 aria-describedby 連到按鈕。

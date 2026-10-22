@@ -64,6 +64,10 @@ export class QuestPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     const entries = questBoardView(state, this.index);
     this.summary.textContent = `佈告欄每天換一次新委託，每週有一件大委託；居民委託要先和他熟起來才會開放。做完佈告欄的委託還能再接。圖鑑碎片：${state.dexFragments}`;
     this.list.replaceChildren();

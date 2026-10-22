@@ -55,6 +55,10 @@ export class ResidentPanel {
   }
 
   private render(state: GameState): void {
+    this.dialog.redraw(() => this.paint(state));
+  }
+
+  private paint(state: GameState): void {
     const rules = this.index.friendship;
     const today = totalDay(state.calendar, this.index.tuning.time.daysPerSeason);
     const here = new Set(residentsOn(state, this.index).map((r) => r.npcId));
