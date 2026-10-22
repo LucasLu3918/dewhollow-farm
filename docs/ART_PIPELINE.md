@@ -16,7 +16,7 @@
 **鎖定物**（先做、先核准、之後不再改）：
 
 1. **風格樣張**：一張含角色、一格地形、兩件物件、一個 UI 元件的合成樣張，使用者核准後存入 `docs/art/style-sheet.png`。
-2. **共用調色盤**：目前 64 色（4 個錨點色、角色與工具衍生的顏色；之後加入季節四組地表色等會再擴充），存為 `content/palette.json`，所有素材最後都量化到此色盤。**只擴充、不重排**（`build_palette.py --base`），已入庫的素材才不必重做；原本的 48 色由 `palette.spec.ts` 守護。
+2. **共用調色盤**：目前 112 色（4 個錨點色、角色、工具、地形與 NPC 衍生的顏色；季節四組地表色等之後再擴充），存為 `content/palette.json`，所有素材最後都量化到此色盤。**只擴充、不重排**（`build_palette.py --base`），已入庫的素材才不必重做；原本的 48 色由 `palette.spec.ts` 守護。
 3. **提示詞模板**：固定前綴（風格詞）＋固定後綴（負面詞），存為 `docs/art/prompt-template.md`；每張圖只換「主體」段。
 4. **光源與輪廓**：光源固定在左上；輪廓 2 px 深棕（不用純黑）；陰影為橢圓落影。
 
@@ -75,7 +75,7 @@
 1. **提示詞**：`風格前綴 + 單一主體 + 純色背景（洋紅 #ff00ff）+ 負面詞`。每張只描述一個主體；數量與位置交給程式，不寫在提示詞（本機已知：指定數量會出錯）。
 2. **產圖**：同一模板、固定 seed 為基準，每件 2–3 個 seed 候選，一次只跑一個 MLX 任務；每張都寫入 `manifest.json`（模型、seed、提示詞、SHA-256）。
 3. **去背**：模型沒有 alpha，改用**綠幕**（`#00ff00`，實際產出為淡綠）並以 `tools/art/key_out.py` 去背（背景色取自四角中位數、只移除與邊界相連的背景、壓掉綠色溢色）。環境：專案根目錄的 `.venv`（Pillow 11.3.0，版本記在 `tools/art/requirements.txt`），建立方式 `python3 -m venv .venv` 後 `.venv/bin/pip install -r tools/art/requirements.txt`。`tools/art/contact_sheet.py` 產生接觸表。洋紅背景實測會偏粉且帶深色落影，已不採用。
-4. **縮放與統一**：`tools/art/finalize.py` 縮到畫格（輸出 `-2x` 母版與 1x 兩個尺寸）、外圍補一圈輪廓、量化到 `content/palette.json` 的共用調色盤（目前 64 色，不抖色）並驗證輸出顏色都在調色盤內；落影由遊戲內另外畫橢圓，不烤進素材。實測 1x 的臉部細節會糊掉，建議引擎使用 `-2x` 並以 0.5 倍顯示。共用調色盤由 `tools/art/build_palette.py` 從已核准素材產生，格式有測試（`content/palette.spec.ts`）。
+4. **縮放與統一**：`tools/art/finalize.py` 縮到畫格（輸出 `-2x` 母版與 1x 兩個尺寸）、外圍補一圈輪廓、量化到 `content/palette.json` 的共用調色盤（目前 112 色，不抖色）並驗證輸出顏色都在調色盤內；落影由遊戲內另外畫橢圓，不烤進素材。實測 1x 的臉部細節會糊掉，建議引擎使用 `-2x` 並以 0.5 倍顯示。共用調色盤由 `tools/art/build_palette.py` 從已核准素材產生，格式有測試（`content/palette.spec.ts`）。
 5. **審核**：用接觸表（contact sheet）看同組素材是否一致；不合格的重跑。
 6. **入庫**：放入 `public/assets/<類別>/`，在 `content/assets.json` 補 `file` 與 `source`（寫明模型 id、seed、manifest 路徑）。
 7. **驗證**：`npm run check`、`npm run test:e2e`；BootScene 載入失敗會顯示真實錯誤並退回占位圖。

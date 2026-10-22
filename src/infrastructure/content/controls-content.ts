@@ -55,6 +55,8 @@ export interface ControlsContent {
   settingsLabels: Readonly<Record<ActionId, string>>;
   /** 虛擬按鍵的文字，每個虛擬按鍵動作一個。 */
   touchButtons: Readonly<Record<TouchActionId, TouchButtonText>>;
+  /** 虛擬按鍵的「更多」鍵：展開次要動作（技能、居民、圖鑑、委託、存檔與工具）。 */
+  touchMore: TouchButtonText;
 }
 
 const nonBlank = z.string().refine((text) => text.trim().length > 0, '不可是空白字串');
@@ -64,6 +66,7 @@ const controlsSchema = z.strictObject({
   hintText: z.strictObject({ arrowMovement: nonBlank, note: nonBlank }),
   settingsLabels: z.record(z.string(), nonBlank),
   touchButtons: z.record(z.string(), z.strictObject({ label: nonBlank, name: nonBlank })),
+  touchMore: z.strictObject({ label: nonBlank, name: nonBlank }),
 });
 
 /**

@@ -13,7 +13,7 @@ import type { TerrainDef } from '../../infrastructure/content/content-schema';
 import type { Hud } from '../hud';
 import type { HelpPanel } from '../help-panel';
 import type { SavePanel } from '../save-panel';
-import { cameraBounds, deadzoneOf } from '../camera';
+import { cameraBounds, deadzoneOf, mapZoomFor } from '../camera';
 import { TILE_SIZE, VIEW_SIZE } from '../constants';
 import { nightAlpha, particleKind, particlePosition, seasonGrassTint, weatherDim } from '../atmosphere';
 import type { Season } from '../../domain/calendar';
@@ -61,7 +61,7 @@ import type { SettingsService } from '../../application/settings';
 import { actionForKey, type ActionId } from '../../domain/keybindings';
 import { SettingsPanel, type SettingsLabels } from '../settings-panel';
 import { TouchControls } from '../touch-controls';
-import { touchKeyFor, type TouchLabels } from '../touch-pad';
+import { touchKeyFor, type TouchLabels, type TouchText } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
 import type { OpenablePanel } from '../panel-dialog';
 
@@ -95,7 +95,7 @@ export interface MapSceneDeps {
   /** 鍵盤監聽與畫面都接好後呼叫一次（見 create 結尾與 main.ts 的 markStageReady）。 */
   onReady: () => void;
   /** 操作說明的文字（設定面板的動作名稱、虛擬按鍵的文字），來自 content/controls.json。 */
-  controls: { settingsLabels: SettingsLabels; touchButtons: TouchLabels };
+  controls: { settingsLabels: SettingsLabels; touchButtons: TouchLabels; touchMore: TouchText };
 }
 
 /** 動作 → 移動方向（按鍵由偏好的按鍵表決定，見 handleKey）。 */
@@ -311,7 +311,7 @@ export class MapScene extends Phaser.Scene {
     this.settingsPanel = new SettingsPanel(document, deps.settings, deps.controls.settingsLabels);
     deps.hud.bindSettings(() => this.settingsPanel.open());
     // 虛擬按鍵（觸控）：按鈕本身掛在 DOM 上，顯示與否由 apply-settings.ts 決定。
-    new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons);
+    new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons, deps.controls.touchMore);
     this.shopPanel = new ShopPanel(document, deps.index, (command) => void this.run(command));
     this.kitchenPanel = new KitchenPanel(document, deps.index, (command) => void this.run(command));
     this.workshopPanel = new WorkshopPanel(document, deps.index, (command) => void this.run(command));
@@ -382,6 +382,19 @@ export class MapScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const zone = deadzoneOf({ width: camera.width, height: camera.height });
     camera.setDeadzone(zone.width, zone.height);
+    // 直式觸控拉近鏡頭（見 mapZoomFor）；畫面大小改變（例如轉向）時重算。
+    const applyZoom = (): void => {
+      camera.setZoom(
+        mapZoomFor({
+          width: window.innerWidth,
+          coarse: window.matchMedia('(pointer: coarse)').matches,
+          portrait: window.matchMedia('(orientation: portrait)').matches,
+        }),
+      );
+    };
+    applyZoom();
+    this.scale.on(Phaser.Scale.Events.RESIZE, applyZoom);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.scale.off(Phaser.Scale.Events.RESIZE, applyZoom));
     // 跟隨骨架的軸心（腳底中心，不含身體起伏，鏡頭才不會跟著抖）；位移量把跟隨點移到格子中心。
     camera.startFollow(this.rig.root, true, FOLLOW_LERP, FOLLOW_LERP, 0, TILE_SIZE / 2);
     if (import.meta.env.DEV) {
@@ -965,7 +978,7 @@ export class MapScene extends Phaser.Scene {
       const kind = effectiveKind(sprite.base, changeAt(state.worldChanges, state.mapId, sprite.x, sprite.y));
       const key = `tile.${kind}`;
       if (sprite.image.texture.key === key) continue;
-      sprite.image.setTexture(key);
+      this.applyAsset(sprite.image, key);
       if (kind === 'grass' && this.shownSeason) sprite.image.setTint(seasonGrassTint(this.shownSeason));
       else sprite.image.clearTint();
     }
@@ -1228,10 +1241,13 @@ export class MapScene extends Phaser.Scene {
     return [describe('player', this.rig), ...this.visibleRigs().map(({ id, rig }) => describe(id, rig))];
   }
 
+  /** 格子的圖：2x 母版以 0.5 倍顯示，仍是 64 px 的格子（占位圖的縮放是 1）。 */
   private image(key: string, x: number, y: number, depth: number): Phaser.GameObjects.Image {
+    const { textureId, scale } = resolveAsset(this.deps.assets, key);
     return this.add
-      .image(x * TILE_SIZE, y * TILE_SIZE, key)
+      .image(x * TILE_SIZE, y * TILE_SIZE, textureId)
       .setOrigin(0)
+      .setScale(scale)
       .setDepth(depth);
   }
 }

@@ -142,7 +142,11 @@ test('the cat comes through the door and appears beside the player in the villag
 test('Maomao and the marsupial live in the village, side by side, and the village has no extra cat', async ({ page }) => {
   await waitForGame(page);
   await enterVillage(page);
-  expect((await actors(page)).map((a) => a.id).sort()).toEqual(['cat', 'maomao', 'marsupial', 'player']);
+  // 村莊的居民（榕伯、阿柑…）也是角色，所以不能只比對四位；確認四位都在，且其他角色都是居民。
+  const ids = (await actors(page)).map((a) => a.id);
+  expect(ids).toEqual(expect.arrayContaining(['cat', 'maomao', 'marsupial', 'player']));
+  const residents = ['rong-bo', 'a-gan', 'shi-shifu', 'zhi-lan', 'xiao-sui'];
+  for (const id of ids) expect(['cat', 'maomao', 'marsupial', 'player', ...residents]).toContain(id);
   expect(await actor(page, 'maomao')).toMatchObject({ kind: 'single', tileX: 10, tileY: 5, width: 64, height: 80 });
   expect(await actor(page, 'marsupial')).toMatchObject({ kind: 'hop', tileX: 11, tileY: 5, width: 48, height: 48 });
 
