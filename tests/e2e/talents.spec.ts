@@ -94,7 +94,7 @@ test('a skill at level 5 offers its two talents, and the chosen one is saved', a
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
   const saved = await readRecord(page);
-  expect(saved.state.schemaVersion).toBe(18);
+  expect(saved.state.schemaVersion).toBe(19);
   expect(saved.state.talents).toEqual({ farming: 'bountiful' });
   expect(saved.state.toolTiers).toHaveProperty('sickle', 0);
 });

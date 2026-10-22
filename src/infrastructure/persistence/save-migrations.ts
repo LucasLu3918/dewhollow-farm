@@ -40,6 +40,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   15: migrateV15ToV16,
   16: migrateV16ToV17,
   17: migrateV17ToV18,
+  18: migrateV18ToV19,
 };
 
 /**
@@ -220,6 +221,23 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v18 → v19：圖鑑與成就都從空開始。舊存檔已經有的魚、作物、節慶與成就進度不回補：
+ * 圖鑑只計入遷移之後才取得的東西，成就只看遷移之後發生的事件（避免一次跳出一堆獎勵）。
+ */
+function migrateV18ToV19(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(18) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v18 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 19,
+    collection: { found: [], claimed: [] },
+    achievements: { unlocked: [], counters: {}, titles: [] },
+  };
 }
 
 /**

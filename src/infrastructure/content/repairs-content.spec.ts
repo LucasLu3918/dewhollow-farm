@@ -13,12 +13,13 @@ describe('修復與隨機事件的真實內容', () => {
     expect(randomEventProblems(shippedPack)).toEqual([]);
   });
 
-  it('spring garden: ten wild vegetables and flowers, each one donation; summer lake: eight fish', () => {
+  it('spring garden: ten wild vegetables and flowers, each one donation; summer lake: eight different fish, one each', () => {
     const garden = shippedPack.repairs?.find((r) => r.id === 'garden');
     const lake = shippedPack.repairs?.find((r) => r.id === 'lake');
     expect(garden).toMatchObject({ season: 'spring', goal: { type: 'kinds', count: 10, each: 1 } });
     expect(garden?.goal.pool).toHaveLength(10);
-    expect(lake).toMatchObject({ season: 'summer', goal: { type: 'total', count: 8 } });
+    expect(lake).toMatchObject({ season: 'summer', goal: { type: 'kinds', count: 8, each: 1 } });
+    expect(new Set(lake?.goal.pool).size).toBe(8);
   });
 
   it('the garden unlocks the fountain blueprint flag; the lake sets the bridge and the lake house', () => {

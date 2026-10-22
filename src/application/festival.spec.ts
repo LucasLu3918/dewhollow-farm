@@ -84,11 +84,12 @@ describe('萌芽祭：花冠製作與獎勵', () => {
     const first = run(start, { type: 'festivalCrown' });
     expect(countOf(first.state.inventory, 'flower-crown')).toBe(1);
     expect(countOf(first.state.inventory, 'flower-spring')).toBe(3);
-    expect(first.state.gold).toBe(80);
+    // 80 金是花冠的節慶獎勵；另外 150 金是第一次參加萌芽祭的成就（M5d）。
+    expect(first.state.gold).toBe(80 + 150);
 
     const second = run(first.state, { type: 'festivalCrown' });
     expect(countOf(second.state.inventory, 'flower-crown')).toBe(2);
-    expect(second.state.gold).toBe(80);
+    expect(second.state.gold).toBe(80 + 150);
   });
 
   it('材料不夠時不做，也不給獎勵', () => {
@@ -110,11 +111,12 @@ describe('萌芽祭：釣魚比賽', () => {
       messages.push(...outcome.messages);
     }
     expect(state.festival.contest).toEqual({ year: 1, caught: 3 });
-    expect(state.gold).toBe(200);
+    // 200 金是比賽獎勵；另外是「第一條魚」（50）與「萌芽祭的參加者」（150）兩項成就（M5d）。
+    expect(state.gold).toBe(200 + 50 + 150);
     expect(messages).toContain('釣魚比賽完成！獎勵 200 金');
 
     state = { ...state, fishing: { fishId: 'carp' } };
-    expect(run(state, { type: 'reel', hit: true }).state.gold).toBe(200);
+    expect(run(state, { type: 'reel', hit: true }).state.gold).toBe(200 + 50 + 150);
   });
 
   it('節慶之外釣到的魚不計入比賽', () => {

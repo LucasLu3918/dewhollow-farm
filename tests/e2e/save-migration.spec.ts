@@ -77,7 +77,7 @@ test('loads a v1 save and rewrites it as the current version on the next save', 
   await expect(page.locator('#hud-log')).toContainText('已存檔');
 
   const saved = await readRecord(page);
-  expect(saved.state.schemaVersion).toBe(18);
+  expect(saved.state.schemaVersion).toBe(19);
   expect(saved.state).toHaveProperty('weather');
   expect(saved.state).toHaveProperty('toolTiers');
   expect(saved.state).not.toHaveProperty('bag');

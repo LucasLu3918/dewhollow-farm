@@ -228,9 +228,9 @@ describe('委託與信件（M5b，真實內容）', () => {
     }
   });
 
-  it('信件共 12 封，寄件人都是居民，寄出日期都在春或夏之內', () => {
+  it('信件共 14 封（M5b 的 12 封，加上 M5d 夏天的 2 封：夜市貨單、夏季結算），寄件人都是居民，寄出日期都在春或夏之內', () => {
     const letters = pack.letters ?? [];
-    expect(letters).toHaveLength(12);
+    expect(letters).toHaveLength(14);
     for (const letter of letters) {
       expect(letter.phase === 'spring' || letter.phase === 'summer').toBe(true);
       expect(pack.npcs.some((n) => n.id === letter.from), letter.id).toBe(true);

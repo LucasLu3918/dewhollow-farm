@@ -32,6 +32,28 @@
       "energy": 40,
       "level": 3,
       "sellPrice": 120
+    },
+    {
+      "id": "fern-egg",
+      "name": "蕨芽炒蛋",
+      "ingredients": {
+        "fern-shoot": 1,
+        "egg": 1
+      },
+      "energy": 25,
+      "level": 1,
+      "sellPrice": 55
+    },
+    {
+      "id": "creek-stew",
+      "name": "溪芹野菇湯",
+      "ingredients": {
+        "creek-celery": 1,
+        "mushroom": 2
+      },
+      "energy": 35,
+      "level": 2,
+      "sellPrice": 80
     }
   ]
 }

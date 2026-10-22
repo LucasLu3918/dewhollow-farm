@@ -24,8 +24,10 @@ import { emptyFestivalState, type FestivalState } from './festival';
 import { emptyStory, type StoryState } from './story';
 import type { RepairState } from './repairs';
 import { noEvent, type TodayEvent } from './random-events';
+import { emptyCollection, type CollectionState } from './collection';
+import { emptyAchievements, type AchievementState } from './achievements';
 
-export const SAVE_SCHEMA_VERSION = 18;
+export const SAVE_SCHEMA_VERSION = 19;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -90,6 +92,10 @@ export interface GameState {
   repairs: RepairState;
   /** 今天的隨機事件（睡醒時決定，見 random-events.ts）；id 為 null 表示今天沒有事件。 */
   dailyEvent: TodayEvent;
+  /** 圖鑑：每一類已發現的條目與已領過的門檻獎勵（見 collection.ts）。 */
+  collection: CollectionState;
+  /** 成就：已達成的成就、計數器與稱號（見 achievements.ts）。 */
+  achievements: AchievementState;
   /** 礦坑的種子：同一個種子每一層的樣子都一樣。 */
   mineSeed: number;
   /** 最深到過的檢查點層數（從入口下來會直接到這裡）；至少是第 1 層。 */
@@ -155,6 +161,8 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     starLine: false,
     repairs: {},
     dailyEvent: noEvent(),
+    collection: emptyCollection(),
+    achievements: emptyAchievements(),
     mineSeed: advanceRng(seed >>> 0),
     mineCheckpoint: 1,
     selectedSeed: selectedSeed.id,

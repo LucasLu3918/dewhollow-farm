@@ -75,7 +75,7 @@ export class RepairPanel {
       const have = countOf(state.inventory, itemId);
       const name = this.index.item(itemId).name;
       const donated = record.donated[itemId] ?? 0;
-      const need = def.goal.type === 'kinds' ? `已捐 ${donated}/${def.goal.each}` : `已捐 ${donated}`;
+      const need = `已捐 ${donated}/${def.goal.each}`;
       const cap = Math.min(have, donationCap(def.goal, record.donated, itemId));
       const label = `${name}：${need}，背包有 ${have}`;
       const refusal = (count: number) => donationRefusal(def, record, itemId, count) ?? (have < count ? 'NO_MATERIAL' : null);
