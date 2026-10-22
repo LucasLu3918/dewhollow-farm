@@ -5,7 +5,7 @@
   "height": 7,
   "rows": [
     "##########",
-    "#B..T..KW#",
+    "#B.GT..KW#",
     "#........#",
     "#........#",
     "#.P....L.#",
@@ -46,6 +46,10 @@
     },
     "T": {
       "kind": "workbench"
+    },
+    "G": {
+      "kind": "furniture",
+      "notice": "legacy"
     }
   },
   "spawn": {

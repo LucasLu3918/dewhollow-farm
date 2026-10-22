@@ -53,7 +53,7 @@ const tileSchema = z.object({
   shop: z.string().min(1).optional(),
   spawn: point.optional(),
   requires: requirementSchema.optional(),
-  notice: z.enum(['bulletin', 'mailbox', 'festival', 'repair']).optional(),
+  notice: z.enum(['bulletin', 'mailbox', 'festival', 'repair', 'legacy']).optional(),
   festival: z.enum(['stars', 'lantern']).optional(),
   /** 溫室的田（不受季節限制，見 domain/greenhouse.ts）。 */
   greenhouse: z.boolean().optional(),
@@ -751,6 +751,62 @@ export const achievementsFileSchema = z.object({
   version: z.literal(1),
   note: z.string().optional(),
   achievements: z.array(achievementSchema),
+});
+
+/** 農場評級（content/rating.json）：權重、收入滿分門檻與評級門檻；加總與順序的檢查在 legacy-content.ts。 */
+export const ratingFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  weights: z.object({
+    income: z.number().min(0).max(1),
+    collection: z.number().min(0).max(1),
+    friendship: z.number().min(0).max(1),
+  }),
+  incomeFull: z.number().int().positive(),
+  grades: z.array(z.object({ grade: z.enum(['S', 'A', 'B', 'C']), min: z.number().min(0).max(1) })).min(1),
+});
+
+const legacyText = z.string().min(1);
+
+/** 豐收重置與傳承（content/legacy.json）：數值與文字；交叉參照的檢查在 legacy-content.ts。 */
+export const legacyFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  defaultPlayerName: legacyText.max(8),
+  notice: z.object({ title: legacyText, text: legacyText }),
+  reset: z.object({
+    playMinutes: z.number().positive().max(60),
+    fromYear: z.number().int().positive(),
+    windowSeason: z.enum(SEASONS),
+    windowDay: z.number().int().positive(),
+    bonusPercentPerReset: z.number().int().min(0).max(100),
+    maxResets: z.number().int().min(0).max(20),
+    resetFlags: z.array(legacyText),
+    menu: legacyText,
+    closed: legacyText,
+    limit: legacyText,
+    warning: legacyText,
+    confirm: legacyText,
+    done: legacyText,
+    needConfirm: legacyText,
+    hint: legacyText,
+    armed: legacyText,
+  }),
+  legacy: z.object({
+    playMinutes: z.number().positive().max(60),
+    requiresChapter: z.number().int().positive(),
+    menu: legacyText,
+    locked: legacyText,
+    nameLabel: legacyText,
+    badName: legacyText,
+    warning: legacyText,
+    hint: legacyText,
+    armed: legacyText,
+    confirm: legacyText,
+    done: legacyText,
+    needConfirm: legacyText,
+  }),
+  notAtNotice: legacyText,
 });
 
 export const cropsFileSchema = z.array(cropSchema);

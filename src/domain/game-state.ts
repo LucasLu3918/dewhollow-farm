@@ -7,6 +7,7 @@ import type { Animal } from './animals';
 import type { ProcessingJob } from './processing';
 import { TOOL_IDS, type ToolId } from './tools';
 import type { WorldChanges } from './world-changes';
+import { NO_LEGACY } from './legacy';
 
 export { TOOL_ORDER, TOOL_IDS, type ToolId } from './tools';
 import type { ContentPack, Direction, Point } from './content';
@@ -29,7 +30,7 @@ import { emptyAchievements, type AchievementState } from './achievements';
 import { emptyMerchantLog, type MerchantLog } from './traveling-merchant';
 import type { DecorPlacement } from './decor';
 
-export const SAVE_SCHEMA_VERSION = 22;
+export const SAVE_SCHEMA_VERSION = 23;
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -113,6 +114,16 @@ export interface GameState {
   selectedSeed: string;
   /** 累計真實遊玩秒數，供平衡分析與顯示。 */
   playtimeSeconds: number;
+  /** 本年賺到的金幣總和（不含花費）；換年時移到 previousYearIncome（見 income.ts）。 */
+  yearlyIncome: number;
+  /** 上一年的收入總和（第 1 年為 0）。 */
+  previousYearIncome: number;
+  /** 豐收重置的次數：每次作物售價 +5%，最多 3 次（見 legacy.ts）。 */
+  resetBonus: number;
+  /** 目前角色的名字（傳承時可以改名，預設沿用原角色名）。 */
+  playerName: string;
+  /** 第幾代農場（從 1 開始，每次傳承加一）。 */
+  generation: number;
 }
 
 export function createNewGame(content: ContentPack, seed: number): GameState {
@@ -181,5 +192,10 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     mineCheckpoint: 1,
     selectedSeed: selectedSeed.id,
     playtimeSeconds: 0,
+    yearlyIncome: 0,
+    previousYearIncome: 0,
+    resetBonus: 0,
+    playerName: (content.legacy ?? NO_LEGACY).defaultPlayerName,
+    generation: 1,
   };
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { migrateState } from './save-migrations';
 import { SaveFormatError } from './save-errors';
 
-const context = { inventoryCapacity: 24, daysPerSeason: 20, wakeMinute: 360 };
+const context = { inventoryCapacity: 24, daysPerSeason: 20, wakeMinute: 360, playerName: '小涵' };
 
 /** 一份合法的 v19 存檔內容（秋冬內容之前）。節慶的紀錄已經有春夏的參加與星河兌換。 */
 function v19State(overrides: Record<string, unknown> = {}): Record<string, unknown> {
@@ -26,7 +26,7 @@ function v19State(overrides: Record<string, unknown> = {}): Record<string, unkno
 describe('migrateState v19 → v20（秋冬：溫室、豐穗祭、暖燈節、主線第 4–5 章）', () => {
   it('bumps the save to the current version (21, see save-migrations-v21.spec.ts)', () => {
     const migrated = migrateState(v19State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(22);
+    expect(migrated.schemaVersion).toBe(23);
   });
 
   it('starts the harvest contest with nothing harvested', () => {
@@ -65,7 +65,7 @@ describe('migrateState v19 → v20（秋冬：溫室、豐穗祭、暖燈節、�
   });
 
   it('a state from a version newer than 21 is still refused', () => {
-    expect(() => migrateState({ schemaVersion: 23 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState({ schemaVersion: 24 }, context)).toThrow(SaveFormatError);
   });
 
   it('a v19 save without a festival record gets an empty harvest tally (the other records are not invented)', () => {

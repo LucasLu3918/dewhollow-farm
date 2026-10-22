@@ -1,6 +1,7 @@
 import type { GameState } from '../domain/game-state';
 import { addItem, type Inventory } from '../domain/inventory';
 import { heartsOf } from '../domain/friendship';
+import { receiveGold } from '../domain/income';
 import { categoryCount, claimKey, discoverEntries, dueRewards, markClaimed, type DexReward } from '../domain/collection';
 import { bumpCounter, markUnlocked, newlyUnlocked, type AchievementContext } from '../domain/achievements';
 import type { GameEvent } from './game-commands';
@@ -71,7 +72,7 @@ function grantDexReward(state: GameState, reward: DexReward, index: ContentIndex
     inventory = stored.value;
   }
   const titles = reward.title ? [...state.achievements.titles, reward.title] : state.achievements.titles;
-  return { ...state, inventory, gold: state.gold + (reward.gold ?? 0), achievements: { ...state.achievements, titles } };
+  return { ...receiveGold(state, reward.gold ?? 0), inventory, achievements: { ...state.achievements, titles } };
 }
 
 function rewardText(gold: number | undefined, title: string | undefined, items: Record<string, number> | undefined, index: ContentIndex): string {
@@ -120,7 +121,7 @@ export function observeProgress(before: GameState, after: GameState, events: rea
 
   // 4) 成就：條件達成就發獎勵，每個只給一次。
   for (const def of newlyUnlocked(index.achievements, next.achievements, achievementContext(next, index))) {
-    next = { ...next, gold: next.gold + (def.reward.gold ?? 0), achievements: markUnlocked(next.achievements, def) };
+    next = { ...receiveGold(next, def.reward.gold ?? 0), achievements: markUnlocked(next.achievements, def) };
     messages.push(`成就達成：${def.name}${rewardText(def.reward.gold, def.reward.title, undefined, index)}`);
   }
 

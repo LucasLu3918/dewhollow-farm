@@ -1,5 +1,6 @@
 import type { GameState } from '../domain/game-state';
 import { addItem } from '../domain/inventory';
+import { receiveGold } from '../domain/income';
 import { currentChapter, chapterReady, pendingSteps, type StoryChapter } from '../domain/story';
 import type { ContentIndex } from './content-index';
 
@@ -15,7 +16,7 @@ export interface StoryOutcome {
 
 /** 章節的獎勵：金幣、物品（放不下就不算完成）與旗標。 */
 function grant(state: GameState, chapter: StoryChapter, index: ContentIndex): GameState | null {
-  let next: GameState = { ...state, gold: state.gold + (chapter.reward.gold ?? 0) };
+  let next: GameState = receiveGold(state, chapter.reward.gold ?? 0);
   for (const [itemId, count] of Object.entries(chapter.reward.items ?? {})) {
     const stored = addItem(next.inventory, index.item(itemId), count);
     if (!stored.ok) return null;

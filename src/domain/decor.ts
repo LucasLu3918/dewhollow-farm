@@ -37,7 +37,7 @@ function keyOf(point: Point): string {
 }
 
 function isServiceTile(tile: TileDef): boolean {
-  return SERVICE_KINDS.has(tile.kind) || tile.notice === 'mailbox' || tile.wardrobe === true;
+  return SERVICE_KINDS.has(tile.kind) || tile.notice === 'mailbox' || tile.notice === 'legacy' || tile.wardrobe === true;
 }
 
 /** 這一格擺的裝飾（沒有就是 undefined）。 */

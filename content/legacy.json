@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "note": "豐收重置與傳承（M6，見 src/domain/legacy.ts）。重置與傳承都在小屋床邊的公告（notice: legacy）前面做，並需要二次確認。豐收重置：第 fromYear 年起、每年春季第 1 天（換年後、睡前）可以做，清空當年的金幣、物品、田地、建築改建與動物、裝飾與穿戴，保留圖鑑、成就、好感、技能天賦、主線進度與服飾圖鑑；每次換取作物售價 bonusPercentPerReset%，最多 maxResets 次。resetFlags 是要清掉的建築旗標，必須是店家賣的 building.<旗標> 或合成效果的旗標。傳承：主線完成 requiresChapter 章後可以做，其餘全部重新開始（等同新遊戲），只保留圖鑑與成就（以及碎片、稱號）。文字為本專案原創。playMinutes 為內容時數的估計；這兩項都在第 2 年以後或主線第 5 章之後，不計入春夏的時數合計。",
+  "defaultPlayerName": "小涵",
+  "notice": {
+    "title": "床邊的公告",
+    "text": "公告板上貼著農場的記事。（第 2 年起的春季第 1 天可以豐收重置；主線第 5 章完成後可以傳承。）"
+  },
+  "notAtNotice": "要站在床邊的公告前面才能做這件事",
+  "reset": {
+    "playMinutes": 3,
+    "fromYear": 2,
+    "windowSeason": "spring",
+    "windowDay": 1,
+    "bonusPercentPerReset": 5,
+    "maxResets": 3,
+    "resetFlags": ["house-wing", "house-full", "cowbarn", "greenhouse", "sprinkler", "bobber"],
+    "menu": "豐收重置",
+    "closed": "豐收重置要等到第 2 年以後的春季第 1 天，換年後、睡前才能做。",
+    "limit": "豐收重置已經做滿 3 次了，不能再換加成。",
+    "warning": "豐收重置會清空今年的金幣、背包與出貨箱、田地、小屋與牛舍的改建、雞舍、牛舍與羊圈的動物、裝飾與穿戴，金幣回到開局的數目，起始種子會放回背包。圖鑑、成就、好感、技能天賦與主線進度都會保留，之後的作物售價會多 5%。",
+    "hint": "先看清楚說明，再按按鈕。",
+    "armed": "再按一次就會執行。",
+    "confirm": "再按一次確認豐收重置",
+    "done": "豐收重置完成了。田地與小屋回到開局的樣子，作物售價永久多了 {percent}%（目前 {count}/{max} 次）。",
+    "needConfirm": "豐收重置還沒有確認，再按一次按鈕才會執行。"
+  },
+  "legacy": {
+    "playMinutes": 4,
+    "requiresChapter": 5,
+    "menu": "傳承",
+    "locked": "主線第 {chapter} 章完成後，才能把農場傳給下一位。",
+    "warning": "傳承會由新的角色接手農場，從第 1 年春天重新開始（等同新遊戲）。只保留圖鑑、成就、碎片與稱號。作物售價加成會歸零，因為是新的農場。",
+    "hint": "名字可以改，預設是原角色名。",
+    "armed": "再按一次就會執行，之後的農場從第 1 年春天開始。",
+    "nameLabel": "新角色的名字（1 至 8 個字）",
+    "badName": "名字要 1 至 8 個字，不能是空白。",
+    "confirm": "再按一次確認傳承",
+    "done": "{name} 接手了農場。新的農場從第 1 年春天開始，圖鑑與成就都保留下來了。",
+    "needConfirm": "傳承還沒有確認，再按一次按鈕才會執行。"
+  }
+}

@@ -14,6 +14,7 @@
         <span id="hud-weather" aria-label="天氣與明天的預報"></span>
         <button id="hud-skills" class="skills" type="button" aria-label="技能等級，點一下打開技能與天賦（或按 K）"></button>
         <span id="hud-gold">0 金</span>
+        <span id="hud-rating" aria-label="農場評級"></span>
         <span class="energy" aria-label="體力">
           <span class="energy-track"><span id="hud-energy-fill"></span></span>
           <span id="hud-energy-text">20 / 20</span>
@@ -102,6 +103,14 @@
         </header>
         <ul id="collection-list" class="shop-list"></ul>
         <button id="collection-close" type="button">離開（Esc）</button>
+      </section>
+      <section id="legacy-panel" class="shop-panel" aria-labelledby="legacy-title" hidden>
+        <div>
+          <h2 id="legacy-title">床邊的公告</h2>
+          <p id="legacy-summary"></p>
+        </div>
+        <ul id="legacy-list" class="shop-list"></ul>
+        <button id="legacy-close" type="button">離開（Esc）</button>
       </section>
       <section id="heart-event-panel" class="shop-panel" aria-labelledby="heart-event-title" hidden>
         <header>

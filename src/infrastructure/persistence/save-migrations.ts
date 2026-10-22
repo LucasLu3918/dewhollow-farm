@@ -14,6 +14,8 @@ export interface MigrationContext {
   daysPerSeason: number;
   /** 睡醒時間（來自 content/tuning.json）。 */
   wakeMinute: number;
+  /** 預設的角色名字（來自 content/legacy.json）；v23 之前的存檔沿用它。 */
+  playerName: string;
 }
 
 type Migration = (state: unknown, context: MigrationContext) => unknown;
@@ -44,6 +46,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   19: migrateV19ToV20,
   20: migrateV20ToV21,
   21: migrateV21ToV22,
+  22: migrateV22ToV23,
 };
 
 /**
@@ -224,6 +227,26 @@ function migrateV7ToV8(raw: unknown): unknown {
     throw new SaveFormatError(`存檔 v7 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
   }
   return { ...(raw as Record<string, unknown>), schemaVersion: 8, animals: [] };
+}
+
+/**
+ * v22 → v23：農場評級與豐收重置、傳承。舊存檔還沒有賺過本年收入（0）、沒有上一年（0）、沒有豐收重置（0 次）；
+ * 農場是第 1 代，角色名字沿用預設（content/legacy.json）。
+ */
+function migrateV22ToV23(raw: unknown, context: MigrationContext): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(22) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v22 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 23,
+    yearlyIncome: 0,
+    previousYearIncome: 0,
+    resetBonus: 0,
+    playerName: context.playerName,
+    generation: 1,
+  };
 }
 
 /**

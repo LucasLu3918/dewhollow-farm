@@ -1,5 +1,6 @@
 import type { GameState } from '../domain/game-state';
 import { removeItem } from '../domain/inventory';
+import { receiveGold } from '../domain/income';
 import { fail, ok, type Result } from '../domain/result';
 import { donationRefusal, goalMet, recordDonation, recordOf, seasonOpen } from '../domain/repairs';
 import type { ContentIndex } from './content-index';
@@ -43,7 +44,7 @@ export function donateToRepair(state: GameState, repairId: string, itemId: strin
 }
 
 function grantRepairReward(state: GameState, reward: { gold?: number; flags?: string[] }): GameState {
-  let next: GameState = { ...state, gold: state.gold + (reward.gold ?? 0) };
+  let next: GameState = receiveGold(state, reward.gold ?? 0);
   for (const flag of reward.flags ?? []) next = { ...next, flags: { ...next.flags, [flag]: true } };
   return next;
 }

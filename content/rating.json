@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "note": "農場評級（M6，見 src/domain/rating.ts）。三項各換算成 0–1 的比例：年度收入除以 incomeFull（超過就算滿）；圖鑑是已發現條目數除以全部條目數；好感是居民好感點數的平均除以滿點（maxHearts × pointsPerHeart）。總分是三項比例乘以權重後加總（權重加總必須是 1）。總分由高到低依 grades 的門檻決定評級，最後一級的門檻必須是 0。數值為本專案原創的估計，之後依模擬與試玩調整。",
+  "weights": {
+    "income": 0.5,
+    "collection": 0.25,
+    "friendship": 0.25
+  },
+  "incomeFull": 60000,
+  "grades": [
+    { "grade": "S", "min": 0.9 },
+    { "grade": "A", "min": 0.75 },
+    { "grade": "B", "min": 0.5 },
+    { "grade": "C", "min": 0 }
+  ]
+}

@@ -3,6 +3,7 @@ import { totalDay } from '../domain/calendar';
 import { boardFor, type BoardState } from '../domain/bulletin';
 import { addPoints, heartCapPoints, heartsOf, NO_FRIENDSHIP } from '../domain/friendship';
 import { addItem, countOf, removeItem } from '../domain/inventory';
+import { receiveGold } from '../domain/income';
 import { deliverableLetters, type LetterDef } from '../domain/mail';
 import { advanceQuest, goalMet, goalProgress, NOT_STARTED, unlockMet, type GoalContext, type Progress, type QuestDef, type QuestEvent, type QuestRecord, type UnlockContext } from '../domain/quests';
 import { fail, ok, type Result } from '../domain/result';
@@ -172,7 +173,7 @@ function grantReward(state: GameState, def: QuestDef, index: ContentIndex): Resu
   let next = state;
   const lines: string[] = [];
   if (reward.gold) {
-    next = { ...next, gold: next.gold + reward.gold };
+    next = receiveGold(next, reward.gold);
     lines.push(`${reward.gold} 金`);
   }
   for (const [itemId, count] of Object.entries(reward.items ?? {})) {
