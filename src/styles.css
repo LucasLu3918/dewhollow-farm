@@ -145,6 +145,32 @@ a:focus-visible {
 }
 
 /*
+ * 開機載入提示：蓋在遊戲區上方，由 main.ts 在場景與鍵盤都接好後移除。
+ * 畫布在 data-ready 標上之前不顯示，所以玩家看得到畫面時，按鍵一定會被接到。
+ */
+.stage:has(> .loading) {
+  position: relative;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  color: var(--ink);
+  font-size: calc(18px * var(--font-scale));
+  background: var(--surface-stage);
+}
+
+#game:not([data-ready]) canvas {
+  visibility: hidden;
+}
+
+/*
  * 虛擬按鍵（觸控）：放在遊戲區的正下方，不蓋住畫面。直式與橫式都是左右兩組（方向鍵在左、動作鍵在右），
  * 寬度不夠時動作鍵自動換行。只有在觸控裝置（或設定為一律顯示）時才顯示，見 apply-settings.ts。
  */
@@ -325,6 +351,41 @@ a:focus-visible {
   padding: 0 12px;
 }
 
+/* 商店：停用的按鈕（買不起、週限額、沒有座位…）淡化，游標不是手指。 */
+#shop-list button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 商店：不能買的原因寫在列裡，換到第二行（只在有原因的列換行，其他列的排法不變）。 */
+#shop-list li:has(> .shop-reason) {
+  flex-wrap: wrap;
+}
+
+.shop-reason {
+  flex: 1 1 100%;
+  font-size: calc(13px * var(--font-scale));
+  opacity: 0.85;
+}
+
+/* 商店：買或升級的結果行（role="status"），錯誤時用錯誤色。 */
+/* 寫在 .shop-panel 底下，才能蓋過 .shop-panel p 的邊界與透明度。 */
+.shop-panel .shop-result {
+  min-height: 1.6em;
+  margin: 0 0 8px;
+  opacity: 1;
+}
+
+.shop-panel .shop-result.error {
+  color: var(--error);
+}
+
+:root[data-colorblind='on'] .shop-result.error {
+  font-weight: 700;
+  border-left: 3px solid var(--error);
+  padding-left: 6px;
+}
+
 /* 狀態列的設定、存檔、說明按鈕與版本號。 */
 .status-actions {
   display: inline-flex;
@@ -396,6 +457,36 @@ a:focus-visible {
 /* 說明頁：寬一點，讓按鍵與更新日誌不擠。 */
 .help-panel {
   width: min(92vw, 560px);
+}
+
+/* 說明頁標題列：標題與版本號在左，右上角的 × 關閉鈕對齊標題的第一行。 */
+.help-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.help-header > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.help-x {
+  flex: 0 0 auto;
+  width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  font-size: calc(24px * var(--font-scale));
+  line-height: 1;
+  color: var(--surface-dialog-ink);
+  background: var(--action-fill);
+  border: 1px solid var(--action-border);
+  border-radius: var(--radius-md);
+}
+
+.help-x:active {
+  background: var(--action-pressed);
 }
 
 .help-section {

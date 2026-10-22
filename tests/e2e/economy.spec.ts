@@ -100,7 +100,7 @@ test('the general store sells seeds: a click on 買一個 takes the gold', async
   await expect(page.locator('#shop-panel')).toBeHidden();
 });
 
-test('the smithy shows the price and refuses an upgrade the player cannot pay for, taking nothing', async ({ page }) => {
+test('the smithy shows the price and disables an upgrade the player cannot pay for, taking nothing', async ({ page }) => {
   await waitForGame(page);
   await toVillage(page);
   // 村莊 (7,10) → 往上到 (7,6)，沿第 6 列往右到 (12,6)（毛毛站在 (10,5)，所以不走第 5 列），
@@ -112,9 +112,10 @@ test('the smithy shows the price and refuses an upgrade the player cannot pay fo
   await expect(page.locator('#shop-title')).toHaveText('鐵匠');
   await expect(page.locator('#shop-list')).toContainText('鋤頭 → 銅級');
 
-  await page.locator('#shop-list li', { hasText: '鋤頭 → 銅級' }).getByRole('button', { name: '升級' }).click();
-  // 銅級鋤頭要 2000 金（設計的初版升級價）；玩家只有 100 金，應用層先檢查金幣。
-  await expect(page.locator('#shop-list')).toContainText('2000 金');
-  await expect(page.locator('#hud-log')).toContainText('金幣不夠');
+  // 銅級鋤頭要 2000 金（設計的初版升級價）；玩家只有 100 金，按鈕停用，原因寫在列內（不必點了才知道）。
+  const upgrade = page.locator('#shop-list li', { hasText: '鋤頭 → 銅級' });
+  await expect(upgrade).toContainText('2000 金');
+  await expect(upgrade.getByRole('button', { name: '升級' })).toBeDisabled();
+  await expect(upgrade).toContainText('金幣不夠');
   await expect(page.locator('#hud-gold')).toHaveText('100 金');
 });

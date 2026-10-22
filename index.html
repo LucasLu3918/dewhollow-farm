@@ -33,7 +33,7 @@
           <span id="hud-version" class="version"></span>
         </span>
       </header>
-      <div id="game" class="stage"></div>
+      <div id="game" class="stage" role="region" aria-label="晨露農場遊戲畫面。用方向鍵移動，按問號鍵看操作說明"><p class="loading" role="status">農場載入中…</p></div>
       <div id="touch-controls" class="touch-controls" hidden></div>
       <section id="settings-panel" class="shop-panel settings-panel" aria-labelledby="settings-title" role="dialog" aria-modal="true" hidden>
         <header>
@@ -67,6 +67,7 @@
           <h2 id="shop-title"></h2>
           <p id="shop-funds"></p>
         </header>
+        <p id="shop-result" class="shop-result" role="status"></p>
         <ul id="shop-list" class="shop-list"></ul>
         <button id="shop-close" type="button">離開櫃檯（Esc）</button>
       </section>
@@ -152,9 +153,12 @@
         <button id="save-close" type="button">關閉（Esc）</button>
       </section>
       <section id="help-panel" class="shop-panel help-panel" aria-labelledby="help-title" role="dialog" aria-modal="true" hidden>
-        <header>
-          <h2 id="help-title">說明</h2>
-          <p id="help-version"></p>
+        <header class="help-header">
+          <div>
+            <h2 id="help-title">說明</h2>
+            <p id="help-version"></p>
+          </div>
+          <button id="help-x" class="help-x" type="button" aria-label="關閉說明">×</button>
         </header>
         <div id="help-body"></div>
         <button id="help-close" type="button">關閉（? 或 Esc）</button>

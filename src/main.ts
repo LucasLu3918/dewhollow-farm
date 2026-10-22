@@ -38,6 +38,7 @@ import crafting from '../content/crafting.json';
 import talents from '../content/talents.json';
 import changelog from '../content/changelog.json';
 import help from '../content/help.json';
+import controlsContent from '../content/controls.json';
 import forest from '../content/maps/forest.json';
 import lake from '../content/maps/lake.json';
 import house from '../content/maps/house.json';
@@ -60,6 +61,7 @@ import { LocalSettingsStore } from './infrastructure/persistence/local-settings-
 import { applySettings, isCoarsePointer } from './presentation/apply-settings';
 import { controlsHint } from './presentation/controls-hint';
 import { loadContent } from './infrastructure/content/load-content';
+import { parseControlsContent } from './infrastructure/content/controls-content';
 import { parseChangelog, parseHelpContent } from './infrastructure/content/info-content';
 import { MemorySaveRepository } from './infrastructure/persistence/memory-save-repository';
 import { IndexedDbSaveRepository, hasIndexedDb } from './infrastructure/persistence/indexeddb-save-repository';
@@ -78,6 +80,20 @@ import { MusicPlayer } from './presentation/audio/music-player';
 import { AudioOutput } from './presentation/audio/audio-output';
 import { registerServiceWorker } from './presentation/service-worker';
 
+/** 移除開機載入提示（index.html 的 #game 內）；啟動失敗或讀不開存檔時也用它，免得一直顯示「載入中」。 */
+function hideLoader(): void {
+  document.querySelector('#game .loading')?.remove();
+}
+
+/**
+ * 場景與鍵盤監聽都接好後呼叫（見 MapScene.create）：#game 標上 data-ready，畫布才會顯示，並移除載入提示。
+ * 畫布在這之前是隱藏的，所以玩家看得到畫面時，按鍵一定會被接到。
+ */
+function markStageReady(): void {
+  document.getElementById('game')?.setAttribute('data-ready', 'true');
+  hideLoader();
+}
+
 /**
  * 組裝點（composition root）：這裡是唯一知道具體實作的地方。
  * 其他層只看見介面（port）與純資料。
@@ -85,6 +101,8 @@ import { registerServiceWorker } from './presentation/service-worker';
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
   const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, merchant, decor, rating, legacy, maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+  // 操作說明的文字（狀態列提示、設定面板的動作名稱、虛擬按鍵）來自 content/controls.json，缺漏會在這裡報錯。
+  const controls = parseControlsContent(controlsContent);
   const index = createContentIndex(loaded.pack);
   // 音效與背景音樂共用同一個音訊出口（AudioContext 與靜音旗標）。
   const audio = new AudioOutput();
@@ -98,7 +116,7 @@ async function bootstrap(): Promise<void> {
   applyPreferences();
   settings.onChange(applyPreferences);
   // 操作提示依目前的按鍵產生；開機時套用一次，改鍵後 SettingsService 會通知訂閱者，提示列跟著更新。
-  const showControlsHint = (): void => hud.setControlsHint(controlsHint(settings.get().bindings));
+  const showControlsHint = (): void => hud.setControlsHint(controlsHint(settings.get().bindings, controls.hintLabels, controls.hintText));
   showControlsHint();
   settings.onChange(showControlsHint);
 
@@ -153,6 +171,7 @@ async function bootstrap(): Promise<void> {
 
   if (!session) {
     // 讀不開這一格：直接打開存檔槽，讓玩家選別的格子或處理這一格（遊戲本身還沒有開始）。
+    hideLoader();
     void saves.open();
     return;
   }
@@ -182,6 +201,8 @@ async function bootstrap(): Promise<void> {
         help: helpPanel,
         saves,
         settings,
+        onReady: markStageReady,
+        controls: { settingsLabels: controls.settingsLabels, touchButtons: controls.touchButtons },
       }),
       new MapScene(),
     ],
@@ -204,6 +225,7 @@ async function bootstrap(): Promise<void> {
 
 bootstrap().catch((error: unknown) => {
   // 啟動階段的錯誤（例如內容資料有誤）無法經由 HUD 物件顯示，直接寫入訊息列表。
+  hideLoader();
   const item = document.createElement('li');
   item.className = 'error';
   item.textContent = `啟動失敗：${error instanceof Error ? error.message : String(error)}`;

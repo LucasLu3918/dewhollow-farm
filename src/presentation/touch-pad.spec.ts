@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import controls from '../../content/controls.json';
 import { ACTION_IDS, DEFAULT_BINDINGS, bindingsAreValid, type ActionId } from '../domain/keybindings';
-import { TOUCH_BUTTONS, touchKeyFor, touchVisible } from './touch-pad';
+import { parseControlsContent } from '../infrastructure/content/controls-content';
+import { TOUCH_LAYOUT, buildTouchButtons, touchKeyFor, touchVisible } from './touch-pad';
+
+/** 按鈕文字來自 content/controls.json（與遊戲載入的是同一份）；測試的預期值不變。 */
+const TOUCH_BUTTONS = buildTouchButtons(parseControlsContent(controls).touchButtons);
 
 describe('virtual pad layout', () => {
   it('offers the four directions and the everyday action keys', () => {
@@ -69,6 +74,13 @@ describe('virtual pad layout', () => {
     expect(touchKeyFor('takeAxe', rebound)).toBe('y');
     expect(touchKeyFor('placeDecor', rebound)).toBe('u');
     expect(touchKeyFor('wear', rebound)).toBe(DEFAULT_BINDINGS.wear);
+  });
+});
+
+describe('virtual pad text source', () => {
+  it('has exactly one text entry in content/controls.json for every button in the layout', () => {
+    const laid = TOUCH_LAYOUT.map((entry) => entry.action).sort();
+    expect(Object.keys(controls.touchButtons).sort()).toEqual(laid);
   });
 });
 

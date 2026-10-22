@@ -1,5 +1,5 @@
 import type { ActionId } from '../domain/keybindings';
-import { TOUCH_BUTTONS, TOUCH_REPEAT_MS, type TouchButton } from './touch-pad';
+import { TOUCH_REPEAT_MS, buildTouchButtons, type TouchButton, type TouchLabels } from './touch-pad';
 
 /**
  * 虛擬按鍵（DOM，pointer events）：畫面下方的方向鍵與動作鍵。
@@ -9,14 +9,16 @@ import { TOUCH_BUTTONS, TOUCH_REPEAT_MS, type TouchButton } from './touch-pad';
 export class TouchControls {
   private timer: number | null = null;
 
-  constructor(doc: Document, onPress: (action: ActionId) => void) {
+  /** labels：每個按鈕的文字（來自 content/controls.json）。 */
+  constructor(doc: Document, onPress: (action: ActionId) => void, labels: TouchLabels) {
     const root = doc.querySelector<HTMLElement>('#touch-controls');
     if (!root) throw new Error('頁面缺少必要元素 #touch-controls');
     root.replaceChildren();
+    const buttons = buildTouchButtons(labels);
     for (const group of ['move', 'act', 'tool'] as const) {
       const wrap = doc.createElement('div');
       wrap.className = `touch-group touch-${group}`;
-      for (const entry of TOUCH_BUTTONS.filter((b) => b.group === group)) {
+      for (const entry of buttons.filter((b) => b.group === group)) {
         wrap.append(this.button(doc, entry, onPress));
       }
       root.append(wrap);

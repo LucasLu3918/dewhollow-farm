@@ -59,9 +59,9 @@ import type { RenderCompatInfo } from '../render-compat';
 import type { View } from '../walk-pose';
 import type { SettingsService } from '../../application/settings';
 import { actionForKey, type ActionId } from '../../domain/keybindings';
-import { SettingsPanel } from '../settings-panel';
+import { SettingsPanel, type SettingsLabels } from '../settings-panel';
 import { TouchControls } from '../touch-controls';
-import { touchKeyFor } from '../touch-pad';
+import { touchKeyFor, type TouchLabels } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
 import type { OpenablePanel } from '../panel-dialog';
 
@@ -92,6 +92,10 @@ export interface MapSceneDeps {
   saves: SavePanel;
   /** 玩家偏好（按鍵、字級、閃光與震動等），不進存檔。 */
   settings: SettingsService;
+  /** 鍵盤監聽與畫面都接好後呼叫一次（見 create 結尾與 main.ts 的 markStageReady）。 */
+  onReady: () => void;
+  /** 操作說明的文字（設定面板的動作名稱、虛擬按鍵的文字），來自 content/controls.json。 */
+  controls: { settingsLabels: SettingsLabels; touchButtons: TouchLabels };
 }
 
 /** 動作 → 移動方向（按鍵由偏好的按鍵表決定，見 handleKey）。 */
@@ -304,10 +308,10 @@ export class MapScene extends Phaser.Scene {
 
   init(deps: MapSceneDeps): void {
     this.deps = deps;
-    this.settingsPanel = new SettingsPanel(document, deps.settings);
+    this.settingsPanel = new SettingsPanel(document, deps.settings, deps.controls.settingsLabels);
     deps.hud.bindSettings(() => this.settingsPanel.open());
     // 虛擬按鍵（觸控）：按鈕本身掛在 DOM 上，顯示與否由 apply-settings.ts 決定。
-    new TouchControls(document, (action) => this.pressAction(action));
+    new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons);
     this.shopPanel = new ShopPanel(document, deps.index, (command) => void this.run(command));
     this.kitchenPanel = new KitchenPanel(document, deps.index, (command) => void this.run(command));
     this.workshopPanel = new WorkshopPanel(document, deps.index, (command) => void this.run(command));
@@ -356,8 +360,12 @@ export class MapScene extends Phaser.Scene {
       window.removeEventListener('keydown', this.onKeyDown);
     });
     // 讀取存檔的提示等到鍵盤已經接上才顯示：提示出現時，按鍵一定會被接到（載入素材的期間按的鍵不算）。
+    // 新遊戲則提示玩家可以按 ? 看操作說明（訊息列在新遊戲開場是空的）。
     if (this.deps.session.restored) this.deps.hud.messages(['已讀取存檔，繼續遊玩。']);
+    else this.deps.hud.messages(['按 ? 看操作說明']);
     this.refresh();
+    // 鍵盤監聽已掛上、畫面也已更新：通知開機流程顯示畫布（畫布在這之前是隱藏的，見 main.ts）。
+    this.deps.onReady();
   }
 
   /** 天色與天氣的遮罩與粒子：固定在畫面上（不隨鏡頭移動）。 */
@@ -602,6 +610,10 @@ export class MapScene extends Phaser.Scene {
     try {
       const outcome = await session.dispatch(command);
       hud.messages(outcome.messages);
+      // 買或升級的結果也送到商店面板的結果行：面板開著時，底部的訊息列在手機上可能看不到。
+      if (command.type === 'buy' || command.type === 'upgrade') {
+        this.shopPanel.showMessage(outcome.messages.join('　'), outcome.events.some((event) => event.type === 'refused'));
+      }
       if (command.type === 'cycleTool' || command.type === 'cycleSeed') sounds.play('click');
       this.playEvents(outcome.events, before, plotsBefore, inventoryBefore);
     } catch (error) {
