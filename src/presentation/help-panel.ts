@@ -1,9 +1,31 @@
-import type { ChangelogEntry, HelpContent } from '../infrastructure/content/info-content';
+import type { ChangelogEntry, HelpContent, HelpKeyEntry } from '../infrastructure/content/info-content';
+import { isCoarsePointer } from './apply-settings';
 import { PanelDialog } from './panel-dialog';
 
+/** 說明頁的一組按鍵：標題、列表，以及列表底下的提示（只有鍵盤按鍵有）。 */
+export interface KeySection {
+  title: string;
+  entries: readonly HelpKeyEntry[];
+  note?: string;
+}
+
+const KEYBOARD_NOTE = '以上是預設按鍵。已經在「設定」裡改過的按鍵，以設定為準；Esc 永遠用來關閉面板。';
+const KEYBOARD_NOTE_TOUCH = '以上是預設按鍵。已經在「設定」裡改過的按鍵，以設定為準；按右上角的 × 關閉。';
+
 /**
- * 說明頁（DOM）：操作按鍵、版本號、更新日誌與隱私說明。文字全部來自 content/help.json 與 content/changelog.json。
- * 打開時不花體力與時間，也不經過應用層的指令。
+ * 按鍵區塊的順序（純函式）：觸控裝置先顯示畫面下方的按鍵，一般裝置先顯示鍵盤按鍵；兩組都會列出。
+ * 提示文字也依裝置而定：觸控裝置不提 Esc，改提右上角的 ×。
+ */
+export function keySections(help: HelpContent, coarse: boolean): KeySection[] {
+  const keyboard: KeySection = { title: '鍵盤按鍵', entries: help.controls, note: coarse ? KEYBOARD_NOTE_TOUCH : KEYBOARD_NOTE };
+  const touch: KeySection = { title: '畫面下方的按鍵', entries: help.touch };
+  return coarse ? [touch, keyboard] : [keyboard, touch];
+}
+
+/**
+ * 說明頁（DOM）：操作按鍵（鍵盤與畫面下方的觸控按鍵）、版本號、更新日誌與隱私說明。
+ * 文字全部來自 content/help.json 與 content/changelog.json。打開時不花體力與時間，也不經過應用層的指令。
+ * coarse 預設依裝置的主要指標決定（見 isCoarsePointer），決定按鍵區塊的順序與關閉提示。
  */
 export class HelpPanel {
   private readonly doc: Document;
@@ -16,6 +38,7 @@ export class HelpPanel {
     private readonly help: HelpContent,
     private readonly changelog: readonly ChangelogEntry[],
     version: string,
+    private readonly coarse: boolean = isCoarsePointer(),
   ) {
     this.doc = doc;
     this.root = required(doc, '#help-panel');
@@ -23,6 +46,7 @@ export class HelpPanel {
     this.body = required(doc, '#help-body');
     required(doc, '#help-version').textContent = `目前版本：v${version}`;
     required(doc, '#help-close').addEventListener('click', () => this.close());
+    required(doc, '#help-x').addEventListener('click', () => this.close());
     this.render();
   }
 
@@ -45,7 +69,7 @@ export class HelpPanel {
 
   private render(): void {
     this.body.replaceChildren(
-      this.section('操作按鍵', this.controls()),
+      ...keySections(this.help, this.coarse).map((group) => this.section(group.title, this.keyList(group))),
       this.section('更新日誌', this.history()),
       this.section(this.help.privacy.title, this.privacy()),
     );
@@ -60,23 +84,26 @@ export class HelpPanel {
     return section;
   }
 
-  private controls(): HTMLElement {
+  private keyList(group: KeySection): HTMLElement {
     const wrap = this.doc.createElement('div');
     const list = this.doc.createElement('ul');
     list.className = 'help-controls';
-    for (const control of this.help.controls) {
+    for (const entry of group.entries) {
       const item = this.doc.createElement('li');
       const keys = this.doc.createElement('kbd');
-      keys.textContent = control.keys;
+      keys.textContent = entry.keys;
       const action = this.doc.createElement('span');
-      action.textContent = control.action;
+      action.textContent = entry.action;
       item.append(keys, action);
       list.append(item);
     }
-    const note = this.doc.createElement('p');
-    note.className = 'help-note';
-    note.textContent = '以上是預設按鍵。已經在「設定」裡改過的按鍵，以設定為準；Esc 永遠用來關閉面板。';
-    wrap.append(list, note);
+    wrap.append(list);
+    if (group.note) {
+      const note = this.doc.createElement('p');
+      note.className = 'help-note';
+      note.textContent = group.note;
+      wrap.append(note);
+    }
     return wrap;
   }
 

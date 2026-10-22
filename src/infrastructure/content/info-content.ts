@@ -14,8 +14,12 @@ const changelogSchema = z.array(
   }),
 );
 
+const keyEntrySchema = z.object({ keys: z.string().min(1), action: z.string().min(1) });
+
 const helpSchema = z.object({
-  controls: z.array(z.object({ keys: z.string().min(1), action: z.string().min(1) })).min(1),
+  controls: z.array(keyEntrySchema).min(1),
+  /** 畫面下方虛擬按鍵的說明（觸控裝置）：按鈕上的文字與對應的功能，不寫鍵盤字母。 */
+  touch: z.array(keyEntrySchema).min(1),
   privacy: z.object({
     title: z.string().min(1),
     paragraphs: z.array(z.string().min(1)).min(1),
@@ -23,6 +27,7 @@ const helpSchema = z.object({
 });
 
 export type ChangelogEntry = z.infer<typeof changelogSchema>[number];
+export type HelpKeyEntry = z.infer<typeof keyEntrySchema>;
 export type HelpContent = z.infer<typeof helpSchema>;
 
 /** 更新日誌：最新的版本在最前面（陣列順序即顯示順序）。 */

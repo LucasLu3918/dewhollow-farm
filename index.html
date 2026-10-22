@@ -153,9 +153,12 @@
         <button id="save-close" type="button">關閉（Esc）</button>
       </section>
       <section id="help-panel" class="shop-panel help-panel" aria-labelledby="help-title" role="dialog" aria-modal="true" hidden>
-        <header>
-          <h2 id="help-title">說明</h2>
-          <p id="help-version"></p>
+        <header class="help-header">
+          <div>
+            <h2 id="help-title">說明</h2>
+            <p id="help-version"></p>
+          </div>
+          <button id="help-x" class="help-x" type="button" aria-label="關閉說明">×</button>
         </header>
         <div id="help-body"></div>
         <button id="help-close" type="button">關閉（? 或 Esc）</button>

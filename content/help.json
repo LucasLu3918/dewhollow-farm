@@ -18,6 +18,24 @@
     { "keys": "?", "action": "打開或關閉這個說明頁" },
     { "keys": "Esc", "action": "離開目前打開的面板" }
   ],
+  "touch": [
+    { "keys": "方向鈕（左下）", "action": "向上、下、左、右移動；按住會連續移動" },
+    { "keys": "互動（右下）", "action": "互動、收割、拾取、與居民說話" },
+    { "keys": "工具", "action": "切換工具" },
+    { "keys": "種子", "action": "切換種子" },
+    { "keys": "技能", "action": "技能與天賦" },
+    { "keys": "居民", "action": "居民與好感" },
+    { "keys": "圖鑑", "action": "圖鑑與成就" },
+    { "keys": "委託", "action": "委託與佈告欄" },
+    { "keys": "存檔", "action": "手動存檔（目前的存檔槽）" },
+    { "keys": "斧", "action": "拿起斧頭" },
+    { "keys": "鎬", "action": "拿起鎬子" },
+    { "keys": "釣", "action": "拿起釣竿" },
+    { "keys": "鐮", "action": "拿起鐮刀" },
+    { "keys": "擺放", "action": "在小屋裡擺放裝飾" },
+    { "keys": "穿", "action": "穿上衣服或帽子" },
+    { "keys": "脫", "action": "脫下衣服或帽子" }
+  ],
   "privacy": {
     "title": "隱私說明",
     "paragraphs": [
