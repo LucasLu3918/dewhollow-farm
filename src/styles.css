@@ -188,9 +188,8 @@ a:focus-visible {
  */
 .touch-controls {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
@@ -198,6 +197,32 @@ a:focus-visible {
 
 .touch-controls[hidden] {
   display: none;
+}
+
+.touch-common {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* 「更多」面板：技能、居民、圖鑑、委託、存檔與工具，收起時不佔高度。 */
+.touch-more {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 6px;
+}
+
+.touch-more[hidden] {
+  display: none;
+}
+
+.touch-more .touch-group {
+  display: contents;
+}
+
+.touch-more-toggle.is-open {
+  background: var(--action-pressed);
 }
 
 .touch-group {
@@ -828,43 +853,41 @@ a:focus-visible {
     grid-column: 1;
     grid-row: 4;
     display: grid;
+    gap: 8px;
+  }
+
+  .touch-common {
+    display: grid;
     grid-template-columns: 180px minmax(0, 1fr);
     gap: 8px 12px;
     align-items: center;
   }
 
   .touch-move {
-    grid-column: 1;
-    grid-row: 1;
     justify-self: center;
   }
 
   .touch-act {
-    grid-column: 2;
-    grid-row: 1;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
     justify-content: stretch;
     max-width: none;
   }
 
-  .touch-tool {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    display: grid;
+  .touch-more {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
   }
 
   .touch-act .touch-button,
-  .touch-tool .touch-button {
+  .touch-more .touch-button {
     width: 100%;
     min-width: 0;
   }
 
-  /* 動作鍵每格約 46px 寬，兩個字（互動、技能…）要留在同一行：縮小左右內距，不換行。 */
-  .touch-act .touch-button {
+  /* 按鍵每格約 80px 寬以上，四個字以內不換行；「更多」面板的工具鍵（斧、鎬…）一個字，寬度充足。 */
+  .touch-act .touch-button,
+  .touch-more .touch-button {
     padding: 0 2px;
     white-space: nowrap;
   }
@@ -908,7 +931,8 @@ a:focus-visible {
     justify-self: center;
   }
 
-  .touch-controls:not([hidden]) {
+  .touch-controls:not([hidden]),
+  .touch-common {
     display: contents;
   }
 
@@ -922,7 +946,7 @@ a:focus-visible {
     grid-column: 3;
     grid-row: 2;
     display: grid;
-    grid-template-columns: repeat(3, 56px);
+    grid-template-columns: repeat(2, 56px);
     grid-auto-rows: 44px;
     justify-content: center;
     gap: 6px;
@@ -971,16 +995,26 @@ a:focus-visible {
     display: none;
   }
 
-  /* 工具組：整列置中、單行（七顆 56px 寬的按鈕），放在最下面。 */
-  .touch-tool {
-    grid-column: 1 / -1;
-    grid-row: 4;
-    justify-content: center;
-    flex-wrap: nowrap;
-    margin-bottom: 0;
+  /*
+   * 「更多」面板展開時浮在遊戲畫面的下方中央（4 欄 × 3 列），不佔用訊息列與按鍵列的高度，
+   * 矮視窗（高度 390px）下也放得進去。
+   */
+  .touch-more {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    justify-self: center;
+    z-index: 2;
+    width: max-content;
+    grid-template-columns: repeat(4, 56px);
+    margin: 0 0 8px;
+    padding: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
   }
 
-  .touch-tool .touch-button {
+  .touch-more .touch-button {
     min-width: 0;
     min-height: 44px;
     width: 56px;

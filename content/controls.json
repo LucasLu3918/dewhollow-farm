@@ -75,5 +75,6 @@
     "placeDecor": { "label": "擺放", "name": "在小屋擺放裝飾" },
     "wear": { "label": "穿", "name": "穿上衣服或帽子" },
     "takeOff": { "label": "脫", "name": "脫下衣服或帽子" }
-  }
+  },
+  "touchMore": { "label": "更多", "name": "更多動作：技能、居民、圖鑑、委託、存檔與工具" }
 }

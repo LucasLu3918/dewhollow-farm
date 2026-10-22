@@ -111,7 +111,8 @@ test('Maomao in the village uses the real image and stands on his tile', async (
   await expect(page.locator('#hud-log')).not.toContainText('素材載入失敗');
 });
 
-test('crops and tiles still use their placeholders at 64 px', async ({ page }) => {
+test('terrain and object tiles use their 2x masters (128 px), shown at 64 px', async ({ page }) => {
   await waitForGame(page);
-  expect(await textureSize(page, 'tile.grass')).toEqual({ width: 64, height: 64 });
+  expect(await textureSize(page, 'tile.grass')).toEqual({ width: 128, height: 128 });
+  expect(await textureSize(page, 'tile.tree')).toEqual({ width: 128, height: 128 });
 });

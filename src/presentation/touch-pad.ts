@@ -9,10 +9,11 @@ import type { TouchMode } from '../domain/settings';
  */
 
 /**
- * move 是方向鍵組（十字排列，按住會連續移動）；act 是動作鍵組；
- * tool 是直接拿工具與小屋動作（擺放、穿上、脫下）的組。
+ * move 是方向鍵組（十字排列，按住會連續移動）；act 是常用的動作鍵組，永遠看得到；
+ * menu 是次要的選單（技能、居民、圖鑑、委託、存檔）與 tool 是直接拿工具與小屋動作（擺放、穿上、脫下），
+ * 兩組都收在「更多」裡，按了才展開，讓遊戲畫面能佔住手機的大部分高度。
  */
-export type TouchGroup = 'move' | 'act' | 'tool';
+export type TouchGroup = 'move' | 'act' | 'menu' | 'tool';
 
 /** 虛擬按鍵的排版：哪個動作放在哪一組，陣列順序即畫面順序。 */
 export const TOUCH_LAYOUT = [
@@ -23,11 +24,11 @@ export const TOUCH_LAYOUT = [
   { action: 'interact', group: 'act' },
   { action: 'cycleTool', group: 'act' },
   { action: 'cycleSeed', group: 'act' },
-  { action: 'skills', group: 'act' },
-  { action: 'residents', group: 'act' },
-  { action: 'collection', group: 'act' },
-  { action: 'quests', group: 'act' },
-  { action: 'manualSave', group: 'act' },
+  { action: 'skills', group: 'menu' },
+  { action: 'residents', group: 'menu' },
+  { action: 'collection', group: 'menu' },
+  { action: 'quests', group: 'menu' },
+  { action: 'manualSave', group: 'menu' },
   { action: 'takeAxe', group: 'tool' },
   { action: 'takePick', group: 'tool' },
   { action: 'takeRod', group: 'tool' },

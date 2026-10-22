@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cameraBounds, deadzoneOf } from './camera';
+import { PORTRAIT_TOUCH_ZOOM, cameraBounds, deadzoneOf, mapZoomFor } from './camera';
 
 const view = { width: 1024, height: 768 };
 
@@ -26,5 +26,18 @@ describe('cameraBounds', () => {
 describe('deadzoneOf', () => {
   it('is a fraction of the view so the camera only moves near the edges', () => {
     expect(deadzoneOf(view)).toEqual({ width: 256, height: 192 });
+  });
+});
+
+describe('mapZoomFor', () => {
+  it('zooms in on a narrow touch screen held upright', () => {
+    expect(mapZoomFor({ width: 375, coarse: true, portrait: true })).toBe(PORTRAIT_TOUCH_ZOOM);
+    expect(PORTRAIT_TOUCH_ZOOM).toBeGreaterThan(1);
+  });
+
+  it('stays at 1x on a mouse, on landscape, and on a wide screen', () => {
+    expect(mapZoomFor({ width: 375, coarse: false, portrait: true })).toBe(1);
+    expect(mapZoomFor({ width: 844, coarse: true, portrait: false })).toBe(1);
+    expect(mapZoomFor({ width: 1024, coarse: true, portrait: true })).toBe(1);
   });
 });

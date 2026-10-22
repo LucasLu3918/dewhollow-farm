@@ -128,7 +128,17 @@ describe('loadContent with shipped content', () => {
 describe('loadContent with rigs', () => {
   it('returns the rigs beside the assets', () => {
     const loaded = loadContent(shipped());
-    expect(loaded.rigs.rigs.map((r) => r.id)).toEqual(['player', 'maomao', 'cat', 'marsupial']);
+    expect(loaded.rigs.rigs.map((r) => r.id)).toEqual([
+      'player',
+      'maomao',
+      'cat',
+      'marsupial',
+      'rong-bo',
+      'a-gan',
+      'shi-shifu',
+      'zhi-lan',
+      'xiao-sui',
+    ]);
     expect(loaded.companions.companions.map((c) => c.id)).toEqual(['cat', 'marsupial']);
   });
 

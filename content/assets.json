@@ -5,49 +5,65 @@
       "id": "tile.grass",
       "kind": "tile",
       "color": "#7fae6b",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，無縫接圖、縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/grass-2x.png",
+      "density": 2
     },
     {
       "id": "tile.field",
       "kind": "tile",
       "color": "#8a6a48",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，無縫接圖、縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/field-2x.png",
+      "density": 2
     },
     {
       "id": "tile.path",
       "kind": "tile",
       "color": "#c9b38a",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，無縫接圖、縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/path-2x.png",
+      "density": 2
     },
     {
       "id": "tile.wall",
       "kind": "tile",
       "color": "#5c5a63",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，無縫接圖、縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/wall-2x.png",
+      "density": 2
     },
     {
       "id": "tile.bed",
       "kind": "object",
       "color": "#c97f8f",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/bed-2x.png",
+      "density": 2
     },
     {
       "id": "tile.shipbox",
       "kind": "object",
       "color": "#a0764e",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/shipbox-2x.png",
+      "density": 2
     },
     {
       "id": "tile.door",
       "kind": "tile",
       "color": "#e0b25c",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/door-2x.png",
+      "density": 2
     },
     {
       "id": "tile.soil",
       "kind": "overlay",
       "color": "#5e4330",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，無縫接圖、縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/soil-2x.png",
+      "density": 2
     },
     {
       "id": "crop.sweet-radish",
@@ -146,31 +162,41 @@
       "id": "npc.rong-bo",
       "kind": "character",
       "color": "#8a6d3b",
-      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101（提示詞 npc-rong-bo-v2），綠幕去背、縮放並量化到 content/palette.json（tools/art/finalize.py）；設定見 docs/art/character-briefs.md",
+      "file": "assets/characters/npc-rong-bo-2x.png",
+      "density": 2
     },
     {
       "id": "npc.a-gan",
       "kind": "character",
       "color": "#e0a040",
-      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101（提示詞 npc-a-gan-v2），綠幕去背、縮放並量化到 content/palette.json（tools/art/finalize.py）；設定見 docs/art/character-briefs.md",
+      "file": "assets/characters/npc-a-gan-2x.png",
+      "density": 2
     },
     {
       "id": "npc.shi-shifu",
       "kind": "character",
       "color": "#6b6f78",
-      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101（提示詞 npc-shi-shifu-v2），綠幕去背、縮放並量化到 content/palette.json（tools/art/finalize.py）；設定見 docs/art/character-briefs.md",
+      "file": "assets/characters/npc-shi-shifu-2x.png",
+      "density": 2
     },
     {
       "id": "npc.zhi-lan",
       "kind": "character",
       "color": "#5f9e6e",
-      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101（提示詞 npc-zhi-lan-v2），綠幕去背、縮放並量化到 content/palette.json（tools/art/finalize.py）；設定見 docs/art/character-briefs.md",
+      "file": "assets/characters/npc-zhi-lan-2x.png",
+      "density": 2
     },
     {
       "id": "npc.xiao-sui",
       "kind": "character",
       "color": "#e8c3a0",
-      "source": "占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101（提示詞 npc-xiao-sui-v2），綠幕去背、縮放並量化到 content/palette.json（tools/art/finalize.py）；設定見 docs/art/character-briefs.md",
+      "file": "assets/characters/npc-xiao-sui-2x.png",
+      "density": 2
     },
     {
       "id": "crop.dew-grass",
@@ -234,37 +260,49 @@
       "id": "tile.tree",
       "kind": "tile",
       "color": "#2f5a36",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/tree-2x.png",
+      "density": 2
     },
     {
       "id": "tile.water",
       "kind": "tile",
       "color": "#3f7fb5",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，無縫接圖、縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/water-2x.png",
+      "density": 2
     },
     {
       "id": "tile.floor",
       "kind": "tile",
       "color": "#b98a5e",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101（提示詞 tile-floor-v3，無縫接圖），縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/floor-2x.png",
+      "density": 2
     },
     {
       "id": "tile.furniture",
       "kind": "tile",
       "color": "#7a5a3c",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/furniture-2x.png",
+      "density": 2
     },
     {
       "id": "tile.cave",
       "kind": "tile",
       "color": "#2a2630",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/cave-2x.png",
+      "density": 2
     },
     {
       "id": "tile.rock",
       "kind": "tile",
       "color": "#6e6a66",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/rock-2x.png",
+      "density": 2
     },
     {
       "id": "tool.axe",
@@ -278,13 +316,17 @@
       "id": "tile.shop",
       "kind": "tile",
       "color": "#8a5a3a",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/shop-2x.png",
+      "density": 2
     },
     {
       "id": "tile.forage",
       "kind": "tile",
       "color": "#8fc46a",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/forage-2x.png",
+      "density": 2
     },
     {
       "id": "tool.pick",
@@ -298,13 +340,17 @@
       "id": "tile.ore",
       "kind": "tile",
       "color": "#9a6b3a",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/ore-2x.png",
+      "density": 2
     },
     {
       "id": "tile.stairs",
       "kind": "tile",
       "color": "#5c5a66",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/stairs-2x.png",
+      "density": 2
     },
     {
       "id": "tool.rod",
@@ -318,31 +364,41 @@
       "id": "tile.trough",
       "kind": "tile",
       "color": "#7a6a4a",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/trough-2x.png",
+      "density": 2
     },
     {
       "id": "tile.kitchen",
       "kind": "tile",
       "color": "#5a4a3a",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/kitchen-2x.png",
+      "density": 2
     },
     {
       "id": "tile.workshop",
       "kind": "tile",
       "color": "#6a5a3c",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/workshop-2x.png",
+      "density": 2
     },
     {
       "id": "tile.workbench",
       "kind": "tile",
       "color": "#6b4f32",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/workbench-2x.png",
+      "density": 2
     },
     {
       "id": "tile.tuft",
       "kind": "tile",
       "color": "#5f8a4c",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/tuft-2x.png",
+      "density": 2
     },
     {
       "id": "tool.sickle",
@@ -356,7 +412,9 @@
       "id": "tile.fence",
       "kind": "tile",
       "color": "#8b6f47",
-      "source": "占位（程式產生）"
+      "source": "本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，單格縮放並量化到 content/palette.json（tools/art/tile_finalize.py）；提示詞見 docs/art/scene-briefs.md",
+      "file": "assets/tiles/fence-2x.png",
+      "density": 2
     },
     {
       "id": "animal.cow",

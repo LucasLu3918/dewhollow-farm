@@ -113,3 +113,18 @@ Bright saturated hand-painted cartoon style, thick dark brown outline, soft high
 - 寵物：棕灰色、圓臉、小耳朵的小型有袋動物（名字待補）。
 
 提示詞待小涵定稿、風格鎖定後，用同一模板與同一組風格詞產生。
+
+## 村裡的 NPC（2026-10-22）
+
+五位 NPC 原本只有色塊，這次依 `content/npcs.json` 的名字與職務重新設計（原創角色，不參考任何既有作品）。提示詞沿用角色的綠幕風格後綴（見上方試驗紀錄），seed 101 為採用結果；候選 seed 202 留在 `private/art-trials/v2/`。
+
+| id | 名稱 | 職務 | 外型重點 | 提示詞 |
+| --- | --- | --- | --- | --- |
+| rong-bo | 榕伯 | 鎮長 | 白髮、白鬍、圓框眼鏡，墨綠背心，手拿棕色筆記本 | npc-rong-bo-v2 |
+| a-gan | 阿柑 | 雜貨店 | 短鮑伯、橘色髮夾，橘黃圍裙配深藍裙 | npc-a-gan-v2 |
+| shi-shifu | 石師傅 | 鐵匠 | 灰色頭巾、粗壯、棕色皮圍裙，手拿小鐵鎚 | npc-shi-shifu-v2 |
+| zhi-lan | 芷蘭 | 藥草師 | 單側長辮，鼠尾草綠披肩，手上提著裝藥草的籃子 | npc-zhi-lan-v2 |
+| xiao-sui | 小穗 | 麵包師 | 奶油色頭巾與圓髮髻，粉色裙配白圍裙，提麵包籃 | npc-xiao-sui-v2 |
+
+入庫：`content/assets.json` 的 `npc.<id>`（128×160 的 2x 母版，0.5 倍顯示成 64×80）與 `content/rigs.json` 的單張精靈條目（`kind: single`）。
+

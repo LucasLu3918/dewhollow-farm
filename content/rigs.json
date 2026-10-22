@@ -12,6 +12,11 @@
     },
     { "id": "maomao", "kind": "single", "textureSize": { "width": 128, "height": 160 }, "asset": "npc.maomao" },
     { "id": "cat", "kind": "hop", "textureSize": { "width": 96, "height": 96 }, "asset": "pet.cat" },
-    { "id": "marsupial", "kind": "hop", "textureSize": { "width": 96, "height": 96 }, "asset": "pet.marsupial" }
+    { "id": "marsupial", "kind": "hop", "textureSize": { "width": 96, "height": 96 }, "asset": "pet.marsupial" },
+    { "id": "rong-bo", "kind": "single", "textureSize": { "width": 128, "height": 160 }, "asset": "npc.rong-bo" },
+    { "id": "a-gan", "kind": "single", "textureSize": { "width": 128, "height": 160 }, "asset": "npc.a-gan" },
+    { "id": "shi-shifu", "kind": "single", "textureSize": { "width": 128, "height": 160 }, "asset": "npc.shi-shifu" },
+    { "id": "zhi-lan", "kind": "single", "textureSize": { "width": 128, "height": 160 }, "asset": "npc.zhi-lan" },
+    { "id": "xiao-sui", "kind": "single", "textureSize": { "width": 128, "height": 160 }, "asset": "npc.xiao-sui" }
   ]
 }

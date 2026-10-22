@@ -51,7 +51,13 @@ describe('virtual pad layout', () => {
   });
 
   it('only uses known groups', () => {
-    for (const button of TOUCH_BUTTONS) expect(['move', 'act', 'tool']).toContain(button.group);
+    for (const button of TOUCH_BUTTONS) expect(['move', 'act', 'menu', 'tool']).toContain(button.group);
+  });
+
+  it('keeps the everyday keys visible and folds the menus and tool grabs into the more panel', () => {
+    const groupOf = (action: string) => TOUCH_BUTTONS.find((b) => b.action === action)?.group;
+    for (const action of ['interact', 'cycleTool', 'cycleSeed']) expect(groupOf(action)).toBe('act');
+    for (const action of ['skills', 'residents', 'collection', 'quests', 'manualSave']) expect(groupOf(action)).toBe('menu');
   });
 
   it('gives every button a unique label and a unique screen-reader name', () => {
