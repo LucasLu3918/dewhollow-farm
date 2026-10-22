@@ -5,8 +5,8 @@ import { ACTION_IDS, DEFAULT_BINDINGS, bindingsAreValid, type ActionId, type Bin
  * 偏好與存檔分開存放，不進 GameState，所以改偏好不需要升級存檔版本。
  */
 
-/** 偏好的格式版本。格式不同時整份回到預設值（不嘗試猜測舊欄位）。 */
-export const SETTINGS_SCHEMA_VERSION = 1;
+/** 偏好的格式版本；v1 為舊版平面欄位，v2 將偏好放入 version envelope。 */
+export const SETTINGS_SCHEMA_VERSION = 2;
 
 export const FONT_SIZES = ['standard', 'large', 'xlarge'] as const;
 export type FontSize = (typeof FONT_SIZES)[number];
@@ -14,6 +14,25 @@ export type FontSize = (typeof FONT_SIZES)[number];
 /** 觸控按鍵：auto 在觸控裝置顯示，on 一律顯示，off 一律隱藏。 */
 export const TOUCH_MODES = ['auto', 'on', 'off'] as const;
 export type TouchMode = (typeof TOUCH_MODES)[number];
+
+export const HANDEDNESSES = ['right', 'left'] as const;
+export type Handedness = (typeof HANDEDNESSES)[number];
+
+export const CONTROL_STYLES = ['dpad', 'fixed-joystick', 'floating-joystick'] as const;
+export type ControlStyle = (typeof CONTROL_STYLES)[number];
+
+export const BUTTON_SCALES = ['small', 'standard', 'large'] as const;
+export type ButtonScale = (typeof BUTTON_SCALES)[number];
+
+export const CONTROLS_PLACEMENTS = ['external', 'overlay'] as const;
+export type ControlsPlacement = (typeof CONTROLS_PLACEMENTS)[number];
+
+export interface MobileSettings {
+  handedness: Handedness;
+  controlStyle: ControlStyle;
+  buttonScale: ButtonScale;
+  controlsPlacement: ControlsPlacement;
+}
 
 export interface EffectToggles {
   /** 鏡頭震動（命中工具時）。 */
@@ -30,6 +49,7 @@ export interface Settings {
   colorblind: boolean;
   effects: EffectToggles;
   touchControls: TouchMode;
+  mobile: MobileSettings;
 }
 
 /** 回傳預設偏好的新副本（呼叫端改它不會影響預設值）。 */
@@ -40,6 +60,13 @@ export function defaultSettings(): Settings {
     colorblind: false,
     effects: { shake: true, flash: true, particles: true },
     touchControls: 'auto',
+    // Preserve the existing layout: right-hand action buttons, D-pad, normal size, outside the canvas.
+    mobile: {
+      handedness: 'right',
+      controlStyle: 'dpad',
+      buttonScale: 'standard',
+      controlsPlacement: 'external',
+    },
   };
 }
 
@@ -53,9 +80,13 @@ function isObject(value: unknown): value is Record<string, unknown> {
  */
 export function sanitizeSettings(raw: unknown): Settings {
   const base = defaultSettings();
-  if (!isObject(raw) || raw.schemaVersion !== SETTINGS_SCHEMA_VERSION) return base;
+  if (!isObject(raw)) return base;
 
-  const rawBindings = raw.bindings;
+  // v1 stored preference fields beside schemaVersion. v2 stores them in an explicit payload envelope.
+  const fields = raw.schemaVersion === 1 ? raw : raw.schemaVersion === SETTINGS_SCHEMA_VERSION && isObject(raw.settings) ? raw.settings : null;
+  if (!fields) return base;
+
+  const rawBindings = fields.bindings;
   if (isObject(rawBindings)) {
     // 只取認得的動作，多出來的欄位直接丟掉。
     const table: Partial<Record<ActionId, string>> = {};
@@ -65,17 +96,36 @@ export function sanitizeSettings(raw: unknown): Settings {
     }
     if (bindingsAreValid(table)) base.bindings = table as Bindings;
   }
-  if (typeof raw.fontSize === 'string' && (FONT_SIZES as readonly string[]).includes(raw.fontSize)) {
-    base.fontSize = raw.fontSize as FontSize;
+  if (typeof fields.fontSize === 'string' && (FONT_SIZES as readonly string[]).includes(fields.fontSize)) {
+    base.fontSize = fields.fontSize as FontSize;
   }
-  if (typeof raw.colorblind === 'boolean') base.colorblind = raw.colorblind;
-  if (isObject(raw.effects)) {
-    if (typeof raw.effects.shake === 'boolean') base.effects.shake = raw.effects.shake;
-    if (typeof raw.effects.flash === 'boolean') base.effects.flash = raw.effects.flash;
-    if (typeof raw.effects.particles === 'boolean') base.effects.particles = raw.effects.particles;
+  if (typeof fields.colorblind === 'boolean') base.colorblind = fields.colorblind;
+  if (isObject(fields.effects)) {
+    if (typeof fields.effects.shake === 'boolean') base.effects.shake = fields.effects.shake;
+    if (typeof fields.effects.flash === 'boolean') base.effects.flash = fields.effects.flash;
+    if (typeof fields.effects.particles === 'boolean') base.effects.particles = fields.effects.particles;
   }
-  if (typeof raw.touchControls === 'string' && (TOUCH_MODES as readonly string[]).includes(raw.touchControls)) {
-    base.touchControls = raw.touchControls as TouchMode;
+  if (typeof fields.touchControls === 'string' && (TOUCH_MODES as readonly string[]).includes(fields.touchControls)) {
+    base.touchControls = fields.touchControls as TouchMode;
+  }
+  if (isObject(fields.mobile)) {
+    if (typeof fields.mobile.handedness === 'string' && (HANDEDNESSES as readonly string[]).includes(fields.mobile.handedness)) {
+      base.mobile.handedness = fields.mobile.handedness as Handedness;
+    }
+    if (typeof fields.mobile.controlStyle === 'string' && (CONTROL_STYLES as readonly string[]).includes(fields.mobile.controlStyle)) {
+      base.mobile.controlStyle = fields.mobile.controlStyle as ControlStyle;
+    }
+    if (typeof fields.mobile.buttonScale === 'string' && (BUTTON_SCALES as readonly string[]).includes(fields.mobile.buttonScale)) {
+      base.mobile.buttonScale = fields.mobile.buttonScale as ButtonScale;
+    }
+    if (typeof fields.mobile.controlsPlacement === 'string' && (CONTROLS_PLACEMENTS as readonly string[]).includes(fields.mobile.controlsPlacement)) {
+      base.mobile.controlsPlacement = fields.mobile.controlsPlacement as ControlsPlacement;
+    }
   }
   return base;
+}
+
+/** 未知未來格式必須保持唯讀，避免新版資料被舊版的安全預設值覆寫。 */
+export function isFutureSettingsVersion(raw: unknown): boolean {
+  return isObject(raw) && typeof raw.schemaVersion === 'number' && Number.isInteger(raw.schemaVersion) && raw.schemaVersion > SETTINGS_SCHEMA_VERSION;
 }

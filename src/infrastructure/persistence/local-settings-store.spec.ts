@@ -25,13 +25,14 @@ describe('LocalSettingsStore', () => {
     expect(store.get()).toEqual(defaultSettings());
   });
 
-  it('reads back what it wrote, including a custom key and the schema version', () => {
+  it('reads back the versioned envelope it wrote, including a custom key', () => {
     const storage = fakeStorage();
     const store = new LocalSettingsStore(() => storage);
     const changed = { ...defaultSettings(), fontSize: 'large' as const, colorblind: true, bindings: { ...DEFAULT_BINDINGS, interact: 'e', wear: 'x' } };
     expect(store.set(changed)).toBe(true);
-    const raw = JSON.parse(storage.data.get(SETTINGS_STORAGE_KEY) ?? 'null') as { schemaVersion: number };
+    const raw = JSON.parse(storage.data.get(SETTINGS_STORAGE_KEY) ?? 'null') as { schemaVersion: number; settings: unknown };
     expect(raw.schemaVersion).toBe(SETTINGS_SCHEMA_VERSION);
+    expect(raw.settings).toEqual(changed);
     expect(new LocalSettingsStore(() => storage).get()).toEqual(changed);
   });
 
@@ -41,8 +42,47 @@ describe('LocalSettingsStore', () => {
   });
 
   it('falls back to the defaults when the stored shape is wrong', () => {
-    const store = new LocalSettingsStore(() => fakeStorage({ [SETTINGS_STORAGE_KEY]: JSON.stringify({ schemaVersion: 1, fontSize: 42 }) }));
+    const store = new LocalSettingsStore(() => fakeStorage({ [SETTINGS_STORAGE_KEY]: JSON.stringify({ schemaVersion: 2, settings: { fontSize: 42 } }) }));
     expect(store.get().fontSize).toBe('standard');
+  });
+
+  it('migrates a flat v1 record and writes v2 on the next preference update', () => {
+    const storage = fakeStorage({
+      [SETTINGS_STORAGE_KEY]: JSON.stringify({
+        schemaVersion: 1,
+        bindings: { ...DEFAULT_BINDINGS, interact: 'e', wear: 'x' },
+        fontSize: 'large',
+        colorblind: true,
+        effects: { shake: false, flash: true, particles: false },
+        touchControls: 'off',
+      }),
+    });
+    const store = new LocalSettingsStore(() => storage);
+
+    const migrated = store.get();
+    expect(migrated).toMatchObject({
+      bindings: { ...DEFAULT_BINDINGS, interact: 'e', wear: 'x' },
+      fontSize: 'large',
+      colorblind: true,
+      effects: { shake: false, flash: true, particles: false },
+      touchControls: 'off',
+    });
+    expect(store.set({ ...migrated, mobile: { ...migrated.mobile, handedness: 'left' } })).toBe(true);
+
+    const saved = JSON.parse(storage.data.get(SETTINGS_STORAGE_KEY) ?? 'null') as { schemaVersion: number; settings: { fontSize: string } };
+    expect(saved.schemaVersion).toBe(SETTINGS_SCHEMA_VERSION);
+    expect(saved.settings.fontSize).toBe('large');
+  });
+
+  it('does not overwrite an unknown future version, even after a user changes settings', () => {
+    const original = JSON.stringify({ schemaVersion: 99, settings: { fontSize: 'xlarge', unknown: true } });
+    const storage = fakeStorage({ [SETTINGS_STORAGE_KEY]: original });
+    const store = new LocalSettingsStore(() => storage);
+    const current = store.get();
+
+    expect(current).toEqual(defaultSettings());
+    expect(store.set({ ...current, fontSize: 'large' })).toBe(false);
+    expect(storage.data.get(SETTINGS_STORAGE_KEY)).toBe(original);
   });
 
   it('falls back to the defaults, and does not throw, when reading the storage throws', () => {
@@ -66,7 +106,9 @@ describe('LocalSettingsStore', () => {
   it('never writes save-game data: the stored record only holds settings fields', () => {
     const storage = fakeStorage();
     new LocalSettingsStore(() => storage).set(defaultSettings());
-    const raw = JSON.parse(storage.data.get(SETTINGS_STORAGE_KEY) ?? 'null') as Record<string, unknown>;
-    expect(Object.keys(raw).sort()).toEqual(['bindings', 'colorblind', 'effects', 'fontSize', 'schemaVersion', 'touchControls']);
+    const raw = JSON.parse(storage.data.get(SETTINGS_STORAGE_KEY) ?? 'null') as { schemaVersion: number; settings: Record<string, unknown> };
+    expect(Object.keys(raw).sort()).toEqual(['schemaVersion', 'settings']);
+    expect(Object.keys(raw.settings).sort()).toEqual(['bindings', 'colorblind', 'effects', 'fontSize', 'mobile', 'touchControls']);
+    expect(raw.schemaVersion).toBe(SETTINGS_SCHEMA_VERSION);
   });
 });

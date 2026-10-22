@@ -1,5 +1,5 @@
 import type { SettingsStore } from '../../application/settings';
-import { SETTINGS_SCHEMA_VERSION, defaultSettings, sanitizeSettings, type Settings } from '../../domain/settings';
+import { SETTINGS_SCHEMA_VERSION, defaultSettings, isFutureSettingsVersion, sanitizeSettings, type Settings } from '../../domain/settings';
 
 /** localStorage 裡偏好的鍵。只放偏好，不放存檔。 */
 export const SETTINGS_STORAGE_KEY = 'dewhollow-farm.settings';
@@ -25,15 +25,20 @@ export function browserStorage(): StringStorage | null {
  * 每次讀寫都包 try/catch：讀不到、格式錯誤或儲存被封鎖時，讀取回傳預設值，寫入回傳 false，都不丟例外。
  */
 export class LocalSettingsStore implements SettingsStore {
+  private futureVersionReadOnly = false;
+
   constructor(private readonly storage: () => StringStorage | null = browserStorage) {}
 
   get(): Settings {
+    this.futureVersionReadOnly = false;
     try {
       const storage = this.storage();
       if (!storage) return defaultSettings();
       const raw = storage.getItem(SETTINGS_STORAGE_KEY);
       if (raw === null) return defaultSettings();
-      return sanitizeSettings(JSON.parse(raw));
+      const record: unknown = JSON.parse(raw);
+      this.futureVersionReadOnly = isFutureSettingsVersion(record);
+      return sanitizeSettings(record);
     } catch {
       return defaultSettings();
     }
@@ -43,7 +48,21 @@ export class LocalSettingsStore implements SettingsStore {
     try {
       const storage = this.storage();
       if (!storage) return false;
-      storage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ schemaVersion: SETTINGS_SCHEMA_VERSION, ...settings }));
+      if (this.futureVersionReadOnly) return false;
+
+      // SettingsService reads once at construction, but also guard direct store use and external updates.
+      const existing = storage.getItem(SETTINGS_STORAGE_KEY);
+      if (existing !== null) {
+        try {
+          if (isFutureSettingsVersion(JSON.parse(existing) as unknown)) {
+            this.futureVersionReadOnly = true;
+            return false;
+          }
+        } catch {
+          // Malformed data can be replaced by a valid v2 record after the player explicitly changes a setting.
+        }
+      }
+      storage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ schemaVersion: SETTINGS_SCHEMA_VERSION, settings }));
       return true;
     } catch {
       return false;

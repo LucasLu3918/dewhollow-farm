@@ -4,7 +4,6 @@ import { expect, test, type Page } from '@playwright/test';
  * 無障礙（M7）：設定面板的改按鍵（衝突詢問與交換、Esc 取消、Esc 不能指派）、恢復預設、字級三檔、
  * 色盲標記、閃光與震動開關，以及偏好在重新整理後保留（偏好存在 localStorage，不進存檔）。
  * 注意：按鍵前要等場景建立好（window.__dewhollow 出現）；換字級等設定會立刻套用，不需要重新整理。
- * 本檔尚未執行（依任務規定，不跑 npm run test:e2e）。
  */
 
 const SETTINGS_KEY = 'dewhollow-farm.settings';
@@ -30,6 +29,10 @@ async function storedSettings(page: Page): Promise<Record<string, unknown> | nul
     const raw = window.localStorage.getItem(key);
     return raw === null ? null : (JSON.parse(raw) as Record<string, unknown>);
   }, SETTINGS_KEY);
+}
+
+function settingsPayload(record: Record<string, unknown> | null): Record<string, unknown> | null {
+  return record?.settings && typeof record.settings === 'object' ? (record.settings as Record<string, unknown>) : null;
 }
 
 test.describe('按鍵重新綁定', () => {
@@ -61,7 +64,8 @@ test.describe('按鍵重新綁定', () => {
     await expect(keyRow(page, '互動').locator('kbd')).toHaveText('Z');
     await expect(keyRow(page, '切換工具').locator('kbd')).toHaveText('X');
     const saved = await storedSettings(page);
-    expect(saved?.schemaVersion).toBe(1);
+    expect(saved?.schemaVersion).toBe(2);
+    expect((settingsPayload(saved)?.bindings as Record<string, unknown>).interact).toBe('z');
   });
 
   test('衝突時取消交換，兩者都維持原來的按鍵', async ({ page }) => {
@@ -120,7 +124,7 @@ test.describe('字級、色盲模式與閃光震動', () => {
       .poll(() => page.evaluate(() => document.documentElement.style.getPropertyValue('--font-scale')))
       .toBe('1.5');
     const saved = await storedSettings(page);
-    expect(saved?.fontSize).toBe('xlarge');
+    expect(settingsPayload(saved)?.fontSize).toBe('xlarge');
   });
 
   test('色盲模式打開後，訊息前面加上 ✓ 或 ✕ 的文字標記', async ({ page }) => {
@@ -143,8 +147,49 @@ test.describe('字級、色盲模式與閃光震動', () => {
     await expect(page.locator('#settings-particles')).toBeChecked();
     await page.locator('#settings-shake').uncheck();
     const saved = await storedSettings(page);
-    expect((saved?.effects as { shake: boolean }).shake).toBe(false);
-    expect((saved?.effects as { particles: boolean }).particles).toBe(true);
+    expect((settingsPayload(saved)?.effects as { shake: boolean }).shake).toBe(false);
+    expect((settingsPayload(saved)?.effects as { particles: boolean }).particles).toBe(true);
+  });
+
+  test('v1 preferences survive migration when a new preference is saved', async ({ page }) => {
+    await page.addInitScript(
+      ({ key }) => {
+        window.localStorage.setItem(key, JSON.stringify({
+          schemaVersion: 1,
+          fontSize: 'large',
+          colorblind: true,
+          effects: { shake: false, flash: true, particles: false },
+          touchControls: 'off',
+        }));
+      },
+      { key: SETTINGS_KEY },
+    );
+    await startGame(page);
+    await openSettings(page);
+    await page.locator('#settings-font button', { hasText: /^特大$/ }).click();
+
+    const record = await storedSettings(page);
+    expect(record?.schemaVersion).toBe(2);
+    expect(settingsPayload(record)).toMatchObject({
+      fontSize: 'xlarge',
+      colorblind: true,
+      effects: { shake: false, flash: true, particles: false },
+      touchControls: 'off',
+    });
+  });
+
+  test('a future settings version remains untouched and reports that changes are not saved', async ({ page }) => {
+    const future = JSON.stringify({ schemaVersion: 99, settings: { fontSize: 'xlarge', futureField: true } });
+    await page.addInitScript(
+      ({ key, value }) => window.localStorage.setItem(key, value),
+      { key: SETTINGS_KEY, value: future },
+    );
+    await startGame(page);
+    await openSettings(page);
+    await page.locator('#settings-font button', { hasText: /^大$/ }).click();
+
+    await expect(page.locator('#settings-message')).toContainText('無法儲存設定');
+    expect(await page.evaluate((key) => window.localStorage.getItem(key), SETTINGS_KEY)).toBe(future);
   });
 
   test('系統開啟「減少動態」時，說明會寫出效果已全部關閉', async ({ page }) => {
