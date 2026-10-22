@@ -1,6 +1,6 @@
 import type { SettingsService } from '../application/settings';
 import { ACTION_IDS, assignKey, bindableKeyProblem, keyLabel, normalizeKey, resetBindings, type ActionId, type Bindings } from '../domain/keybindings';
-import { FONT_SIZES, TOUCH_MODES, type FontSize, type Settings, type TouchMode } from '../domain/settings';
+import { CONTROLS_PLACEMENTS, FONT_SIZES, TOUCH_MODES, type ControlsPlacement, type FontSize, type Settings, type TouchMode } from '../domain/settings';
 import { FONT_SIZE_LABELS } from './accessibility';
 import { prefersReducedMotion } from './motion';
 import { PanelDialog } from './panel-dialog';
@@ -15,6 +15,7 @@ const TOUCH_LABELS: Record<TouchMode, string> = {
   on: '一律顯示',
   off: '隱藏',
 };
+const PLACEMENT_LABELS: Record<ControlsPlacement, string> = { external: '畫面外（不遮住遊戲）', overlay: '覆蓋於畫面邊緣' };
 
 /**
  * 設定面板（DOM）：改按鍵、字級、色盲模式、閃光與震動、觸控按鍵。
@@ -34,6 +35,7 @@ export class SettingsPanel {
   private readonly particles: HTMLInputElement;
   private readonly reduced: HTMLElement;
   private readonly touch: HTMLSelectElement;
+  private readonly placement: HTMLSelectElement;
   private readonly dialog: PanelDialog;
   private capturing: ActionId | null = null;
   private pendingSwap: { action: ActionId; key: string; conflict: ActionId } | null = null;
@@ -57,6 +59,7 @@ export class SettingsPanel {
     this.particles = required<HTMLInputElement>(doc, '#settings-particles');
     this.reduced = required(doc, '#settings-reduced');
     this.touch = required<HTMLSelectElement>(doc, '#settings-touch');
+    this.placement = required<HTMLSelectElement>(doc, '#settings-placement');
 
     required(doc, '#settings-close').addEventListener('click', () => this.close());
     required(doc, '#settings-reset').addEventListener('click', () => this.restoreDefaults());
@@ -77,9 +80,15 @@ export class SettingsPanel {
     this.flash.addEventListener('change', () => this.setEffect('flash', this.flash.checked));
     this.particles.addEventListener('change', () => this.setEffect('particles', this.particles.checked));
     this.touch.addEventListener('change', () => this.save({ touchControls: this.touch.value as TouchMode }, '已更新虛擬按鍵的設定。'));
+    this.placement.addEventListener('change', () => {
+      const saved = this.service.update({ mobile: { controlsPlacement: this.placement.value as ControlsPlacement } });
+      this.say(saved ? '已更新觸控按鍵版位。' : `已更新觸控按鍵版位。${SAVE_FAILED}`);
+      this.render();
+    });
 
     this.buildFontChoices();
     this.buildTouchOptions();
+    this.buildPlacementOptions();
     this.render();
   }
 
@@ -226,6 +235,15 @@ export class SettingsPanel {
     }
   }
 
+  private buildPlacementOptions(): void {
+    for (const placement of CONTROLS_PLACEMENTS) {
+      const option = this.doc.createElement('option');
+      option.value = placement;
+      option.textContent = PLACEMENT_LABELS[placement];
+      this.placement.append(option);
+    }
+  }
+
   /**
    * 依目前的偏好重畫整個面板（按鍵列表、字級按鈕、勾選框與交換提示）。
    * 經過 dialog.redraw：重畫前記下焦點，按鍵列表重建後焦點回到同一個動作的「改鍵」按鈕（data-focus-key）。
@@ -247,6 +265,7 @@ export class SettingsPanel {
     this.flash.checked = settings.effects.flash;
     this.particles.checked = settings.effects.particles;
     this.touch.value = settings.touchControls;
+    this.placement.value = settings.mobile.controlsPlacement;
     this.reduced.textContent = prefersReducedMotion()
       ? '系統的「減少動態」已開啟，閃光、震動與粒子效果會一律關閉。'
       : '這些效果在系統開啟「減少動態」時會一律關閉。';

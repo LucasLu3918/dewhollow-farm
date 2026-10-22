@@ -37,6 +37,7 @@ async function areaRatios(page: Page, view: 'down' | 'left'): Promise<number[]> 
   return page.evaluate(async (v) => {
     const debug = window.__dewhollow;
     if (!debug) throw new Error('缺少 window.__dewhollow');
+    const inspect = debug;
     // 只量玩家自己：旁邊的寵物會被起伏的身體遮住不同的面積，混進量測。
     debug.setOthersHidden(true);
     const phases: [number, number][] = [[0, 0], [0, 0.1], [0, 0.2], [0, 0.3], [0, 0.4], [0, 0.5], [0, 0.7], [0, 0.8], [1, 0.25], [1, 0.5], [1, 0.75], [0, 1]];
@@ -49,8 +50,12 @@ async function areaRatios(page: Page, view: 'down' | 'left'): Promise<number[]> 
       canvas.height = 116;
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('沒有 2D context');
-      // 玩家站在畫布 (480, 416)（出生點 (7,9)，鏡頭捲動 (0,224)）
-      ctx.drawImage(img, 416, 316, 128, 116, 0, 0, 128, 116);
+      // 玩家世界座標固定在出生點；相機 viewport 會因安全區與控制版位調整，依當前 camera transform 取樣。
+      const camera = inspect.cameraView();
+      const scroll = inspect.cameraScroll();
+      const playerScreenX = camera.x + (480 - scroll.x) * camera.zoom;
+      const playerScreenY = camera.y + (640 - scroll.y) * camera.zoom;
+      ctx.drawImage(img, playerScreenX - 64, playerScreenY - 100, 128, 116, 0, 0, 128, 116);
       const d = ctx.getImageData(0, 0, 128, 116).data;
       const at = 4 * (128 + 1);
       const bg = [d[at] ?? 0, d[at + 1] ?? 0, d[at + 2] ?? 0];

@@ -58,7 +58,7 @@ import type { SaveRepository } from './application/ports';
 import { SaveSlotService, slotFromQuery } from './application/save-slots';
 import { SettingsService } from './application/settings';
 import { LocalSettingsStore } from './infrastructure/persistence/local-settings-store';
-import { applySettings, isCoarsePointer } from './presentation/apply-settings';
+import { applySettings } from './presentation/apply-settings';
 import { controlsHint } from './presentation/controls-hint';
 import { loadContent } from './infrastructure/content/load-content';
 import { parseControlsContent } from './infrastructure/content/controls-content';
@@ -81,6 +81,7 @@ import { AudioOutput } from './presentation/audio/audio-output';
 import { registerServiceWorker } from './presentation/service-worker';
 import { parsePerfFlag } from './presentation/frame-stats';
 import { startPerfOverlay } from './presentation/perf-overlay';
+import { ResponsiveLayoutController } from './presentation/responsive/responsive-layout';
 
 /** 移除開機載入提示（index.html 的 #game 內）；啟動失敗或讀不開存檔時也用它，免得一直顯示「載入中」。 */
 function hideLoader(): void {
@@ -110,13 +111,24 @@ async function bootstrap(): Promise<void> {
   const audio = new AudioOutput();
   // 玩家偏好（按鍵、字級、色盲模式、閃光與震動、觸控）存在 localStorage，與存檔分開；讀不到就用預設值。
   const settings = new SettingsService(new LocalSettingsStore());
+  const app = document.querySelector<HTMLElement>('.app');
+  const gameHost = document.getElementById('game');
+  if (!app || !gameHost) throw new Error('頁面缺少必要的響應式版面容器');
+  const responsive = new ResponsiveLayoutController(document, app, gameHost, settings.get());
+  responsive.start();
+  settings.onChange((next) => responsive.updateSettings(next));
+  window.addEventListener('pagehide', (event) => {
+    if (!event.persisted) responsive.dispose();
+  });
   const applyPreferences = (): void => {
     const current = settings.get();
-    applySettings(document, current, isCoarsePointer());
+    const pointers = responsive.get().pointer;
+    applySettings(document, current, pointers.coarse, pointers.touchPoints);
     hud.setColorblind(current.colorblind);
   };
   applyPreferences();
   settings.onChange(applyPreferences);
+  responsive.subscribe(applyPreferences);
   // 操作提示依目前的按鍵產生；開機時套用一次，改鍵後 SettingsService 會通知訂閱者，提示列跟著更新。
   const showControlsHint = (): void => hud.setControlsHint(controlsHint(settings.get().bindings, controls.hintLabels, controls.hintText));
   showControlsHint();
@@ -203,6 +215,7 @@ async function bootstrap(): Promise<void> {
         help: helpPanel,
         saves,
         settings,
+        responsive,
         onReady: markStageReady,
         controls: { settingsLabels: controls.settingsLabels, touchButtons: controls.touchButtons, touchMore: controls.touchMore },
       }),

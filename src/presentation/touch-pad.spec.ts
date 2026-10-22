@@ -72,6 +72,8 @@ describe('virtual pad visibility', () => {
   it('shows on a touch screen by default and hides on a mouse-only device', () => {
     expect(touchVisible('auto', true)).toBe(true);
     expect(touchVisible('auto', false)).toBe(false);
+    expect(touchVisible('auto', false, 2)).toBe(true);
+    expect(touchVisible('auto', false, 0)).toBe(false);
   });
 
   it('can be forced on or off in the settings', () => {

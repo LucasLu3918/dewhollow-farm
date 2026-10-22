@@ -66,6 +66,8 @@ import type { TouchLabels, TouchText } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
 import type { OpenablePanel } from '../panel-dialog';
 import { gateAction } from '../action-gate';
+import { cameraViewportFor } from '../responsive/layout';
+import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
 
 /** 鍵盤事件與虛擬按鍵共用的形狀：只需要按鍵名稱與 preventDefault。 */
 type KeyLike = Pick<KeyboardEvent, 'key' | 'preventDefault'>;
@@ -94,6 +96,7 @@ export interface MapSceneDeps {
   saves: SavePanel;
   /** 玩家偏好（按鍵、字級、閃光與震動等），不進存檔。 */
   settings: SettingsService;
+  responsive: ResponsiveLayoutController;
   /** 鍵盤監聽與畫面都接好後呼叫一次（見 create 結尾與 main.ts 的 markStageReady）。 */
   onReady: () => void;
   /** 操作說明的文字（設定面板的動作名稱、虛擬按鍵的文字），來自 content/controls.json。 */
@@ -216,6 +219,9 @@ declare global {
   interface Window {
     __dewhollow?: {
       cameraScroll(): { x: number; y: number };
+      worldGeneration(): number;
+      responsiveLayout(): ReturnType<ResponsiveLayoutController['get']>;
+      cameraView(): { x: number; y: number; width: number; height: number; zoom: number; bounds: { x: number; y: number; width: number; height: number } };
       mapId(): string;
       /** 玩家與地圖上所有圖片的貼圖名稱與畫面範圍（世界座標）。 */
       sprites(): SpriteDebugInfo[];
@@ -256,6 +262,8 @@ declare global {
  * 規則判斷留在應用層；這裡只決定怎麼呈現（方向、走路節奏、動作效果）。
  */
 export class MapScene extends Phaser.Scene {
+  private static worldGenerationCount = 0;
+  private worldGeneration = 0;
   private deps!: MapSceneDeps;
   private world!: Phaser.GameObjects.Container;
   private rig!: CharacterRig;
@@ -362,6 +370,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.worldGeneration = ++MapScene.worldGenerationCount;
     this.world = this.add.container(0, 0);
     this.createSky();
     this.starMeter = this.add.graphics().setScrollFactor(0).setDepth(DEPTH_SKY + 2);
@@ -397,26 +406,29 @@ export class MapScene extends Phaser.Scene {
   /** 鏡頭跟隨玩家：中央留一塊死區，玩家走到邊緣才捲動；邊界在換地圖時重設。 */
   private setupCamera(): void {
     const camera = this.cameras.main;
-    const zone = deadzoneOf({ width: camera.width, height: camera.height });
-    camera.setDeadzone(zone.width, zone.height);
-    // 直式觸控拉近鏡頭（見 mapZoomFor）；畫面大小改變（例如轉向）時重算。
-    const applyZoom = (): void => {
-      camera.setZoom(
-        mapZoomFor({
-          width: window.innerWidth,
-          coarse: window.matchMedia('(pointer: coarse)').matches,
-          portrait: window.matchMedia('(orientation: portrait)').matches,
-        }),
-      );
+    const applyLayout = (layout: ReturnType<ResponsiveLayoutController['get']>): void => {
+      const viewport = cameraViewportFor(layout, VIEW_SIZE);
+      camera.setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
+      camera.setZoom(mapZoomFor({
+        width: layout.safeRect.width,
+        coarse: layout.pointer.coarse,
+        portrait: layout.orientation === 'portrait',
+      }));
+      const zone = deadzoneOf({ width: camera.width / camera.zoom, height: camera.height / camera.zoom });
+      camera.setDeadzone(zone.width, zone.height);
+      const state = this.deps.session.state;
+      this.frameCamera(this.deps.index.map(state.mapId), state.player);
     };
-    applyZoom();
-    this.scale.on(Phaser.Scale.Events.RESIZE, applyZoom);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.scale.off(Phaser.Scale.Events.RESIZE, applyZoom));
+    const unsubscribeLayout = this.deps.responsive.subscribe(applyLayout);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, unsubscribeLayout);
     // 跟隨骨架的軸心（腳底中心，不含身體起伏，鏡頭才不會跟著抖）；位移量把跟隨點移到格子中心。
     camera.startFollow(this.rig.root, true, FOLLOW_LERP, FOLLOW_LERP, 0, TILE_SIZE / 2);
     if (import.meta.env.DEV) {
       window.__dewhollow = {
         cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
+        worldGeneration: () => this.worldGeneration,
+        responsiveLayout: () => this.deps.responsive.get(),
+        cameraView: () => ({ x: camera.x, y: camera.y, width: camera.width / camera.zoom, height: camera.height / camera.zoom, zoom: camera.zoom, bounds: { ...camera.getBounds() } }),
         mapId: () => this.deps.session.state.mapId,
         sprites: () => this.debugSprites(),
         pose: () => ({ ...this.rig.currentPose() }),
@@ -453,7 +465,7 @@ export class MapScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const bounds = cameraBounds(
       { width: map.width * TILE_SIZE, height: map.height * TILE_SIZE },
-      { width: camera.width, height: camera.height },
+      { width: camera.width / camera.zoom, height: camera.height / camera.zoom },
     );
     camera.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
     const center = centerOf(tile.x, tile.y);
