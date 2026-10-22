@@ -6,8 +6,8 @@ import { CROWN_RECIPE } from '../../domain/festival';
  * 地點、居民、物品、食譜、店家與旗標都要存在；節慶的告示與水池要在地圖上找得到。
  */
 
-/** 旗標的來源（不是 talked:<居民> 的情況）：節慶與主線自己設定的，以及 M5d 會設定的 lakeBridge。 */
-const STORY_OWN_FLAGS = ['done:till', 'done:ship', 'lakeBridge'] as const;
+/** 旗標的來源（不是 talked:<居民> 的情況）：主線與委託以外，自己設定的旗標（修復的獎勵旗標另外從 repairs.json 讀）。 */
+const STORY_OWN_FLAGS = ['done:till', 'done:ship'] as const;
 
 export function festivalProblems(pack: ContentPack): string[] {
   const problems: string[] = [];
@@ -77,10 +77,12 @@ export function festivalProblems(pack: ContentPack): string[] {
     }
   }
   // 合成配方用旗標解鎖的，必須有星河兌換會設定它，否則永遠做不了。
-  const exchangeFlags = new Set(festivals.flatMap((f) => (f.exchange ?? []).flatMap((line) => (line.flag ? [line.flag] : []))));
+  // 修復的獎勵旗標也能解鎖配方（例如春季修復給的噴泉圖紙）。
+  const repairFlags = (pack.repairs ?? []).flatMap((r) => r.reward.flags ?? []);
+  const exchangeFlags = new Set([...festivals.flatMap((f) => (f.exchange ?? []).flatMap((line) => (line.flag ? [line.flag] : []))), ...repairFlags]);
   for (const recipe of pack.crafting) {
     if (recipe.unlock && 'flag' in recipe.unlock && !exchangeFlags.has(recipe.unlock.flag)) {
-      problems.push(`合成配方 ${recipe.id} 的解鎖旗標 ${recipe.unlock.flag} 沒有任何兌換來源（星河兌換）`);
+      problems.push(`合成配方 ${recipe.id} 的解鎖旗標 ${recipe.unlock.flag} 沒有任何兌換來源（星河兌換或修復）`);
     }
   }
 
@@ -112,6 +114,7 @@ export function storyProblems(pack: ContentPack): string[] {
   ]);
   const knownFlags = new Set<string>([
     ...STORY_OWN_FLAGS,
+    ...(pack.repairs ?? []).flatMap((r) => r.reward.flags ?? []),
     ...pack.crafting.flatMap((r) => (r.effect?.type === 'flag' ? [r.effect.flag] : [])),
     ...pack.shops.flatMap((s) => s.stock.filter((line) => line.itemId.startsWith('building.')).map((line) => line.itemId.slice('building.'.length))),
     ...(pack.quests?.defs ?? []).flatMap((q) => (q.reward.flag ? [q.reward.flag] : [])),

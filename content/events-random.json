@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "note": "隨機事件（M5d）：春夏共 8 種。chance 是每天出現事件的機率（百分比）；每天在睡醒時以日期種子決定（見 src/domain/random-events.ts）。效果只有物品、產出與機率、旗標與居民行程，不改任何體力成本。period 為 night 的事件，物品在睡前入袋。weekdays：0 為週一，4 為週五，5 為週六。playMinutes 為內容時數的估計。",
+  "chance": 40,
+  "events": [
+    {
+      "id": "lost-kitten",
+      "name": "迷路的小貓",
+      "message": "溪邊有一隻迷路的小貓，你把牠送回了鎮上。榕伯塞給你一條鯽魚當謝禮。",
+      "seasons": ["spring", "summer"],
+      "weathers": [],
+      "weekdays": [],
+      "period": "day",
+      "effect": { "type": "grant", "items": { "fish.crucian": 1 } },
+      "playMinutes": 1
+    },
+    {
+      "id": "caravan",
+      "name": "行商商隊",
+      "message": "一支帆車似的小商隊停在湖畔的路口，留下一袋魚餌和一包普通肥料，說是下週還會再來。",
+      "seasons": ["spring", "summer"],
+      "weathers": [],
+      "weekdays": [4, 5],
+      "period": "day",
+      "effect": { "type": "grant", "items": { "bait": 3, "fertilizer-basic": 1 } },
+      "playMinutes": 1
+    },
+    {
+      "id": "meteor",
+      "name": "夜空流星",
+      "message": "今晚的夜空有流星劃過。躺在床上數了幾顆，其中一顆落在農場的籬笆外，你撿了回來。",
+      "seasons": ["spring", "summer"],
+      "weathers": ["sunny"],
+      "weekdays": [],
+      "period": "night",
+      "effect": { "type": "grant", "items": { "star-shard": 1 } },
+      "playMinutes": 1
+    },
+    {
+      "id": "storm-debris",
+      "name": "突發暴風雨",
+      "message": "一陣突如其來的風雨吹斷了幾根枝條。雨停後，你在農場邊撿到了一些木材。",
+      "seasons": ["spring", "summer"],
+      "weathers": ["rain", "wind"],
+      "weekdays": [],
+      "period": "day",
+      "effect": { "type": "grant", "items": { "wood": 3 } },
+      "playMinutes": 1
+    },
+    {
+      "id": "wildflowers",
+      "name": "野花盛開",
+      "message": "森林的草地一夜之間開滿了花。今天在森林裡採集，多採到一件的機會變高了。",
+      "seasons": ["spring", "summer"],
+      "weathers": ["sunny"],
+      "weekdays": [],
+      "period": "day",
+      "effect": { "type": "yield", "action": "forage", "chance": 0.5 },
+      "playMinutes": 1
+    },
+    {
+      "id": "neighbor-gift",
+      "name": "鄰居送禮",
+      "message": "小穗從麵包店探出頭，說多種了一份甜蘿蔔，硬要塞一包種子給你。",
+      "seasons": ["spring", "summer"],
+      "weathers": [],
+      "weekdays": [],
+      "period": "day",
+      "effect": { "type": "grant", "items": { "seed.sweet-radish": 1 } },
+      "playMinutes": 1
+    },
+    {
+      "id": "lake-fog",
+      "name": "湖面起霧",
+      "message": "早上的湖面起了薄霧，水裡的魚像是比平常靠近岸邊。今天在湖邊釣魚比較容易上鉤。",
+      "seasons": ["spring", "summer"],
+      "weathers": [],
+      "weekdays": [],
+      "period": "day",
+      "effect": { "type": "bite", "points": 15 },
+      "playMinutes": 1
+    },
+    {
+      "id": "plaza-concert",
+      "name": "廣場音樂會",
+      "message": "傍晚的鎮廣場有人組了一場小小的音樂會。居民們今晚都到廣場來了。",
+      "seasons": ["spring", "summer"],
+      "weathers": ["sunny"],
+      "weekdays": [],
+      "period": "day",
+      "effect": {
+        "type": "concert",
+        "mapId": "plaza",
+        "period": "evening",
+        "spots": [
+          { "npcId": "rong-bo", "x": 10, "y": 8 },
+          { "npcId": "a-gan", "x": 11, "y": 8 },
+          { "npcId": "shi-shifu", "x": 12, "y": 8 },
+          { "npcId": "zhi-lan", "x": 10, "y": 9 },
+          { "npcId": "xiao-sui", "x": 11, "y": 9 },
+          { "npcId": "maomao", "x": 12, "y": 9 }
+        ]
+      },
+      "playMinutes": 1
+    }
+  ]
+}

@@ -53,7 +53,7 @@ const tileSchema = z.object({
   shop: z.string().min(1).optional(),
   spawn: point.optional(),
   requires: requirementSchema.optional(),
-  notice: z.enum(['bulletin', 'mailbox', 'festival']).optional(),
+  notice: z.enum(['bulletin', 'mailbox', 'festival', 'repair']).optional(),
   festival: z.enum(['stars']).optional(),
 });
 
@@ -531,6 +531,69 @@ export const festivalsFileSchema = z.object({
   version: z.literal(1),
   note: z.string().optional(),
   festivals: z.array(festivalSchema),
+});
+
+/** 社區修復（見 domain/repairs.ts 與 content/repairs.json）。 */
+const repairGoalSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('kinds'),
+    pool: z.array(z.string().min(1)).min(1),
+    count: z.number().int().positive().max(99),
+    each: z.number().int().positive().max(5),
+  }),
+  z.object({
+    type: z.literal('total'),
+    pool: z.array(z.string().min(1)).min(1),
+    count: z.number().int().positive().max(99),
+  }),
+]);
+const repairSchema = z.object({
+  id: z.string().min(1),
+  season: z.enum(SEASONS),
+  name: z.string().min(1),
+  request: z.string().min(1),
+  done: z.string().min(1),
+  goal: repairGoalSchema,
+  reward: z.object({
+    gold: z.number().int().nonnegative().optional(),
+    flags: z.array(z.string().min(1)).optional(),
+  }),
+  playMinutes: z.number().positive().max(60),
+});
+export const repairsFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  repairs: z.array(repairSchema),
+});
+
+/** 隨機事件（見 domain/random-events.ts 與 content/events-random.json）。 */
+const randomEventEffectSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('grant'), items: z.record(z.string().min(1), z.number().int().positive()) }),
+  z.object({ type: z.literal('yield'), action: z.enum(['harvest', 'forage', 'chop', 'mine']), chance: z.number().min(0).max(1) }),
+  z.object({ type: z.literal('bite'), points: z.number().int().min(0).max(100) }),
+  z.object({
+    type: z.literal('concert'),
+    mapId: z.string().min(1),
+    period: z.enum(PERIODS),
+    spots: z.array(z.object({ npcId: z.string().min(1), x: z.number().int().nonnegative(), y: z.number().int().nonnegative() })).min(1),
+  }),
+]);
+const randomEventSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  message: z.string().min(1),
+  seasons: z.array(z.enum(SEASONS)).min(1),
+  weathers: z.array(z.enum(WEATHERS)),
+  weekdays: z.array(z.number().int().min(0).max(6)),
+  period: z.enum(['day', 'night']),
+  effect: randomEventEffectSchema,
+  playMinutes: z.number().positive().max(60),
+});
+export const randomEventsFileSchema = z.object({
+  version: z.literal(1),
+  note: z.string().optional(),
+  chance: z.number().int().min(0).max(100),
+  events: z.array(randomEventSchema),
 });
 
 /** 主線章節（見 domain/story.ts 與 content/main-quest.json）。每個步驟恰好一個旗標或一件委託。 */

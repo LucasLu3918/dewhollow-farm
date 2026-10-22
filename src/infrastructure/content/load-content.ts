@@ -39,11 +39,14 @@ import {
   lettersFileSchema,
   festivalsFileSchema,
   mainQuestFileSchema,
+  repairsFileSchema,
+  randomEventsFileSchema,
   type MusicFile,
   type SoundsFile,
   type TerrainFile,
 } from './content-schema';
 import { festivalProblems, storyProblems } from './festival-content';
+import { randomEventProblems, repairProblems } from './repairs-content';
 import type { StoryChapter } from '../../domain/story';
 
 export interface RawContentFiles {
@@ -51,6 +54,10 @@ export interface RawContentFiles {
   festivals?: unknown;
   /** 主線章節（content/main-quest.json）。測試用的最小內容可以省略（視為沒有章節）。 */
   mainQuest?: unknown;
+  /** 社區修復（content/repairs.json）。測試用的最小內容可以省略（視為沒有修復）。 */
+  repairs?: unknown;
+  /** 隨機事件（content/events-random.json）。測試用的最小內容可以省略（視為沒有隨機事件）。 */
+  randomEvents?: unknown;
   crops: unknown;
   npcs: unknown;
   /** 居民行程（content/schedules.json）。 */
@@ -138,6 +145,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const letters = lettersFileSchema.parse(raw.letters);
   const festivals = festivalsFileSchema.parse(raw.festivals ?? { version: 1, festivals: [] });
   const mainQuest = mainQuestFileSchema.parse(raw.mainQuest ?? { version: 1, chapters: [] });
+  const repairs = repairsFileSchema.parse(raw.repairs ?? { version: 1, repairs: [] });
+  const randomEvents = randomEventsFileSchema.parse(raw.randomEvents ?? { version: 1, chance: 0, events: [] });
 
   const pack: ContentPack = {
     crops,
@@ -163,6 +172,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     festivals: festivals.festivals,
     // 步驟的「恰好一個旗標或委託」已由 schema 檢查；型別上 zod 的輸出較寬，這裡收窄回 StoryStep。
     chapters: mainQuest.chapters as StoryChapter[],
+    repairs: repairs.repairs,
+    randomEvents: { chance: randomEvents.chance, events: randomEvents.events },
   };
   const problems = [
     ...validateCrossReferences(pack, assets),
@@ -170,6 +181,8 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
     ...questProblems(pack),
     ...festivalProblems(pack),
     ...storyProblems(pack),
+    ...repairProblems(pack),
+    ...randomEventProblems(pack),
     ...rigProblems(rigs, assets),
     ...companionProblems(companions, rigs, pack),
     ...toolProblems(tools, assets),

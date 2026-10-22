@@ -14,7 +14,7 @@
     "#.....==.......#",
     "#h.............#",
     "#..............#",
-    "#..nbb.......s.#",
+    "#..nbbp......s.#",
     "################"
   ],
   "legend": {
@@ -25,6 +25,7 @@
     "b": { "kind": "furniture" },
     "n": { "kind": "furniture", "notice": "bulletin" },
     "h": { "kind": "furniture", "notice": "festival" },
+    "p": { "kind": "furniture", "notice": "repair" },
     "o": { "kind": "water", "festival": "stars" },
     "s": { "kind": "shop", "shop": "night-market" },
     "V": { "kind": "door", "to": "village", "spawn": { "x": 14, "y": 6 } }

@@ -26,6 +26,7 @@ import { ResidentPanel } from '../resident-panel';
 import { QuestPanel } from '../quest-panel';
 import { HeartEventPanel } from '../heart-event-panel';
 import { FestivalPanel } from '../festival-panel';
+import { RepairPanel } from '../repair-panel';
 import { playFirework } from '../fireworks';
 import { openFestival } from '../../domain/festival';
 import { starPhase } from '../../domain/star-fishing';
@@ -234,6 +235,7 @@ export class MapScene extends Phaser.Scene {
   private questPanel!: QuestPanel;
   private heartEventPanel!: HeartEventPanel;
   private festivalPanel!: FestivalPanel;
+  private repairPanel!: RepairPanel;
   /** 夜釣星星進行中的計時器與甩竿的時刻（一圈的時限，見 star-fishing.ts）。 */
   private starTimer: Phaser.Time.TimerEvent | null = null;
   private starStartedAt = 0;
@@ -269,6 +271,7 @@ export class MapScene extends Phaser.Scene {
     this.questPanel = new QuestPanel(document, deps.index, (command) => void this.run(command));
     this.heartEventPanel = new HeartEventPanel(document, deps.index, (command) => void this.run(command));
     this.festivalPanel = new FestivalPanel(document, deps.index, (command) => void this.run(command));
+    this.repairPanel = new RepairPanel(document, deps.index, (command) => void this.run(command));
     deps.hud.bindSkills(() => this.skillPanel.toggle(deps.session.state));
     this.terrainByKind = new Map(deps.terrain.map((entry) => [entry.kind, entry]));
   }
@@ -391,7 +394,7 @@ export class MapScene extends Phaser.Scene {
       }
       return;
     }
-    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen() || this.residentPanel.isOpen() || this.questPanel.isOpen() || this.festivalPanel.isOpen()) {
+    if (this.shopPanel.isOpen() || this.kitchenPanel.isOpen() || this.workshopPanel.isOpen() || this.workbenchPanel.isOpen() || this.skillPanel.isOpen() || this.residentPanel.isOpen() || this.questPanel.isOpen() || this.festivalPanel.isOpen() || this.repairPanel.isOpen()) {
       // 櫃檯、廚房或面板開著時，按鍵只用來離開（Esc），其餘操作都在面板上用滑鼠完成。
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -403,6 +406,7 @@ export class MapScene extends Phaser.Scene {
         this.residentPanel.close();
         this.questPanel.close();
         this.festivalPanel.close();
+        this.repairPanel.close();
       }
       return;
     }
@@ -508,6 +512,7 @@ export class MapScene extends Phaser.Scene {
     this.skillPanel.refresh(session.state);
     this.questPanel.refresh(session.state);
     this.festivalPanel.refresh(session.state);
+    this.repairPanel.refresh(session.state);
     this.refresh();
   }
 
@@ -544,6 +549,8 @@ export class MapScene extends Phaser.Scene {
         this.questPanel.open(this.deps.session.state);
       } else if (event.type === 'festivalOpened') {
         this.festivalPanel.open(this.deps.session.state);
+      } else if (event.type === 'repairOpened') {
+        this.repairPanel.open(this.deps.session.state);
       } else if (event.type === 'starLine') {
         this.startStarGame();
       } else if (event.type === 'saveRequested') {

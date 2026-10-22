@@ -40,6 +40,8 @@ import quests from '../../../content/quests.json';
 import letters from '../../../content/letters.json';
 import festivals from '../../../content/festivals.json';
 import mainQuest from '../../../content/main-quest.json';
+import repairs from '../../../content/repairs.json';
+import randomEvents from '../../../content/events-random.json';
 
 /** M4c 的內容：牛、牛舍、牧草地、乳製品。內容錯誤由 loadContent 一次列出。 */
 const { pack } = loadContent({
@@ -51,7 +53,7 @@ const { pack } = loadContent({
     quests,
     letters,
     festivals,
-    mainQuest,
+    mainQuest, repairs, randomEvents,
   maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,

@@ -138,6 +138,17 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   }),
   /** 夜釣星星是否正在等收網（甩竿後為真）。 */
   starLine: z.boolean(),
+  /** 社區修復：每項修復的紀錄（年份、各物品已捐的數量、是否完成）。 */
+  repairs: z.record(
+    z.string().min(1),
+    z.object({
+      year: z.number().int().nonnegative(),
+      donated: z.record(z.string().min(1), z.number().int().positive()),
+      done: z.boolean(),
+    }),
+  ),
+  /** 今天的隨機事件（day 為事件那天的總天數；id 為 null 表示今天沒有事件）。 */
+  dailyEvent: z.object({ day: z.number().int().nonnegative(), id: z.string().min(1).nullable() }),
   mineSeed: z.number().int().nonnegative().max(4294967295),
   /** 礦坑沒有底，檢查點可以是任何正整數層（見 domain/mine.ts）。 */
   mineCheckpoint: z.number().int().min(1),
