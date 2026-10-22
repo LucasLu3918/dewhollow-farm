@@ -123,14 +123,31 @@ export class Hud {
   bindMainActionHold(onStart: () => boolean, onEnd: () => void): () => void {
     let timer: number | null = null;
     let heldPointer: number | null = null;
-    let suppressClick = false;
+    const suppressedClicks = new Map<number, number>();
+    const suppressClickFor = (pointerId: number, expiresAt = Number.POSITIVE_INFINITY): void => {
+      suppressedClicks.set(pointerId, expiresAt);
+    };
+    const pruneSuppressedClicks = (): void => {
+      const now = Date.now();
+      for (const [pointerId, expiresAt] of suppressedClicks) {
+        if (expiresAt < now) suppressedClicks.delete(pointerId);
+      }
+    };
     const clear = (): void => {
       if (timer !== null) window.clearTimeout(timer);
       timer = null;
     };
     const end = (event: PointerEvent): void => {
-      if (heldPointer !== event.pointerId) return;
+      if (heldPointer !== event.pointerId) {
+        if (event.type === 'pointerup' && suppressedClicks.has(event.pointerId)) {
+          suppressedClicks.set(event.pointerId, Date.now() + 1000);
+        } else if (event.type === 'pointercancel') {
+          suppressedClicks.delete(event.pointerId);
+        }
+        return;
+      }
       clear();
+      if (suppressedClicks.has(event.pointerId)) suppressedClicks.set(event.pointerId, Date.now() + 1000);
       heldPointer = null;
       onEnd();
       try {
@@ -140,8 +157,9 @@ export class Hud {
     const cancel = (): void => {
       clear();
       if (heldPointer === null) return;
+      if (suppressedClicks.has(heldPointer)) suppressedClicks.set(heldPointer, Date.now() + 1000);
+      else suppressClickFor(heldPointer, Date.now() + 1000);
       heldPointer = null;
-      suppressClick = true;
       onEnd();
     };
     const leave = (event: PointerEvent): void => {
@@ -152,20 +170,27 @@ export class Hud {
     };
     const onDown = (event: PointerEvent): void => {
       if (this.mainAction.disabled || (event.button !== 0 && event.pointerType !== 'touch')) return;
+      pruneSuppressedClicks();
       // A continuous action is one owned gesture; extra fingers must not replace its timer or owner.
-      if (heldPointer !== null) return;
+      if (heldPointer !== null) {
+        if (event.pointerId !== heldPointer) suppressClickFor(event.pointerId);
+        return;
+      }
       heldPointer = event.pointerId;
-      suppressClick = false;
       try { this.mainAction.setPointerCapture(event.pointerId); } catch { /* Synthetic or detached target. */ }
       timer = window.setTimeout(() => {
         timer = null;
-        suppressClick = onStart();
+        const owner = heldPointer;
+        if (owner !== null && onStart()) suppressClickFor(owner);
       }, 280);
     };
     const onClick = (event: MouseEvent): void => {
-      if (!suppressClick) return;
-      suppressClick = false;
+      pruneSuppressedClicks();
+      const pointerId = 'pointerId' in event ? (event as PointerEvent).pointerId : undefined;
+      if (pointerId === undefined || !suppressedClicks.has(pointerId)) return;
+      suppressedClicks.delete(pointerId);
       event.preventDefault();
+      event.stopImmediatePropagation();
     };
     const onContextMenu = (event: MouseEvent): void => event.preventDefault();
     const onVisibilityChange = (): void => {

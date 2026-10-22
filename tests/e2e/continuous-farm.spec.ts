@@ -33,6 +33,52 @@ async function holdMainAction(page: Page, durationMs: number): Promise<void> {
   await page.mouse.up();
 }
 
+async function dispatchPointerClick(page: Page, pointerId: number): Promise<void> {
+  await page.evaluate((id) => {
+    document.querySelector<HTMLButtonElement>('#hud-action')!.dispatchEvent(new PointerEvent('click', {
+      pointerId: id, pointerType: 'touch', button: 0, bubbles: true, cancelable: true,
+    }));
+  }, pointerId);
+}
+
+async function verifyMultiPointerClicksAreSuppressed(page: Page, order: 'secondary-first' | 'owner-first'): Promise<void> {
+  await start(page);
+  await moveToEmptyField(page);
+  await enableContinuousActions(page);
+  await page.evaluate(() => {
+    const button = document.querySelector<HTMLButtonElement>('#hud-action')!;
+    const bounds = button.getBoundingClientRect();
+    const down = (pointerId: number) => new PointerEvent('pointerdown', {
+      pointerId, pointerType: 'touch', button: 0, clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2, bubbles: true,
+    });
+    button.dispatchEvent(down(51));
+  });
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? false)).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0)).toBe(1);
+  await page.waitForTimeout(1100);
+  await page.evaluate(() => {
+    const button = document.querySelector<HTMLButtonElement>('#hud-action')!;
+    const bounds = button.getBoundingClientRect();
+    const init = (type: string, pointerId: number) => new PointerEvent(type, {
+      pointerId, pointerType: 'touch', button: 0, clientX: bounds.left + bounds.width / 2,
+      clientY: bounds.top + bounds.height / 2, bubbles: true,
+    });
+    button.dispatchEvent(init('pointerdown', 52));
+    button.dispatchEvent(init('pointerup', 52));
+    button.dispatchEvent(init('pointerup', 51));
+  });
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? true)).toBe(false);
+  const baseline = await page.evaluate(() => ({
+    refused: window.__dewhollow?.soundLog().filter((id) => id === 'refuse').length ?? 0,
+    till: window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0,
+  }));
+  const ids = order === 'secondary-first' ? [52, 51] : [51, 52];
+  for (const pointerId of ids) await dispatchPointerClick(page, pointerId);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.soundLog().filter((id) => id === 'refuse').length ?? 0)).toBe(baseline.refused);
+  expect(await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0)).toBe(baseline.till);
+}
+
 async function saveGame(page: Page): Promise<void> {
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
@@ -134,6 +180,14 @@ test.describe('可取消的長按連續農務', () => {
     await page.waitForTimeout(700);
     const hits = await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0);
     expect(hits).toBe(1);
+  });
+
+  test('secondary click 先到時不消耗 owner click 的抑制，兩者都不 dispatch', async ({ page }) => {
+    await verifyMultiPointerClicksAreSuppressed(page, 'secondary-first');
+  });
+
+  test('owner click 先到時也不讓 secondary click dispatch', async ({ page }) => {
+    await verifyMultiPointerClicksAreSuppressed(page, 'owner-first');
   });
 
   test('持續移動會重新查詢面前田地；舊田不重做且新田可執行', async ({ page }) => {
