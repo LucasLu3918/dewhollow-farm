@@ -62,6 +62,20 @@ export function playActionEffect(scene: Phaser.Scene, action: ActionFeedback, x:
   }
 }
 
+/** 採集產量的飄字間隔（毫秒）：多種物品依序飄出，不疊在同一個位置。 */
+const YIELD_LABEL_STAGGER_MS = 160;
+
+/**
+ * 採集得到的物品（例如「+3 木材」）在被作用的格子上方依序飄出。文字不受「減少粒子」影響，與出貨的飄字相同。
+ * labels 為空時什麼都不做。
+ */
+export function yieldLabels(scene: Phaser.Scene, x: number, y: number, labels: readonly string[]): void {
+  const { px: cx, py: cy } = tileCenter(x, y);
+  labels.forEach((label, index) => {
+    scene.time.delayedCall(index * YIELD_LABEL_STAGGER_MS, () => floatText(scene, cx, cy - px(12), label, '#ffe08a'));
+  });
+}
+
 /** 角色走路時的腳步塵土，發生在離開的格子；顏色由地面決定（見 content/terrain.json）。 */
 export function footstepDust(scene: Phaser.Scene, x: number, y: number, color: string, particles = true): void {
   if (!particles) return;

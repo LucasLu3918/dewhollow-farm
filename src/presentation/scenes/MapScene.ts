@@ -5,7 +5,7 @@ import { tileAt } from '../../domain/world';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import type { ContentIndex } from '../../application/content-index';
-import type { Command, GameEvent } from '../../application/game-commands';
+import type { ActionFeedback, Command, GameEvent } from '../../application/game-commands';
 import type { CompanionDef, CompanionManifest } from '../../infrastructure/assets/companion-manifest';
 import type { ToolDef, ToolManifest } from '../../infrastructure/assets/tool-manifest';
 import type { RigDef, RigManifest } from '../../infrastructure/assets/rig-manifest';
@@ -46,7 +46,8 @@ import { PLAYER_WEARER } from '../../domain/decor';
 import { decorColorOf, wearColorOf } from '../decor-style';
 import { emotesForEvent, type EmoteKind } from '../emote-defs';
 import { playEmote, type EmoteHandle } from '../emote';
-import { footstepDust, pickupFlight, playActionEffect, shipFlight, sleepEffect, type ShipIcon } from '../effects';
+import { footstepDust, pickupFlight, playActionEffect, shipFlight, sleepEffect, yieldLabels, type ShipIcon } from '../effects';
+import { gainedItems } from '../yield-feedback';
 import { footstepKind, touchesWater, type FootstepEnv } from '../footstep-surface';
 import { shipIconsFor, shippedItemIds } from '../ship-animation';
 import type { Inventory } from '../../domain/inventory';
@@ -126,6 +127,19 @@ const MOVE_DURATION_MS = 110;
 
 /** 揮一次工具的時間；命中的那一刻由 tool-swing.ts 的 impactAt 決定。 */
 const SWING_DURATION_MS = 420;
+
+/**
+ * 命中時的鏡頭微震強度，依動作的分量分級：開墾是翻土（輕），砍樹與挖礦是撞硬物（稍重）。
+ * 沒有列出的動作不震；減少動態或玩家關掉震動時整個不出現（見 effectGates）。
+ */
+const IMPACT_SHAKE: Partial<Record<ActionFeedback, { ms: number; intensity: number }>> = {
+  till: { ms: 90, intensity: 0.003 },
+  chop: { ms: 120, intensity: 0.005 },
+  mine: { ms: 120, intensity: 0.005 },
+};
+
+/** 會得到物品的採集動作：命中時在格子上飄出「+數量 名稱」。收成的作物由 pickUp 處理，不在這裡。 */
+const YIELD_ACTIONS = new Set<ActionFeedback>(['chop', 'mine', 'forage']);
 
 /** 居民與夥伴被搭話時，原地做一步的時間（比走一格慢，才看得清楚）。 */
 const REACT_DURATION_MS = 320;
@@ -732,15 +746,26 @@ export class MapScene extends Phaser.Scene {
     const reduced = prefersReducedMotion();
     const gates = this.effectGates();
     const key = plotKey(event.x, event.y);
+    // 產量在事件發生當下就算好：命中可能晚於下一個動作（揮動被補播），那時背包已經包含後面動作的物品。
+    const gains = YIELD_ACTIONS.has(event.action) ? gainedItems(inventoryBefore.stacks, this.deps.session.state.inventory.stacks) : [];
     const impact = (): void => {
       if (this.heldPlots.delete(key)) this.drawPlots(); // 命中：這一格才更新成動作後的樣子
       this.log(`effect:${event.action}`);
       this.deps.sounds.play(ACTION_SOUND[event.action]);
       if (event.action === 'harvest') this.pickUp(event.x, event.y, plotsBefore);
       playActionEffect(this, event.action, event.x, event.y, gates.particles);
-      if (event.action === 'till' && gates.shake) {
-        this.cameras.main.shake(90, 0.003);
+      const shake = IMPACT_SHAKE[event.action];
+      if (shake && gates.shake) {
+        this.cameras.main.shake(shake.ms, shake.intensity);
         this.log('shake');
+      }
+      if (gains.length > 0) {
+        yieldLabels(
+          this,
+          event.x,
+          event.y,
+          gains.map((gain) => `+${gain.count} ${this.deps.index.item(gain.itemId).name}`),
+        );
       }
     };
     const tool = this.deps.tools.tools.find((t) => t.action === event.action);
