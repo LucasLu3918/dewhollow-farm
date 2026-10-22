@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import mineRulesJson from '../../content/mine.json';
-import type { ContentPack } from '../domain/content';
+import type { ContentPack, TileDef } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { plotKey } from '../domain/farm';
 import { countOf, createInventory, type Inventory } from '../domain/inventory';
@@ -9,6 +9,7 @@ import { rollInt } from '../domain/random';
 import { priceWithQuality, sellPriceOf } from '../domain/pricing';
 import { executeCommand } from './game-commands';
 import { createContentIndex } from './content-index';
+import { resolveInteraction } from './interaction';
 
 /** 測試用的小型內容：農場與村莊各一張，足以覆蓋各種操作。 */
 const content: ContentPack = {
@@ -108,6 +109,31 @@ const content: ContentPack = {
 };
 
 const index = createContentIndex(content);
+
+function probeIndex(tile: TileDef) {
+  return createContentIndex({
+    ...content,
+    items: [
+      ...content.items,
+      { id: 'decor.test', name: '琉璃燈', kind: 'decor', maxStack: 1 },
+      { id: 'stone', name: '石頭', kind: 'material', maxStack: 99 },
+    ],
+    maps: [...content.maps, {
+      id: 'interaction-probe', name: '互動測試地', width: 3, height: 3,
+      rows: ['###', '#T#', '###'], legend: { '#': { kind: 'wall' }, T: tile }, spawn: { x: 1, y: 2 },
+    }],
+    schedule: {
+      ...content.schedule,
+      entries: [...content.schedule.entries, { npcId: 'mira', period: 'morning' as const, mapId: 'interaction-probe', x: 1, y: 1 }],
+    },
+  });
+}
+
+function probeState(overrides: Partial<GameState> = {}): GameState {
+  return {
+    ...start(), mapId: 'interaction-probe', player: { x: 1, y: 2, facing: 'up' }, ...overrides,
+  };
+}
 
 /** 田地 (2,1)：玩家站在 (3,1) 面向左側即可互動。 */
 const FIELD = plotKey(2, 1);
@@ -272,6 +298,112 @@ describe('action feedback', () => {
     const state = at(start({ inventory: bagOf([crops('sweet-radish', 1)]) }), SHIP_SIDE);
     const out = executeCommand(state, { type: 'interact' }, index);
     expect(out.events).toContainEqual({ type: 'acted', action: 'ship', x: 1, y: 2 });
+  });
+});
+
+describe('shared interaction query', () => {
+  it('describes a field action without changing state, time, or random state', () => {
+    const state = at(start(), FIELD_SIDE);
+    const before = structuredClone(state);
+    const descriptor = resolveInteraction(state, index);
+    expect(descriptor).toMatchObject({ action: 'workPlot', labelKey: 'till', target: { x: 2, y: 1 } });
+    expect(state).toEqual(before);
+    expect(state.calendar).toEqual(before.calendar);
+    expect(state.rng).toBe(before.rng);
+  });
+
+  it('uses the same target and action selection for ripe crops, residents, bed, shipping, and no target', () => {
+    const ripe = start({ plots: { [FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 2 } } } });
+    expect(resolveInteraction(at(ripe, FIELD_SIDE), index)).toMatchObject({ action: 'workPlot', labelKey: 'harvest' });
+
+    const resident = at(start({ mapId: 'village', player: { x: 1, y: 1, facing: 'up' } }), { x: 1, y: 1, facing: 'up' });
+    expect(resolveInteraction(resident, index)).toMatchObject({ action: 'talk', labelKey: 'talk', target: { x: 1, y: 0 } });
+    expect(resolveInteraction(at(start(), BED_SIDE), index)).toMatchObject({ action: 'sleep', labelKey: 'sleep' });
+    expect(resolveInteraction(at(start(), SHIP_SIDE), index)).toMatchObject({ action: 'shipAll', labelKey: 'ship' });
+
+    const nothing = at(start(), { x: 1, y: 1, facing: 'up' });
+    expect(resolveInteraction(nothing, index)).toMatchObject({ action: 'nothing', labelKey: 'nothing' });
+    const probe = probeIndex({ kind: 'grass' });
+    expect(executeCommand(probeState(), { type: 'interact' }, probe).events).toContainEqual({ type: 'refused', reason: 'NOTHING_HERE' });
+  });
+
+  it('keeps doors as movement targets instead of an interaction action', () => {
+    const door = at(start(), { x: 3, y: 1, facing: 'down' });
+    expect(resolveInteraction(door, index)).toMatchObject({ action: 'nothing', labelKey: 'nothing' });
+    expect(executeCommand(door, { type: 'move', direction: 'down' }, index).state.mapId).toBe('village');
+  });
+
+  it('resolves and dispatches water, rock, equipment, and placed decor through the same target', () => {
+    const waterIndex = probeIndex({ kind: 'water' });
+    const water = probeState({ tool: 'rod' });
+    expect(resolveInteraction(water, waterIndex)).toMatchObject({ action: 'cast', labelKey: 'fish', target: { x: 1, y: 1 } });
+    expect(executeCommand(water, { type: 'interact' }, waterIndex).events.some((event) => event.type === 'acted' && event.action === 'fish')).toBe(true);
+
+    const rockIndex = probeIndex({ kind: 'rock' });
+    const rock = probeState({ tool: 'pick' });
+    expect(resolveInteraction(rock, rockIndex)).toMatchObject({ action: 'mineRock', labelKey: 'mine' });
+    expect(executeCommand(rock, { type: 'interact' }, rockIndex).events.some((event) => event.type === 'acted' && event.action === 'mine')).toBe(true);
+
+    const equipmentIndex = probeIndex({ kind: 'kitchen' });
+    expect(resolveInteraction(probeState(), equipmentIndex)).toMatchObject({ action: 'openKitchen', labelKey: 'kitchen' });
+    expect(executeCommand(probeState(), { type: 'interact' }, equipmentIndex).events).toContainEqual({ type: 'kitchenOpened' });
+    for (const [kind, action, labelKey, event] of [
+      ['workshop', 'openWorkshop', 'workshop', { type: 'workshopOpened' }],
+      ['workbench', 'openWorkbench', 'workbench', { type: 'workbenchOpened' }],
+    ] as const) {
+      const indexForEquipment = probeIndex({ kind });
+      expect(resolveInteraction(probeState(), indexForEquipment)).toMatchObject({ action, labelKey });
+      expect(executeCommand(probeState(), { type: 'interact' }, indexForEquipment).events).toContainEqual(event);
+    }
+
+    const decorIndex = probeIndex({ kind: 'grass' });
+    const decor = probeState({ decor: { 'interaction-probe': [{ itemId: 'decor.test', x: 1, y: 1 }] } });
+    expect(resolveInteraction(decor, decorIndex)).toMatchObject({ action: 'pickUpDecor', labelKey: 'pickUpDecor', entityId: 'decor.test' });
+    expect(executeCommand(decor, { type: 'interact' }, decorIndex).state.decor['interaction-probe']).toEqual([]);
+  });
+
+  it('refreshes a queried descriptor against the changed plot before the next execution', () => {
+    const planted = probeState({
+      tool: 'seedbag',
+      plots: { '1,1': { watered: false, dryDays: 0, crop: null } },
+    });
+    const probe = probeIndex({ kind: 'field' });
+    const before = resolveInteraction(planted, probe);
+    expect(before).toMatchObject({ action: 'workPlot', labelKey: 'plant' });
+    const afterPlant = executeCommand(planted, { type: 'interact' }, probe).state;
+    expect(resolveInteraction(afterPlant, probe)).toMatchObject({ action: 'workPlot', labelKey: 'alreadyPlanted' });
+  });
+
+  it('matches empty field, water, and fertilizing intents to the current tool and plot', () => {
+    const probe = probeIndex({ kind: 'field' });
+    expect(resolveInteraction(probeState({ tool: 'can' }), probe)).toMatchObject({ action: 'workPlot', labelKey: 'noSoil' });
+    expect(resolveInteraction(probeState({ tool: 'can', plots: { '1,1': { watered: false, dryDays: 0, crop: null } } }), probe))
+      .toMatchObject({ action: 'workPlot', labelKey: 'water' });
+    expect(resolveInteraction(probeState({
+      tool: 'seedbag',
+      inventory: bagOf([{ itemId: 'fertilizer-basic', quality: 'normal', count: 1 }]),
+      plots: { '1,1': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 } } },
+    }), probe)).toMatchObject({ action: 'workPlot', labelKey: 'fertilize' });
+
+    const tilled = probeState({ tool: 'hoe', plots: { '1,1': { watered: false, dryDays: 0, crop: null } } });
+    expect(resolveInteraction(tilled, probe)).toMatchObject({ action: 'workPlot', labelKey: 'alreadyTilled' });
+    expect(executeCommand(tilled, { type: 'interact' }, probe).events).toContainEqual({ type: 'refused', reason: 'ALREADY_TILLED' });
+
+    const fertilized = probeState({
+      tool: 'seedbag',
+      inventory: bagOf([{ itemId: 'fertilizer-basic', quality: 'normal', count: 1 }]),
+      plots: { '1,1': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 }, fertilizer: 'basic' } },
+    });
+    expect(resolveInteraction(fertilized, probe)).toMatchObject({ action: 'workPlot', labelKey: 'alreadyFertilized' });
+    expect(executeCommand(fertilized, { type: 'interact' }, probe).events).toContainEqual({ type: 'refused', reason: 'ALREADY_FERTILIZED' });
+
+    const fertilizerUsed = probeState({
+      tool: 'seedbag',
+      inventory: bagOf([]),
+      plots: { '1,1': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 }, fertilizer: 'basic' } },
+    });
+    expect(resolveInteraction(fertilizerUsed, probe)).toMatchObject({ action: 'workPlot', labelKey: 'alreadyPlanted' });
+    expect(executeCommand(fertilizerUsed, { type: 'interact' }, probe).events).toContainEqual({ type: 'refused', reason: 'ALREADY_PLANTED' });
   });
 });
 

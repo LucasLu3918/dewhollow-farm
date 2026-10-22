@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ACTION_IDS, type ActionId } from '../../domain/keybindings';
+import { INTERACTION_LABEL_KEYS, type InteractionLabelKey } from '../../application/interaction';
 import { ContentError } from './load-content';
 
 /**
@@ -51,6 +52,8 @@ export interface ControlsContent {
   /** 狀態列提示用的短標籤，每個 ActionId 一個。 */
   hintLabels: Readonly<Record<ActionId, string>>;
   hintText: HintTextContent;
+  /** Original wording for interaction descriptor keys; behavior owns keys, content owns copy. */
+  interactionLabels: Readonly<Record<InteractionLabelKey, string>>;
   /** 設定面板的動作名稱，每個 ActionId 一個。 */
   settingsLabels: Readonly<Record<ActionId, string>>;
   /** 虛擬按鍵的文字，每個虛擬按鍵動作一個。 */
@@ -64,6 +67,7 @@ const nonBlank = z.string().refine((text) => text.trim().length > 0, '不可是�
 const controlsSchema = z.strictObject({
   hintLabels: z.record(z.string(), nonBlank),
   hintText: z.strictObject({ arrowMovement: nonBlank, note: nonBlank }),
+  interactionLabels: z.record(z.string(), nonBlank),
   settingsLabels: z.record(z.string(), nonBlank),
   touchButtons: z.record(z.string(), z.strictObject({ label: nonBlank, name: nonBlank })),
   touchMore: z.strictObject({ label: nonBlank, name: nonBlank }),
@@ -79,6 +83,7 @@ export function parseControlsContent(raw: unknown): ControlsContent {
   const data = parsed.data;
   const problems = [
     ...coverageProblems('狀態列提示的標籤', data.hintLabels, ACTION_IDS),
+    ...coverageProblems('互動提示文字', data.interactionLabels, INTERACTION_LABEL_KEYS),
     ...coverageProblems('設定面板的動作名稱', data.settingsLabels, ACTION_IDS),
     ...coverageProblems('虛擬按鍵的文字', data.touchButtons, TOUCH_ACTION_IDS),
   ];

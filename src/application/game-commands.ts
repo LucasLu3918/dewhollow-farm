@@ -43,6 +43,7 @@ import { starCatchHit } from '../domain/star-fishing';
 import { closeIncomeYear, receiveGold } from '../domain/income';
 import { cropPriceBonusPercent } from '../domain/legacy';
 import { runHarvestReset, runLegacy, type LegacyOutcome } from './legacy';
+import { resolveInteraction } from './interaction';
 
 export type Command =
   | { type: 'move'; direction: Direction }
@@ -400,44 +401,44 @@ function enter(state: GameState, tile: TileDef, direction: Direction, index: Con
 }
 
 function interact(state: GameState, index: ContentIndex): CommandOutcome {
-  const map = index.map(state.mapId);
-  const target = neighbor(state.player, state.player.facing);
-  const resident = residentAt(state, index, target.x, target.y);
-  if (resident) return talk(state, resident.npcId, index);
-  // 面對擺好的裝飾按互動：收回背包（見 pickUpDecor）。
-  if (decorAt(state.decor[state.mapId], target.x, target.y)) return pickUpDecor(state, index);
-
-  const tile = tileAt(map, target.x, target.y);
-  if (!tile) return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
-  const kind = effectiveKind(tile.kind, changeAt(state.worldChanges, state.mapId, target.x, target.y));
-
-  if (tile.notice === 'bulletin') return openBulletin(state, index);
-  if (tile.notice === 'mailbox') return collectMailbox(state, index);
-  if (tile.notice === 'festival') return reply(state, [], [{ type: 'festivalOpened' }]);
-  if (tile.notice === 'repair') return reply(state, [], [{ type: 'repairOpened' }]);
-  if (tile.notice === 'legacy') return reply(state, [], [{ type: 'legacyOpened' }]);
-  if (tile.kind === 'rock' || tile.kind === 'ore') {
-    if (kind === tile.kind) return mineRock(state, target, tile, index);
+  // Resolve again at dispatch time: a previously shown descriptor is never trusted after state changes.
+  const interaction = resolveInteraction(state, index);
+  const target = interaction.target;
+  switch (interaction.action) {
+    case 'talk': return talk(state, interaction.entityId ?? '', index);
+    case 'pickUpDecor': return pickUpDecor(state, index);
+    case 'openBulletin': return openBulletin(state, index);
+    case 'collectMailbox': return collectMailbox(state, index);
+    case 'openFestival': return reply(state, [], [{ type: 'festivalOpened' }]);
+    case 'openRepair': return reply(state, [], [{ type: 'repairOpened' }]);
+    case 'openLegacy': return reply(state, [], [{ type: 'legacyOpened' }]);
+    case 'mineRock': {
+      if (!target) break;
+      const tile = tileAt(index.map(state.mapId), target.x, target.y);
+      if (tile) return mineRock(state, target, tile, index);
+      break;
+    }
+    case 'castStar': return castStar(state, index);
+    case 'lightLantern':
+      if (target) return festivalCommand(state, lightLantern(state, `${target.x},${target.y}`, index));
+      break;
+    case 'cast': if (target) return cast(state, target, index); break;
+    case 'feedAnimals': return feedAnimals(state, index);
+    case 'openKitchen': return reply(state, [], [{ type: 'kitchenOpened' }]);
+    case 'openWorkshop': return reply(state, [], [{ type: 'workshopOpened' }]);
+    case 'openWorkbench': return reply(state, [], [{ type: 'workbenchOpened' }]);
+    case 'petAnimal': if (target) return petAt(state, target, index); break;
+    case 'openCave': if (target) return openCave(state, target, index); break;
+    case 'sleep': return sleep(state, index);
+    case 'shipAll': return shipAll(state, index);
+    case 'mineLocked': return reply(state, [messageFor('MINE_LOCKED')], [refused('MINE_LOCKED')]);
+    case 'openShop': return reply(state, [], [{ type: 'shopOpened', shopId: interaction.entityId ?? '' }]);
+    case 'forage': if (target) return forage(state, target, index); break;
+    case 'chopTree': if (target) return chopTree(state, target, index); break;
+    case 'cutGrass': if (target) return cutGrass(state, target, index); break;
+    case 'workPlot': if (interaction.plotKey) return workPlot(state, interaction.plotKey, index); break;
+    case 'nothing': break;
   }
-  if (tile.festival === 'stars') return castStar(state, index);
-  if (tile.festival === 'lantern') return festivalCommand(state, lightLantern(state, `${target.x},${target.y}`, index));
-  if (tile.kind === 'water') return cast(state, target, index);
-  if (tile.kind === 'trough') return feedAnimals(state, index);
-  if (kind === 'kitchen') return reply(state, [], [{ type: 'kitchenOpened' }]);
-  if (kind === 'workshop') return reply(state, [], [{ type: 'workshopOpened' }]);
-  if (kind === 'workbench') return reply(state, [], [{ type: 'workbenchOpened' }]);
-  if (tile.slot) return petAt(state, target, index);
-  if (tile.kind === 'cave' && kind === 'cave') return openCave(state, target, index);
-  if (kind === 'bed') return sleep(state, index);
-  if (kind === 'shipbox') return shipAll(state, index);
-  if (kind === 'cave') return reply(state, [messageFor('MINE_LOCKED')], [refused('MINE_LOCKED')]);
-  if (kind === 'shop') return reply(state, [], [{ type: 'shopOpened', shopId: tile.shop ?? '' }]);
-  if (tile.kind === 'forage') return forage(state, target, index);
-  if (kind === 'tree') return chopTree(state, target, index);
-  if (kind === 'tuft') return cutGrass(state, target, index);
-
-  const key = plotKey(target.x, target.y);
-  if (kind === 'field' || state.plots[key]) return workPlot(state, key, index);
   return reply(state, [NOTHING_HERE], [refused('NOTHING_HERE')]);
 }
 
