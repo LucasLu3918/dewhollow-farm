@@ -145,6 +145,32 @@ a:focus-visible {
 }
 
 /*
+ * 開機載入提示：蓋在遊戲區上方，由 main.ts 在場景與鍵盤都接好後移除。
+ * 畫布在 data-ready 標上之前不顯示，所以玩家看得到畫面時，按鍵一定會被接到。
+ */
+.stage:has(> .loading) {
+  position: relative;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  color: var(--ink);
+  font-size: calc(18px * var(--font-scale));
+  background: var(--surface-stage);
+}
+
+#game:not([data-ready]) canvas {
+  visibility: hidden;
+}
+
+/*
  * 虛擬按鍵（觸控）：放在遊戲區的正下方，不蓋住畫面。直式與橫式都是左右兩組（方向鍵在左、動作鍵在右），
  * 寬度不夠時動作鍵自動換行。只有在觸控裝置（或設定為一律顯示）時才顯示，見 apply-settings.ts。
  */
