@@ -70,6 +70,8 @@ export class CharacterRig {
   private stillMs = 0;
   private walk?: Phaser.Tweens.Tween;
   private target?: { x: number; y: number };
+  /** 到達目前這一格後呼叫；供居民逐格接續尋路。 */
+  private arrive?: () => void;
   /** 進行中的揮工具動作。 */
   private action?: { tween?: Phaser.Tweens.Tween; image: Phaser.GameObjects.Image; fired: boolean; onImpact: () => void; onComplete: () => void };
   /** 走路中按下動作：等這一步走完再揮。 */
@@ -138,13 +140,20 @@ export class CharacterRig {
    * 走向某個位置，一步一格；每呼叫一次算一步（biped 左右腳交替、single 左右傾斜交替、hop 每次一跳）。
    * 已經在往同一處走、或已經站在那裡時不重來，避免按其他鍵時中斷走路並讓腳步順序錯亂。
    */
-  walkTo(x: number, y: number, durationMs: number): void {
-    if (this.walk && this.target?.x === x && this.target.y === y) return;
-    if (!this.walk && this.root.x === x && this.root.y === y) return;
+  walkTo(x: number, y: number, durationMs: number, onArrive?: () => void): void {
+    if (this.walk && this.target?.x === x && this.target.y === y) {
+      this.arrive = onArrive;
+      return;
+    }
+    if (!this.walk && this.root.x === x && this.root.y === y) {
+      onArrive?.();
+      return;
+    }
 
     this.finishAction();
     this.stopWalk();
     this.target = { x, y };
+    this.arrive = onArrive;
     this.run(durationMs, { x, y });
   }
 
@@ -288,6 +297,7 @@ export class CharacterRig {
     const walk = this.walk;
     this.walk = undefined;
     this.target = undefined;
+    this.arrive = undefined;
     this.toolState = null;
 
     try {
@@ -341,6 +351,9 @@ export class CharacterRig {
         const queued = this.queued;
         this.queued = undefined;
         if (queued) void this.swing(queued.tool, queued.durationMs, queued.reducedMotion, queued.onImpact, queued.onStart).then(queued.onComplete);
+        const arrive = this.arrive;
+        this.arrive = undefined;
+        arrive?.();
       },
     });
   }
@@ -449,6 +462,7 @@ export class CharacterRig {
     this.walk?.stop();
     this.walk = undefined;
     this.target = undefined;
+    this.arrive = undefined;
   }
 
   private frameName(rig: BipedRig, view: View, piece: Piece): string {

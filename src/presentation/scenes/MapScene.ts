@@ -44,6 +44,7 @@ import type { Weather } from '../../domain/weather';
 import { RENDER_COMPAT_KEY } from '../apply-render-compat';
 import { CharacterRig, type RigDebugInfo } from '../character-rig';
 import { centerOf, standOf } from '../layout';
+import { findRoute, tileOfStand } from '../resident-route';
 import { PLAYER_WEARER } from '../../domain/decor';
 import { decorColorOf, wearColorOf } from '../decor-style';
 import { emotesForEvent, type EmoteKind } from '../emote-defs';
@@ -287,6 +288,9 @@ export class MapScene extends Phaser.Scene {
   private rig!: CharacterRig;
   /** 目前地圖上的居民（依行程站位），見 syncResidents。毛毛有骨架，其他人是占位。 */
   private npcRigs = new Map<string, ResidentView>();
+  /** 居民的最新行程目標與路線代次；行程變動時先走完當前一步，再重新規劃。 */
+  private residentWalks = new Map<string, { goal: Point; run: number; inStep: boolean }>();
+  private residentRunCount = 0;
   private companions = new Map<string, CompanionState>();
   /** 玩家上一次畫面更新時站的格子，用來算出「剛離開的格子」給跟隨的寵物。 */
   private playerTile: Point | null = null;
@@ -461,6 +465,7 @@ export class MapScene extends Phaser.Scene {
       // Phaser may already have removed the DisplayList; settle animation promises without drawing shutdown impacts.
       this.rig.shutdown();
       for (const rig of this.npcRigs.values()) if (rig instanceof CharacterRig) rig.shutdown();
+      this.residentWalks.clear();
       for (const state of this.companions.values()) state.rig.shutdown();
       this.npcRigs.clear();
       this.companions.clear();
@@ -1062,6 +1067,7 @@ export class MapScene extends Phaser.Scene {
    */
   private syncResidents(): void {
     const state = this.deps.session.state;
+    const map = this.deps.index.map(state.mapId);
     const present = new Set<string>();
     for (const placement of residentsOn(state, this.deps.index)) {
       present.add(placement.npcId);
@@ -1074,20 +1080,67 @@ export class MapScene extends Phaser.Scene {
         this.npcRigs.set(placement.npcId, created);
         continue;
       }
-      const dx = Math.abs(view.root.x - stand.x);
-      const dy = Math.abs(view.root.y - stand.y);
-      if (dx === 0 && dy === 0) continue;
-      // 走過去的時間依距離：每格一步的時間，至少一步。
-      const steps = Math.max(1, Math.round(Math.max(dx, dy) / TILE_SIZE));
-      view.walkTo(stand.x, stand.y, MOVE_DURATION_MS * steps);
+      if (view.root.x === stand.x && view.root.y === stand.y && !this.residentWalks.has(placement.npcId)) continue;
+      this.walkResident(placement.npcId, view, map, { x: placement.x, y: placement.y });
     }
     for (const [id, view] of [...this.npcRigs]) {
       if (present.has(id)) continue;
       this.activeEmotes.get(id)?.handle.destroy();
       this.activeEmotes.delete(id);
+      this.residentWalks.delete(id);
       view.destroy();
       this.npcRigs.delete(id);
     }
+  }
+
+  /** 居民沿可走格子逐格移動；無法抵達時沿用舊行為，直接到達行程站位。 */
+  private walkResident(npcId: string, view: ResidentView, map: MapDef, goal: Point): void {
+    const previous = this.residentWalks.get(npcId);
+    if (previous?.goal.x === goal.x && previous.goal.y === goal.y) return;
+
+    const run = ++this.residentRunCount;
+    const current = { goal, run, inStep: previous?.inStep ?? false };
+    this.residentWalks.set(npcId, current);
+    // Tween 中的座標不是格心；等目前這一步走完再從確切格子重新找路，避免斜切障礙物。
+    if (current.inStep) return;
+    this.planResidentRoute(npcId, view, map, goal, run);
+  }
+
+  private planResidentRoute(npcId: string, view: ResidentView, map: MapDef, goal: Point, run: number): void {
+    const route = findRoute(map, tileOfStand(view.root.x, view.root.y), goal);
+    if (!route) {
+      this.residentWalks.delete(npcId);
+      const stand = standOf(goal.x, goal.y);
+      view.teleport(stand.x, stand.y);
+      return;
+    }
+    if (route.length === 0) {
+      this.residentWalks.delete(npcId);
+      return;
+    }
+
+    const stepTo = (index: number): void => {
+      const active = this.residentWalks.get(npcId);
+      if (!active || active.run !== run) return;
+      const next = route[index];
+      if (!next) {
+        this.residentWalks.delete(npcId);
+        return;
+      }
+      const stand = standOf(next.x, next.y);
+      active.inStep = true;
+      view.walkTo(stand.x, stand.y, MOVE_DURATION_MS, () => {
+        const latest = this.residentWalks.get(npcId);
+        if (!latest) return;
+        latest.inStep = false;
+        if (latest.run !== run) {
+          this.planResidentRoute(npcId, view, map, latest.goal, latest.run);
+          return;
+        }
+        stepTo(index + 1);
+      });
+    };
+    stepTo(0);
   }
 
   /** 有骨架的居民（目前是毛毛）用骨架；其餘是占位色塊。 */
@@ -1228,6 +1281,7 @@ export class MapScene extends Phaser.Scene {
     for (const [key, entry] of this.activeEmotes) if (key !== 'player') entry.handle.destroy();
     for (const rig of this.npcRigs.values()) rig.destroy();
     this.npcRigs.clear();
+    this.residentWalks.clear();
     for (const [id, state] of this.companions) {
       if (!state.def.home) continue;
       state.rig.destroy();
