@@ -162,10 +162,10 @@ const YIELD_ACTIONS = new Set<ActionFeedback>(['chop', 'mine', 'forage']);
 /** 居民與夥伴被搭話時，原地做一步的時間（比走一格慢，才看得清楚）。 */
 const REACT_DURATION_MS = 320;
 
-/** 圖層深度：居民 5、跟隨的寵物 9（在玩家後面）、玩家 10。 */
+/** 居民在地圖角色下方；玩家與跟隨寵物共用深度帶，再依腳底位置決定前後。 */
 const DEPTH_RESIDENT = 5;
-const DEPTH_FOLLOWER = 9;
-const DEPTH_PLAYER = 10;
+const DEPTH_ACTOR_BASE = 10;
+const DEPTH_PLAYER_TIE_BREAK = 0.001;
 /** 擺在地板上的裝飾：在地板之上、動物之下。 */
 const DEPTH_DECOR = 3;
 /** 天色與天氣的遮罩、粒子，在世界之上、HUD（DOM）之下。 */
@@ -198,6 +198,8 @@ interface SpriteDebugInfo {
 interface ActorDebugInfo {
   id: string;
   kind: string;
+  footX: number;
+  footY: number;
   tileX: number;
   tileY: number;
   left: number;
@@ -260,6 +262,8 @@ declare global {
       actors(): ActorDebugInfo[];
       /** 藏起（或恢復）玩家以外的所有角色，讓像素量測只看玩家自己，不受旁邊的寵物遮擋影響。 */
       setOthersHidden(hidden: boolean): void;
+      /** 開發用：只藏起或顯示玩家，供角色重疊像素檢查建立遮罩。 */
+      setPlayerHidden(hidden: boolean): void;
       /** 目前還在畫面上的表情氣泡。 */
       emotes(): EmoteDebugInfo[];
       /** 效果發生的紀錄（揮動開始、命中時的粒子、鏡頭微震），用來驗證效果落在命中那一刻。 */
@@ -457,7 +461,7 @@ export class MapScene extends Phaser.Scene {
     this.time.addEvent({ delay: FIREWORK_INTERVAL_MS, loop: true, callback: () => this.maybeFirework() });
     // 玩家骨架：腳底中心站在格子底邊中央，上半身與腳分開動作。
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
-    this.rig.root.setDepth(DEPTH_PLAYER);
+    this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
     this.createFollowers();
     this.setupCamera();
     window.addEventListener('keydown', this.onKeyDown);
@@ -546,6 +550,7 @@ export class MapScene extends Phaser.Scene {
         renderCompat: () => this.registry.get(RENDER_COMPAT_KEY) as RenderCompatInfo,
         actors: () => this.debugActors(),
         setOthersHidden: (hidden) => this.setOthersHidden(hidden),
+        setPlayerHidden: (hidden) => this.rig.root.setVisible(!hidden),
         emotes: () => this.debugEmotes(),
         effectLog: () => this.effectEntries.map((e) => ({ ...e })),
         continuousFarmActionsRunning: () => this.continuousFarmActions.isRunning,
@@ -1217,9 +1222,10 @@ export class MapScene extends Phaser.Scene {
       return;
     }
     if (!this.wearBadge) {
-      this.wearBadge = this.add.rectangle(0, 0, TILE_SIZE * 0.35, TILE_SIZE * 0.2, wearColorOf(worn)).setDepth(DEPTH_PLAYER + 1);
+      this.wearBadge = this.add.rectangle(0, 0, TILE_SIZE * 0.35, TILE_SIZE * 0.2, wearColorOf(worn)).setDepth(this.actorDepth(this.rig.footPosition().y, true) + 1);
     }
     this.wearBadge.setFillStyle(wearColorOf(worn));
+    this.wearBadge.setDepth(this.actorDepth(this.rig.footPosition().y, true) + 1);
     this.moveWearBadge();
   }
 
@@ -1227,6 +1233,7 @@ export class MapScene extends Phaser.Scene {
     if (!this.wearBadge) return;
     const head = this.headOf(this.rig);
     this.wearBadge.setPosition(head.x, head.y - TILE_SIZE * 0.4);
+    this.wearBadge.setDepth(this.actorDepth(this.rig.footPosition().y, true) + 1);
   }
 
   /** 玩家造成的地圖變化（砍樹、採野薄荷、隔日恢復）即時反映到地板與透明物件層。 */
@@ -1309,7 +1316,7 @@ export class MapScene extends Phaser.Scene {
     for (const def of this.deps.companions.companions) {
       if (!def.follows) continue;
       const rig = new CharacterRig(this, this.rigDef(def.rig), this.deps.assets);
-      rig.root.setDepth(DEPTH_FOLLOWER).setVisible(false);
+      rig.root.setDepth(this.actorDepth(rig.footPosition().y, false)).setVisible(false);
       this.companions.set(def.id, { def, rig, tile: null });
     }
   }
@@ -1414,7 +1421,21 @@ export class MapScene extends Phaser.Scene {
     this.moveWearBadge();
     for (const rig of this.npcRigs.values()) rig.update(delta);
     for (const state of this.companions.values()) state.rig.update(delta);
+    this.updateFollowerDepths();
     this.drawStarMeter();
+  }
+
+  /** 玩家與跟隨寵物依腳底 Y 排序；腳底較低者畫在前面，同腳底時玩家優先。 */
+  private updateFollowerDepths(): void {
+    this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
+    for (const state of this.companions.values()) {
+      if (!state.def.follows) continue;
+      state.rig.root.setDepth(this.actorDepth(state.rig.footPosition().y, false));
+    }
+  }
+
+  private actorDepth(footY: number, player: boolean): number {
+    return DEPTH_ACTOR_BASE + footY / TILE_SIZE + (player ? DEPTH_PLAYER_TIE_BREAK : 0);
   }
 
   /** 每一畫面更新：夜色依時間、變暗依天氣、粒子依天氣與時間。 */
@@ -1503,6 +1524,8 @@ export class MapScene extends Phaser.Scene {
       return {
         id,
         kind: info.kind,
+        footX: foot.x,
+        footY: foot.y,
         tileX: Math.floor(foot.x / TILE_SIZE),
         tileY: Math.round(foot.y / TILE_SIZE) - 1,
         left: info.left,
