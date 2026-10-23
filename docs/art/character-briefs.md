@@ -65,7 +65,7 @@ Bright saturated hand-painted cartoon style, thick dark brown outline, soft high
 
 使用者採用：小涵 seed 101、毛毛 seed 101、黑貓 seed 101、有袋動物 seed 202。
 
-處理工具（`tools/art/`）：`build_palette.py` 由這四張產生 `content/palette.json`（48 色：4 個錨點色＋44 個衍生色，錨點含深棕輪廓與兩位角色的標誌色）；`finalize.py` 縮到畫格、外圍補輪廓、量化到調色盤並驗證輸出顏色都在調色盤內。成品在 `private/art-trials/final/`（尚未進 `public/`）。
+歷史處理紀錄（2026-10-21）：當時 `build_palette.py` 由四張圖產生 48 色調色盤；角色圖曾縮到畫格、補輪廓並量化。**此段是舊流程紀錄**：目前 `finalize.py` 保留 RGBA8888 全彩，不再量化輸出；輸出檔若已存在會拒絕覆寫。當時的試驗成品在 `private/art-trials/final/`，不代表目前核准狀態。
 
 | 素材 | 1x 畫格 | 2x 母版畫格 | 用色（2x／1x） |
 | --- | --- | --- | --- |
@@ -84,7 +84,7 @@ Bright saturated hand-painted cartoon style, thick dark brown outline, soft high
 尚待處理：
 - 只有正面（或四分之三）站姿，四方向與行走動畫尚未開始。
 - 小涵與毛毛的臉部比例不完全相同（毛毛的頭髮占比大），之後要統一頭身比。
-- 黑貓的尾巴偏短（設定是長尾）；有袋動物偏像小熊，要更像有袋動物需再調整描述。
+- 黑貓已於 2026-10-23 恢復為清楚的四足貓圖；尾巴仍較設定短，後續方向圖可再補強。有袋動物已依下方描述修復為矮袋鼠（quokka）。
 - 已入庫（2026-10-21）：四個 2x 母版放在 `public/assets/characters/`，`content/assets.json` 以 `file`、`density: 2` 與 `source`（模型、授權、seed、處理方式）登錄；`player.up/down/left/right` 暫用同一張小涵正面圖，`npc.maomao` 用毛毛，`pet.cat`、`pet.marsupial` 先登錄、尚未接進畫面。引擎以線性取樣、0.5 倍顯示，角色以腳底對齊格子。瀏覽器實測臉部與服裝清楚，縮小沒有鋸齒。
 - 四方向暫用同一張的限制已解除（見下方「四方向試驗」）。
 
@@ -110,7 +110,7 @@ Bright saturated hand-painted cartoon style, thick dark brown outline, soft high
 - 臉：淺膚色，深棕色大眼，臉頰略帶粉。
 - 服裝：深海軍藍針織套頭衫、墨綠灰色工裝長褲（側邊口袋）、白色休閒運動鞋。
 - 標誌色：亮藍色（愛心與閃光）。
-- 寵物：棕灰色、圓臉、小耳朵的小型有袋動物（名字待補）。
+- 寵物：矮袋鼠（quokka），棕灰毛色、圓而短的口鼻、小圓耳、渾圓身軀、短前肢、較發達後肢與自然彎曲尾巴。
 
 提示詞待小涵定稿、風格鎖定後，用同一模板與同一組風格詞產生。
 
@@ -128,3 +128,12 @@ Bright saturated hand-painted cartoon style, thick dark brown outline, soft high
 
 入庫：`content/assets.json` 的 `npc.<id>`（128×160 的 2x 母版，0.5 倍顯示成 64×80）與 `content/rigs.json` 的單張精靈條目（`kind: single`）。
 
+## 寵物物種修復（2026-10-23）
+
+### 矮袋鼠（quokka）
+
+- 物種：明確限定為 quokka，不使用泛稱「有袋動物」。
+- 輪廓：棕灰色短毛、圓而稍短的口鼻、小圓耳、渾圓軀幹、短前肢、較發達後肢與清楚可見的自然彎曲尾巴。
+- 姿勢：自然低伏的四足姿勢；不畫人類直立軀幹、肩腰比例、手指、服裝或配件。
+- 已採用：使用者核准的單張靜態候選，經透明背景修正及 `tools/art/finalize.py` 轉成 96×96 RGBA8888，於遊戲中以 48×48 顯示。
+- 限制：目前只有單一方向靜態圖；本次未新增方向圖或逐幀動畫。

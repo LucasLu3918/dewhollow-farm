@@ -37,3 +37,9 @@
 - 地面放大時仍有清楚像素群；相鄰鋪設時沒有可見接縫。
 - 物件 alpha 外部為透明，邊緣無綠幕或黑邊；疊在草地、水、農地、道路和室內地板上都能辨認。
 - 遊戲以 1×、2×、4× 檢視時，輪廓、五官、手持物與腳底定位都可辨識。
+
+## 樣張與新素材核准
+
+- [風格樣張候選](art/style-sheet.png)以目前遊戲畫面和已核准遊戲素材作參考，尚待使用者明確核准，不是已鎖定的 style sheet。
+- 每個新素材依 [進件與審核狀態](art/asset-review.md) 個別通過 candidate → reviewed → approved → integrated。其他素材或同物種既有圖片的核准不能移用到新方向、新幀或新素材。
+- 可重用的提示詞骨架見 [prompt-template.md](art/prompt-template.md)。

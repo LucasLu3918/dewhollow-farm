@@ -31,6 +31,43 @@ async function waitForGame(page: Page): Promise<void> {
   await expect.poll(() => mapId(page)).toBe('farm');
 }
 
+async function walk(page: Page, key: string, times: number): Promise<void> {
+  for (let i = 0; i < times; i += 1) {
+    await page.keyboard.press(key);
+    await page.waitForTimeout(80);
+  }
+}
+
+async function waitForPlayer(page: Page, x: number, y: number): Promise<void> {
+  await expect.poll(() => page.evaluate(() => {
+    const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+    return player && !player.busy ? [player.tileX, player.tileY] : null;
+  })).toEqual([x, y]);
+}
+
+async function greenhouseFencePixel(page: Page, x: number, y: number): Promise<[number, number, number]> {
+  return page.evaluate(async ({ tileX, tileY }) => {
+    const debug = window.__dewhollow;
+    if (!debug) throw new Error('缺少 window.__dewhollow');
+    const camera = debug.cameraView();
+    const scroll = debug.cameraScroll();
+    const image = new Image();
+    image.src = await debug.snapshot();
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('沒有 2D canvas context');
+    context.drawImage(image, 0, 0);
+    // Fence art leaves a clear gap above its rails at the center of each tile.
+    const px = Math.round(camera.x + (tileX * 64 + 32 - scroll.x) * camera.zoom);
+    const py = Math.round(camera.y + (tileY * 64 + 8 - scroll.y) * camera.zoom);
+    const pixel = context.getImageData(px, py, 1, 1).data;
+    return [pixel[0] ?? 0, pixel[1] ?? 0, pixel[2] ?? 0];
+  }, { tileX: x, tileY: y });
+}
+
 test('camera follows the player on the large farm and stays inside the map', async ({ page }) => {
   await waitForGame(page);
 
@@ -80,4 +117,29 @@ test('camera is reframed when changing maps', async ({ page }) => {
   await press(page, 'ArrowDown', 1);
   await expect.poll(() => mapId(page)).toBe('farm');
   await expect.poll(async () => (await scroll(page)).y).toBeCloseTo((await cameraView(page))!.bounds.y + (await cameraView(page))!.bounds.height - (await cameraView(page))!.height, 0);
+});
+
+test('greenhouse transparent fence gaps show grass on both mirrored sides', async ({ page }) => {
+  await waitForGame(page);
+
+  // Approach the west side from the north and sample the transparent center gap in fence tile (27,22).
+  await walk(page, 'ArrowDown', 11);
+  await walk(page, 'ArrowRight', 19);
+  await walk(page, 'ArrowDown', 2);
+  await waitForPlayer(page, 26, 22);
+  await page.waitForTimeout(150);
+  const west = await greenhouseFencePixel(page, 27, 22);
+
+  // Walk around the greenhouse to reach the mirrored east fence at (33,22).
+  await walk(page, 'ArrowDown', 4);
+  await walk(page, 'ArrowRight', 8);
+  await walk(page, 'ArrowUp', 4);
+  await waitForPlayer(page, 34, 22);
+  await page.waitForTimeout(150);
+  const east = await greenhouseFencePixel(page, 33, 22);
+
+  for (const [side, [red, green, blue]] of [['west', west], ['east', east]] as const) {
+    expect(green, `${side} fence gap should reveal grass`).toBeGreaterThan(red * 1.2);
+    expect(green, `${side} fence gap should reveal grass`).toBeGreaterThan(blue * 1.1);
+  }
 });

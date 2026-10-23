@@ -165,3 +165,48 @@ test.describe('響應式版面整合', () => {
     await expect(page.locator('#settings-placement')).toHaveValue('overlay');
   });
 });
+
+test.describe('桌機短視窗版面', () => {
+  test.use({ viewport: { width: 1280, height: 720 } });
+
+  test('1280×720 的遊戲畫面、主要操作與回饋列都在首屏，不需垂直捲動', async ({ page }) => {
+    await start(page);
+    for (let i = 0; i < 4; i += 1) {
+      await page.keyboard.press('ArrowUp');
+      await page.waitForFunction(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy === false);
+    }
+
+    const action = page.locator('#hud-action');
+    await expect(action).toBeEnabled();
+    await action.click();
+    await expect(page.locator('#hud-log')).toContainText('開墾了一塊田');
+
+    const layout = await page.evaluate(() => {
+      const rect = (selector: string) => {
+        const element = document.querySelector<HTMLElement>(selector);
+        if (!element) return null;
+        const bounds = element.getBoundingClientRect();
+        return { top: bounds.top, right: bounds.right, bottom: bounds.bottom, width: bounds.width, height: bounds.height };
+      };
+      return {
+        viewport: { width: innerWidth, height: innerHeight },
+        clientHeight: document.documentElement.clientHeight,
+        scrollHeight: document.documentElement.scrollHeight,
+        status: rect('.status'),
+        action: rect('#hud-action'),
+        stage: rect('#game'),
+        canvas: rect('#game canvas'),
+        log: rect('#hud-log'),
+      };
+    });
+
+    expect(layout.scrollHeight).toBeLessThanOrEqual(layout.clientHeight);
+    for (const [name, box] of Object.entries({ status: layout.status, action: layout.action, stage: layout.stage, canvas: layout.canvas, log: layout.log })) {
+      expect(box, `${name} is present`).not.toBeNull();
+      expect(box!.top, `${name} top`).toBeGreaterThanOrEqual(0);
+      expect(box!.right, `${name} right`).toBeLessThanOrEqual(layout.viewport.width + 1);
+      expect(box!.bottom, `${name} bottom`).toBeLessThanOrEqual(layout.viewport.height + 1);
+    }
+    expect(Math.abs(layout.stage!.width / layout.stage!.height - 4 / 3)).toBeLessThan(0.02);
+  });
+});
