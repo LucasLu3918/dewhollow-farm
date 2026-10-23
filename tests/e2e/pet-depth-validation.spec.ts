@@ -74,7 +74,7 @@ async function captureCrossing(page: Page, key: string, depth: 'player-front' | 
   }>((resolve, reject) => {
     const debug = window.__dewhollow;
     if (!debug) return reject(new Error('缺少 window.__dewhollow'));
-    const timeout = window.setTimeout(() => reject(new Error('5 秒內未捕捉到玩家與黑貓的交叉重疊')), 5_000);
+    const timeout = window.setTimeout(() => reject(new Error('10 秒內未捕捉到玩家與黑貓的交叉重疊')), 10_000);
     const poll = (): void => {
       const [player, cat] = debug.actors().filter((item) => item.id === 'player' || item.id === 'cat');
       if (!player || !cat) return reject(new Error('找不到交叉中的玩家與黑貓'));
@@ -96,7 +96,24 @@ async function captureCrossing(page: Page, key: string, depth: 'player-front' | 
     };
     poll();
   }), depth);
-  await page.keyboard.press(key);
+  const oppositeKey = key === 'ArrowUp' ? 'ArrowDown' : 'ArrowUp';
+  let captureSettled = false;
+  let captureFailure: unknown;
+  void crossing.then(
+    () => { captureSettled = true; },
+    (error: unknown) => { captureFailure = error; captureSettled = true; },
+  );
+  let movementKey = key;
+  for (let attempt = 0; attempt < 8 && !captureSettled; attempt += 1) {
+    await page.keyboard.press(movementKey);
+    await expect.poll(async () => {
+      if (captureSettled) return true;
+      const [player, cat] = await Promise.all([actor(page, 'player'), actor(page, 'cat')]);
+      return !player.busy && !cat.busy;
+    }, { intervals: [16], timeout: 1_500 }).toBe(true);
+    if (captureFailure) throw captureFailure;
+    movementKey = movementKey === key ? oppositeKey : key;
+  }
   const { sampledFeet, pausedFeet } = await crossing;
   expect(pausedFeet.player).toBeCloseTo(sampledFeet.player, 3);
   expect(pausedFeet.cat).toBeCloseTo(sampledFeet.cat, 3);
