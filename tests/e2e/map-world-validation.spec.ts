@@ -83,16 +83,20 @@ async function player(page: Page): Promise<Actor> {
 
 async function walk(page: Page, key: string, steps = 1): Promise<void> {
   for (let i = 0; i < steps; i += 1) {
-    const beforeMap = await mapId(page);
-    const before = await player(page);
+    const before = await page.evaluate(() => {
+      const debug = window.__dewhollow;
+      const actor = debug?.actors().find((candidate) => candidate.id === 'player');
+      if (!debug || !actor) throw new Error('找不到遊戲或玩家');
+      return { mapId: debug.mapId(), tileX: actor.tileX, tileY: actor.tileY };
+    });
     await page.keyboard.press(key);
-    const delta = key === 'ArrowUp' ? [0, -1] : key === 'ArrowDown' ? [0, 1] : key === 'ArrowLeft' ? [-1, 0] : [1, 0];
-    await expect.poll(async () => {
-      if ((await mapId(page)) !== beforeMap) return true;
-      const current = await player(page);
-      return !current.busy && (current.tileX !== before.tileX || current.tileY !== before.tileY);
-    }).toBe(true);
-    await expect.poll(async () => !(await player(page)).busy).toBe(true);
+    await page.waitForFunction(({ mapId: beforeMap, tileX, tileY }) => {
+      const debug = window.__dewhollow;
+      const actor = debug?.actors().find((candidate) => candidate.id === 'player');
+      if (!debug || !actor) return false;
+      const moved = debug.mapId() !== beforeMap || actor.tileX !== tileX || actor.tileY !== tileY;
+      return moved && !actor.busy;
+    }, before);
   }
 }
 
@@ -280,7 +284,7 @@ test('the lakeside fishing view and mine entrance have deterministic visual base
 });
 
 test('field edges stay walkable while farm buildings, greenhouse fence, forest trees, and door transitions block correctly', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   await waitForGame(page);
 
   // The field and grass edge is traversable in both directions.

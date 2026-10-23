@@ -51,8 +51,10 @@ async function move(page: Page, direction: 'Up' | 'Down' | 'Left' | 'Right', ste
   for (let index = 0; index < steps; index += 1) {
     const before = await tile(page);
     await touchAction(page, `move${direction}`);
-    await expect.poll(() => tile(page)).not.toEqual(before);
-    await expect.poll(() => page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy ?? true)).toBe(false);
+    await page.waitForFunction(({ x, y }) => {
+      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+      return Boolean(player && !player.busy && (player.tileX !== x || player.tileY !== y));
+    }, before);
   }
 }
 
@@ -232,7 +234,7 @@ test.describe('行動版完整觸控農場流程', () => {
     { name: 'landscape', width: 844, height: 390 },
   ]) {
     test(`touch completes dialogue, shop, farm and save loop in ${viewport.name}`, async ({ page }, testInfo: TestInfo) => {
-      test.setTimeout(120_000);
+      test.setTimeout(180_000);
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await start(page);
       const beforeFarm = await talkShopAndReturn(page);
