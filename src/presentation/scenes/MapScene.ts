@@ -252,8 +252,8 @@ declare global {
       rig(): { view: string; mode: string; visible: string[] };
       /** 直接擺出走路循環的某一刻，供逐格檢視。 */
       setPose(view: View, step: number, u: number): void;
-      /** 暫停場景更新，保留目前畫格供開發測試穩定擷取。 */
-      pauseScene(): Promise<void>;
+      /** 暫停場景更新；預設將角色重設為 REST pose，也可保留目前姿勢供遮擋測試擷取。 */
+      pauseScene(options?: { preservePose?: boolean }): Promise<void>;
       /** 直接讀取 WebGL 畫面（原始像素，不經瀏覽器合成）；回傳 PNG 的 data URL。供逐格視覺檢查用。 */
       snapshot(): Promise<string>;
       /** 軟體繪圖器保底的偵測與套用結果（見 render-compat.ts）。 */
@@ -534,13 +534,15 @@ export class MapScene extends Phaser.Scene {
           return { view, mode, visible: [...visible] };
         },
         setPose: (view, step, u) => this.rig.preview(view, step, u),
-        pauseScene: () => new Promise<void>((resolve) => {
+        pauseScene: (options) => new Promise<void>((resolve) => {
           this.events.once(Phaser.Scenes.Events.PAUSE, () => {
-            const freezePose = (rig: CharacterRig): void => {
-              rig.preview(rig.debugInfo().view, 0, 0);
-            };
-            freezePose(this.rig);
-            for (const { rig } of this.visibleRigs()) freezePose(rig);
+            if (!options?.preservePose) {
+              const freezePose = (rig: CharacterRig): void => {
+                rig.preview(rig.debugInfo().view, 0, 0);
+              };
+              freezePose(this.rig);
+              for (const { rig } of this.visibleRigs()) freezePose(rig);
+            }
             // Stable test captures need a deterministic weather particle phase as well as frozen actors.
             this.updateSky(0);
             resolve();

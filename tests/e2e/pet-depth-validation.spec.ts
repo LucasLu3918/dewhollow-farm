@@ -89,7 +89,7 @@ async function captureCrossing(page: Page, key: string, depth: 'player-front' | 
 }
 
 async function captureOverlap(page: Page): Promise<OverlapCapture> {
-  await page.evaluate(() => window.__dewhollow?.pauseScene());
+  await page.evaluate(() => window.__dewhollow?.pauseScene({ preservePose: true }));
 
   return page.evaluate(() => {
     const debug = window.__dewhollow;
