@@ -100,6 +100,14 @@ test('the approved cat artwork matches the farm visual baseline', async ({ page 
   });
 });
 
+test('the approved cat and quokka artwork match the village visual baseline', async ({ page }) => {
+  await waitForGame(page);
+  await enterVillage(page);
+  await expect(page.locator('#game canvas')).toHaveScreenshot('pet-companions-village.png', {
+    animations: 'disabled',
+  });
+});
+
 test('the cat starts beside the player, standing on a tile of its own', async ({ page }) => {
   await waitForGame(page);
   const player = await actor(page, 'player');

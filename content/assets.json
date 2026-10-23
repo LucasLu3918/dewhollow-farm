@@ -230,7 +230,7 @@
       "color": "#8c6a4f",
       "file": "assets/characters/marsupial-2x.png",
       "density": 2,
-      "source": "OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。"
+      "source": "OpenAI built-in image generation tool（2026-10-23），使用者核准候選之透明背景編修版；tools/art/finalize.py 以最近鄰縮放至 96×96 RGBA8888，使用既有 pet.marsupial rig。"
     },
     {
       "id": "tool.hoe",
