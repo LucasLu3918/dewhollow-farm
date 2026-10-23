@@ -69,7 +69,9 @@
       "id": "crop.sweet-radish",
       "kind": "crop",
       "color": "#e8745a",
-      "source": "占位（程式產生）"
+      "source": "OpenAI built-in image generation tool（2026-10-23），使用者核准之甜蘿蔔原創像素圖；保留核准 PNG 原始位元組，未重繪或重採樣。",
+      "file": "assets/crops/sweet-radish-2x.png",
+      "density": 2
     },
     {
       "id": "crop.moon-bean",

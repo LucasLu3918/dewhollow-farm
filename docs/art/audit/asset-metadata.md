@@ -18,7 +18,7 @@ BootScene.preload queues every file-backed manifest entry. Consumer labels are t
 | tile.shipbox | public/assets/tiles/shipbox-2x.png | 128×128; d=2; display 64×64 | 9,4–123,127; α>0 8904/16384; partial 8901 | —; — | BootScene → MapScene |
 | tile.door | public/assets/tiles/door-2x.png | 128×128; d=2; display 64×64 | 7,6–103,122; α>0 8168/16384; partial 8151 | —; — | BootScene → MapScene |
 | tile.soil | public/assets/tiles/soil-2x.png | 128×128; d=2; display 64×64 | 0,0–128,128; α>0 16384/16384; partial 0 | —; — | BootScene → MapScene |
-| crop.sweet-radish | — | generated 64×64 fallback; d=n/a | Graphics, no PNG | —; — | BootScene → MapScene |
+| crop.sweet-radish | public/assets/crops/sweet-radish-2x.png | 128×128; d=2; display 64×64 | α bbox 5,9–124,125; α>0 4,824/16,384; partial 4,785 | —; — | BootScene → MapScene |
 | crop.moon-bean | — | generated 64×64 fallback; d=n/a | Graphics, no PNG | —; — | BootScene → MapScene |
 | crop.star-pepper | — | generated 64×64 fallback; d=n/a | Graphics, no PNG | —; — | BootScene → MapScene |
 | crop.golden-rice | — | generated 64×64 fallback; d=n/a | Graphics, no PNG | —; — | BootScene → MapScene |
