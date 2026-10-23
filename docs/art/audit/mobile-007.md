@@ -32,6 +32,18 @@ E2E_BASE_URL=http://127.0.0.1:5189 PWA_BASE_URL=http://127.0.0.1:4189 \
   --project=chromium --workers=1 --output=/private/tmp/dewhollow-mobile-007-27
 ```
 
+## AC-007 補充驗收
+
+計畫 AC-007 的手機直式 390×844、橫式 844×390、平板直式 768×1024、桌機 1280×720 viewport 均有自動化版面證據；原有 768×1024 截圖見上方。新增的專項規格為 [mobile-acceptance-gaps.spec.ts](../../tests/e2e/mobile-acceptance-gaps.spec.ts)：
+
+- `平板直式 768×1024 的主要操作區保持在 viewport 內並附截圖`：再次量測遊戲畫面、HUD、工具／種子／主要動作、移動／動作控制與操作紀錄，並附 `tablet-768x1024.png` Playwright screenshot。
+- `觸控可開啟並關閉使用背包種子的選擇面板`：390×844 觸控操作打開 `#tool-seed-panel`，確認可見開局背包中的甜蘿蔔種子，然後關閉面板。專案沒有獨立背包總覽 UI，此案例驗證目前可觸控使用、且讀取背包種子的選擇面板。
+- `直式存檔在切換橫式後仍可再次存檔並重載相同遊戲狀態`：直式移動並觸控存檔，改為橫式後再次存檔，再重載並比對地圖、位置及持久化狀態。只略過會隨等待時間增加的 `playtimeSeconds`。
+
+執行 `npm run test:e2e -- tests/e2e/mobile-acceptance-gaps.spec.ts`（Node 24.22.1）：Chromium 3/3 通過。新增平板截圖是該次 Playwright attachment，未加入版本控制。Playwright `setViewportSize` 只驗證 viewport resize/orientation layout，未模擬原生裝置旋轉事件。
+
+**整體仍為 Partial**：自動化確認版面與操作路徑，不足以核准實機安全區、瀏海與系統瀏覽器列、文字實際可讀性或手指命中率。使用者已表示目前沒有 iOS／Android 實機；這些人工驗收待有設備時完成。觸控工具輪盤長按／取消見 [touch.spec.ts](../../tests/e2e/touch.spec.ts)，連續農務去重／取消見 [continuous-farm.spec.ts](../../tests/e2e/continuous-farm.spec.ts)，後者的主要長按案例以滑鼠／鍵盤測試，觸控長按副作用尚未完整覆蓋。
+
 ## 截圖
 
 - [1280×720 桌機修復前](mobile-007-desktop-before.png) — 首屏下緣裁掉遊戲畫面，操作紀錄在視窗下方。
