@@ -40,6 +40,6 @@
 
 ## 樣張與新素材核准
 
-- [風格樣張候選](art/style-sheet.png)以目前遊戲畫面和已核准遊戲素材作參考，尚待使用者明確核准，不是已鎖定的 style sheet。
+- [風格樣張](art/style-sheet.png)以目前遊戲畫面和已核准遊戲素材作參考；使用者已於 2026-10-23 核准目前 SHA-256 `9cf2c3db8e3047b577386f873b58b4c17ff1379263329e44b5930a60bdbcc4ae` 的版本作為專案像素美術 Golden Reference。逐項素材仍須依 [進件與審核狀態](art/asset-review.md) 個別核准。
 - 每個新素材依 [進件與審核狀態](art/asset-review.md) 個別通過 candidate → reviewed → approved → integrated。其他素材或同物種既有圖片的核准不能移用到新方向、新幀或新素材。
 - 可重用的提示詞骨架見 [prompt-template.md](art/prompt-template.md)。

@@ -6,7 +6,7 @@
 
 ## 一、素材（content/assets.json）
 
-共 65 筆：有檔案 16 筆（其中本機模型生成 9、程式產生 3）、水平翻轉 1 筆（不另存檔）、占位（程式繪製的色塊，無檔案）48 筆。
+共 65 筆：有檔案 46 筆（其中本機模型生成 0、程式產生 3）、水平翻轉 1 筆（不另存檔）、占位（程式繪製的色塊，無檔案）18 筆。
 
 ### 1.1 本機影像模型生成
 
@@ -17,32 +17,62 @@
 
 | 素材 id | 類別 | 檔案 | 來源與授權 |
 | --- | --- | --- | --- |
-| `player.up` | character | `assets/characters/xiaohan-back-2x.png` | 本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md（背面；提示詞 xiaohan-back-v1） |
-| `player.down` | character | `assets/characters/xiaohan-2x.png` | 本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md（正面） |
-| `player.left` | character | `assets/characters/xiaohan-side-2x.png` | 本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md（側面朝左；提示詞 xiaohan-side-v1） |
-| `npc.maomao` | character | `assets/characters/maomao-2x.png` | 本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md |
-| `pet.cat` | character | `assets/characters/cat-2x.png` | 本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md |
-| `pet.marsupial` | character | `assets/characters/marsupial-2x.png` | 本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 202，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定見 docs/art/character-briefs.md |
-| `tool.hoe` | object | `assets/tools/hoe-2x.png` | 本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 202，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定與挑選見 docs/art/tool-briefs.md |
-| `tool.can` | object | `assets/tools/can-2x.png` | 本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 101，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定與挑選見 docs/art/tool-briefs.md |
-| `tool.seedbag` | object | `assets/tools/seedbag-2x.png` | 本機模型生成：Z-Image Turbo（Apache-2.0）文生圖 seed 202，綠幕去背、縮放並量化到 content/palette.json（tools/art）；設定與挑選見 docs/art/tool-briefs.md |
 
 ### 1.2 程式產生（有檔案）
 
 | 素材 id | 類別 | 檔案 | 來源與授權 |
 | --- | --- | --- | --- |
-| `pwa.icon-192` | object | `assets/icons/icon-192.png` | 程式產生：tools/pwa/make-icons.mjs 以幾何圖形與純色繪製（太陽、幼苗、土丘），自行設計，無外部素材。PWA 圖示（192 px） |
-| `pwa.icon-512` | object | `assets/icons/icon-512.png` | 程式產生：tools/pwa/make-icons.mjs 以幾何圖形與純色繪製（太陽、幼苗、土丘），自行設計，無外部素材。PWA 圖示（512 px） |
-| `pwa.icon-maskable-512` | object | `assets/icons/icon-maskable-512.png` | 程式產生：tools/pwa/make-icons.mjs 以幾何圖形與純色繪製（太陽、幼苗、土丘），內容在中央圓以內，自行設計，無外部素材。PWA maskable 圖示（512 px） |
+| `pwa.icon-192` | object | `assets/icons/icon-192.png` | 程式產生：tools/pwa/make-icons.mjs 以 64×64 邏輯畫布繪製像素風草地、太陽與幼苗，再以最近鄰放大輸出 RGBA8888；無外部素材。 |
+| `pwa.icon-512` | object | `assets/icons/icon-512.png` | 程式產生：tools/pwa/make-icons.mjs 以 64×64 邏輯畫布繪製像素風草地、太陽與幼苗，再以最近鄰放大輸出 RGBA8888；無外部素材。 |
+| `pwa.icon-maskable-512` | object | `assets/icons/icon-maskable-512.png` | 程式產生：tools/pwa/make-icons.mjs 以 64×64 邏輯畫布繪製像素風草地、太陽與幼苗，再以最近鄰放大輸出 RGBA8888；無外部素材。 |
 
 ### 1.3 其他有檔案的素材
 
 | 素材 id | 類別 | 檔案 | 來源與授權 |
 | --- | --- | --- | --- |
-| `tool.axe` | object | `assets/tools/axe-2x.png` | 暫用鋤頭的圖（複製 hoe-2x.png，本機模型 Z-Image Turbo 文生圖 seed 202）。斧頭的正式圖待產圖後替換；日後替換時只改 file 與 source。 |
-| `tool.pick` | object | `assets/tools/pick-2x.png` | 暫用鋤頭的圖（複製 hoe-2x.png，本機模型 Z-Image Turbo 文生圖 seed 202）。鎬的正式圖待產圖後替換。 |
-| `tool.rod` | object | `assets/tools/rod-2x.png` | 暫用鋤頭的圖（複製 hoe-2x.png，本機模型 Z-Image Turbo 文生圖 seed 202）。釣竿的正式圖待產圖後替換。 |
-| `tool.sickle` | object | `assets/tools/sickle-2x.png` | 暫用鋤頭的圖（複製 hoe-2x.png，本機模型 Z-Image Turbo 文生圖 seed 202）。鐮刀的正式圖待產圖後替換；日後替換時只改 file 與 source。 |
+| `tile.grass` | tile | `assets/tiles/grass-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
+| `tile.field` | tile | `assets/tiles/field-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
+| `tile.path` | tile | `assets/tiles/path-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
+| `tile.wall` | tile | `assets/tiles/wall-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
+| `tile.bed` | overlay | `assets/tiles/bed-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.shipbox` | overlay | `assets/tiles/shipbox-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.door` | overlay | `assets/tiles/door-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.soil` | tile | `assets/tiles/soil-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩農地土壤地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
+| `crop.sweet-radish` | crop | `assets/crops/sweet-radish-2x.png` | OpenAI built-in image generation tool（2026-10-23），使用者核准之甜蘿蔔原創像素圖；保留核准 PNG 原始位元組，未重繪或重採樣。 |
+| `player.up` | character | `assets/characters/xiaohan-back-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `player.down` | character | `assets/characters/xiaohan-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `player.left` | character | `assets/characters/xiaohan-side-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `npc.maomao` | character | `assets/characters/maomao-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `npc.rong-bo` | character | `assets/characters/npc-rong-bo-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `npc.a-gan` | character | `assets/characters/npc-a-gan-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `npc.shi-shifu` | character | `assets/characters/npc-shi-shifu-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `npc.zhi-lan` | character | `assets/characters/npc-zhi-lan-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `npc.xiao-sui` | character | `assets/characters/npc-xiao-sui-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `pet.cat` | character | `assets/characters/cat-2x.png` | 恢復自原創舊版素材，commit 842025a2107064039ce5851b8493f7f0e7b9fcb3；舊版 manifest 記載本機 Z-Image Turbo（Apache-2.0）文生圖 seed 101，並經 tools/art 去背、縮放與 palette 量化。 |
+| `pet.marsupial` | character | `assets/characters/marsupial-2x.png` | OpenAI built-in image generation tool（2026-10-23），使用者核准候選之透明背景編修版；tools/art/finalize.py 以最近鄰縮放至 96×96 RGBA8888，使用既有 pet.marsupial rig。 |
+| `tool.hoe` | object | `assets/tools/hoe-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `tool.can` | object | `assets/tools/can-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `tool.seedbag` | object | `assets/tools/seedbag-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `tile.tree` | overlay | `assets/tiles/tree-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.water` | tile | `assets/tiles/water-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
+| `tile.floor` | tile | `assets/tiles/floor-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
+| `tile.furniture` | overlay | `assets/tiles/furniture-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.cave` | tile | `assets/tiles/cave-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
+| `tile.rock` | overlay | `assets/tiles/rock-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tool.axe` | object | `assets/tools/axe-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `tile.shop` | overlay | `assets/tiles/shop-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.forage` | overlay | `assets/tiles/forage-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tool.pick` | object | `assets/tools/pick-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `tile.ore` | overlay | `assets/tiles/ore-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.stairs` | overlay | `assets/tiles/stairs-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tool.rod` | object | `assets/tools/rod-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `tile.trough` | overlay | `assets/tiles/trough-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.kitchen` | overlay | `assets/tiles/kitchen-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.workshop` | overlay | `assets/tiles/workshop-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.workbench` | overlay | `assets/tiles/workbench-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.tuft` | overlay | `assets/tiles/tuft-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tool.sickle` | object | `assets/tools/sickle-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
+| `tile.fence` | overlay | `assets/tiles/fence-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
 
 ### 1.4 水平翻轉（不另存檔）
 
@@ -58,15 +88,6 @@
 
 | 素材 id | 類別 | 檔案 | 來源與授權 |
 | --- | --- | --- | --- |
-| `tile.grass` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.field` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.path` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.wall` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.bed` | object | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.shipbox` | object | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.door` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.soil` | overlay | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `crop.sweet-radish` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
 | `crop.moon-bean` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
 | `crop.star-pepper` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
 | `crop.golden-rice` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
@@ -75,30 +96,9 @@
 | `crop.snow-radish` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
 | `crop.frost-mushroom` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
 | `crop.ember-onion` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `npc.rong-bo` | character | （無檔案，程式繪製色塊） | 占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源 |
-| `npc.a-gan` | character | （無檔案，程式繪製色塊） | 占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源 |
-| `npc.shi-shifu` | character | （無檔案，程式繪製色塊） | 占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源 |
-| `npc.zhi-lan` | character | （無檔案，程式繪製色塊） | 占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源 |
-| `npc.xiao-sui` | character | （無檔案，程式繪製色塊） | 占位：程式繪製的色塊（M5a），無檔案；正式美術待繪製後補上 file 與來源 |
 | `crop.dew-grass` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
 | `crop.dusk-potato` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
 | `crop.silver-wheat` | crop | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.tree` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.water` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.floor` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.furniture` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.cave` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.rock` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.shop` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.forage` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.ore` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.stairs` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.trough` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.kitchen` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.workshop` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.workbench` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.tuft` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
-| `tile.fence` | tile | （無檔案，程式繪製色塊） | 占位（程式產生） |
 | `animal.cow` | object | （無檔案，程式繪製色塊） | 占位（程式產生）：牛的圖由 src/presentation/animal-art.ts 用 Graphics 畫成（與雞相同做法） |
 | `item.milk` | object | （無檔案，程式繪製色塊） | 占位（程式產生）：物品目前沒有圖示，這筆只登錄來源（牛奶） |
 | `item.cheese` | object | （無檔案，程式繪製色塊） | 占位（程式產生）：物品目前沒有圖示，這筆只登錄來源（起司） |
@@ -115,13 +115,13 @@
 
 | 套件 | 版本 | 授權 | 類別 | 用途 |
 | --- | --- | --- | --- | --- |
-| `dexie` | 4.4.6 | Apache-2.0 | 執行期 | IndexedDB 存檔封裝 |
-| `phaser` | 4.2.1 | MIT | 執行期 | 遊戲引擎（場景、貼圖、輸入與鏡頭） |
-| `zod` | 4.6.7 | MIT | 執行期 | 內容與存檔資料的格式驗證 |
-| `@playwright/test` | 1.64.1 | Apache-2.0 | 開發用 | 端到端測試（不隨遊戲發布） |
-| `typescript` | 5.9.3 | Apache-2.0 | 開發用 | 型別檢查與編譯 |
-| `vite` | 8.3.5 | MIT | 開發用 | 開發伺服器與建置（產生 dist/） |
-| `vitest` | 5.0.5 | MIT | 開發用 | 單元測試與模擬 |
+| `dexie` | 4.4.6 | （未安裝，無法讀取） | 執行期 | IndexedDB 存檔封裝 |
+| `phaser` | 4.2.1 | （未安裝，無法讀取） | 執行期 | 遊戲引擎（場景、貼圖、輸入與鏡頭） |
+| `zod` | 4.6.7 | （未安裝，無法讀取） | 執行期 | 內容與存檔資料的格式驗證 |
+| `@playwright/test` | 1.64.1 | （未安裝，無法讀取） | 開發用 | 端到端測試（不隨遊戲發布） |
+| `typescript` | 5.9.3 | （未安裝，無法讀取） | 開發用 | 型別檢查與編譯 |
+| `vite` | 8.3.5 | （未安裝，無法讀取） | 開發用 | 開發伺服器與建置（產生 dist/） |
+| `vitest` | 5.0.5 | （未安裝，無法讀取） | 開發用 | 單元測試與模擬 |
 
 ## 三、已安裝的全部套件（含間接依賴）
 
@@ -129,23 +129,19 @@
 
 | 授權 | 套件數 |
 | --- | --- |
-| MIT | 33 |
-| （平台專用套件，本機未安裝，未讀取授權） | 24 |
-| Apache-2.0 | 7 |
-| MPL-2.0 | 2 |
-| ISC | 1 |
-| BSD-3-Clause | 1 |
+| （未安裝，無法讀取） | 41 |
+| （平台專用套件，本機未安裝，未讀取授權） | 27 |
 
 | 套件 | 版本 | 授權 |
 | --- | --- | --- |
-| `@jridgewell/resolve-uri` | 3.1.2 | MIT |
-| `@jridgewell/sourcemap-codec` | 1.6.0 | MIT |
-| `@jridgewell/trace-mapping` | 0.3.31 | MIT |
-| `@oxc-project/types` | 0.154.0 | MIT |
-| `@playwright/test` | 1.64.1 | Apache-2.0 |
+| `@jridgewell/resolve-uri` | 3.1.2 | （未安裝，無法讀取） |
+| `@jridgewell/sourcemap-codec` | 1.6.0 | （未安裝，無法讀取） |
+| `@jridgewell/trace-mapping` | 0.3.31 | （未安裝，無法讀取） |
+| `@oxc-project/types` | 0.154.0 | （未安裝，無法讀取） |
+| `@playwright/test` | 1.64.1 | （未安裝，無法讀取） |
 | `@rolldown/binding-android-arm-eabi` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-android-arm64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
-| `@rolldown/binding-darwin-arm64` | 1.2.14 | MIT |
+| `@rolldown/binding-darwin-arm64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-darwin-x64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-freebsd-x64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-linux-arm-gnueabihf` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
@@ -158,25 +154,25 @@
 | `@rolldown/binding-openharmony-arm64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-win32-arm64-msvc` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-win32-x64-msvc` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
-| `@rolldown/pluginutils` | 1.0.1 | MIT |
-| `@types/chai` | 5.2.3 | MIT |
-| `@types/deep-eql` | 4.0.2 | MIT |
-| `@types/estree` | 1.0.9 | MIT |
-| `@vitest/mocker` | 5.0.5 | MIT |
-| `@vitest/spy` | 5.0.5 | MIT |
-| `assertion-error` | 2.0.1 | MIT |
-| `chai` | 6.3.0 | MIT |
-| `detect-libc` | 2.1.2 | Apache-2.0 |
-| `dexie` | 4.4.6 | Apache-2.0 |
-| `es-module-lexer` | 2.3.2 | MIT |
-| `estree-walker` | 3.0.3 | MIT |
-| `eventemitter3` | 5.0.4 | MIT |
-| `expect-type` | 1.4.0 | Apache-2.0 |
-| `fdir` | 6.5.0 | MIT |
-| `fsevents` | 2.3.3 | MIT |
-| `lightningcss` | 1.33.0 | MPL-2.0 |
+| `@rolldown/pluginutils` | 1.0.1 | （未安裝，無法讀取） |
+| `@types/chai` | 5.2.3 | （未安裝，無法讀取） |
+| `@types/deep-eql` | 4.0.2 | （未安裝，無法讀取） |
+| `@types/estree` | 1.0.9 | （未安裝，無法讀取） |
+| `@vitest/mocker` | 5.0.5 | （未安裝，無法讀取） |
+| `@vitest/spy` | 5.0.5 | （未安裝，無法讀取） |
+| `assertion-error` | 2.0.1 | （未安裝，無法讀取） |
+| `chai` | 6.3.0 | （未安裝，無法讀取） |
+| `detect-libc` | 2.1.2 | （未安裝，無法讀取） |
+| `dexie` | 4.4.6 | （未安裝，無法讀取） |
+| `es-module-lexer` | 2.3.2 | （未安裝，無法讀取） |
+| `estree-walker` | 3.0.3 | （未安裝，無法讀取） |
+| `eventemitter3` | 5.0.4 | （未安裝，無法讀取） |
+| `expect-type` | 1.4.0 | （未安裝，無法讀取） |
+| `fdir` | 6.5.0 | （未安裝，無法讀取） |
+| `fsevents` | 2.3.3 | （平台專用套件，本機未安裝，未讀取授權） |
+| `lightningcss` | 1.33.0 | （未安裝，無法讀取） |
 | `lightningcss-android-arm64` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
-| `lightningcss-darwin-arm64` | 1.33.0 | MPL-2.0 |
+| `lightningcss-darwin-arm64` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
 | `lightningcss-darwin-x64` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
 | `lightningcss-freebsd-x64` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
 | `lightningcss-linux-arm-gnueabihf` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
@@ -186,26 +182,26 @@
 | `lightningcss-linux-x64-musl` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
 | `lightningcss-win32-arm64-msvc` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
 | `lightningcss-win32-x64-msvc` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
-| `magic-string` | 1.4.3 | MIT |
-| `nanoid` | 3.3.20 | MIT |
-| `obug` | 3.0.0 | MIT |
-| `phaser` | 4.2.1 | MIT |
-| `picocolors` | 1.1.1 | ISC |
-| `picomatch` | 4.0.7 | MIT |
-| `playwright` | 1.64.1 | Apache-2.0 |
-| `playwright-core` | 1.64.1 | Apache-2.0 |
-| `postcss` | 8.5.31 | MIT |
-| `rolldown` | 1.2.14 | MIT |
-| `source-map-js` | 1.2.2 | BSD-3-Clause |
-| `std-env` | 4.3.0 | MIT |
-| `tinybench` | 6.2.2 | MIT |
-| `tinyexec` | 1.3.1 | MIT |
-| `tinyglobby` | 0.2.17 | MIT |
-| `typescript` | 5.9.3 | Apache-2.0 |
-| `vite` | 8.3.5 | MIT |
-| `vitest` | 5.0.5 | MIT |
-| `why-is-node-running` | 3.2.1 | MIT |
-| `zod` | 4.6.7 | MIT |
+| `magic-string` | 1.4.3 | （未安裝，無法讀取） |
+| `nanoid` | 3.3.20 | （未安裝，無法讀取） |
+| `obug` | 3.0.0 | （未安裝，無法讀取） |
+| `phaser` | 4.2.1 | （未安裝，無法讀取） |
+| `picocolors` | 1.1.1 | （未安裝，無法讀取） |
+| `picomatch` | 4.0.7 | （未安裝，無法讀取） |
+| `playwright` | 1.64.1 | （未安裝，無法讀取） |
+| `playwright-core` | 1.64.1 | （未安裝，無法讀取） |
+| `postcss` | 8.5.31 | （未安裝，無法讀取） |
+| `rolldown` | 1.2.14 | （未安裝，無法讀取） |
+| `source-map-js` | 1.2.2 | （未安裝，無法讀取） |
+| `std-env` | 4.3.0 | （未安裝，無法讀取） |
+| `tinybench` | 6.2.2 | （未安裝，無法讀取） |
+| `tinyexec` | 1.3.1 | （未安裝，無法讀取） |
+| `tinyglobby` | 0.2.17 | （未安裝，無法讀取） |
+| `typescript` | 5.9.3 | （未安裝，無法讀取） |
+| `vite` | 8.3.5 | （未安裝，無法讀取） |
+| `vitest` | 5.0.5 | （未安裝，無法讀取） |
+| `why-is-node-running` | 3.2.1 | （未安裝，無法讀取） |
+| `zod` | 4.6.7 | （未安裝，無法讀取） |
 
 ## 四、字型
 
