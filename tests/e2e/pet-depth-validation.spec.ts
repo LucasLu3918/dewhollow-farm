@@ -71,17 +71,17 @@ async function captureCrossing(page: Page, key: string, depth: 'player-front' | 
   const overlapReached = page.waitForFunction((targetDepth) => {
     const debug = window.__dewhollow;
     if (!debug) return false;
-    const player = debug.sprites().find((sprite) => sprite.key.startsWith('player.'));
-    const cat = debug.sprites().find((sprite) => sprite.key === 'pet.cat');
-    if (!player || !cat) return false;
     const [playerActor, catActor] = debug.actors().filter((item) => item.id === 'player' || item.id === 'cat');
     if (!playerActor || !catActor) return false;
-    const overlapWidth = Math.min(player.left + player.width, cat.left + cat.width) - Math.max(player.left, cat.left);
-    const overlapHeight = Math.min(player.top + player.height, cat.top + cat.height) - Math.max(player.top, cat.top);
-    const depthOrderReached = targetDepth === 'player-front'
-      ? playerActor.footY > catActor.footY
-      : playerActor.footY < catActor.footY;
-    return playerActor?.busy && catActor?.busy && overlapWidth > 12 && overlapHeight > 12 && depthOrderReached;
+    const footGap = targetDepth === 'player-front'
+      ? playerActor.footY - catActor.footY
+      : catActor.footY - playerActor.footY;
+    const maxRestOverlapGap = targetDepth === 'player-front' ? 68 : 36;
+    const horizontalFootGap = Math.abs(playerActor.footX - catActor.footX);
+    // The resting silhouettes are 64×80 and 48×48, centered on their root foot positions.
+    // Keep at least 12 px of overlap after pauseScene resets the walking pose.
+    const restPoseOverlap = horizontalFootGap < 44 && footGap > 0 && footGap < maxRestOverlapGap;
+    return playerActor.busy && catActor.busy && restPoseOverlap;
   }, depth, { timeout: 5_000 });
   await page.keyboard.press(key);
   await overlapReached;
@@ -151,36 +151,32 @@ async function expectOcclusionOrder(page: Page, crossing: OverlapCapture): Promi
       debug.setOthersHidden(false);
     }
 
-    const left = Math.max(0, Math.floor(geometry.camera.x + (Math.max(geometry.player.left, geometry.cat.left) - geometry.scroll.x) * geometry.camera.zoom));
-    const top = Math.max(0, Math.floor(geometry.camera.y + (Math.max(geometry.player.top, geometry.cat.top) - geometry.scroll.y) * geometry.camera.zoom));
-    const right = Math.min(both.width, Math.ceil(geometry.camera.x + (Math.min(geometry.player.left + geometry.player.width, geometry.cat.left + geometry.cat.width) - geometry.scroll.x) * geometry.camera.zoom));
-    const bottom = Math.min(both.height, Math.ceil(geometry.camera.y + (Math.min(geometry.player.top + geometry.player.height, geometry.cat.top + geometry.cat.height) - geometry.scroll.y) * geometry.camera.zoom));
     const pixel = (image: PixelImage, x: number, y: number): [number, number, number, number] => {
       const at = (y * image.width + x) * 4;
       return [image.data[at] ?? 0, image.data[at + 1] ?? 0, image.data[at + 2] ?? 0, image.data[at + 3] ?? 0];
     };
-    let overlapRegionPixels = 0;
+    let sharedActorPixels = 0;
     let playerFrontPixels = 0;
     let catFrontPixels = 0;
-    for (let y = top; y < bottom; y += 1) {
-      for (let x = left; x < right; x += 1) {
-        overlapRegionPixels += 1;
+    for (let y = 0; y < both.height; y += 1) {
+      for (let x = 0; x < both.width; x += 1) {
         const visible = pixel(both, x, y);
         const playerPixel = pixel(playerOnly, x, y);
         const backgroundPixel = pixel(background, x, y);
         const catPixel = pixel(catOnly, x, y);
         const changed = (a: number[], b: number[]): boolean => a.some((channel, index) => channel !== b[index]);
         if (!changed(playerPixel, backgroundPixel) || !changed(catPixel, backgroundPixel) || !changed(playerPixel, catPixel)) continue;
+        sharedActorPixels += 1;
         const matchesPlayer = !changed(visible, playerPixel);
         const matchesCat = !changed(visible, catPixel);
         if (matchesPlayer && !matchesCat) playerFrontPixels += 1;
         if (matchesCat && !matchesPlayer) catFrontPixels += 1;
       }
     }
-    return { overlapRegionPixels, playerFrontPixels, catFrontPixels };
+    return { sharedActorPixels, playerFrontPixels, catFrontPixels };
   }, crossing);
 
-  expect(result.overlapRegionPixels, `玩家與黑貓外框在畫面上應有重疊：${JSON.stringify(result)}`).toBeGreaterThan(0);
+  expect(result.sharedActorPixels, `暫停後玩家與黑貓的實際渲染遮罩應有共同像素：${JSON.stringify({ result, geometry: crossing })}`).toBeGreaterThan(0);
   return { playerFrontPixels: result.playerFrontPixels, catFrontPixels: result.catFrontPixels };
 }
 
