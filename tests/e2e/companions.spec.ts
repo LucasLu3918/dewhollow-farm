@@ -93,6 +93,13 @@ test('the pets have their own real 2x images, and only the cat is on the farm', 
   expect(ids).toEqual(['cat', 'player']);
 });
 
+test('the approved cat artwork matches the farm visual baseline', async ({ page }) => {
+  await waitForGame(page);
+  await expect(page.locator('#game canvas')).toHaveScreenshot('pet-cat-farm.png', {
+    animations: 'disabled',
+  });
+});
+
 test('the cat starts beside the player, standing on a tile of its own', async ({ page }) => {
   await waitForGame(page);
   const player = await actor(page, 'player');

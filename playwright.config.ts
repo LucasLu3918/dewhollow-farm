@@ -12,6 +12,8 @@ const previewPort = pwaBase.port || '4173';
 
 export default defineConfig({
   testDir: 'tests/e2e',
+  // Keep approved visual baselines portable across macOS and Linux CI.
+  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
   timeout: 30_000,
   use: {
     baseURL: e2eBaseURL,

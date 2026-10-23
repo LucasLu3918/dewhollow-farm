@@ -222,7 +222,7 @@
       "color": "#1d1d1f",
       "file": "assets/characters/cat-2x.png",
       "density": 2,
-      "source": "OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。"
+      "source": "恢復自原創舊版素材，commit 842025a2107064039ce5851b8493f7f0e7b9fcb3；舊版 manifest 記載本機 Z-Image Turbo（Apache-2.0）文生圖 seed 101，並經 tools/art 去背、縮放與 palette 量化。"
     },
     {
       "id": "pet.marsupial",
