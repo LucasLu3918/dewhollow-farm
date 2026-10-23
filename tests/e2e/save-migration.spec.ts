@@ -90,6 +90,40 @@ test('loads a v1 save and rewrites it as the current version on the next save', 
   });
 });
 
+test('a v1 save in the village loads the content-backed quokka and preserves its pass-through home tile', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#game canvas')).toBeVisible();
+  const villageSave = {
+    ...V1_RECORD,
+    state: {
+      ...V1_RECORD.state,
+      mapId: 'village',
+      player: { x: 11, y: 6, facing: 'up' },
+    },
+  };
+  await putRecord(page, villageSave);
+
+  await page.reload();
+  await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
+  expect(await page.evaluate(() => window.__dewhollow?.textureSize('pet.marsupial'))).toEqual({ width: 96, height: 96 });
+  await expect.poll(async () => {
+    const actors = await page.evaluate(() => window.__dewhollow?.actors() ?? []);
+    return actors.find((candidate) => candidate.id === 'marsupial');
+  }).toMatchObject({ tileX: 11, tileY: 5, width: 48, height: 48 });
+
+  // Resident companions are visual companions, not movement blockers.
+  await page.keyboard.press('ArrowUp');
+  await expect.poll(async () => {
+    const actors = await page.evaluate(() => window.__dewhollow?.actors() ?? []);
+    return actors.find((candidate) => candidate.id === 'player')?.tileY;
+  }).toBe(5);
+  await expect.poll(async () => {
+    const actors = await page.evaluate(() => window.__dewhollow?.actors() ?? []);
+    return actors.find((candidate) => candidate.id === 'marsupial');
+  }).toMatchObject({ tileX: 11, tileY: 5, width: 48, height: 48 });
+});
+
 test('loads a v1 save whose plots have no dryDays field, as the old game wrote them', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
