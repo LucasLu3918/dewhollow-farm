@@ -547,6 +547,10 @@ export class MapScene extends Phaser.Scene {
             this.updateSky(0);
             resolve();
           });
+          // Preserve the exact in-flight actor overlap requested by depth snapshots.
+          // Scene pause is processed on the game loop; stop tween advancement first
+          // so the actors cannot finish their crossing before the PAUSE event.
+          if (options?.preservePose) this.tweens.pauseAll();
           this.scene.pause();
         }),
         renderCompat: () => this.registry.get(RENDER_COMPAT_KEY) as RenderCompatInfo,

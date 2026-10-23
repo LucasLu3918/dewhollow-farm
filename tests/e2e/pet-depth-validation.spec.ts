@@ -68,7 +68,7 @@ async function walk(page: Page, key: string): Promise<void> {
 }
 
 async function captureCrossing(page: Page, key: string, depth: 'player-front' | 'cat-front'): Promise<OverlapCapture> {
-  const overlapReached = page.waitForFunction((targetDepth) => {
+  const overlapReached = page.waitForFunction(async (targetDepth) => {
     const debug = window.__dewhollow;
     if (!debug) return false;
     const [playerActor, catActor] = debug.actors().filter((item) => item.id === 'player' || item.id === 'cat');
@@ -81,7 +81,12 @@ async function captureCrossing(page: Page, key: string, depth: 'player-front' | 
     // The resting silhouettes are 64×80 and 48×48, centered on their root foot positions.
     // Keep at least 12 px of overlap after pauseScene resets the walking pose.
     const restPoseOverlap = horizontalFootGap < 44 && footGap > 0 && footGap < maxRestOverlapGap;
-    return playerActor.busy && catActor.busy && restPoseOverlap;
+    if (!playerActor.busy || !catActor.busy || !restPoseOverlap) return false;
+
+    // Freeze inside the browser evaluation that observes the overlap. Waiting for the
+    // parent test to pause the scene can let this short crossing finish first on CI.
+    await debug.pauseScene({ preservePose: true });
+    return true;
   }, depth, { timeout: 5_000 });
   await page.keyboard.press(key);
   await overlapReached;
@@ -89,8 +94,6 @@ async function captureCrossing(page: Page, key: string, depth: 'player-front' | 
 }
 
 async function captureOverlap(page: Page): Promise<OverlapCapture> {
-  await page.evaluate(() => window.__dewhollow?.pauseScene({ preservePose: true }));
-
   return page.evaluate(() => {
     const debug = window.__dewhollow;
     if (!debug) throw new Error('缺少 window.__dewhollow');
