@@ -119,6 +119,10 @@ async function captureRaster(page: Page, imagePath: string): Promise<{ width: nu
 }
 
 test('the approved pet village raster is pixel-identical across independent fresh sessions', async ({ browser }, testInfo) => {
+  // This diagnostic opens two full game sessions; allow headroom when the complete E2E suite
+  // is running beside another worker on slower CI hosts.
+  test.setTimeout(60_000);
+
   const firstSession = await preparePetScene(browser);
   const firstImagePath = testInfo.outputPath('pet-village-repeatability-first.png');
   let firstRaster: { width: number; height: number; sha256: string };
