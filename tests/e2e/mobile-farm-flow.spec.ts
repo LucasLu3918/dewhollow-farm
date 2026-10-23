@@ -1,5 +1,10 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 
+// Mirrors content/tuning.json: harvest min/max are 1/2 and harvest energy cost is 1.
+const HARVEST_MIN = 1;
+const HARVEST_MAX = 2;
+const HARVEST_ENERGY_COST = 1;
+
 const SETTINGS_KEY = 'dewhollow-farm.settings';
 const HARVESTED_CROP = 'crop.moon-bean';
 
@@ -11,6 +16,7 @@ interface SavedGame {
     energy: { current: number };
     gold: number;
     inventory: { stacks: { itemId: string; count: number }[] };
+    plots: Record<string, { watered: boolean; crop: { cropId: string; growthDays: number } | null }>;
     [key: string]: unknown;
   };
 }
@@ -185,16 +191,25 @@ async function plantWaterAndHarvest(page: Page, beforeFarm: SavedGame): Promise<
   await enterHouseAndSleep(page); // night 2 -> day 3
   await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 3 天');
   await bedToPlot(page);
+  const harvestEnergyBefore = Number((await page.locator('#hud-energy-text').innerText()).match(/\d+/)?.[0]);
+  const harvestEffectsBefore = await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:harvest').length ?? 0);
   await interact(page);
   await expect(page.locator('#hud-log')).toContainText('收成了 月光豆');
   await expect(page.locator('#hud-log')).toContainText('成就達成：第一次收成（獲得 50 金）');
+  await expect(page.locator('#hud-log li').filter({ hasText: '收成了 月光豆' })).toHaveCount(1);
+  await expect(page.locator('#hud-log li').filter({ hasText: '第一次收成' })).toHaveCount(1);
+  await expect(page.locator('#hud-energy-text')).toHaveText(`${harvestEnergyBefore - HARVEST_ENERGY_COST} / 100`);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:harvest').length ?? 0)).toBe(harvestEffectsBefore + 1);
 
   const saved = await saveByTouch(page);
   expect(saved.state.calendar).toMatchObject({ day: 3, season: 'spring' });
   expect(saved.state.energy.current).toBe(99);
   expect(saved.state.gold).toBe(140); // 90 after the shop purchase, plus the first-harvest achievement reward.
   const priorCrops = beforeFarm.state.inventory.stacks.find((stack) => stack.itemId === HARVESTED_CROP)?.count ?? 0;
-  expect(saved.state.inventory.stacks.find((stack) => stack.itemId === HARVESTED_CROP)?.count ?? 0).toBe(priorCrops + 1);
+  const harvestedCount = saved.state.inventory.stacks.find((stack) => stack.itemId === HARVESTED_CROP)?.count ?? 0;
+  expect(harvestedCount - priorCrops).toBeGreaterThanOrEqual(HARVEST_MIN);
+  expect(harvestedCount - priorCrops).toBeLessThanOrEqual(HARVEST_MAX);
+  expect(saved.state.plots['7,4']?.crop).toBeNull();
   expect(saved.state.inventory.stacks.find((stack) => stack.itemId === 'seed.dew-grass')?.count ?? 0).toBeGreaterThan(0);
 
   await page.reload();
