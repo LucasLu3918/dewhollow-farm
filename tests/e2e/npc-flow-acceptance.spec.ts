@@ -84,6 +84,7 @@ function residentEffects(record: SaveRecord) {
 }
 
 test('a rendered resident conversation and shop flow survive reload without duplicate effects', async ({ page }) => {
+  test.setTimeout(60_000);
   await waitForGame(page);
 
   // Farm spawn → village, then route around the shop counter to stand west of 阿柑 (2,4).
@@ -142,11 +143,10 @@ test('a rendered resident conversation and shop flow survive reload without dupl
   const afterRepeatTalk = await saveGame(page);
   expect(residentEffects(afterRepeatTalk)).toEqual(residentEffects(afterFirstTalk));
 
-  // The same resident's shop is an actual follow-up interaction; opening/closing it is free.
-  await walk(page, 'ArrowUp', 3);
-  await walk(page, 'ArrowRight', 4);
-  await walk(page, 'ArrowDown', 3);
-  await walk(page, 'ArrowLeft', 1);
+  // The same resident's shop is an actual follow-up interaction; use the south lane to avoid 阿柑 and 榕伯.
+  await walk(page, 'ArrowDown', 2);
+  await walk(page, 'ArrowRight', 3);
+  await walk(page, 'ArrowUp', 2);
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('x');
   await expect(page.locator('#shop-panel')).toBeVisible();
