@@ -241,6 +241,7 @@ declare global {
       worldGeneration(): number;
       responsiveLayout(): ReturnType<ResponsiveLayoutController['get']>;
       interaction(): ReturnType<typeof resolveInteraction>;
+      interactionTargetMarker(): { visible: boolean; target: Point | null; x: number; y: number; width: number; height: number };
       continuousFarmActionsStopReason(): string;
       continuousFarmCancelSource(): string;
       cameraView(): { x: number; y: number; width: number; height: number; zoom: number; bounds: { x: number; y: number; width: number; height: number } };
@@ -294,6 +295,9 @@ export class MapScene extends Phaser.Scene {
   private worldGeneration = 0;
   private deps!: MapSceneDeps;
   private world!: Phaser.GameObjects.Container;
+  /** Non-interactive one-tile outline for the current authoritative interaction target. */
+  private interactionTargetGfx: Phaser.GameObjects.Graphics | null = null;
+  private interactionTargetCell: Point | null = null;
   private rig!: CharacterRig;
   /** 目前地圖上的居民（依行程站位），見 syncResidents。毛毛有骨架，其他人是占位。 */
   private npcRigs = new Map<string, ResidentView>();
@@ -483,6 +487,9 @@ export class MapScene extends Phaser.Scene {
       this.unsubscribeContinuousSetting?.();
       this.unsubscribeContinuousSetting = null;
       this.touchControls.dispose();
+      this.interactionTargetGfx?.destroy();
+      this.interactionTargetGfx = null;
+      this.interactionTargetCell = null;
     });
     // 讀取存檔的提示等到鍵盤已經接上才顯示：提示出現時，按鍵一定會被接到（載入素材的期間按的鍵不算）。
     // 新遊戲則提示玩家可以按 ? 看操作說明（訊息列在新遊戲開場是空的）。
@@ -527,7 +534,15 @@ export class MapScene extends Phaser.Scene {
         cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
         worldGeneration: () => this.worldGeneration,
         responsiveLayout: () => this.deps.responsive.get(),
-      interaction: () => resolveInteraction(this.deps.session.state, this.deps.index),
+        interaction: () => resolveInteraction(this.deps.session.state, this.deps.index),
+        interactionTargetMarker: () => ({
+          visible: this.interactionTargetGfx?.visible ?? false,
+          target: this.interactionTargetCell ? { ...this.interactionTargetCell } : null,
+          x: this.interactionTargetGfx?.x ?? 0,
+          y: this.interactionTargetGfx?.y ?? 0,
+          width: TILE_SIZE,
+          height: TILE_SIZE,
+        }),
         cameraView: () => ({ x: camera.x, y: camera.y, width: camera.width / camera.zoom, height: camera.height / camera.zoom, zoom: camera.zoom, bounds: { ...camera.getBounds() } }),
         mapId: () => this.deps.session.state.mapId,
         sprites: () => this.debugSprites(),
@@ -1059,6 +1074,7 @@ export class MapScene extends Phaser.Scene {
     const map = this.deps.index.map(state.mapId);
     this.deps.hud.update(state, this.deps.pack);
     const interaction = resolveInteraction(state, this.deps.index);
+    this.updateInteractionTargetMarker(interaction.target);
     this.deps.hud.setMainAction(
       this.deps.controls.interactionLabels[interaction.labelKey],
       interaction.action !== 'nothing',
@@ -1088,6 +1104,25 @@ export class MapScene extends Phaser.Scene {
     this.residentPanel.refresh(state);
     this.questPanel.refresh(state);
     this.heartEventPanel.sync(state);
+  }
+
+  /** Render the existing descriptor target without adding pointer input or changing interaction semantics. */
+  private updateInteractionTargetMarker(target: Point | null): void {
+    if (!this.interactionTargetGfx || !this.interactionTargetGfx.active) {
+      this.interactionTargetGfx = this.add.graphics().setDepth(DEPTH_SKY - 1);
+    }
+    const marker = this.interactionTargetGfx;
+    marker.clear();
+    this.interactionTargetCell = target ? { ...target } : null;
+    if (!target) {
+      marker.setVisible(false);
+      return;
+    }
+
+    marker.setPosition(target.x * TILE_SIZE, target.y * TILE_SIZE).setVisible(true);
+    // Warm double outline remains readable over grass, soil and structures while leaving the tile visible.
+    marker.lineStyle(3, 0xffe38a, 0.95).strokeRect(2, 2, TILE_SIZE - 4, TILE_SIZE - 4);
+    marker.lineStyle(1, 0xffffff, 0.8).strokeRect(6, 6, TILE_SIZE - 12, TILE_SIZE - 12);
   }
 
   /**
