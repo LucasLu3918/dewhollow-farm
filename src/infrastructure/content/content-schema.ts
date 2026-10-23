@@ -46,6 +46,7 @@ const requirementSchema = z.discriminatedUnion('type', [
 
 const tileSchema = z.object({
   kind: z.enum(['grass', 'field', 'path', 'wall', 'bed', 'shipbox', 'door', 'tree', 'water', 'floor', 'furniture', 'cave', 'rock', 'shop', 'forage', 'ore', 'stairs', 'trough', 'kitchen', 'workshop', 'workbench', 'tuft', 'fence']),
+  ground: z.enum(['grass', 'field', 'path', 'wall', 'water', 'floor', 'cave']).optional(),
   item: z.string().min(1).optional(),
   seasons: z.array(z.enum(SEASONS)).min(1).optional(),
   slot: z.boolean().optional(),

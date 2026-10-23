@@ -33,31 +33,30 @@ function inEllipse(u, v, cx, cy, rx, ry) {
   return ((u - cx) / rx) ** 2 + ((v - cy) / ry) ** 2 <= 1;
 }
 
-/** 4×4 超取樣做抗鋸齒，回傳 RGBA 像素。 */
+/** 先以 64×64 像素畫布繪製，再用最近鄰放大，保留硬邊像素風格。 */
 function render(size) {
-  const samples = 4;
+  const logicalSize = 64;
+  const scale = size / logicalSize;
+  if (!Number.isInteger(scale)) throw new Error(`圖示尺寸 ${size} 必須是 64 的整數倍`);
+  const logical = Buffer.alloc(logicalSize * logicalSize * 4);
+  for (let y = 0; y < logicalSize; y++) {
+    for (let x = 0; x < logicalSize; x++) {
+      const [r, g, b] = colorAt((x + 0.5) / logicalSize, (y + 0.5) / logicalSize);
+      const i = (y * logicalSize + x) * 4;
+      logical[i] = r;
+      logical[i + 1] = g;
+      logical[i + 2] = b;
+      logical[i + 3] = 255;
+    }
+  }
   const rgba = Buffer.alloc(size * size * 4);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      let r = 0;
-      let g = 0;
-      let b = 0;
-      for (let sy = 0; sy < samples; sy++) {
-        for (let sx = 0; sx < samples; sx++) {
-          const u = (x + (sx + 0.5) / samples) / size;
-          const v = (y + (sy + 0.5) / samples) / size;
-          const [cr, cg, cb] = colorAt(u, v);
-          r += cr;
-          g += cg;
-          b += cb;
-        }
-      }
-      const n = samples * samples;
+      const logicalX = Math.floor(x / scale);
+      const logicalY = Math.floor(y / scale);
+      const source = (logicalY * logicalSize + logicalX) * 4;
       const i = (y * size + x) * 4;
-      rgba[i] = Math.round(r / n);
-      rgba[i + 1] = Math.round(g / n);
-      rgba[i + 2] = Math.round(b / n);
-      rgba[i + 3] = 255;
+      logical.copy(rgba, i, source, source + 4);
     }
   }
   return rgba;
