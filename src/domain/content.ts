@@ -68,8 +68,13 @@ export type TileKind =
   | 'rock'
   | 'fence';
 
+/** Terrain surfaces which can sit under a map object as the opaque bottom layer. */
+export type GroundKind = 'grass' | 'field' | 'path' | 'wall' | 'water' | 'floor' | 'cave';
+
 export interface TileDef {
   kind: TileKind;
+  /** Optional explicit terrain below an object; omitted legacy maps infer it from nearby ground tiles. */
+  ground?: GroundKind;
   /** 僅門會用到：通往的地圖與落點。 */
   to?: string;
   spawn?: Point;

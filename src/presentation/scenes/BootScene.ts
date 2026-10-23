@@ -70,10 +70,10 @@ export class BootScene extends Phaser.Scene {
     }
     // 表情氣泡不產圖：用 Graphics 畫成貼圖（顏色取自共用調色盤）。
     registerEmoteTextures(this);
-    // 入庫的圖片多半是縮小顯示的高解析母版；遊戲設定為像素風（最近鄰），縮小時會鋸齒，改用線性取樣。
+    // 32-bit 像素圖使用最近鄰取樣，保留原始像素格與硬邊輪廓。
     for (const entry of this.deps.assets.assets) {
       if (entry.file && this.textures.exists(entry.id)) {
-        this.textures.get(entry.id).setFilter(Phaser.Textures.FilterMode.LINEAR);
+        this.textures.get(entry.id).setFilter(Phaser.Textures.FilterMode.NEAREST);
       }
     }
     const sceneDeps: MapSceneDeps = {

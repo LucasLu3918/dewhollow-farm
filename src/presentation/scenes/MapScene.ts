@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { ContentPack, Direction, MapDef, Point } from '../../domain/content';
 import { plotKey, type PlotMap, type PlotState } from '../../domain/farm';
 import { tileAt } from '../../domain/world';
+import { groundLayerFor, isGroundLayer } from '../map-layers';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import { resolveInteraction, type InteractionLabelKey } from '../../application/interaction';
@@ -297,8 +298,15 @@ export class MapScene extends Phaser.Scene {
    * 遊戲狀態是立刻改變的，但畫面上鋤頭還在空中時，田地不該已經翻好。
    */
   private heldPlots = new Map<string, PlotState | null>();
-  /** 每一格地圖的圖片與它原本的地形：玩家造成的變化（砍樹、採野薄荷）會換成草地。 */
-  private tileSprites: { x: number; y: number; base: TileKind; image: Phaser.GameObjects.Image }[] = [];
+  /** 每格的地面底層與透明物件層：地圖變化（砍樹、採野薄荷）即時更新對應圖層。 */
+  private tileSprites: {
+    x: number;
+    y: number;
+    base: TileKind;
+    ground: TileKind;
+    groundImage: Phaser.GameObjects.Image;
+    objectImage?: Phaser.GameObjects.Image;
+  }[] = [];
   private shopPanel!: ShopPanel;
   private kitchenPanel!: KitchenPanel;
   private workshopPanel!: WorkshopPanel;
@@ -1095,7 +1103,7 @@ export class MapScene extends Phaser.Scene {
     this.shownSeason = season;
     const tint = seasonGrassTint(season);
     for (const sprite of this.tileSprites) {
-      if (sprite.image.texture.key === 'tile.grass') sprite.image.setTint(tint);
+      if (sprite.groundImage.texture.key === 'tile.grass') sprite.groundImage.setTint(tint);
     }
   }
 
@@ -1153,16 +1161,29 @@ export class MapScene extends Phaser.Scene {
     this.wearBadge.setPosition(head.x, head.y - TILE_SIZE * 0.4);
   }
 
-  /** 玩家造成的地圖變化（砍樹、採野薄荷、隔日恢復）即時反映到每一格的圖片上。 */
+  /** 玩家造成的地圖變化（砍樹、採野薄荷、隔日恢復）即時反映到地板與透明物件層。 */
   private syncWorldTiles(): void {
     const state = this.deps.session.state;
     for (const sprite of this.tileSprites) {
       const kind = effectiveKind(sprite.base, changeAt(state.worldChanges, state.mapId, sprite.x, sprite.y));
-      const key = `tile.${kind}`;
-      if (sprite.image.texture.key === key) continue;
-      this.applyAsset(sprite.image, key);
-      if (kind === 'grass' && this.shownSeason) sprite.image.setTint(seasonGrassTint(this.shownSeason));
-      else sprite.image.clearTint();
+      const ground = isGroundLayer(kind) ? kind : sprite.ground;
+      const groundKey = `tile.${ground}`;
+      if (sprite.groundImage.texture.key !== groundKey) this.applyAsset(sprite.groundImage, groundKey);
+      if (ground === 'grass' && this.shownSeason) sprite.groundImage.setTint(seasonGrassTint(this.shownSeason));
+      else sprite.groundImage.clearTint();
+
+      if (isGroundLayer(kind)) {
+        sprite.objectImage?.setVisible(false);
+      } else {
+        const objectKey = `tile.${kind}`;
+        if (!sprite.objectImage) {
+          sprite.objectImage = this.image(objectKey, sprite.x, sprite.y, 1);
+          this.world.add(sprite.objectImage);
+        } else {
+          this.applyAsset(sprite.objectImage, objectKey);
+          sprite.objectImage.setVisible(true);
+        }
+      }
     }
   }
 
@@ -1183,9 +1204,12 @@ export class MapScene extends Phaser.Scene {
       for (let x = 0; x < map.width; x += 1) {
         const tile = tileAt(map, x, y);
         if (!tile) continue;
-        const image = this.image(`tile.${tile.kind}`, x, y, 0);
-        this.tileSprites.push({ x, y, base: tile.kind, image });
-        this.world.add(image);
+        const ground = groundLayerFor(map, x, y);
+        const groundImage = this.image(`tile.${ground}`, x, y, 0);
+        const objectImage = isGroundLayer(tile.kind) ? undefined : this.image(`tile.${tile.kind}`, x, y, 1);
+        this.tileSprites.push({ x, y, base: tile.kind, ground, groundImage, objectImage });
+        this.world.add(groundImage);
+        if (objectImage) this.world.add(objectImage);
       }
     }
 

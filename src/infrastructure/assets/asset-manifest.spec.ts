@@ -200,11 +200,10 @@ describe('shipped assets', () => {
     expect(byId.get('pet.marsupial')).toMatchObject({ file: 'assets/characters/marsupial-2x.png', density: 2 });
   });
 
-  it('records where each real asset came from, including the model and seed', () => {
-    // 程式產生的圖示（PWA）沒有模型與 seed，來源寫明產生的程式即可（見 pwa-assets.spec.ts）。
+  it('records the generation source for every shipped asset', () => {
+    // 舊素材保留 Z-Image 與 seed；新素材記錄內建產圖工具與後製流程。
     for (const asset of manifest.assets.filter((a) => a.file && !a.source.startsWith('程式產生'))) {
-      expect(asset.source, asset.id).toMatch(/Z-Image Turbo/);
-      expect(asset.source, asset.id).toMatch(/seed \d+/);
+      expect(asset.source, asset.id).toMatch(/(?:Z-Image Turbo.*seed \d+|OpenAI built-in image generation tool)/);
     }
   });
 });

@@ -1,18 +1,17 @@
-"""把地形與物件的大圖（768 px 方形）處理成格子素材：可選的無縫接圖、縮到格子、量化到共用調色盤。
+"""把地面或透明物件圖處理成 64 px 格子的 RGBA8888 素材。
 
 地形（草、土、路、木板、水…）要能無縫鋪滿格子，所以加 --seamless：
     先把圖的左右、上下各錯開半張，再以羽化遮罩把原本的接縫融掉（只在圖的中間區域混色，
     四個邊緣與錯開後的接縫完全吻合）。物件（樹、箱子、床…）是獨立的一格，不加 --seamless。
 
-每個素材輸出兩個尺寸，與 finalize.py（角色）相同：
-    <輸出前綴>-2x.png   母版，畫格為 1x 的兩倍（遊戲在高解析度螢幕上用它，顯示時縮成 0.5 倍）
-    <輸出前綴>.png      1x，由母版縮小後再量化，畫格就是設計尺寸（64 px）
+每個素材只輸出遊戲載入的 2x 母版：
+    <輸出前綴>-2x.png   畫格為設計尺寸（64 px）的兩倍（遊戲顯示時縮成 0.5 倍）
 
-不補輪廓、不去背：地形是整格不透明的，物件的深棕輪廓由模型畫出（見 docs/art/scene-briefs.md）。
+地面是不透明、可無縫拼接的整格圖；物件以 --overlay 輸出透明圖層，保留來源 alpha。
 
 用法（在專案根目錄）：
     .venv/bin/python tools/art/tile_finalize.py 大圖.png 輸出前綴 --seamless
-    .venv/bin/python tools/art/tile_finalize.py 大圖.png 輸出前綴
+    .venv/bin/python tools/art/tile_finalize.py 透明物件.png 輸出前綴 --overlay
 """
 
 from __future__ import annotations
@@ -20,9 +19,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from PIL import Image, ImageChops
-
-from finalize import load_palette, quantize
+from PIL import Image, ImageChops, ImageOps
 
 CELL_1X = 64  # 1x 的格子邊長（與 TILE_SIZE 一致）
 SOURCE_SIZE = 768  # 模型輸出的方形邊長；所有地形與物件都用同一個尺寸生成
@@ -48,20 +45,22 @@ def make_seamless(img: Image.Image) -> Image.Image:
     return Image.composite(blended, shifted_y, ramp_mask(size, vertical=True))
 
 
-def finalize_tile(src: Path, prefix: Path, seamless: bool, palette_path: Path) -> None:
-    colors, _outline = load_palette(palette_path)
-    img = Image.open(src).convert("RGB")
-    if img.size != (SOURCE_SIZE, SOURCE_SIZE):
-        img = img.resize((SOURCE_SIZE, SOURCE_SIZE), Image.LANCZOS)
-    if seamless:
-        img = make_seamless(img)
+def finalize_tile(src: Path, prefix: Path, seamless: bool, overlay: bool) -> None:
+    source = Image.open(src)
+    if overlay:
+        img = source.convert("RGBA")
+        contained = ImageOps.contain(img, (CELL_1X * 2, CELL_1X * 2), method=Image.Resampling.NEAREST)
+        two_x = Image.new("RGBA", (CELL_1X * 2, CELL_1X * 2), (0, 0, 0, 0))
+        two_x.alpha_composite(contained, ((two_x.width - contained.width) // 2, (two_x.height - contained.height) // 2))
+    else:
+        img = ImageOps.fit(source.convert("RGB"), (SOURCE_SIZE, SOURCE_SIZE), method=Image.Resampling.NEAREST)
+        if seamless:
+            img = make_seamless(img)
+        two_x = img.resize((CELL_1X * 2, CELL_1X * 2), Image.Resampling.NEAREST).convert("RGBA")
 
-    rgba = img.convert("RGBA")
-    two_x = quantize(rgba.resize((CELL_1X * 2, CELL_1X * 2), Image.LANCZOS), colors)
-    one_x = quantize(two_x.resize((CELL_1X, CELL_1X), Image.LANCZOS), colors)
     two_x.save(prefix.with_name(prefix.name + "-2x.png"))
-    one_x.save(prefix.with_name(prefix.name + ".png"))
-    print(f"{src.name} → {prefix.name}-2x.png / {prefix.name}.png（{'無縫' if seamless else '單格'}）")
+    mode = "物件透明層" if overlay else "無縫地面" if seamless else "地面"
+    print(f"{src.name} → {prefix.name}-2x.png（{mode}，RGBA8888）")
 
 
 def main() -> None:
@@ -69,9 +68,9 @@ def main() -> None:
     parser.add_argument("src", type=Path)
     parser.add_argument("prefix", type=Path)
     parser.add_argument("--seamless", action="store_true", help="地形：讓圖能無縫鋪滿格子")
-    parser.add_argument("--palette", type=Path, default=Path("content/palette.json"))
+    parser.add_argument("--overlay", action="store_true", help="物件：保留 alpha 並置中到透明格子")
     args = parser.parse_args()
-    finalize_tile(args.src, args.prefix, args.seamless, args.palette)
+    finalize_tile(args.src, args.prefix, args.seamless, args.overlay)
 
 
 if __name__ == "__main__":
