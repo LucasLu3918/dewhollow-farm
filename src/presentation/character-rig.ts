@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { resolveAsset, type AssetManifest } from '../infrastructure/assets/asset-manifest';
 import type { BipedRig, RigDef } from '../infrastructure/assets/rig-manifest';
-import type { ToolDef } from '../infrastructure/assets/tool-manifest';
+import { toolTexturePixelSizes, type ToolDef } from '../infrastructure/assets/tool-manifest';
 import { squashSprite } from './effects';
 import { rigLayout, type RigLayout } from './rig-layout';
 import { actionLean, impactAt, motionFactor, toolPose, type ActionLean } from './tool-swing';
@@ -396,9 +396,11 @@ export class CharacterRig {
     const { textureId } = resolveAsset(this.assets, tool.asset);
     if (!this.scene.textures.exists(textureId)) throw new Error(`工具 ${tool.id}：貼圖 ${textureId} 不存在（素材可能載入失敗）`);
     const source = this.scene.textures.get(textureId).getSourceImage();
-    if (source.width !== tool.textureSize.width || source.height !== tool.textureSize.height) {
+    const asset = this.assets.assets.find((entry) => entry.id === tool.asset);
+    const expected = toolTexturePixelSizes(tool, asset);
+    if (!expected.some((size) => source.width === size.width && source.height === size.height)) {
       throw new Error(
-        `工具 ${tool.id}：貼圖 ${textureId} 是 ${source.width}×${source.height}，tools.json 宣告的是 ${tool.textureSize.width}×${tool.textureSize.height}`,
+        `工具 ${tool.id}：貼圖 ${textureId} 是 ${source.width}×${source.height}，density=${asset?.density ?? 1} 時預期來源尺寸為 ${expected.map((size) => `${size.width}×${size.height}`).join(' 或 ')}`,
       );
     }
     const image = this.scene.add.image(0, 0, textureId).setVisible(false);

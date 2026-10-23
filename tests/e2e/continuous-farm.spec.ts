@@ -198,19 +198,18 @@ test.describe('可取消的長按連續農務', () => {
         clientY: bounds.top + bounds.height / 2, bubbles: true,
       });
       button.dispatchEvent(init(41));
+      window.setTimeout(() => {
+        const currentBounds = button.getBoundingClientRect();
+        const initSecondary = (type: string) => new PointerEvent(type, {
+          pointerId: 42, pointerType: 'touch', button: 0,
+          clientX: currentBounds.left + currentBounds.width / 2,
+          clientY: currentBounds.top + currentBounds.height / 2, bubbles: true,
+        });
+        button.dispatchEvent(initSecondary('pointerdown'));
+        button.dispatchEvent(initSecondary('pointerup'));
+      }, 285);
     });
-    await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? false)).toBe(true);
-    await page.evaluate(() => {
-      const button = document.querySelector<HTMLButtonElement>('#hud-action')!;
-      const bounds = button.getBoundingClientRect();
-      const init = (type: string, pointerId: number) => new PointerEvent(type, {
-        pointerId, pointerType: 'touch', button: 0, clientX: bounds.left + bounds.width / 2,
-        clientY: bounds.top + bounds.height / 2, bubbles: true,
-      });
-      button.dispatchEvent(init('pointerdown', 42));
-      button.dispatchEvent(init('pointerup', 42));
-    });
-    await expect.poll(() => page.evaluate(() => window.__dewhollow?.continuousFarmActionsRunning() ?? false)).toBe(true);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0), { timeout: 10_000 }).toBe(1);
     await page.evaluate(() => {
       const button = document.querySelector<HTMLButtonElement>('#hud-action')!;
       button.dispatchEvent(new PointerEvent('pointerup', { pointerId: 41, pointerType: 'touch', bubbles: true }));
@@ -246,17 +245,25 @@ test.describe('可取消的長按連續農務', () => {
     expect(box).not.toBeNull();
     const clientX = (box?.x ?? 0) + (box?.width ?? 0) / 2;
     const clientY = (box?.y ?? 0) + (box?.height ?? 0) / 2;
-    await page.mouse.move(clientX, clientY);
-    await page.mouse.down();
-    await expect.poll(() => page.evaluate(() => [
-      window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0,
-      window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy ?? false,
-    ])).toEqual([0, true]);
     const playerBeforeMove = await page.evaluate(() => {
       const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
       return player ? { x: player.tileX, y: player.tileY } : null;
     });
-    await page.keyboard.press('ArrowRight');
+    await page.evaluate(() => {
+      const moveDuringSwing = (): void => {
+        const hits = window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0;
+        if (hits === 0) {
+          requestAnimationFrame(moveDuringSwing);
+          return;
+        }
+        window.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true,
+        }));
+      };
+      requestAnimationFrame(moveDuringSwing);
+    });
+    await page.mouse.move(clientX, clientY);
+    await page.mouse.down();
     await expect.poll(() => page.evaluate(() => {
       const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
       return player ? `${player.tileX},${player.tileY}` : '';

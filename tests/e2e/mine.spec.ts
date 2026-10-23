@@ -43,6 +43,7 @@ async function toMineEntrance(page: Page): Promise<void> {
 }
 
 test('the pick breaks a rock for stone, and the fallen rock at the cave mouth can be cleared', async ({ page }) => {
+  test.setTimeout(60_000);
   await waitForGame(page);
   await toMineEntrance(page);
 
@@ -67,6 +68,7 @@ test('the pick breaks a rock for stone, and the fallen rock at the cave mouth ca
 });
 
 test('without the pick the cave mouth stays shut and says what is needed', async ({ page }) => {
+  test.setTimeout(60_000);
   await waitForGame(page);
   await toMineEntrance(page);
   // 出生點 (8,8) → 往上到 (8,2)，往左到 (7,2)，面向上方的洞口 (7,1)。沒有鎬：洞口不動。

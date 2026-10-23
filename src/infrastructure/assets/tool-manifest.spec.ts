@@ -3,7 +3,7 @@ import assets from '../../../content/assets.json';
 import tools from '../../../content/tools.json';
 import { toolsFileSchema } from '../content/content-schema';
 import type { AssetEntry, AssetManifest } from './asset-manifest';
-import { toolProblems, type ToolDef, type ToolManifest } from './tool-manifest';
+import { toolProblems, toolTexturePixelSizes, type ToolDef, type ToolManifest } from './tool-manifest';
 
 const objectAsset = (id: string, extra: Partial<AssetEntry> = {}): AssetEntry => ({
   id,
@@ -96,6 +96,20 @@ describe('toolProblems', () => {
     ]);
     // 邊界上的點算在圖片裡（握把常在圖片底邊）。
     expect(toolProblems(manifestOf({ ...hoe, grip: { x: 96, y: 96 } }), assetsOf())).toEqual([]);
+  });
+});
+
+describe('toolTexturePixelSizes', () => {
+  it('accepts both existing design-size files and density-scaled source files', () => {
+    expect(toolTexturePixelSizes(hoe, objectAsset('tool.hoe'))).toEqual([
+      { width: 192, height: 192 },
+      { width: 96, height: 96 },
+    ]);
+  });
+
+  it('keeps density-one and unspecified-density assets at their design dimensions', () => {
+    expect(toolTexturePixelSizes(hoe, objectAsset('tool.hoe', { density: 1 }))).toEqual([{ width: 96, height: 96 }]);
+    expect(toolTexturePixelSizes(hoe, objectAsset('tool.hoe', { density: undefined }))).toEqual([{ width: 96, height: 96 }]);
   });
 });
 
