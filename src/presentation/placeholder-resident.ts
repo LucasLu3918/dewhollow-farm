@@ -10,7 +10,7 @@ import { resolveAsset } from '../infrastructure/assets/asset-manifest';
 export interface ResidentView {
   readonly root: Phaser.GameObjects.Container;
   teleport(x: number, y: number): void;
-  walkTo(x: number, y: number, durationMs: number): void;
+  walkTo(x: number, y: number, durationMs: number, onArrive?: () => void): void;
   stepInPlace(durationMs: number): void;
   displayHeight(): number;
   update(deltaMs: number): void;
@@ -36,9 +36,9 @@ export class PlaceholderResident implements ResidentView {
     this.root.setPosition(x, y);
   }
 
-  walkTo(x: number, y: number, durationMs: number): void {
+  walkTo(x: number, y: number, durationMs: number, onArrive?: () => void): void {
     this.scene.tweens.killTweensOf(this.root);
-    this.scene.tweens.add({ targets: this.root, x, y, duration: durationMs, ease: 'Linear' });
+    this.scene.tweens.add({ targets: this.root, x, y, duration: durationMs, ease: 'Linear', onComplete: () => onArrive?.() });
   }
 
   /** 被搭話時原地跳一下（和毛毛的原地搖擺是同一種回饋）。 */
