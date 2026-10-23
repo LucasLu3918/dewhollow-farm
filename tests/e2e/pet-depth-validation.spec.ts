@@ -68,29 +68,42 @@ async function walk(page: Page, key: string): Promise<void> {
 }
 
 async function captureCrossing(page: Page, key: string, depth: 'player-front' | 'cat-front'): Promise<OverlapCapture> {
-  const overlapReached = page.waitForFunction(async (targetDepth) => {
+  const crossing = page.evaluate((targetDepth) => new Promise<{
+    sampledFeet: { player: number; cat: number };
+    pausedFeet: { player: number; cat: number };
+  }>((resolve, reject) => {
     const debug = window.__dewhollow;
-    if (!debug) return false;
-    const [playerActor, catActor] = debug.actors().filter((item) => item.id === 'player' || item.id === 'cat');
-    if (!playerActor || !catActor) return false;
-    const footGap = targetDepth === 'player-front'
-      ? playerActor.footY - catActor.footY
-      : catActor.footY - playerActor.footY;
-    const maxRestOverlapGap = targetDepth === 'player-front' ? 68 : 36;
-    const horizontalFootGap = Math.abs(playerActor.footX - catActor.footX);
-    // The resting silhouettes are 64×80 and 48×48, centered on their root foot positions.
-    // Keep at least 12 px of overlap after pauseScene resets the walking pose.
-    const restPoseOverlap = horizontalFootGap < 44 && footGap > 0 && footGap < maxRestOverlapGap;
-    if (!playerActor.busy || !catActor.busy || !restPoseOverlap) return false;
-
-    // Freeze inside the browser evaluation that observes the overlap. Waiting for the
-    // parent test to pause the scene can let this short crossing finish first on CI.
-    await debug.pauseScene({ preservePose: true });
-    return true;
-  }, depth, { timeout: 5_000 });
+    if (!debug) return reject(new Error('缺少 window.__dewhollow'));
+    const timeout = window.setTimeout(() => reject(new Error('5 秒內未捕捉到玩家與黑貓的交叉重疊')), 5_000);
+    const poll = (): void => {
+      const [player, cat] = debug.actors().filter((item) => item.id === 'player' || item.id === 'cat');
+      if (!player || !cat) return reject(new Error('找不到交叉中的玩家與黑貓'));
+      const signedGap = targetDepth === 'player-front' ? player.footY - cat.footY : cat.footY - player.footY;
+      const horizontalGap = Math.abs(player.footX - cat.footX);
+      // Sample after crossing the depth boundary, with at least 12 px of shared sprite area.
+      if (!player.busy || !cat.busy || signedGap < 4 || signedGap > 36 || horizontalGap >= 24) {
+        window.requestAnimationFrame(poll);
+        return;
+      }
+      const sampledFeet = { player: player.footY, cat: cat.footY };
+      // Pause synchronously, then wait for Phaser's PAUSE event before reading the frozen pose.
+      void debug.pauseScene({ preservePose: true }).then(() => {
+        window.clearTimeout(timeout);
+        const [pausedPlayer, pausedCat] = debug.actors().filter((item) => item.id === 'player' || item.id === 'cat');
+        if (!pausedPlayer || !pausedCat) return reject(new Error('暫停後找不到玩家與黑貓'));
+        resolve({ sampledFeet, pausedFeet: { player: pausedPlayer.footY, cat: pausedCat.footY } });
+      }, reject);
+    };
+    poll();
+  }), depth);
   await page.keyboard.press(key);
-  await overlapReached;
-  return captureOverlap(page);
+  const { sampledFeet, pausedFeet } = await crossing;
+  expect(pausedFeet.player).toBeCloseTo(sampledFeet.player, 3);
+  expect(pausedFeet.cat).toBeCloseTo(sampledFeet.cat, 3);
+  const capture = await captureOverlap(page);
+  const signedGap = depth === 'player-front' ? capture.feet.player - capture.feet.cat : capture.feet.cat - capture.feet.player;
+  expect(signedGap, `暫停後腳底仍應位於 ${depth} 的深度範圍：${JSON.stringify(capture.feet)}`).toBeGreaterThan(0);
+  return capture;
 }
 
 async function captureOverlap(page: Page): Promise<OverlapCapture> {
