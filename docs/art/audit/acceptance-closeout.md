@@ -1,6 +1,6 @@
 # Acceptance closeout — Dewhollow Farm art and pet fix
 
-**Functional candidate validated:** `db75397` on `codex/dewhollow-art-quality-pet-fix` (2026-10-23). The closeout document is refreshed after those code checks; the final PR CI must validate the pushed documentation commit as well.
+**Functional candidate validated:** `616be307e9280a01cb4b944a8b18c51f8b317c1c` (PR #16, merged to `main`). Verification was repeated on 2026-10-24 using the Node 24 runtime required by `.nvmrc`; the documentation follow-up still needs its own PR CI.
 **Plan:** `Dewhollow_Farm_Art_Quality_Pet_Fix_Agent_Plan_zh-TW.md`  
 **Purpose:** distinguish implemented fixes from the plan's broader acceptance gates. A green test suite does not imply that every visual, device, or performance criterion passed.
 
@@ -10,7 +10,7 @@
 |---|---|---|---|
 | DF-ART-001 — regression audit | **Partial** | The regression report compares old, regressed, and fixed pet renders and records root cause, hashes, scope, and PR history. The metadata audit covers all 65 manifest entries and includes a same-source NEAREST/LANCZOS/palette comparison. | Rig-specific anchor/offset coverage for every asset and subjective whole-project style consistency remain incomplete. |
 | DF-PET-002 — black cat | **Partial** | Restored `pet.cat` identity and existing rig/save ID. The rendered E2E verifies the 48×48 display, tile foot anchor, pass-through collision, southbound and northbound occlusion, and building collision/door behavior. | The restored cat's tail is shorter than the written brief. |
-| DF-PET-003 — quokka | **Partial** | User approved the second candidate as the base and the exact integrated PNG SHA-256 `614fc13c48dab042962c7dc39f2353890d5f038e04076205a99cad27aed822d7`. Existing village render, placement and interaction coverage passes. | Human species-recognition review at actual in-game size and across scene backgrounds remains unrecorded. |
+| DF-PET-003 — quokka | **Partial** | User approved the second candidate as the base, exact integrated PNG SHA-256 `614fc13c48dab042962c7dc39f2353890d5f038e04076205a99cad27aed822d7`, and its 48×48 village render as recognizable quokka without bear/person appearance. The reviewed snapshot is `tests/e2e/companions.spec.ts-snapshots/pet-companions-village.png` (SHA-256 `af0118ece49de2f5b5f39ab63874711bcfe11c4a08e70adcfdf29ebd7c2906b8`). Existing placement and interaction coverage passes. | A signed anatomy checklist, quokka-specific collision coverage, and a historical shipped-save fixture remain unavailable. |
 | DF-ART-004 — art pipeline | **Partial** | User approved the exact style-sheet revision recorded in `asset-review.md`; candidate/reviewed/approved/integrated workflow and exclusive-create output safety are documented and tested. Asset provenance and dimensions are inventoried. | A complete alpha/scale/loading visual audit and animation-frame identity checklist remain incomplete. |
 | DF-MAP-005 — map ground and occlusion | **Partial** | Greenhouse ground is explicit; map unit and pixel-sampling tests cover four seasons, field edges, shop wall, greenhouse fence, doors, tree collision/overlap, pet depth ordering, mature field, lake and mine. Eight scene baselines are committed. | Building-depth coverage beyond the tested tree/pet interactions and full-town/farm visual review remain incomplete. |
 | DF-FEEL-006 — day loop and gameplay | **Partial** | Multiday crop/forage/shipping/sleep/save loop checks time, energy, inventory and currency. Rendered NPC acceptance verifies dialogue, shop, daily-repeat protection, range refusal and unchanged state across reload. A rendered bulletin quest acceptance/completion success path now verifies visible feedback and persistence. | Rendered current-target and refusal feedback across every gameplay system remain incomplete. |
@@ -19,9 +19,10 @@
 
 ## Current automated verification
 
-- `npm run check` on functional candidate `db75397`: TypeScript, 148 Vitest files, 1,541 passed, 1 skipped, production build and bundle budget passed (2.778 MB raw first-load size; 8 MB budget).
-- `npm run test:e2e` on functional candidate `db75397`: all 190 Chromium tests passed with 9 workers in 2.9 minutes.
-- Pet-depth E2E: all five cases passed; the northbound overlap case passed five repeated runs under five workers. Pixel ordering compares same-pose WebGL captures and retains a strict foreground-pixel majority assertion.
+- `npm run check` on `616be30` with Node 24.22.1: typecheck, 148 Vitest files, 1,541 passed, 1 skipped, production build and bundle budget passed (2.778 MB raw first-load size; 8 MB budget).
+- `npm run test:e2e -- --workers=4` on `616be30` with Node 24.22.1: all 190 Chromium tests passed in 4.4 minutes.
+- Pet-depth E2E: all five cases passed in the full suite and 10 repeated runs (50/50) under nine workers. Pixel ordering compares same-pose WebGL captures and retains a strict foreground-pixel majority assertion.
+- Runtime note: `.nvmrc` specifies Node 24. An attempted run with system Node 26.11.1 crashed Vite's dev server; that run is not counted as product test evidence.
 - Resident/shop stability E2E: three repeated runs passed (11.8, 11.7 and 11.9 seconds); route avoids the scheduled NPC blockers while preserving dialogue, purchase/refusal, persistence and unchanged-state assertions.
 - Sweet-radish asset manifest tests: 30/30 passed. Mature-field E2E passed after snapshot regeneration and on the combined suite.
 - Quest success E2E: focused test passed and is included in the 190-test combined run.
@@ -43,6 +44,7 @@
 ## Signoff record
 
 - **Pet direction approval:** user confirmed “restore the old black cat; use the second quokka candidate as the base.” This records the chosen direction.
+- **Quokka rendered-size review:** user reviewed the 48×48 village snapshot `tests/e2e/companions.spec.ts-snapshots/pet-companions-village.png` (SHA-256 `af0118ece49de2f5b5f39ab63874711bcfe11c4a08e70adcfdf29ebd7c2906b8`) and confirmed it reads as a quokka, not a bear or person, on 2026-10-24.
 - **Sweet-radish approval:** user approved exact 128×128 PNG, SHA-256 `e7cb6a3631de28f28cda03e9ced2725a1bf30c6f8634975e0a53964f47e8fbe7`, on 2026-10-23; copied without redraw/resampling to `public/assets/crops/sweet-radish-2x.png` and registered at density 2.
 - **Style reference approval:** user approved `docs/art/style-sheet.png` as the overall pixel-art direction on 2026-10-23; SHA-256 `9cf2c3db8e3047b577386f873b58b4c17ff1379263329e44b5930a60bdbcc4ae`.
 - **Current exact quokka PNG:** `public/assets/characters/marsupial-2x.png`, SHA-256 `614fc13c48dab042962c7dc39f2353890d5f038e04076205a99cad27aed822d7`, approved by the user on 2026-10-23.
