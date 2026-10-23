@@ -95,7 +95,8 @@
       }
     },
     "W": {
-      "kind": "fence"
+      "kind": "fence",
+      "ground": "grass"
     },
     "g": {
       "kind": "field",
