@@ -65,7 +65,7 @@ Bright saturated hand-painted cartoon style, thick dark brown outline, soft high
 
 使用者採用：小涵 seed 101、毛毛 seed 101、黑貓 seed 101、有袋動物 seed 202。
 
-處理工具（`tools/art/`）：`build_palette.py` 由這四張產生 `content/palette.json`（48 色：4 個錨點色＋44 個衍生色，錨點含深棕輪廓與兩位角色的標誌色）；`finalize.py` 縮到畫格、外圍補輪廓、量化到調色盤並驗證輸出顏色都在調色盤內。成品在 `private/art-trials/final/`（尚未進 `public/`）。
+歷史處理紀錄（2026-10-21）：當時 `build_palette.py` 由四張圖產生 48 色調色盤；角色圖曾縮到畫格、補輪廓並量化。**此段是舊流程紀錄**：目前 `finalize.py` 保留 RGBA8888 全彩，不再量化輸出；輸出檔若已存在會拒絕覆寫。當時的試驗成品在 `private/art-trials/final/`，不代表目前核准狀態。
 
 | 素材 | 1x 畫格 | 2x 母版畫格 | 用色（2x／1x） |
 | --- | --- | --- | --- |

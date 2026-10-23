@@ -58,7 +58,11 @@ def finalize_tile(src: Path, prefix: Path, seamless: bool, overlay: bool) -> Non
             img = make_seamless(img)
         two_x = img.resize((CELL_1X * 2, CELL_1X * 2), Image.Resampling.NEAREST).convert("RGBA")
 
-    two_x.save(prefix.with_name(prefix.name + "-2x.png"))
+    target = prefix.with_name(prefix.name + "-2x.png")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    # Exclusive creation prevents an approved asset from being silently replaced.
+    with target.open("xb") as output:
+        two_x.save(output, format="PNG")
     mode = "物件透明層" if overlay else "無縫地面" if seamless else "地面"
     print(f"{src.name} → {prefix.name}-2x.png（{mode}，RGBA8888）")
 

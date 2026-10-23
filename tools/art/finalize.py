@@ -61,7 +61,9 @@ def process(src: Path, prefix: Path, frame: tuple[int, int], palette_path: Path)
 
     target = prefix.with_name(prefix.name + "-2x.png")
     target.parent.mkdir(parents=True, exist_ok=True)
-    master.save(target)
+    # Exclusive creation prevents an approved asset from being silently replaced.
+    with target.open("xb") as output:
+        master.save(output, format="PNG")
     print(f"{target.name}: {master.width}×{master.height}，RGBA8888")
 
 
