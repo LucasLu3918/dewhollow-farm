@@ -53,6 +53,38 @@ async function toLake(page: Page): Promise<void> {
   await walk(page, 'ArrowUp', 1);
 }
 
+/** Save a known RNG state so the bite/reel checks do not depend on a fresh-game seed. */
+async function setFishingRng(page: Page, rng: number): Promise<void> {
+  await page.keyboard.press('s');
+  await expect(page.locator('#hud-log')).toContainText('已存檔');
+  await page.evaluate((nextRng) => new Promise<void>((resolve, reject) => {
+    const request = indexedDB.open('dewhollow-farm');
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction('saves', 'readwrite');
+      const store = transaction.objectStore('saves');
+      const get = store.get('slot-1');
+      get.onerror = () => reject(get.error);
+      get.onsuccess = () => {
+        const record = get.result as { state: { rng: number } } | undefined;
+        if (!record) {
+          db.close();
+          reject(new Error('找不到釣魚測試存檔'));
+          return;
+        }
+        record.state.rng = nextRng;
+        store.put(record);
+      };
+      transaction.oncomplete = () => { db.close(); resolve(); };
+      transaction.onerror = () => { db.close(); reject(transaction.error); };
+    };
+  }), rng);
+  await page.reload();
+  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
+}
+
 test('the status line shows every skill level, starting at zero', async ({ page }) => {
   await waitForGame(page);
   await expect(page.locator('#hud-skills')).toContainText('耕作 0');
@@ -65,24 +97,17 @@ test('casting at the lake with the rod: a fish bites sometimes, and a quick pres
   await toLake(page);
   await page.keyboard.press('r');
   await expect(page.locator('#hud-tool')).toHaveText('釣竿');
+  await setFishingRng(page, 2_654_435_761); // first cast deterministically bites (same LCG as the domain tests).
 
-  // 投竿直到有魚上鉤（每次投竿扣 2 點體力，最多試 15 次）。
-  let bit = false;
-  for (let attempt = 0; attempt < 15 && !bit; attempt += 1) {
-    await page.keyboard.press('x');
-    await expect
-      .poll(async () => (await page.locator('#hud-log').textContent()) ?? '')
-      .toMatch(/魚上鉤了|魚沒有上鉤/);
-    bit = ((await page.locator('#hud-log').textContent()) ?? '').includes('魚上鉤了');
-    if (!bit) await page.waitForTimeout(50);
-  }
-  if (!bit) test.skip(true, '15 次投竿都沒有上鉤（機率極低），這次略過收線檢查');
+  await page.keyboard.press('x');
+  await expect(page.locator('#hud-log li').last()).toContainText('魚上鉤了');
 
   // 上鉤期間方向輸入被閘門擋下，玩家位置不變；互動鍵仍能在時限內收線。
   const beforeReel = await playerPosition(page);
-  await page.keyboard.press('ArrowDown');
-  expect(await playerPosition(page)).toEqual(beforeReel);
+  await page.keyboard.down('ArrowDown');
   await page.keyboard.press('x');
+  await page.keyboard.up('ArrowDown');
+  expect(await playerPosition(page)).toEqual(beforeReel);
   await expect(page.locator('#hud-log')).toContainText('釣到了');
   // 投竿每次給 6 點釣魚經驗，所以技能列上的等級會跟著上升（這裡只檢查它顯示出來）。
   await expect(page.locator('#hud-skills')).toContainText('釣魚');
@@ -92,14 +117,8 @@ test('a fish that is not reeled in within the window gets away', async ({ page }
   await waitForGame(page);
   await toLake(page);
   await page.keyboard.press('r');
-  let bit = false;
-  for (let attempt = 0; attempt < 15 && !bit; attempt += 1) {
-    await page.keyboard.press('x');
-    await expect
-      .poll(async () => (await page.locator('#hud-log').textContent()) ?? '')
-      .toMatch(/魚上鉤了|魚沒有上鉤/);
-    bit = ((await page.locator('#hud-log').textContent()) ?? '').includes('魚上鉤了');
-  }
-  if (!bit) test.skip(true, '15 次投竿都沒有上鉤，這次略過');
+  await setFishingRng(page, 2_654_435_761);
+  await page.keyboard.press('x');
+  await expect(page.locator('#hud-log li').last()).toContainText('魚上鉤了');
   await expect(page.locator('#hud-log')).toContainText('魚跑掉了', { timeout: 5000 });
 });

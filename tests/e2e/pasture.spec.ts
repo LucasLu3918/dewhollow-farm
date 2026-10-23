@@ -8,6 +8,8 @@ import { expect, test, type Page } from '@playwright/test';
  */
 interface Actor {
   id: string;
+  tileX: number;
+  tileY: number;
   busy: boolean;
 }
 
@@ -23,7 +25,19 @@ async function mapId(page: Page): Promise<string> {
 
 async function walk(page: Page, key: string, steps: number): Promise<void> {
   for (let i = 0; i < steps; i += 1) {
+    const before = await page.evaluate(() => {
+      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+      return { map: window.__dewhollow?.mapId() ?? '', x: player?.tileX ?? -1, y: player?.tileY ?? -1 };
+    });
     await page.keyboard.press(key);
+    await expect
+      .poll(async () => {
+        const actors = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
+        const player = actors.find((a) => a.id === 'player');
+        const currentMap = await mapId(page);
+        return Boolean(player && (currentMap !== before.map || player.tileX !== before.x || player.tileY !== before.y));
+      })
+      .toBe(true);
     await expect
       .poll(async () => {
         const actors = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
@@ -31,6 +45,24 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
       })
       .toBe(false);
   }
+}
+
+async function faceBlockedTile(page: Page, key: string): Promise<void> {
+  const before = await page.evaluate(() => {
+    const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+    return { x: player?.tileX ?? -1, y: player?.tileY ?? -1 };
+  });
+  await page.keyboard.press(key);
+  await expect
+    .poll(async () => {
+      const player = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
+      return player.find((actor) => actor.id === 'player')?.busy ?? true;
+    })
+    .toBe(false);
+  await expect.poll(async () => page.evaluate(() => {
+    const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+    return { x: player?.tileX ?? -1, y: player?.tileY ?? -1 };
+  })).toEqual(before);
 }
 
 /** 直接寫入遊戲使用的 IndexedDB（與 save-migration.spec.ts 相同的做法）。 */
@@ -92,7 +124,7 @@ test('the pasture gate is shut before spring day 15, and says when it opens', as
   await waitForGame(page);
   await walk(page, 'ArrowRight', 31);
   await walk(page, 'ArrowDown', 4);
-  await walk(page, 'ArrowRight', 1);
+  await faceBlockedTile(page, 'ArrowRight');
   await expect(page.locator('#hud-log')).toContainText('春 15 天起才開放');
   expect(await mapId(page)).toBe('farm');
 });
@@ -118,7 +150,7 @@ test('on spring day 15 the gate opens, and a cow in the remodeled barn is fed, p
 
   // 乾草槽：站在 (2,2) 面向右邊的槽 (3,2)，餵一次（一包乾草餵全部的牛）。
   await walk(page, 'ArrowUp', 1);
-  await walk(page, 'ArrowRight', 1);
+  await faceBlockedTile(page, 'ArrowRight');
   await page.keyboard.press('x');
   await expect(page.locator('#hud-log')).toContainText('餵了牛');
 

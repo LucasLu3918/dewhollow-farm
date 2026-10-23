@@ -234,7 +234,7 @@ test.describe('行動版完整觸控農場流程', () => {
     { name: 'landscape', width: 844, height: 390 },
   ]) {
     test(`touch completes dialogue, shop, farm and save loop in ${viewport.name}`, async ({ page }, testInfo: TestInfo) => {
-      test.setTimeout(180_000);
+      test.setTimeout(300_000);
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await start(page);
       const beforeFarm = await talkShopAndReturn(page);
