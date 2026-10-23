@@ -81,7 +81,7 @@ async function captureCrossing(page: Page, key: string, depth: 'player-front' | 
       const signedGap = targetDepth === 'player-front' ? player.footY - cat.footY : cat.footY - player.footY;
       const horizontalGap = Math.abs(player.footX - cat.footX);
       // Sample after crossing the depth boundary, with at least 12 px of shared sprite area.
-      if (!player.busy || !cat.busy || signedGap < 4 || signedGap > 36 || horizontalGap >= 24) {
+      if (!player.busy || signedGap < 4 || signedGap > 36 || horizontalGap >= 24) {
         window.requestAnimationFrame(poll);
         return;
       }
