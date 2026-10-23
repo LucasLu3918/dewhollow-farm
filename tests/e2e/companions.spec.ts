@@ -84,6 +84,86 @@ async function enterVillage(page: Page): Promise<void> {
   await expect.poll(async () => (await actor(page, 'maomao'))?.pose).toEqual(REST);
 }
 
+async function pauseScene(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const debug = window.__dewhollow;
+    if (!debug) throw new Error('缺少 window.__dewhollow');
+    return debug.pauseScene();
+  });
+}
+
+async function expectPetBaselineCanvas(page: Page): Promise<void> {
+  const size = await page.locator('#game canvas').evaluate((canvas) => {
+    const { width, height } = canvas.getBoundingClientRect();
+    return { width: Math.round(width), height: Math.round(height) };
+  });
+  expect(size).toEqual({ width: 926, height: 694 });
+}
+
+async function waitForCameraToSettle(page: Page): Promise<{ x: number; y: number }> {
+  const settled = await page.evaluate(() => new Promise<{ x: number; y: number } | null>((resolve) => {
+    const debug = window.__dewhollow;
+    if (!debug) throw new Error('缺少 window.__dewhollow');
+    let previous = debug.cameraScroll();
+    let stableFrames = 0;
+    const deadline = performance.now() + 5_000;
+    const sample = (): void => {
+      const current = debug.cameraScroll();
+      stableFrames = current.x === previous.x && current.y === previous.y ? stableFrames + 1 : 0;
+      previous = current;
+      if (stableFrames >= 5) {
+        resolve(current);
+      } else if (performance.now() >= deadline) {
+        resolve(null);
+      } else {
+        requestAnimationFrame(sample);
+      }
+    };
+    requestAnimationFrame(sample);
+  }));
+  expect(settled, '相機 scroll 應連續五個畫面更新保持不變').not.toBeNull();
+  return settled!;
+}
+
+async function setPetBaselineViewport(page: Page): Promise<void> {
+  // Restore the pre-MOBILE-007 desktop stage geometry used by the approved 1280×720 pet goldens.
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.addInitScript(() => {
+    const random = Math.random;
+    Math.random = () => {
+      Math.random = random;
+      return 0;
+    };
+
+    const addStyle = () => {
+      if (!document.head) return false;
+      const style = document.createElement('style');
+      style.dataset.petBaselineLayout = 'true';
+      style.textContent = `
+        @media (orientation: landscape) and (min-width: 601px) and (min-height: 521px) {
+          .app {
+            height: auto !important;
+            grid-template-rows: auto auto auto !important;
+          }
+          .app .stage {
+            width: 100% !important;
+            height: auto !important;
+            aspect-ratio: 4 / 3 !important;
+          }
+        }
+      `;
+      document.head.append(style);
+      return true;
+    };
+    if (!addStyle()) {
+      const observer = new MutationObserver(() => {
+        if (addStyle()) observer.disconnect();
+      });
+      observer.observe(document, { childList: true, subtree: true });
+    }
+  });
+}
+
 test('the pets have their own real 2x images, and only the cat is on the farm', async ({ page }) => {
   await waitForGame(page);
   for (const key of ['pet.cat', 'pet.marsupial']) {
@@ -94,15 +174,29 @@ test('the pets have their own real 2x images, and only the cat is on the farm', 
 });
 
 test('the approved cat artwork matches the farm visual baseline', async ({ page }) => {
+  await setPetBaselineViewport(page);
   await waitForGame(page);
+  await expect(page.locator('#hud-weather')).toContainText('晴');
+  await expectPetBaselineCanvas(page);
+  await expect.poll(async () => (await actor(page, 'cat'))?.pose).toEqual(REST);
+  await expect.poll(async () => (await actor(page, 'player'))?.pose).toEqual(REST);
+  await pauseScene(page);
   await expect(page.locator('#game canvas')).toHaveScreenshot('pet-cat-farm.png', {
     animations: 'disabled',
   });
 });
 
 test('the approved cat and quokka artwork match the village visual baseline', async ({ page }) => {
+  await setPetBaselineViewport(page);
   await waitForGame(page);
+  await expect(page.locator('#hud-weather')).toContainText('晴');
+  await expectPetBaselineCanvas(page);
   await enterVillage(page);
+  const settledCamera = await waitForCameraToSettle(page);
+  await expect.poll(async () => (await actor(page, 'marsupial'))?.pose).toEqual(REST);
+  await expect.poll(async () => (await actor(page, 'player'))?.pose).toEqual(REST);
+  await pauseScene(page);
+  expect(await page.evaluate(() => window.__dewhollow?.cameraScroll())).toEqual(settledCamera);
   await expect(page.locator('#game canvas')).toHaveScreenshot('pet-companions-village.png', {
     animations: 'disabled',
   });
