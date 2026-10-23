@@ -15,9 +15,9 @@ export interface ToolDef {
   /** 哪個農務動作會拿出這個工具；一個動作只能有一個工具。 */
   action: ActionKind;
   asset: string;
-  /** 圖片的原始大小（2x 母版像素），載入後會與實際貼圖核對。 */
+  /** 工具圖的設計尺寸；來源像素尺寸由 assets.json 的 density 換算。 */
   textureSize: { width: number; height: number };
-  /** 握把在圖片上的位置（2x 母版像素）；揮動時工具繞這一點旋轉。圖畫的是朝右的樣子。 */
+  /** 握把在設計尺寸上的位置；揮動時工具繞這一點旋轉。圖畫的是朝右的樣子。 */
   grip: { x: number; y: number };
   swing: SwingKind;
 }
@@ -25,6 +25,22 @@ export interface ToolDef {
 export interface ToolManifest {
   version: 1;
   tools: ToolDef[];
+}
+
+/** 列出工具素材可接受的來源像素尺寸：density 尺寸與既有設計尺寸檔案。 */
+export function toolTexturePixelSizes(
+  tool: Pick<ToolDef, 'textureSize'>,
+  asset?: Pick<AssetEntry, 'density'>,
+): { width: number; height: number }[] {
+  const density = asset?.density ?? 1;
+  const densitySize = {
+    width: tool.textureSize.width * density,
+    height: tool.textureSize.height * density,
+  };
+  if (densitySize.width === tool.textureSize.width && densitySize.height === tool.textureSize.height) {
+    return [densitySize];
+  }
+  return [densitySize, tool.textureSize];
 }
 
 /** 工具與素材清單的交叉檢查。 */
