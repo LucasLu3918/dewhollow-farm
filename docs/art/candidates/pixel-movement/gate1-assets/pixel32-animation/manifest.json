@@ -1,0 +1,382 @@
+{
+  "schemaVersion": 1,
+  "title": "Dewhollow pixel32 four-direction animation candidate",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "hand-authored integer pixel primitives",
+    "generator": "tools/art/generate_gate1_animation.mjs",
+    "generatorSha256": "f4aff3c6bd4c743fa0381da6e44f1438ff466a97bec05126191cdb8822df63c1"
+  },
+  "pixelContract": {
+    "frameWidth": 32,
+    "frameHeight": 48,
+    "columns": 4,
+    "rows": 4,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open"
+  },
+  "atlas": {
+    "file": "player-4dir.png",
+    "width": 128,
+    "height": 192,
+    "sha256": "d27f4deaeb1207c7b9e120fb829ac8af7d139865c7347aec7f15e37976c26266"
+  },
+  "directions": [
+    "down",
+    "up",
+    "left",
+    "right"
+  ],
+  "frames": {
+    "down-idle": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "down",
+      "pose": "idle",
+      "sha256": "9827757cf610a6bc51abcf9bf5550160b604af51ec9c4b1d240c9988f2760877"
+    },
+    "down-contact-a": {
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "down",
+      "pose": "contact-a",
+      "sha256": "fa28309b2cdc0895d12f9ebedcbac6773ed7550554a0bdd7d5698982997f727b"
+    },
+    "down-passing": {
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "down",
+      "pose": "passing",
+      "sha256": "dcda77bc1ffb96e3e58bd7d0efb1d89a88570cd46e2fd32ac8eea9fcc0e85b77"
+    },
+    "down-contact-b": {
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "down",
+      "pose": "contact-b",
+      "sha256": "a7a3ed6773bcc782b6333d0e044244d5ea2f134e1c44f454763e5137ecddab38"
+    },
+    "up-idle": {
+      "x": 0,
+      "y": 48,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "up",
+      "pose": "idle",
+      "sha256": "53941b3a686e237e2439dd518eacaca7e6d58db0bd7d33c7213af3dd3d9dd366"
+    },
+    "up-contact-a": {
+      "x": 32,
+      "y": 48,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "up",
+      "pose": "contact-a",
+      "sha256": "9bec4cf731ce6bb13c2b570312825e0a0ace64115f1b10941393404cb44e121c"
+    },
+    "up-passing": {
+      "x": 64,
+      "y": 48,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "up",
+      "pose": "passing",
+      "sha256": "442b4244e5103a3a981777ce5e4fe0c4d9face517998147f6deb6e991f6b6a18"
+    },
+    "up-contact-b": {
+      "x": 96,
+      "y": 48,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "up",
+      "pose": "contact-b",
+      "sha256": "6689c4c2da9b83508c137d71dcef2ebd0cc6a3fcb38025765168442ee19bd5de"
+    },
+    "left-idle": {
+      "x": 0,
+      "y": 96,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "left",
+      "pose": "idle",
+      "sha256": "9236bb6be4ab78f8bab864755980b6a9ef818c5b45f1a777c38c2df6cec5aa4d"
+    },
+    "left-contact-a": {
+      "x": 32,
+      "y": 96,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "left",
+      "pose": "contact-a",
+      "sha256": "e20fdb180ce4174ec55ebf4535b207872592b61230b228f7d1d4c21491d68e2d"
+    },
+    "left-passing": {
+      "x": 64,
+      "y": 96,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "left",
+      "pose": "passing",
+      "sha256": "aba31192c949e059dda6aa75cecec7d4080e0776248783c89a334c652040d976"
+    },
+    "left-contact-b": {
+      "x": 96,
+      "y": 96,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "left",
+      "pose": "contact-b",
+      "sha256": "2f1d9f2ab7706b05a8bd02d7a1982038247c43d6f609c0c7cc3f6db3318c848f"
+    },
+    "right-idle": {
+      "x": 0,
+      "y": 144,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "right",
+      "pose": "idle",
+      "sha256": "c753e0b6fc8200e7b17df6bf1a205628160dbca274ad179d861eade81048e660"
+    },
+    "right-contact-a": {
+      "x": 32,
+      "y": 144,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "right",
+      "pose": "contact-a",
+      "sha256": "9aa91b23fcce109124b1d8355b854b837a08932d9ad4b4f86e0a312202a74be1"
+    },
+    "right-passing": {
+      "x": 64,
+      "y": 144,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "right",
+      "pose": "passing",
+      "sha256": "5969984fc5ba554e860cb4e7638fafd7b532a731c83624ff84638f188053bfa7"
+    },
+    "right-contact-b": {
+      "x": 96,
+      "y": 144,
+      "width": 32,
+      "height": 48,
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "direction": "right",
+      "pose": "contact-b",
+      "sha256": "6594f8a9be48ec36156c63c30bd5f6ef6ec3056e71eeaefe34ac7bc62d73f5a9"
+    }
+  },
+  "clips": {
+    "idle": {
+      "frames": [
+        "down-idle",
+        "up-idle",
+        "left-idle",
+        "right-idle"
+      ],
+      "loop": true
+    },
+    "walk": {
+      "frameDurationMs": 55,
+      "frames": [
+        "down-contact-a",
+        "down-passing",
+        "down-contact-b",
+        "down-passing",
+        "up-contact-a",
+        "up-passing",
+        "up-contact-b",
+        "up-passing",
+        "left-contact-a",
+        "left-passing",
+        "left-contact-b",
+        "left-passing",
+        "right-contact-a",
+        "right-passing",
+        "right-contact-b",
+        "right-passing"
+      ],
+      "loop": true
+    }
+  },
+  "toolFeedback": {
+    "frameSource": "../16bit.png#tool",
+    "impactAt": 0.55,
+    "reducedMotionScale": 0.4,
+    "status": "candidate-preview-only"
+  },
+  "limitations": [
+    "Candidate art and motion only; not approved or registered as production assets.",
+    "Right-facing frames mirror left-facing poses; Gate 1 visual review must confirm silhouette and foot contact.",
+    "The preview tool overlay demonstrates timing only and does not change farming rules."
+  ]
+}

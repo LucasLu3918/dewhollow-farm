@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pixel32 動作候選預覽</title>
+    <link rel="stylesheet" href="./preview.css">
+    <script type="module" src="./preview.js"></script>
+  </head>
+  <body>
+    <main class="workspace">
+      <header class="heading">
+        <div>
+          <h1>Pixel32 四向動作候選</h1>
+          <p>原生 32×48 · 2× 最近鄰顯示 · 候選素材</p>
+        </div>
+        <span class="candidate-state">尚未核准</span>
+      </header>
+
+      <section class="stage" aria-label="候選角色預覽">
+        <canvas id="preview-canvas" width="384" height="320" aria-label="四方向角色動畫畫面"></canvas>
+        <div class="readout" aria-live="polite">
+          <span id="frame-readout">方向：下 · 狀態：站立 · 幀：down-idle</span>
+          <span id="impact-readout">工具命中：尚未觸發</span>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="動畫控制">
+        <fieldset>
+          <legend>方向</legend>
+          <div class="button-row" id="directions">
+            <button type="button" data-direction="down" aria-pressed="true">下</button>
+            <button type="button" data-direction="up" aria-pressed="false">上</button>
+            <button type="button" data-direction="left" aria-pressed="false">左</button>
+            <button type="button" data-direction="right" aria-pressed="false">右</button>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>動作</legend>
+          <div class="button-row" id="motions">
+            <button type="button" data-motion="idle" aria-pressed="true">站立</button>
+            <button type="button" data-motion="walk" aria-pressed="false">走路</button>
+            <button type="button" data-motion="tool" aria-pressed="false">揮動工具</button>
+          </div>
+        </fieldset>
+        <label class="motion-toggle"><input id="reduced-motion" type="checkbox"> 減少動態</label>
+      </section>
+
+      <p class="note">此頁只展示 Gate 1 候選幀與工具命中時序，不會改動遊戲狀態，也不代表美術或動作已通過 Gate 1。</p>
+      <p id="error-message" role="alert" hidden></p>
+    </main>
+  </body>
+</html>
