@@ -904,8 +904,12 @@ a:focus-visible {
 @media (max-width: 600px) and (orientation: portrait) {
   .app {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(220px, 1fr) auto auto;
     gap: 0;
+    height: 100vh;
+    height: 100dvh;
     padding-top: 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
   }
 
   .status {
@@ -920,6 +924,14 @@ a:focus-visible {
   /* 技能等級列：手機上隱藏，改從虛擬按鍵的「技能」打開技能與天賦；hud.ts 仍會更新它的文字（K 鍵與點擊不變）。 */
   #hud-skills {
     display: none;
+  }
+
+  /* 停用狀態保留觸控尺寸，但收成狀態列裡的緊湊提示，不再獨佔一整行。 */
+  .status .hud-action:disabled {
+    flex: 0 1 auto;
+    min-height: 48px;
+    padding: 0 8px;
+    order: 0;
   }
 
   /* 主要資訊依序排在前面；工具、種子、評級與礦坑狀態縮小、改成次要色，接在後面；按鈕獨占最後一行。 */
@@ -981,6 +993,9 @@ a:focus-visible {
   .stage {
     grid-column: 1;
     grid-row: 2;
+    min-height: 220px;
+    height: 100%;
+    aspect-ratio: auto;
     margin-bottom: 8px;
   }
 
@@ -1031,6 +1046,7 @@ a:focus-visible {
     grid-column: 1;
     grid-row: 4;
     display: grid;
+    position: relative;
     gap: 8px;
   }
 
@@ -1058,6 +1074,35 @@ a:focus-visible {
 
   .touch-more {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  #touch-controls[data-placement='external'] .touch-more {
+    position: absolute;
+    inset-inline: 0;
+    bottom: calc(100% + 8px);
+    z-index: 9;
+    max-height: min(38dvh, 320px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--panel);
+  }
+
+  #touch-controls[data-placement='overlay'] .touch-more {
+    position: absolute;
+    inset-inline: auto max(var(--responsive-safe-right, 0px), 8px);
+    bottom: calc(var(--responsive-safe-bottom, 0px) + 128px);
+    width: min(82vw, 320px);
+    max-height: min(38dvh, 320px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    z-index: 9;
+  }
+
+  #touch-controls[data-placement='overlay'][data-handedness='left'] .touch-more {
+    inset-inline: max(var(--responsive-safe-left, 0px), 8px) auto;
   }
 
   .touch-act .touch-button,
