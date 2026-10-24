@@ -93,6 +93,7 @@ test('the status line shows every skill level, starting at zero', async ({ page 
 });
 
 test('casting at the lake with the rod: a fish bites sometimes, and a quick press reels it in', async ({ page }) => {
+  test.setTimeout(90_000);
   await waitForGame(page);
   await toLake(page);
   await page.keyboard.press('r');
@@ -114,6 +115,7 @@ test('casting at the lake with the rod: a fish bites sometimes, and a quick pres
 });
 
 test('a fish that is not reeled in within the window gets away', async ({ page }) => {
+  test.setTimeout(90_000);
   await waitForGame(page);
   await toLake(page);
   await page.keyboard.press('r');

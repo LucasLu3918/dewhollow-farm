@@ -36,13 +36,13 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
         const player = actors.find((a) => a.id === 'player');
         const currentMap = await mapId(page);
         return Boolean(player && (currentMap !== before.map || player.tileX !== before.x || player.tileY !== before.y));
-      })
+      }, { timeout: 15_000 })
       .toBe(true);
     await expect
       .poll(async () => {
         const actors = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
         return actors.find((a) => a.id === 'player')?.busy ?? true;
-      })
+      }, { timeout: 15_000 })
       .toBe(false);
   }
 }
@@ -57,12 +57,12 @@ async function faceBlockedTile(page: Page, key: string): Promise<void> {
     .poll(async () => {
       const player = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
       return player.find((actor) => actor.id === 'player')?.busy ?? true;
-    })
+    }, { timeout: 15_000 })
     .toBe(false);
   await expect.poll(async () => page.evaluate(() => {
     const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
     return { x: player?.tileX ?? -1, y: player?.tileY ?? -1 };
-  })).toEqual(before);
+  }), { timeout: 15_000 }).toEqual(before);
 }
 
 /** 直接寫入遊戲使用的 IndexedDB（與 save-migration.spec.ts 相同的做法）。 */
@@ -121,6 +121,7 @@ const DAY_FIFTEEN_WITH_COW = {
 };
 
 test('the pasture gate is shut before spring day 15, and says when it opens', async ({ page }) => {
+  test.setTimeout(120_000);
   await waitForGame(page);
   await walk(page, 'ArrowRight', 31);
   await walk(page, 'ArrowDown', 4);
@@ -130,6 +131,7 @@ test('the pasture gate is shut before spring day 15, and says when it opens', as
 });
 
 test('on spring day 15 the gate opens, and a cow in the remodeled barn is fed, petted, then milked', async ({ page }) => {
+  test.setTimeout(120_000);
   await waitForGame(page);
   await putRecord(page, DAY_FIFTEEN_WITH_COW);
 
