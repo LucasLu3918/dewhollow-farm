@@ -7,13 +7,6 @@ import { expect, test, type Page } from '@playwright/test';
  * - 羊圈在牧草地：乾草槽 (5,12)，座位 (3,11)、(5,11)、(7,11)。
  * 這個檔案尚未在這次工作中執行（會與其他 worktree 搶 5173 port）；路線與格子依內容檔推算。
  */
-interface Actor {
-  id: string;
-  busy: boolean;
-  tileX: number;
-  tileY: number;
-}
-
 async function waitForGame(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
@@ -25,32 +18,48 @@ async function mapId(page: Page): Promise<string> {
 }
 
 async function walk(page: Page, key: string, steps: number): Promise<void> {
+  const direction = key === 'ArrowRight' ? 'right'
+    : key === 'ArrowLeft' ? 'left'
+      : key === 'ArrowDown' ? 'down'
+        : 'up';
+  const delta = direction === 'right' ? { x: 1, y: 0 }
+    : direction === 'left' ? { x: -1, y: 0 }
+      : direction === 'down' ? { x: 0, y: 1 }
+        : { x: 0, y: -1 };
   for (let i = 0; i < steps; i += 1) {
-    const before = await page.evaluate(() => {
-      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
-      return { map: window.__dewhollow?.mapId() ?? '', x: player?.tileX ?? -1, y: player?.tileY ?? -1 };
-    });
-    await page.keyboard.press(key);
-    await expect
-      .poll(async () => {
-        const actors = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
-        const player = actors.find((actor) => actor.id === 'player');
-        const currentMap = await mapId(page);
-        return Boolean(player && (currentMap !== before.map || player.tileX !== before.x || player.tileY !== before.y));
-      })
-      .toBe(true);
     await expect
       .poll(async () => {
         const movement = await page.evaluate(() => window.__dewhollow?.movement());
         return movement && movement.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
       })
       .toBe(true);
+    const before = await page.evaluate(() => {
+      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+      return { map: window.__dewhollow?.mapId() ?? '', x: player?.tileX ?? -1, y: player?.tileY ?? -1 };
+    });
+    await page.keyboard.press(key);
+    try {
+      await page.waitForFunction(({ map, x, y, dx, dy }) => {
+        const currentMap = window.__dewhollow?.mapId() ?? '';
+        const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+        return currentMap !== map || (player?.tileX === x + dx && player?.tileY === y + dy);
+      }, { map: before.map, x: before.x, y: before.y, dx: delta.x, dy: delta.y }, { timeout: 15_000 });
+    } catch (cause) {
+      const current = await page.evaluate(() => {
+        const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+        return { map: window.__dewhollow?.mapId() ?? '', player, movement: window.__dewhollow?.movement() };
+      });
+      throw new Error(
+        `Tap ${direction} from ${before.map} (${before.x},${before.y}) did not reach the adjacent tile at step ${i + 1}/${steps}; now ${current.map} (${current.player?.tileX ?? -1},${current.player?.tileY ?? -1}), movement=${JSON.stringify(current.movement)}`,
+        { cause },
+      );
+    }
     await expect
       .poll(async () => {
-        const actors = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
-        return actors.find((actor) => actor.id === 'player')?.busy ?? true;
+        const movement = await page.evaluate(() => window.__dewhollow?.movement());
+        return movement && movement.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
       })
-      .toBe(false);
+      .toBe(true);
   }
 }
 
