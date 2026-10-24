@@ -28,6 +28,7 @@ test('integrated pixel32 preview composes unapproved animation and map candidate
   await page.getByRole('button', { name: '揮動工具' }).click();
   await expect(canvas).toHaveAttribute('data-motion', 'tool');
   await page.getByRole('button', { name: '右', exact: true }).click();
+  await expect(page.getByRole('button', { name: '右', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(canvas).toHaveAttribute('data-direction', 'right');
   await expect(canvas).toHaveAttribute('data-motion', 'walk');
   await expect(page.locator('#scene-readout')).toContainText('玩家位置 12,4');

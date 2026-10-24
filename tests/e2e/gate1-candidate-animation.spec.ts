@@ -14,8 +14,10 @@ test('pixel32 candidate animator shows four directions, looping walk and isolate
   await expect(canvas).toHaveAttribute('data-frame', 'down-idle');
 
   await page.getByRole('button', { name: '左' }).click();
+  await expect(page.getByRole('button', { name: '左' })).toHaveAttribute('aria-pressed', 'true');
   await expect(canvas).toHaveAttribute('data-direction', 'left');
   await page.getByRole('button', { name: '走路' }).click();
+  await expect(page.getByRole('button', { name: '走路' })).toHaveAttribute('aria-pressed', 'true');
   await expect(canvas).toHaveAttribute('data-motion', 'walk');
   await expect.poll(async () => canvas.getAttribute('data-frame')).toMatch(/^left-(contact-a|passing|contact-b)$/);
 

@@ -95,16 +95,15 @@ function draw(time) {
   requestAnimationFrame(draw);
 }
 
-document.querySelector('#directions')?.addEventListener('click', (event) => {
-  const button = event.target.closest('button[data-direction]');
-  if (!button) return;
-  state.direction = button.dataset.direction;
-  pressed(document.querySelector('#directions'), 'direction', state.direction);
-});
-document.querySelector('#motions')?.addEventListener('click', (event) => {
-  const button = event.target.closest('button[data-motion]');
-  if (button) startMotion(button.dataset.motion);
-});
+for (const button of document.querySelectorAll('#directions button[data-direction]')) {
+  button.addEventListener('click', () => {
+    state.direction = button.dataset.direction;
+    pressed(document.querySelector('#directions'), 'direction', state.direction);
+  });
+}
+for (const button of document.querySelectorAll('#motions button[data-motion]')) {
+  button.addEventListener('click', () => startMotion(button.dataset.motion));
+}
 if (reducedMotionToggle) reducedMotionToggle.checked = state.reducedMotion;
 reducedMotionPreference.addEventListener('change', (event) => {
   state.reducedMotion = event.matches;
