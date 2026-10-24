@@ -655,20 +655,19 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
         delta: movement.delta,
         start: before,
       });
-      const after = await playerPosition(page);
-      if (movement.axis === 'x') expect(after.x - before.x).toBe(movement.delta);
-      else expect(after.y - before.y).toBe(movement.delta);
-      if (movement.axis === 'x') expect(after.y).toBe(before.y);
-      else expect(after.x).toBe(before.x);
-      const atRelease = await playerPosition(page);
+      const committedAfter = await page.evaluate(() => window.__dewhollow?.movement().tile ?? null);
+      expect(committedAfter).not.toBeNull();
+      if (movement.axis === 'x') expect(committedAfter!.x - before.x).toBe(movement.delta);
+      else expect(committedAfter!.y - before.y).toBe(movement.delta);
+      if (movement.axis === 'x') expect(committedAfter!.y).toBe(before.y);
+      else expect(committedAfter!.x).toBe(before.x);
       await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null)).toBeNull();
       await expect.poll(() => page.evaluate(() => {
         const movementState = window.__dewhollow?.movement();
         return Boolean(movementState && !movementState.moving && !movementState.pending && movementState.queuedTaps === 0);
       })).toBe(true);
       const stopped = await playerPosition(page);
-      expect(stopped).toEqual(after);
-      expect(atRelease).toEqual(after);
+      expect(stopped).toEqual(committedAfter);
       if (movement.axis === 'x') expect(stopped.y).toBe(before.y);
       else expect(stopped.x).toBe(before.x);
       await page.waitForTimeout(350);
