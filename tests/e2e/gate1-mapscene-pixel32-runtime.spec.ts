@@ -1,4 +1,4 @@
-import { expect, test, type Browser } from '@playwright/test';
+import { expect, test, type Browser, type Page } from '@playwright/test';
 
 const candidateQuery = '?renderProfile=pixel32&gate1Runtime=pixel32-map-animation';
 const candidateRoot = '/docs/art/candidates/pixel-movement/gate1-assets';
@@ -41,6 +41,34 @@ async function waitForMovementIdle(page: import('@playwright/test').Page): Promi
   })).toBe(true);
 }
 
+async function moveOneTile(page: Page, key: string, axis: 'x' | 'y', delta: number): Promise<void> {
+  const before = await page.evaluate(() => window.__dewhollow!.movement().tile);
+  await page.keyboard.press(key);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile), { timeout: 10_000 }).not.toEqual(before);
+  await waitForMovementIdle(page);
+  const after = await page.evaluate(() => window.__dewhollow!.movement().tile);
+  expect(after[axis]).toBe(before[axis] + delta);
+  expect(after[axis === 'x' ? 'y' : 'x']).toBe(before[axis === 'x' ? 'y' : 'x']);
+}
+
+async function animateOneTile(page: Page, key: string, direction: string, axis: 'x' | 'y', delta: number): Promise<void> {
+  const before = await page.evaluate(() => window.__dewhollow!.movement().tile);
+  await page.keyboard.down(key);
+  await expect.poll(() => page.evaluate(({ expectedDirection }) => {
+    const debug = window.__dewhollow;
+    const frame = debug?.pixel32CandidateRuntime().playerFrame ?? '';
+    return debug?.movement().moving === true
+      && frame.startsWith(`${expectedDirection}-`)
+      && !frame.endsWith('-idle');
+  }, { expectedDirection: direction }), { intervals: [10, 20, 50], timeout: 5_000 }).toBe(true);
+  await page.keyboard.up(key);
+  await waitForMovementIdle(page);
+  const after = await page.evaluate(() => window.__dewhollow!.movement().tile);
+  expect(after[axis]).toBe(before[axis] + delta);
+  expect(after[axis === 'x' ? 'y' : 'x']).toBe(before[axis === 'x' ? 'y' : 'x']);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toBe(`${direction}-idle`);
+}
+
 test('pixel32 map and player animation candidates run in the same DEV MapScene', async ({ browser }, testInfo) => {
   const { context, page, requests } = await startCandidateFarm(browser);
   // Boot assets may finish before the listener; diagnostics confirm both atlases and frames are registered.
@@ -67,44 +95,17 @@ test('pixel32 map and player animation candidates run in the same DEV MapScene',
   const screenshot = await page.screenshot({ animations: 'disabled', scale: 'css' });
   await testInfo.attach('pixel32-mapscene-candidate-1280x720.png', { body: screenshot, contentType: 'image/png' });
 
-  await page.keyboard.down('ArrowRight');
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toMatch(/right-(contact-a|passing|contact-b)/);
-  await page.waitForFunction((startX) => (window.__dewhollow?.movement().tile.x ?? startX) >= startX + 1, initial.movement!.tile.x, { timeout: 10_000 });
-  await page.keyboard.up('ArrowRight');
-  await waitForMovementIdle(page);
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toBe('right-idle');
+  await animateOneTile(page, 'ArrowRight', 'right', 'x', 1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 
   // Exercise the other directions in the same grid runtime, then use the normal hoe command on (7, 4).
-  await page.keyboard.down('ArrowLeft');
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toMatch(/left-(contact-a|passing|contact-b)/);
-  await page.keyboard.up('ArrowLeft');
-  await waitForMovementIdle(page);
+  await animateOneTile(page, 'ArrowLeft', 'left', 'x', -1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile.x ?? -1)).toBe(initial.movement!.tile.x);
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toBe('left-idle');
-  await page.keyboard.down('ArrowUp');
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toMatch(/up-(contact-a|passing|contact-b)/);
-  await page.keyboard.up('ArrowUp');
-  await waitForMovementIdle(page);
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile.y ?? -1)).toBe(initial.movement!.tile.y - 1);
-  for (let step = 1; step < 4; step += 1) {
-    const beforeY = await page.evaluate(() => window.__dewhollow?.movement().tile.y ?? -1);
-    await page.keyboard.press('ArrowUp');
-    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile.y ?? -1)).toBe(beforeY - 1);
-    await waitForMovementIdle(page);
-  }
+  await animateOneTile(page, 'ArrowUp', 'up', 'y', -1);
+  for (let step = 1; step < 4; step += 1) await moveOneTile(page, 'ArrowUp', 'y', -1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toBe('up-idle');
-  await page.keyboard.down('ArrowDown');
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toMatch(/down-(contact-a|passing|contact-b)/);
-  await page.keyboard.up('ArrowDown');
-  await waitForMovementIdle(page);
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile.y ?? -1)).toBe(initial.movement!.tile.y - 3);
-  await page.keyboard.down('ArrowUp');
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toMatch(/up-(contact-a|passing|contact-b)/);
-  await page.keyboard.up('ArrowUp');
-  await waitForMovementIdle(page);
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile.y ?? -1)).toBe(initial.movement!.tile.y - 4);
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toBe('up-idle');
+  await animateOneTile(page, 'ArrowDown', 'down', 'y', 1);
+  await animateOneTile(page, 'ArrowUp', 'up', 'y', -1);
   await page.keyboard.press('x');
   await expect(page.locator('#hud-energy-text')).toHaveText('98 / 100');
   await expect(page.locator('#hud-log')).toContainText('開墾了一塊田');
