@@ -14,8 +14,8 @@
 1. 建立 candidate，記錄素材 ID、brief、來源工具／授權和版本雜湊；原始候選與私人提示詞留在 `private/art-trials/`。
 2. 產生縮放預覽或接觸表，依 brief 檢查主體、輪廓、色彩、尺寸、alpha／接縫、商標和遊戲中的可讀性。審核者只能把通過檢視的精確版本標為 reviewed。
 3. 把 reviewed 候選與預覽交給使用者。只有針對該確切版本的明確同意，才能標為 approved；未回覆、沉默、其他素材的舊核准或 agent 自行判斷都不算同意。
-4. 僅對 approved 版本執行最終化；檢查輸出，再新增 `content/assets.json` 的用途、檔案及真實來源，狀態改為 integrated。
-5. 以載入／渲染驗證和適用的測試完成驗收。修圖或替換候選會產生新版本，須回到 candidate，不能沿用前一版核准。
+4. 僅對 approved 版本執行最終化。要將輸出放入 `public/` 或登錄 `content/assets.json` 前，先使用 [`asset_review_gate.py`](../../tools/art/asset_review_gate.py) 提供人工核准 JSON、asset key、候選檔和新目的地；核准 SHA 必須精確相符。閘門拒絕未核准候選和任何既有目的地，並寫入 provenance。不得以複製檔案或直接編輯 manifest 繞過此步驟。
+5. 檢查閘門輸出與 provenance，再新增 `content/assets.json` 的用途、檔案及真實來源，狀態改為 integrated。以載入／渲染驗證和適用的測試完成驗收。修圖或替換候選會產生新版本，須回到 candidate，不能沿用前一版核准。
 
 ## 人工核准紀錄
 

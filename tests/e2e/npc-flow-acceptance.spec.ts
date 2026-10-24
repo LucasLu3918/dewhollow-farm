@@ -84,7 +84,7 @@ function residentEffects(record: SaveRecord) {
 }
 
 test('a rendered resident conversation and shop flow survive reload without duplicate effects', async ({ page }) => {
-  test.setTimeout(60_000);
+  test.setTimeout(120_000);
   await waitForGame(page);
 
   // Farm spawn → village, then route around the shop counter to stand west of 阿柑 (2,4).

@@ -9,6 +9,8 @@ interface Actor {
   width: number;
   height: number;
   busy: boolean;
+  footY: number;
+  depth: number;
 }
 
 interface Sprite {
@@ -18,6 +20,7 @@ interface Sprite {
   width: number;
   height: number;
   flipX: boolean;
+  depth: number;
 }
 
 const SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;
@@ -155,69 +158,89 @@ async function capture(page: Page, name: string): Promise<void> {
   await expect(page.locator('#game canvas')).toHaveScreenshot(name, { animations: 'disabled' });
 }
 
-async function playerWinsTreeOverlap(page: Page, playerSprite: Sprite, tree: Sprite): Promise<number> {
+async function treeOcclusionChangeWhenPlayerHidden(page: Page, playerSprite: Sprite, tree: Sprite): Promise<{
+  opaqueOverlapSamples: number;
+  changedByHidingPlayer: number;
+  unchangedPixels: number;
+  meanRgbDelta: number;
+  threshold: number;
+  changedPercent: number;
+}> {
   return page.evaluate(async ({ actor, object }) => {
     const debug = window.__dewhollow;
     if (!debug) throw new Error('缺少 window.__dewhollow');
-    const load = async (url: string): Promise<ImageData> => {
+    const snapshotPixels = async (): Promise<ImageData> => {
       const image = new Image();
-      image.src = url;
+      image.src = await debug.snapshot();
       await image.decode();
       const canvas = document.createElement('canvas');
       canvas.width = image.width;
       canvas.height = image.height;
       const context = canvas.getContext('2d');
-      if (!context) throw new Error(`無法讀取素材 ${url}`);
+      if (!context) throw new Error('沒有 2D canvas context');
       context.drawImage(image, 0, 0);
       return context.getImageData(0, 0, canvas.width, canvas.height);
     };
-    const screenshot = new Image();
-    screenshot.src = await debug.snapshot();
-    await screenshot.decode();
-    const output = document.createElement('canvas');
-    output.width = screenshot.width;
-    output.height = screenshot.height;
-    const outputContext = output.getContext('2d');
-    if (!outputContext) throw new Error('沒有 2D canvas context');
-    outputContext.drawImage(screenshot, 0, 0);
-    const composite = outputContext.getImageData(0, 0, output.width, output.height);
-    const [playerArt, treeArt] = await Promise.all([
-      load('/assets/characters/xiaohan-side-2x.png'),
-      load('/assets/tiles/tree-2x.png'),
-    ]);
+    const treeImage = new Image();
+    treeImage.src = '/assets/tiles/tree-2x.png';
+    await treeImage.decode();
+    const treeMaskCanvas = document.createElement('canvas');
+    treeMaskCanvas.width = treeImage.width;
+    treeMaskCanvas.height = treeImage.height;
+    const treeMaskContext = treeMaskCanvas.getContext('2d');
+    if (!treeMaskContext) throw new Error('無法讀取樹木 alpha');
+    treeMaskContext.drawImage(treeImage, 0, 0);
+    const treeMask = treeMaskContext.getImageData(0, 0, treeImage.width, treeImage.height);
+
+    const visible = await snapshotPixels();
+    let hidden: ImageData;
+    debug.setPlayerHidden(true);
+    try {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+      hidden = await snapshotPixels();
+    } finally {
+      debug.setPlayerHidden(false);
+      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    }
     const camera = debug.cameraView();
     const scroll = debug.cameraScroll();
     const x0 = Math.max(actor.left, object.left);
     const y0 = Math.max(actor.top, object.top);
     const x1 = Math.min(actor.left + actor.width, object.left + object.width);
     const y1 = Math.min(actor.top + actor.height, object.top + object.height);
-    let playerPixelsOnTop = 0;
+    let opaqueOverlapSamples = 0;
+    let changedByHidingPlayer = 0;
+    let unchangedPixels = 0;
+    let rgbDeltaSum = 0;
+    const threshold = 24;
     for (let y = y0 + 1; y < y1; y += 1) {
       for (let x = x0 + 1; x < x1; x += 1) {
-        const actorX = Math.min(playerArt.width - 1, Math.floor(((x - actor.left) / actor.width) * playerArt.width));
-        const actorY = Math.min(playerArt.height - 1, Math.floor(((y - actor.top) / actor.height) * playerArt.height));
-        const sourceX = actor.flipX ? playerArt.width - 1 - actorX : actorX;
-        const treeX = Math.min(treeArt.width - 1, Math.floor(((x - object.left) / object.width) * treeArt.width));
-        const treeY = Math.min(treeArt.height - 1, Math.floor(((y - object.top) / object.height) * treeArt.height));
-        const playerAt = (actorY * playerArt.width + sourceX) * 4;
-        const treeAt = (treeY * treeArt.width + treeX) * 4;
-        if ((playerArt.data[playerAt + 3] ?? 0) < 220 || (treeArt.data[treeAt + 3] ?? 0) < 220) continue;
-
         const canvasX = Math.round(camera.x + (x - scroll.x) * camera.zoom);
         const canvasY = Math.round(camera.y + (y - scroll.y) * camera.zoom);
-        if (canvasX < 0 || canvasY < 0 || canvasX >= composite.width || canvasY >= composite.height) continue;
-        const renderedAt = (canvasY * composite.width + canvasX) * 4;
-        let playerDistance = 0;
-        let treeDistance = 0;
+        if (canvasX < 0 || canvasY < 0 || canvasX >= visible.width || canvasY >= visible.height) continue;
+        const treeX = Math.min(treeImage.width - 1, Math.floor(((x - object.left) / object.width) * treeImage.width));
+        const treeY = Math.min(treeImage.height - 1, Math.floor(((y - object.top) / object.height) * treeImage.height));
+        const treeAt = (treeY * treeImage.width + treeX) * 4;
+        if ((treeMask.data[treeAt + 3] ?? 0) < 220) continue;
+        opaqueOverlapSamples += 1;
+        const renderedAt = (canvasY * visible.width + canvasX) * 4;
+        let rgbDelta = 0;
         for (let channel = 0; channel < 3; channel += 1) {
-          const actual = composite.data[renderedAt + channel] ?? 0;
-          playerDistance += Math.abs(actual - (playerArt.data[playerAt + channel] ?? 0));
-          treeDistance += Math.abs(actual - (treeArt.data[treeAt + channel] ?? 0));
+          rgbDelta += Math.abs((visible.data[renderedAt + channel] ?? 0) - (hidden.data[renderedAt + channel] ?? 0));
         }
-        if (playerDistance + 24 < treeDistance) playerPixelsOnTop += 1;
+        rgbDeltaSum += rgbDelta;
+        if (rgbDelta > threshold) changedByHidingPlayer += 1;
+        else unchangedPixels += 1;
       }
     }
-    return playerPixelsOnTop;
+    return {
+      opaqueOverlapSamples,
+      changedByHidingPlayer,
+      unchangedPixels,
+      meanRgbDelta: opaqueOverlapSamples ? rgbDeltaSum / opaqueOverlapSamples : 0,
+      threshold,
+      changedPercent: opaqueOverlapSamples ? changedByHidingPlayer / opaqueOverlapSamples * 100 : 0,
+    };
   }, { actor: playerSprite, object: tree });
 }
 
@@ -355,5 +378,44 @@ test('field edges stay walkable while farm buildings, greenhouse fence, forest t
   await pauseScene(page);
   const playerSprite = treeSprites.find((sprite) => sprite.key === 'player.left');
   expect(playerSprite, '玩家朝右使用左右翻轉的側面素材').toBeDefined();
-  expect(await playerWinsTreeOverlap(page, playerSprite!, tree!), '重疊區像素應由角色覆蓋樹幹').toBeGreaterThan(8);
+  const evidence = await treeOcclusionChangeWhenPlayerHidden(page, playerSprite!, tree!);
+  expect(actor.depth, 'the southern player foot is lower than the tree foot').toBeGreaterThan(tree!.depth);
+  expect(evidence.opaqueOverlapSamples, JSON.stringify(evidence)).toBeGreaterThan(8);
+  expect(evidence.changedByHidingPlayer, JSON.stringify(evidence)).toBeGreaterThan(8);
+});
+
+test('a forest tree covers the player when they overlap from behind', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#game canvas')).toBeVisible();
+  // The test save starts on the blocked tree tile to create a deterministic visual overlap.
+  await putRecord(page, { mapId: 'forest', player: { x: 15, y: 7, facing: 'down' } });
+  await page.reload();
+  await expect.poll(() => mapId(page)).toBe('forest');
+
+  const sceneSprites = await sprites(page);
+  const tree = sceneSprites.find((sprite) => sprite.key === 'tile.tree' && sprite.left === 15 * 64 && sprite.top === 7 * 64);
+  const playerSprite = sceneSprites.find((sprite) => sprite.key === 'player.down');
+  const actor = await player(page);
+  expect(tree, 'forest tree overlay at (15,7)').toBeDefined();
+  expect(playerSprite, 'player facing down for the behind-tree view').toBeDefined();
+  expect(actor.left + actor.width).toBeGreaterThan(tree!.left);
+  expect(actor.left).toBeLessThan(tree!.left + tree!.width);
+  expect(actor.top + actor.height).toBeGreaterThan(tree!.top);
+  expect(actor.top).toBeLessThan(tree!.top + tree!.height);
+
+  await pauseScene(page);
+  const evidence = await treeOcclusionChangeWhenPlayerHidden(page, playerSprite!, tree!);
+  console.log('北側樹木遮擋驗收', {
+    opaqueOverlapSamples: evidence.opaqueOverlapSamples,
+    changedByHidingPlayer: evidence.changedByHidingPlayer,
+    changedPercent: evidence.changedPercent,
+    meanRgbDelta: evidence.meanRgbDelta,
+    threshold: evidence.threshold,
+  });
+  console.log('北側樹與玩家深度', { treeFootY: tree!.top + tree!.height, treeDepth: tree!.depth, playerFootY: actor.footY, playerDepth: actor.depth });
+  expect(tree!.depth, 'same-foot tree tie-break places the tree above the player').toBeGreaterThan(actor.depth);
+  expect(evidence.opaqueOverlapSamples, JSON.stringify(evidence)).toBeGreaterThan(8);
+  expect(evidence.changedPercent, JSON.stringify(evidence)).toBeLessThanOrEqual(2);
+  expect(evidence.meanRgbDelta, JSON.stringify(evidence)).toBeLessThan(10);
+  await expect(page.locator('#game canvas')).toHaveScreenshot('forest-tree-occlusion.png', { animations: 'disabled' });
 });

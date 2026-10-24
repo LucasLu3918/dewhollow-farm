@@ -166,6 +166,7 @@ const REACT_DURATION_MS = 320;
 const DEPTH_RESIDENT = 5;
 const DEPTH_ACTOR_BASE = 10;
 const DEPTH_PLAYER_TIE_BREAK = 0.001;
+const DEPTH_TREE_TIE_BREAK = 0.001;
 /** 擺在地板上的裝飾：在地板之上、動物之下。 */
 const DEPTH_DECOR = 3;
 /** 天色與天氣的遮罩、粒子，在世界之上、HUD（DOM）之下。 */
@@ -192,6 +193,7 @@ interface SpriteDebugInfo {
   width: number;
   height: number;
   flipX: boolean;
+  depth: number;
 }
 
 /** 開發模式下的角色資訊：站的格子、外框與姿勢。 */
@@ -211,6 +213,7 @@ interface ActorDebugInfo {
   tool: { id: string; rotation: number; scale: number } | null;
   /** 正在走路、揮工具，或有排隊的動作。 */
   busy: boolean;
+  depth: number;
 }
 
 /** 開發模式下的表情氣泡資訊：誰、什麼表情、世界座標與目前的大小與透明度。 */
@@ -238,6 +241,7 @@ declare global {
       worldGeneration(): number;
       responsiveLayout(): ReturnType<ResponsiveLayoutController['get']>;
       interaction(): ReturnType<typeof resolveInteraction>;
+      interactionTargetMarker(): { visible: boolean; target: Point | null; x: number; y: number; width: number; height: number };
       continuousFarmActionsStopReason(): string;
       continuousFarmCancelSource(): string;
       cameraView(): { x: number; y: number; width: number; height: number; zoom: number; bounds: { x: number; y: number; width: number; height: number } };
@@ -291,6 +295,9 @@ export class MapScene extends Phaser.Scene {
   private worldGeneration = 0;
   private deps!: MapSceneDeps;
   private world!: Phaser.GameObjects.Container;
+  /** Non-interactive one-tile outline for the current authoritative interaction target. */
+  private interactionTargetGfx: Phaser.GameObjects.Graphics | null = null;
+  private interactionTargetCell: Point | null = null;
   private rig!: CharacterRig;
   /** 目前地圖上的居民（依行程站位），見 syncResidents。毛毛有骨架，其他人是占位。 */
   private npcRigs = new Map<string, ResidentView>();
@@ -480,6 +487,9 @@ export class MapScene extends Phaser.Scene {
       this.unsubscribeContinuousSetting?.();
       this.unsubscribeContinuousSetting = null;
       this.touchControls.dispose();
+      this.interactionTargetGfx?.destroy();
+      this.interactionTargetGfx = null;
+      this.interactionTargetCell = null;
     });
     // 讀取存檔的提示等到鍵盤已經接上才顯示：提示出現時，按鍵一定會被接到（載入素材的期間按的鍵不算）。
     // 新遊戲則提示玩家可以按 ? 看操作說明（訊息列在新遊戲開場是空的）。
@@ -524,7 +534,15 @@ export class MapScene extends Phaser.Scene {
         cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
         worldGeneration: () => this.worldGeneration,
         responsiveLayout: () => this.deps.responsive.get(),
-      interaction: () => resolveInteraction(this.deps.session.state, this.deps.index),
+        interaction: () => resolveInteraction(this.deps.session.state, this.deps.index),
+        interactionTargetMarker: () => ({
+          visible: this.interactionTargetGfx?.visible ?? false,
+          target: this.interactionTargetCell ? { ...this.interactionTargetCell } : null,
+          x: this.interactionTargetGfx?.x ?? 0,
+          y: this.interactionTargetGfx?.y ?? 0,
+          width: TILE_SIZE,
+          height: TILE_SIZE,
+        }),
         cameraView: () => ({ x: camera.x, y: camera.y, width: camera.width / camera.zoom, height: camera.height / camera.zoom, zoom: camera.zoom, bounds: { ...camera.getBounds() } }),
         mapId: () => this.deps.session.state.mapId,
         sprites: () => this.debugSprites(),
@@ -1056,6 +1074,7 @@ export class MapScene extends Phaser.Scene {
     const map = this.deps.index.map(state.mapId);
     this.deps.hud.update(state, this.deps.pack);
     const interaction = resolveInteraction(state, this.deps.index);
+    this.updateInteractionTargetMarker(interaction.target);
     this.deps.hud.setMainAction(
       this.deps.controls.interactionLabels[interaction.labelKey],
       interaction.action !== 'nothing',
@@ -1085,6 +1104,25 @@ export class MapScene extends Phaser.Scene {
     this.residentPanel.refresh(state);
     this.questPanel.refresh(state);
     this.heartEventPanel.sync(state);
+  }
+
+  /** Render the existing descriptor target without adding pointer input or changing interaction semantics. */
+  private updateInteractionTargetMarker(target: Point | null): void {
+    if (!this.interactionTargetGfx || !this.interactionTargetGfx.active) {
+      this.interactionTargetGfx = this.add.graphics().setDepth(DEPTH_SKY - 1);
+    }
+    const marker = this.interactionTargetGfx;
+    marker.clear();
+    this.interactionTargetCell = target ? { ...target } : null;
+    if (!target) {
+      marker.setVisible(false);
+      return;
+    }
+
+    marker.setPosition(target.x * TILE_SIZE, target.y * TILE_SIZE).setVisible(true);
+    // Warm double outline remains readable over grass, soil and structures while leaving the tile visible.
+    marker.lineStyle(3, 0xffe38a, 0.95).strokeRect(2, 2, TILE_SIZE - 4, TILE_SIZE - 4);
+    marker.lineStyle(1, 0xffffff, 0.8).strokeRect(6, 6, TILE_SIZE - 12, TILE_SIZE - 12);
   }
 
   /**
@@ -1259,11 +1297,11 @@ export class MapScene extends Phaser.Scene {
         const objectKey = `tile.${kind}`;
         if (!sprite.objectImage) {
           sprite.objectImage = this.image(objectKey, sprite.x, sprite.y, 1);
-          this.world.add(sprite.objectImage);
         } else {
           this.applyAsset(sprite.objectImage, objectKey);
-          sprite.objectImage.setVisible(true);
         }
+        this.placeObjectImage(sprite.objectImage, kind, sprite.y);
+        sprite.objectImage.setVisible(true);
       }
     }
   }
@@ -1276,6 +1314,11 @@ export class MapScene extends Phaser.Scene {
   }
 
   private drawMap(mapId: string): void {
+    // Tree overlays live on the scene display list so their foot depth can sort
+    // against actor roots. Destroy those roots explicitly before clearing the tile container.
+    for (const sprite of this.tileSprites) {
+      if (sprite.objectImage && sprite.objectImage.parentContainer !== this.world) sprite.objectImage.destroy();
+    }
     this.world.removeAll(true);
     this.heldPlots.clear();
     this.tileSprites = [];
@@ -1290,7 +1333,7 @@ export class MapScene extends Phaser.Scene {
         const objectImage = isGroundLayer(tile.kind) ? undefined : this.image(`tile.${tile.kind}`, x, y, 1);
         this.tileSprites.push({ x, y, base: tile.kind, ground, groundImage, objectImage });
         this.world.add(groundImage);
-        if (objectImage) this.world.add(objectImage);
+        if (objectImage) this.placeObjectImage(objectImage, tile.kind, y);
       }
     }
 
@@ -1444,6 +1487,22 @@ export class MapScene extends Phaser.Scene {
     return DEPTH_ACTOR_BASE + footY / TILE_SIZE + (player ? DEPTH_PLAYER_TIE_BREAK : 0);
   }
 
+  /** Tree overlays share the scene display list with actor roots, using the image bottom as their foot anchor. */
+  private placeObjectImage(image: Phaser.GameObjects.Image, kind: TileKind, tileY: number): void {
+    if (kind !== 'tree') {
+      if (image.parentContainer !== this.world) this.world.add(image);
+      image.setDepth(1);
+      return;
+    }
+
+    if (image.parentContainer === this.world) this.world.remove(image);
+    // A tree at the same foot Y renders just ahead of the player; lower actors
+    // still win naturally because their per-tile depth step is much larger.
+    const footY = image.getBounds().bottom || (tileY + 1) * TILE_SIZE;
+    image.setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
+    this.children.bringToTop(image);
+  }
+
   /** 每一畫面更新：夜色依時間、變暗依天氣、粒子依天氣與時間。 */
   private updateSky(time: number): void {
     const state = this.deps.session.state;
@@ -1485,7 +1544,13 @@ export class MapScene extends Phaser.Scene {
 
   private debugSprites(): SpriteDebugInfo[] {
     const player = this.rig.debugInfo();
-    const images = this.world.getAll().filter((c): c is Phaser.GameObjects.Image => c instanceof Phaser.GameObjects.Image);
+    const tileRootImages = this.tileSprites
+      .map((sprite) => sprite.objectImage)
+      .filter((image): image is Phaser.GameObjects.Image => image !== undefined && image.parentContainer === null);
+    const images = [
+      ...this.world.getAll().filter((c): c is Phaser.GameObjects.Image => c instanceof Phaser.GameObjects.Image),
+      ...tileRootImages,
+    ];
     const others = images.map((image) => {
       const bounds = image.getBounds();
       return {
@@ -1495,18 +1560,20 @@ export class MapScene extends Phaser.Scene {
         width: Math.round(bounds.width),
         height: Math.round(bounds.height),
         flipX: image.flipX,
+        depth: image.depth,
       };
     });
-    const asSprite = (info: RigDebugInfo): SpriteDebugInfo => ({
+    const asSprite = (info: RigDebugInfo, depth: number): SpriteDebugInfo => ({
       key: info.key,
       left: info.left,
       top: info.top,
       width: info.width,
       height: info.height,
       flipX: info.flipX,
+      depth,
     });
-    const actors = this.visibleRigs().map(({ rig }) => asSprite(rig.debugInfo()));
-    return [asSprite(player), ...actors, ...others];
+    const actors = this.visibleRigs().map(({ rig }) => asSprite(rig.debugInfo(), rig.root.depth));
+    return [asSprite(player, this.rig.root.depth), ...actors, ...others];
   }
 
   /** 開發用：藏起或恢復玩家以外的角色。恢復時，沒有地方可站的跟隨寵物仍然保持隱藏。 */
@@ -1541,6 +1608,7 @@ export class MapScene extends Phaser.Scene {
         pose: { ...rig.currentPose() },
         tool: rig.currentTool(),
         busy: rig.isBusy(),
+        depth: rig.root.depth,
       };
     };
     return [describe('player', this.rig), ...this.visibleRigs().map(({ id, rig }) => describe(id, rig))];
