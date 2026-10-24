@@ -1,3 +1,13 @@
+# DF-UX-01 手機 FOV、joystick 與 HUD 快捷流程
+
+- [ ] 確認 hybrid touch 的 FOV、手機直橫式鏡頭矩陣與實際 camera viewport。
+- [ ] viewport 取消時收合 touch「更多」面板並同步 ARIA 狀態。
+- [ ] 驗證 joystick／touch cancel 與 HUD 工具、種子快捷流程。
+- [ ] 更新 DF-UX-01 驗收證據並保留 `DEVICE_PENDING` 實機狀態。
+- [ ] 執行完整檢查與 E2E、commit、push、PR、CI 與 merge。
+
+---
+
 # Gate 1 整合候選預覽任務
 
 - [x] 任務 1：在獨立候選路徑整合 pixel32 地圖與四向動畫候選。

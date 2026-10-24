@@ -594,17 +594,18 @@ export class MapScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const applyLayout = (layout: ReturnType<ResponsiveLayoutController['get']>): void => {
       const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
+      const touchInput = layout.pointer.coarse || layout.pointer.touchPoints > 0;
       const pixelViewport = calculatePixelViewportPolicy({
         container: layout.worldRect,
         safeArea: layout.safeRect,
         dpr: window.devicePixelRatio || 1,
         orientation: layout.orientation,
         profile: profile.id,
-        input: layout.pointer.coarse ? 'touch' : 'pointer',
+        input: touchInput ? 'touch' : 'pointer',
       });
       const canvasHost = this.game.canvas.parentElement;
       if (canvasHost) {
-        if (profile.id === 'legacy' && !layout.pointer.coarse) delete canvasHost.dataset.pixelProfile;
+        if (profile.id === 'legacy' && !touchInput) delete canvasHost.dataset.pixelProfile;
         else canvasHost.dataset.pixelProfile = profile.id;
       }
       if (this.scale.gameSize.width !== pixelViewport.renderResolution.width
@@ -617,7 +618,7 @@ export class MapScene extends Phaser.Scene {
       this.nightShade?.setSize(designSize.width, designSize.height);
       this.weatherShade?.setSize(designSize.width, designSize.height);
       const zoom = profile.id === 'legacy'
-        ? mapZoomFor({ cameraWidth: camera.width, coarse: layout.pointer.coarse, portrait: layout.orientation === 'portrait' })
+        ? mapZoomFor({ cameraWidth: camera.width, coarse: touchInput, portrait: layout.orientation === 'portrait' })
         : camera.width / (pixelViewport.worldTilesVisible.width * TILE_SIZE);
       camera.setZoom(zoom);
       const zone = deadzoneOf({ width: camera.width / camera.zoom, height: camera.height / camera.zoom });
@@ -734,13 +735,14 @@ export class MapScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const layout = this.deps.responsive.get();
     const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
+    const touchInput = layout.pointer.coarse || layout.pointer.touchPoints > 0;
     const pixelViewport = calculatePixelViewportPolicy({
       container: layout.worldRect,
       safeArea: layout.safeRect,
       dpr: window.devicePixelRatio || 1,
       orientation: layout.orientation,
       profile: profile.id,
-      input: layout.pointer.coarse ? 'touch' : 'pointer',
+      input: touchInput ? 'touch' : 'pointer',
     });
     return {
       profile: profile.id,
