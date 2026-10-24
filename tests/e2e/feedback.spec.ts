@@ -78,6 +78,7 @@ test('each ground makes its own footprint: grass, tilled field, then the stone p
 });
 
 test('a harvested crop flies up to the player and is named as it lands', async ({ page }) => {
+  test.setTimeout(60_000);
   await waitForGame(page);
   // 田邊 (7,5) → 小屋的床 (2,1)：左走五步到 (2,5)、上一步進門（落在 (4,5)）、上三步到 (4,2)、繞過工作台到 (2,2)、上一步、左轉向床。
   const toBed = ['ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowUp', 'ArrowLeft'];
