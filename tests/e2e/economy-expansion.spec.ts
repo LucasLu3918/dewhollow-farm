@@ -5,7 +5,7 @@ import { expect, test, type Page } from '@playwright/test';
  * - 小屋的門在農場 (2,4)，從 (2,5) 往上進門，落在小屋 (4,5)。
  * - 牧草地：往右到 (38,9)、往下到 (38,13)，往右進牧草地的門 (39,13)，落在 (1,7)（春 15 天起開放）。
  * - 羊圈在牧草地：乾草槽 (5,12)，座位 (3,11)、(5,11)、(7,11)。
- * 這個檔案尚未在這次工作中執行（會與其他 worktree 搶 5173 port）；路線與格子依內容檔推算。
+ * 路線與格子依內容檔及實際 Chromium 路徑驗證。
  */
 async function waitForGame(page: Page): Promise<void> {
   await page.goto('/');
@@ -15,6 +15,36 @@ async function waitForGame(page: Page): Promise<void> {
 
 async function mapId(page: Page): Promise<string> {
   return page.evaluate(() => window.__dewhollow?.mapId() ?? '');
+}
+
+async function waitForMovementIdle(page: Page, context: string): Promise<void> {
+  try {
+    await expect
+      .poll(async () => {
+        const movement = await page.evaluate(() => window.__dewhollow?.movement());
+        return movement && movement.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
+      })
+      .toBe(true);
+  } catch (cause) {
+    const snapshot = await page.evaluate(() => {
+      const actors = window.__dewhollow?.actors() ?? [];
+      const player = actors.find((actor) => actor.id === 'player');
+      return {
+        map: window.__dewhollow?.mapId() ?? '',
+        movement: window.__dewhollow?.movement(),
+        player: player && {
+          tileX: player.tileX,
+          tileY: player.tileY,
+          footX: player.footX,
+          footY: player.footY,
+          busy: player.busy,
+        },
+        visibilityState: document.visibilityState,
+        hasFocus: document.hasFocus(),
+      };
+    });
+    throw new Error(`Movement scheduler did not become idle (${context}); snapshot=${JSON.stringify(snapshot)}`, { cause });
+  }
 }
 
 async function walk(page: Page, key: string, steps: number): Promise<void> {
@@ -27,12 +57,7 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
       : direction === 'down' ? { x: 0, y: 1 }
         : { x: 0, y: -1 };
   for (let i = 0; i < steps; i += 1) {
-    await expect
-      .poll(async () => {
-        const movement = await page.evaluate(() => window.__dewhollow?.movement());
-        return movement && movement.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
-      })
-      .toBe(true);
+    await waitForMovementIdle(page, `before ${direction} step ${i + 1}/${steps}`);
     const before = await page.evaluate(() => {
       const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
       return { map: window.__dewhollow?.mapId() ?? '', x: player?.tileX ?? -1, y: player?.tileY ?? -1 };
@@ -54,12 +79,7 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
         { cause },
       );
     }
-    await expect
-      .poll(async () => {
-        const movement = await page.evaluate(() => window.__dewhollow?.movement());
-        return movement && movement.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
-      })
-      .toBe(true);
+    await waitForMovementIdle(page, `after ${direction} step ${i + 1}/${steps}`);
   }
 }
 
