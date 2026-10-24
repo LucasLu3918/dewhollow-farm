@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Pixel32 地圖候選預覽｜Dewhollow Farm</title>
+    <link rel="stylesheet" href="./preview.css">
+    <script type="module" src="./preview.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <p class="eyebrow">GATE 1 · 候選素材</p>
+        <h1>四季地圖與遮擋層</h1>
+        <p class="intro">同一張像素32場景，切換四季、田地邊緣與角色前後層。這是候選稿，尚未核准或接入正式遊戲。</p>
+      </header>
+      <section class="controls" aria-label="預覽控制">
+        <fieldset>
+          <legend>季節色樣</legend>
+          <div class="season-buttons">
+            <button type="button" data-season="spring" aria-pressed="true">春</button>
+            <button type="button" data-season="summer" aria-pressed="false">夏</button>
+            <button type="button" data-season="autumn" aria-pressed="false">秋</button>
+            <button type="button" data-season="winter" aria-pressed="false">冬</button>
+          </div>
+        </fieldset>
+        <label class="toggle"><input id="behind-canopy" type="checkbox" checked> 角色走到樹冠後方</label>
+      </section>
+      <section class="scene-card" aria-label="地圖候選畫面">
+        <div class="scene-heading"><span>春日農場小景</span><span class="candidate-tag">未核准候選</span></div>
+        <div class="canvas-wrap"><canvas id="map-preview" width="480" height="288" role="img" aria-label="四季地圖候選，包含田地、道路、多格建物與樹冠遮擋"></canvas></div>
+        <div class="legend"><span><i class="swatch grass"></i>草地</span><span><i class="swatch field"></i>田地邊緣</span><span><i class="swatch path"></i>道路</span><span><i class="swatch canopy"></i>樹冠前景</span></div>
+      </section>
+      <footer><p id="readout" aria-live="polite">準備候選場景…</p><p>32px 原生圖塊 · 最近鄰顯示 · MapScene 與正式素材未變更</p></footer>
+    </main>
+  </body>
+</html>
