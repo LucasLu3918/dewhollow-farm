@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -127,5 +128,20 @@ describe('Gate 1 pixel32 candidate asset checker', () => {
     const result = fixture.run();
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('does not reproduce from generate.mjs');
+  });
+
+  it('accepts identical RGBA pixels when the generator uses a different PNG compression level', () => {
+    const fixture = createFixture();
+    const generatorPath = join(fixture.assets, 'generate.mjs');
+    const generator = readFileSync(generatorPath, 'utf8').replace('deflateSync(raw, { level: 9 })', 'deflateSync(raw, { level: 1 })');
+    expect(generator).not.toBe(readFileSync(generatorPath, 'utf8'));
+    writeFileSync(generatorPath, generator);
+    const manifest = fixture.readManifest();
+    manifest.source.generatorSha256 = createHash('sha256').update(generator).digest('hex');
+    fixture.writeManifest(manifest);
+
+    const result = fixture.run();
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('PASS');
   });
 });

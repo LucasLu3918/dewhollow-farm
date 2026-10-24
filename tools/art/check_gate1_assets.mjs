@@ -161,6 +161,12 @@ function frameDigest(image, rect) {
   return sha256(output);
 }
 
+function manifestReproductionShape(manifest) {
+  const normalized = structuredClone(manifest);
+  for (const candidate of normalized.candidates ?? []) candidate.sha256 = '<atlas-png-container-digest>';
+  return JSON.stringify(normalized);
+}
+
 async function check(manifestPath) {
   const errors = [];
   const directory = dirname(manifestPath);
@@ -308,14 +314,17 @@ async function check(manifestPath) {
         const reason = generated.error?.message ?? generated.stderr?.trim() ?? `exit ${generated.status}`;
         errors.push(`generate.mjs could not reproduce candidate outputs: ${reason}`);
       } else {
-        const generatedManifest = await readBounded(join(temporaryDirectory, 'manifest.json'), 'generated manifest.json', MAX_JSON_BYTES);
+        const generatedManifest = JSON.parse((await readBounded(join(temporaryDirectory, 'manifest.json'), 'generated manifest.json', MAX_JSON_BYTES)).toString('utf8'));
         const generatedPalette = await readBounded(join(temporaryDirectory, 'palette.json'), 'generated palette.json', MAX_JSON_BYTES);
-        if (sha256(generatedManifest) !== sha256(manifestBytes)) errors.push('manifest.json does not reproduce from generate.mjs');
+        if (manifestReproductionShape(generatedManifest) !== manifestReproductionShape(manifest)) errors.push('manifest.json does not reproduce from generate.mjs');
         if (sha256(generatedPalette) !== sha256(paletteBytes)) errors.push('palette.json does not reproduce from generate.mjs');
         for (const candidate of manifest.candidates) {
           const generatedAtlas = await readBounded(join(temporaryDirectory, candidate.atlas), `generated ${candidate.atlas}`, MAX_ATLAS_BYTES);
           const currentAtlas = await readBounded(join(directory, candidate.atlas), candidate.atlas, MAX_ATLAS_BYTES);
-          if (sha256(generatedAtlas) !== sha256(currentAtlas)) errors.push(`${candidate.atlas} does not reproduce from generate.mjs`);
+          const dimensions = EXPECTED_ATLAS_DIMENSIONS[candidate.id];
+          const generatedImage = decodeRgbaPng(generatedAtlas, `generated ${candidate.atlas}`, ...dimensions);
+          const currentImage = decodeRgbaPng(currentAtlas, candidate.atlas, ...dimensions);
+          if (!generatedImage.pixels.equals(currentImage.pixels)) errors.push(`${candidate.atlas} pixels do not reproduce from generate.mjs`);
         }
       }
     } finally {
