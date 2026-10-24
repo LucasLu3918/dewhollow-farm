@@ -17,7 +17,7 @@ const MAP = [
 ];
 const TILE = 32;
 const WALK_CYCLE_MS = 220;
-const TOOL_DURATION_MS = 420;
+const TOOL_DURATION_MS = 1000;
 const state = {
   direction: 'down', season: 'spring', tileX: 11, tileY: 4,
   walkingUntil: 0, toolStartedAt: null, previousToolProgress: 0, impactSeen: false,

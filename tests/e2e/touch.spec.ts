@@ -601,26 +601,65 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
     for (const [index, movement] of cases.entries()) {
       const before = await playerPosition(page);
       const pointerId = 90 + index;
-      const send = (type: string) => pad.dispatchEvent(type, {
-        pointerId,
-        pointerType: 'touch',
-        bubbles: true,
-        cancelable: true,
-        clientX: center.x + movement.dx,
-        clientY: center.y + movement.dy,
+      await page.evaluate(({ id, x, y, dx, dy, direction, axis, delta, start }) => new Promise<void>((resolve, reject) => {
+        const target = document.querySelector<HTMLElement>('.touch-move');
+        if (!target) return reject(new Error('找不到固定搖桿'));
+        const dispatch = (type: string, clientX: number, clientY: number) => target.dispatchEvent(new PointerEvent(type, {
+          pointerId: id,
+          pointerType: 'touch',
+          bubbles: true,
+          cancelable: true,
+          clientX,
+          clientY,
+        }));
+        dispatch('pointerdown', x, y);
+        dispatch('pointermove', x + dx, y + dy);
+        const deadline = performance.now() + 3000;
+        const confirmFirstStep = () => {
+          const state = window.__dewhollow?.movement();
+          if (!state) {
+            dispatch('pointerup', x + dx, y + dy);
+            reject(new Error('無法讀取移動狀態'));
+            return;
+          }
+          if (state.heldDirection && state.heldDirection !== direction) {
+            dispatch('pointerup', x + dx, y + dy);
+            reject(new Error(`搖桿方向錯誤：預期 ${direction}，實際 ${state.heldDirection}`));
+            return;
+          }
+          const expectedTile = {
+            x: start.x + (axis === 'x' ? delta : 0),
+            y: start.y + (axis === 'y' ? delta : 0),
+          };
+          if (state.moving && state.tile.x === expectedTile.x && state.tile.y === expectedTile.y) {
+            dispatch('pointerup', x + dx, y + dy);
+            resolve();
+            return;
+          }
+          if (performance.now() >= deadline) {
+            dispatch('pointerup', x + dx, y + dy);
+            reject(new Error('搖桿未在時限內啟動第一個移動步驟'));
+            return;
+          }
+          requestAnimationFrame(confirmFirstStep);
+        };
+        requestAnimationFrame(confirmFirstStep);
+      }), {
+        id: pointerId,
+        x: center.x,
+        y: center.y,
+        dx: movement.dx,
+        dy: movement.dy,
+        direction: movement.direction,
+        axis: movement.axis,
+        delta: movement.delta,
+        start: before,
       });
-      await send('pointerdown');
-      await send('pointermove');
-      await expect.poll(async () => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null))
-        .toBe(movement.direction);
-      await expect.poll(async () => {
-        const position = await playerPosition(page);
-        return movement.axis === 'x' ? position.x - before.x : position.y - before.y;
-      }).toBe(movement.delta);
       const after = await playerPosition(page);
+      if (movement.axis === 'x') expect(after.x - before.x).toBe(movement.delta);
+      else expect(after.y - before.y).toBe(movement.delta);
       if (movement.axis === 'x') expect(after.y).toBe(before.y);
       else expect(after.x).toBe(before.x);
-      await send('pointerup');
       const atRelease = await playerPosition(page);
       await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null)).toBeNull();
       await expect.poll(() => page.evaluate(() => {
@@ -628,8 +667,8 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
         return Boolean(movementState && !movementState.moving && !movementState.pending && movementState.queuedTaps === 0);
       })).toBe(true);
       const stopped = await playerPosition(page);
-      const settledDelta = movement.axis === 'x' ? stopped.x - atRelease.x : stopped.y - atRelease.y;
-      expect([0, movement.delta]).toContain(settledDelta);
+      expect(stopped).toEqual(after);
+      expect(atRelease).toEqual(after);
       if (movement.axis === 'x') expect(stopped.y).toBe(before.y);
       else expect(stopped.x).toBe(before.x);
       await page.waitForTimeout(350);
