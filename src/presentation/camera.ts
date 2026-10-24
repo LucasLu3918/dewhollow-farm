@@ -1,4 +1,5 @@
 /** 鏡頭計算：純函式，不依賴 Phaser，方便單元測試。 */
+import { TILE_SIZE } from './constants';
 
 export interface Size {
   width: number;
@@ -13,15 +14,17 @@ export interface Rect extends Size {
 /** 玩家在視窗中央這個比例的範圍內移動時，鏡頭不動。 */
 const DEADZONE_RATIO = 0.25;
 
-/** 與 styles.css 的窄螢幕斷點一致（直式手機）。 */
-export const NARROW_VIEW_WIDTH = 600;
+/** 以 1024px 設計視窗計算的直式 9 格倍率；實際倍率會依 camera viewport 寬度調整。 */
+export const PORTRAIT_TOUCH_ZOOM = 1024 / (9 * TILE_SIZE);
 
-/** 直式觸控的鏡頭倍率：手機螢幕窄，格子若是 1 倍只有約 21 px，拉近到 1.5 倍（約 32 px）才看得清楚。 */
-export const PORTRAIT_TOUCH_ZOOM = 1.5;
-
-/** 鏡頭倍率：窄螢幕的直式觸控裝置用 PORTRAIT_TOUCH_ZOOM，其餘（電腦、橫式、寬螢幕）維持 1 倍。 */
-export function mapZoomFor(view: { width: number; coarse: boolean; portrait: boolean }): number {
-  return view.coarse && view.portrait && view.width <= NARROW_VIEW_WIDTH ? PORTRAIT_TOUCH_ZOOM : 1;
+/** 觸控鏡頭依方向保持目標格數；滑鼠版維持既有 1× 視野。 */
+export function mapZoomFor(view: { cameraWidth: number; coarse: boolean; portrait: boolean }): number {
+  if (!view.coarse) return 1;
+  const targetTiles = view.portrait ? 9 : 14;
+  const cameraWidth = Number.isFinite(view.cameraWidth) && view.cameraWidth > 0
+    ? view.cameraWidth
+    : targetTiles * TILE_SIZE;
+  return cameraWidth / (targetTiles * TILE_SIZE);
 }
 
 /**

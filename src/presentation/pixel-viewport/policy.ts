@@ -38,7 +38,8 @@ function positiveFinite(value: number, fallback: number): number {
   return Number.isFinite(value) && value > 0 ? value : fallback;
 }
 
-function targetTileRange(orientation: ViewportOrientation, input: ViewportInput): { min: number; max: number } {
+function targetTileRange(orientation: ViewportOrientation, input: ViewportInput, profile: RenderProfileId): { min: number; max: number } {
+  if (profile === 'legacy' && input === 'pointer') return { min: 14, max: 20 };
   if (orientation === 'portrait') return { min: 8, max: 10 };
   return input === 'touch' ? { min: 12, max: 16 } : { min: 14, max: 20 };
 }
@@ -50,15 +51,21 @@ function targetTileRange(orientation: ViewportOrientation, input: ViewportInput)
 export function calculatePixelViewportPolicy(input: PixelViewportPolicyInput): PixelViewportPolicy {
   const profile = renderProfileFor(input.profile, true);
   const fit = input.fit ?? 'contain';
-  const range = targetTileRange(input.orientation, input.input ?? 'pointer');
-  const visibleWidth = profile.id === 'legacy' ? 16 : Math.round((range.min + range.max) / 2);
+  const inputKind = input.input ?? 'pointer';
+  const range = targetTileRange(input.orientation, inputKind, profile.id);
+  // Legacy keeps its original desktop framing; touch uses the documented per-orientation target.
+  const visibleWidth = profile.id === 'legacy' && inputKind !== 'touch'
+    ? 16
+    : Math.round((range.min + range.max) / 2);
   const safeWidth = positiveFinite(Math.min(input.container.width, input.safeArea.width), 1);
   const safeHeight = positiveFinite(Math.min(input.container.height, input.safeArea.height), 1);
-  // Candidate canvases match the safe viewport aspect so Phaser does not stretch
-  // a 4:3 backing buffer across the portrait stage.
-  const visibleHeight = profile.id === 'legacy' ? 12 : Math.max(1, Math.round(visibleWidth / (safeWidth / safeHeight)));
-  const renderWidth = profile.id === 'legacy' ? 1024 : visibleWidth * profile.tilePixels;
-  const renderHeight = profile.id === 'legacy' ? 768 : visibleHeight * profile.tilePixels;
+  // Touch canvases match the safe viewport aspect so Phaser never stretches a 4:3
+  // backing buffer across a portrait stage. Legacy keeps the same 64px tile art.
+  const visibleHeight = profile.id === 'legacy' && inputKind !== 'touch'
+    ? 12
+    : Math.max(1, Math.round(visibleWidth / (safeWidth / safeHeight)));
+  const renderWidth = profile.id === 'legacy' && inputKind !== 'touch' ? 1024 : visibleWidth * profile.tilePixels;
+  const renderHeight = profile.id === 'legacy' && inputKind !== 'touch' ? 768 : visibleHeight * profile.tilePixels;
   const widthScale = safeWidth / renderWidth;
   const heightScale = safeHeight / renderHeight;
   const cssScale = fit === 'cover' ? Math.max(widthScale, heightScale) : Math.min(widthScale, heightScale);

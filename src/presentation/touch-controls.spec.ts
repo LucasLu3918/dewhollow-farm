@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { becameHidden, DirectionalHoldEmitter } from './touch-controls';
+import { becameHidden, DirectionalHoldEmitter, isJoystickMovementSource } from './touch-controls';
 import type { Direction } from '../domain/content';
 
 describe('touch control visibility cancellation', () => {
@@ -15,6 +15,11 @@ describe('touch control visibility cancellation', () => {
 });
 
 describe('directional touch hold events', () => {
+  it('identifies joystick holds as continuous input sources', () => {
+    expect(isJoystickMovementSource('touch-controls:joystick:4')).toBe(true);
+    expect(isJoystickMovementSource('touch-controls:pointer:4')).toBe(false);
+  });
+
   it('emits a directional hold, updates it without a release gap, and releases the source', () => {
     const events: Array<[string, Direction | null]> = [];
     const holds = new DirectionalHoldEmitter((source, direction) => events.push([source, direction]));

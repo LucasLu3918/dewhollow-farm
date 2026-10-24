@@ -21,6 +21,12 @@ const JOYSTICK_SIZE = 144;
 const JOYSTICK_RADIUS = JOYSTICK_SIZE / 2 - 24;
 const FLOATING_ACTIVATION_OUTSET = 12;
 const POINTER_SOURCE_PREFIX = 'touch-controls:pointer:';
+const JOYSTICK_SOURCE_PREFIX = 'touch-controls:joystick:';
+
+/** Joystick input is continuous; a direction change must not become a queued tap. */
+export function isJoystickMovementSource(source: string): boolean {
+  return source.startsWith(JOYSTICK_SOURCE_PREFIX);
+}
 
 interface PointerGesture {
   kind: 'move-button' | 'action-button' | 'joystick';
@@ -281,8 +287,8 @@ export class TouchControls {
     const dy = (event.clientY - this.joystickCenter.y) / JOYSTICK_RADIUS;
     const direction = directionForJoystick(dx, dy, this.joystickDirection);
     this.joystickDirection = direction;
-    if (direction) this.directionalHolds.set(pointerSource(event.pointerId), direction);
-    else this.directionalHolds.release(pointerSource(event.pointerId));
+    if (direction) this.directionalHolds.set(joystickSource(event.pointerId), direction);
+    else this.directionalHolds.release(joystickSource(event.pointerId));
 
     const length = Math.hypot(dx, dy);
     const scale = length > 1 ? 1 / length : 1;
@@ -296,7 +302,9 @@ export class TouchControls {
     if (!gesture) return;
     event.preventDefault();
     this.gestures.delete(event.pointerId);
-    this.directionalHolds.release(pointerSource(event.pointerId));
+    this.directionalHolds.release(gesture.kind === 'joystick'
+      ? joystickSource(event.pointerId)
+      : pointerSource(event.pointerId));
     if (gesture.kind === 'joystick') {
       this.joystickPointerId = null;
       this.joystickDirection = null;
@@ -344,6 +352,10 @@ export class TouchControls {
 
 function pointerSource(pointerId: number): string {
   return `${POINTER_SOURCE_PREFIX}${pointerId}`;
+}
+
+function joystickSource(pointerId: number): string {
+  return `${JOYSTICK_SOURCE_PREFIX}${pointerId}`;
 }
 
 function clamp(value: number, min: number, max: number): number {
