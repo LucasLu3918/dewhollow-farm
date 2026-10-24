@@ -448,6 +448,96 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
     expect(await playerPosition(page)).toEqual(stopped);
   });
 
+  test('orientation change cancels a held floating joystick until a new gesture', async ({ page }) => {
+    await seedMobileControls(page, 'floating-joystick');
+    await startGame(page);
+    const pad = page.locator('.touch-move');
+    const startGesture = async (pointerId: number): Promise<void> => {
+      const box = await pad.boundingBox();
+      expect(box).not.toBeNull();
+      const center = { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 };
+      const send = (type: string, x: number, y: number) => pad.dispatchEvent(type, {
+        pointerId,
+        pointerType: 'touch',
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y,
+      });
+      await send('pointerdown', center.x, center.y);
+      await send('pointermove', center.x + 58, center.y);
+    };
+
+    const before = await playerPosition(page);
+    await startGesture(61);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null)).toBe('right');
+    await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(before.x);
+
+    await page.evaluate(() => window.dispatchEvent(new Event('orientationchange')));
+    await expect.poll(() => page.evaluate(() => {
+      const movement = window.__dewhollow?.movement();
+      return movement && movement.heldDirection === null && !movement.moving && !movement.pending;
+    })).toBe(true);
+    const stopped = await playerPosition(page);
+
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.evaluate(() => window.dispatchEvent(new Event('orientationchange')));
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => window.dispatchEvent(new Event('orientationchange')));
+    await page.waitForTimeout(350);
+    expect(await playerPosition(page)).toEqual(stopped);
+
+    await startGesture(62);
+    await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(stopped.x);
+  });
+
+  test('visibility hidden cancels a held floating joystick until a new gesture', async ({ page }) => {
+    await seedMobileControls(page, 'floating-joystick');
+    await startGame(page);
+    const pad = page.locator('.touch-move');
+    const startGesture = async (pointerId: number): Promise<void> => {
+      const box = await pad.boundingBox();
+      expect(box).not.toBeNull();
+      const center = { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 };
+      const send = (type: string, x: number, y: number) => pad.dispatchEvent(type, {
+        pointerId,
+        pointerType: 'touch',
+        bubbles: true,
+        cancelable: true,
+        clientX: x,
+        clientY: y,
+      });
+      await send('pointerdown', center.x, center.y);
+      await send('pointermove', center.x + 58, center.y);
+    };
+
+    const before = await playerPosition(page);
+    await startGesture(71);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null)).toBe('right');
+    await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(before.x);
+
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await expect.poll(() => page.evaluate(() => {
+      const movement = window.__dewhollow?.movement();
+      return movement && movement.heldDirection === null && !movement.moving && !movement.pending;
+    })).toBe(true);
+    const stopped = await playerPosition(page);
+
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+      document.dispatchEvent(new Event('visibilitychange'));
+      Reflect.deleteProperty(document, 'visibilityState');
+    });
+    await page.waitForTimeout(350);
+    expect(await playerPosition(page)).toEqual(stopped);
+
+    await startGesture(72);
+    await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(stopped.x);
+  });
+
   test('fixed joystick moves on a cardinal axis and stops on release', async ({ page }) => {
     await seedMobileControls(page, 'fixed-joystick');
     await startGame(page);
