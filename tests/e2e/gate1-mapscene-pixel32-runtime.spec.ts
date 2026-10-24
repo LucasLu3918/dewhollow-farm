@@ -59,18 +59,20 @@ async function moveOneTile(page: Page, key: string, axis: 'x' | 'y', delta: numb
 async function animateOneTile(page: Page, key: string, direction: string, axis: 'x' | 'y', delta: number): Promise<void> {
   await waitForMovementIdle(page);
   const before = await page.evaluate(() => window.__dewhollow!.movement().tile);
-  await page.keyboard.down(key);
-  try {
-    await expect.poll(() => page.evaluate(({ expectedDirection }) => {
+  const animationSeen = page.evaluate(async (expectedDirection) => {
+    const startedAt = performance.now();
+    while (performance.now() - startedAt < 5_000) {
       const debug = window.__dewhollow;
       const frame = debug?.pixel32CandidateRuntime().playerFrame ?? '';
-      return debug?.movement().moving === true
+      if (debug?.movement().moving === true
         && frame.startsWith(`${expectedDirection}-`)
-        && !frame.endsWith('-idle');
-    }, { expectedDirection: direction }), { intervals: [10, 20, 50], timeout: 5_000 }).toBe(true);
-  } finally {
-    await page.keyboard.up(key);
-  }
+        && !frame.endsWith('-idle')) return true;
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    }
+    return false;
+  }, direction);
+  await page.keyboard.press(key);
+  expect(await animationSeen, `${direction} walk animation should appear during one discrete input`).toBe(true);
   await waitForMovementIdle(page);
   const after = await page.evaluate(() => window.__dewhollow!.movement().tile);
   expect(after[axis]).toBe(before[axis] + delta);
