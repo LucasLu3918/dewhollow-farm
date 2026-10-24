@@ -345,7 +345,7 @@ test('field edges stay walkable while farm buildings, greenhouse fence, forest t
   await walk(page, 'ArrowDown', 12); // (30,19), above the greenhouse door
   await walk(page, 'ArrowDown'); // Q entrance -> greenhouse interior (30,22)
   await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 30, y: 22 });
-  await walk(page, 'ArrowLeft', 2); // (28,22), next to the west fence
+  await walk(page, 'ArrowLeft', 2); // (28,22), immediately inside the west fence at x=27
   await blockedMove(page, 'ArrowLeft');
   await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 28, y: 22 });
   const greenhouseSprites = await sprites(page);

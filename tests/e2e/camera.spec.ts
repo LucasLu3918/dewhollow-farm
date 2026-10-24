@@ -5,7 +5,17 @@ import { expect, test, type Page } from '@playwright/test';
  * 鏡頭位置由開發模式的 window.__dewhollow 提供（正式建置不含）。
  */
 async function press(page: Page, key: string, times: number): Promise<void> {
-  for (let i = 0; i < times; i += 1) await page.keyboard.press(key);
+  for (let i = 0; i < times; i += 1) {
+    await page.keyboard.press(key);
+    if (key.startsWith('Arrow')) await waitForMovementIdle(page);
+  }
+}
+
+async function waitForMovementIdle(page: Page): Promise<void> {
+  await expect.poll(() => page.evaluate(() => {
+    const movement = window.__dewhollow?.movement();
+    return !movement || (!movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null);
+  })).toBe(true);
 }
 
 async function scroll(page: Page): Promise<{ x: number; y: number }> {
@@ -34,7 +44,7 @@ async function waitForGame(page: Page): Promise<void> {
 async function walk(page: Page, key: string, times: number): Promise<void> {
   for (let i = 0; i < times; i += 1) {
     await page.keyboard.press(key);
-    await page.waitForTimeout(80);
+    await waitForMovementIdle(page);
   }
 }
 
@@ -85,6 +95,10 @@ test('camera follows the player on the large farm and stays inside the map', asy
 
   // 再往東走到 x=38，鏡頭應停在右邊界。
   await press(page, 'ArrowRight', 31);
+  await expect.poll(async () => {
+    const player = await page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player'));
+    return player ? [player.tileX, player.tileY] : null;
+  }).toEqual([38, 28]);
   await expect.poll(async () => (await scroll(page)).x).toBeCloseTo((await cameraView(page))!.bounds.x + (await cameraView(page))!.bounds.width - (await cameraView(page))!.width, 0);
 });
 

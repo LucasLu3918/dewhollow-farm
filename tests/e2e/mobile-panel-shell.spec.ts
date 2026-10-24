@@ -6,6 +6,14 @@ async function start(page: Page): Promise<void> {
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).not.toBe('');
 }
 
+async function pressMovement(page: Page, key: string): Promise<void> {
+  await page.keyboard.press(key);
+  await expect.poll(() => page.evaluate(() => {
+    const movement = window.__dewhollow?.movement();
+    return !movement || (!movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null);
+  })).toBe(true);
+}
+
 test.describe('MB-07 compact HUD and shared panel shell', () => {
   test('primary action follows the facing target and dispatches through the existing interaction route', async ({ page }) => {
     await start(page);
@@ -15,7 +23,7 @@ test.describe('MB-07 compact HUD and shared panel shell', () => {
     await expect(action).toHaveAttribute('aria-label', /主要動作：/);
     await expect(action).toBeDisabled();
     await expect(action).toHaveText('沒有可互動的目標');
-    for (let step = 0; step < 4; step += 1) await page.keyboard.press('ArrowUp');
+    for (let step = 0; step < 4; step += 1) await pressMovement(page, 'ArrowUp');
     await expect(action).toBeEnabled();
     await expect(action).toHaveText('開墾');
     await action.click();

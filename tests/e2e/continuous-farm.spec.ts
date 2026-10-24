@@ -7,10 +7,17 @@ async function start(page: Page): Promise<void> {
 }
 
 async function moveToEmptyField(page: Page): Promise<void> {
-  for (let i = 0; i < 4; i += 1) await page.keyboard.press('ArrowLeft');
-  for (let i = 0; i < 4; i += 1) await page.keyboard.press('ArrowUp');
-  await page.keyboard.press('ArrowRight');
-  await expect.poll(async () => page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy ?? true)).toBe(false);
+  for (let i = 0; i < 4; i += 1) await pressMovement(page, 'ArrowLeft');
+  for (let i = 0; i < 4; i += 1) await pressMovement(page, 'ArrowUp');
+  await pressMovement(page, 'ArrowRight');
+}
+
+async function pressMovement(page: Page, key: string): Promise<void> {
+  await page.keyboard.press(key);
+  await expect.poll(() => page.evaluate(() => {
+    const movement = window.__dewhollow?.movement();
+    return !movement || (!movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null);
+  })).toBe(true);
 }
 
 async function enableContinuousActions(page: Page): Promise<void> {
@@ -257,6 +264,9 @@ test.describe('可取消的長按連續農務', () => {
           return;
         }
         window.dispatchEvent(new KeyboardEvent('keydown', {
+          key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true,
+        }));
+        window.dispatchEvent(new KeyboardEvent('keyup', {
           key: 'ArrowRight', code: 'ArrowRight', bubbles: true, cancelable: true,
         }));
       };

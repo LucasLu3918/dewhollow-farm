@@ -1,5 +1,13 @@
 import { expect, test } from '@playwright/test';
 
+async function pressMovement(page: import('@playwright/test').Page, key: string): Promise<void> {
+  await page.keyboard.press(key);
+  await expect.poll(() => page.evaluate(() => {
+    const movement = window.__dewhollow?.movement();
+    return !movement || (!movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null);
+  })).toBe(true);
+}
+
 test.describe('interaction target feedback', () => {
   test('shows the descriptor cell, tracks turns, and leaves command results unchanged', async ({ page }, testInfo) => {
     await page.goto('/');
@@ -7,7 +15,7 @@ test.describe('interaction target feedback', () => {
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 
     // Move beside the starting field, then turn right so both descriptors have visible targets.
-    for (let i = 0; i < 4; i += 1) await page.keyboard.press('ArrowUp');
+    for (let i = 0; i < 4; i += 1) await pressMovement(page, 'ArrowUp');
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.interactionTargetMarker().visible ?? false)).toBe(true);
     const facingUp = await page.evaluate(() => ({
       descriptor: window.__dewhollow?.interaction(),
