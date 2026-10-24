@@ -25,6 +25,14 @@ import {
   type CandidateId,
 } from '../candidate-art';
 import { renderProfileFor } from '../pixel-viewport/profiles';
+import {
+  candidateFramesFromManifest,
+  PIXEL32_ANIMATION_ATLAS_KEY,
+  PIXEL32_ANIMATION_MANIFEST_KEY,
+  PIXEL32_MAP_ATLAS_KEY,
+  PIXEL32_MAP_MANIFEST_KEY,
+  pixel32CandidateRuntimeRequested,
+} from '../pixel32-candidate-runtime';
 
 interface CandidateManifest {
   status: string;
@@ -80,10 +88,18 @@ export class BootScene extends Phaser.Scene {
       this.load.json(CANDIDATE_MANIFEST_CACHE_KEY, `${root}/manifest.json`);
       this.load.image(CANDIDATE_ATLAS_TEXTURE, `${root}/${atlas}`);
     }
+    if (this.pixel32RuntimeRequested()) {
+      const root = '/docs/art/candidates/pixel-movement/gate1-assets';
+      this.load.json(PIXEL32_MAP_MANIFEST_KEY, `${root}/pixel32-map/manifest.json`);
+      this.load.image(PIXEL32_MAP_ATLAS_KEY, `${root}/pixel32-map/map-atlas.png`);
+      this.load.json(PIXEL32_ANIMATION_MANIFEST_KEY, `${root}/pixel32-animation/manifest.json`);
+      this.load.image(PIXEL32_ANIMATION_ATLAS_KEY, `${root}/pixel32-animation/player-4dir.png`);
+    }
   }
 
   create(): void {
     const candidateId = this.registerCandidateAtlas();
+    const pixel32CandidateRuntime = this.registerPixel32CandidateAtlases();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
     registerAnimalTextures(this);
     for (const entry of this.deps.assets.assets) {
@@ -123,11 +139,39 @@ export class BootScene extends Phaser.Scene {
       controls: this.deps.controls,
     };
     this.registry.set('gate1-candidate-id', candidateId);
+    this.registry.set('gate1-pixel32-candidate-runtime', pixel32CandidateRuntime);
     this.scene.start('map', sceneDeps);
+  }
+
+  private pixel32RuntimeRequested(): boolean {
+    return pixel32CandidateRuntimeRequested(new URLSearchParams(window.location.search), import.meta.env.DEV);
+  }
+
+  private registerPixel32CandidateAtlases(): boolean {
+    if (!this.pixel32RuntimeRequested()
+      || !this.textures.exists(PIXEL32_MAP_ATLAS_KEY)
+      || !this.textures.exists(PIXEL32_ANIMATION_ATLAS_KEY)) return false;
+
+    const mapFrames = candidateFramesFromManifest(this.cache.json.get(PIXEL32_MAP_MANIFEST_KEY), 'map-atlas.png');
+    const animationFrames = candidateFramesFromManifest(this.cache.json.get(PIXEL32_ANIMATION_MANIFEST_KEY), 'player-4dir.png');
+    if (!mapFrames || !animationFrames) return false;
+
+    this.registerFrames(PIXEL32_MAP_ATLAS_KEY, mapFrames);
+    this.registerFrames(PIXEL32_ANIMATION_ATLAS_KEY, animationFrames);
+    return true;
+  }
+
+  private registerFrames(textureKey: string, frames: Record<string, { x: number; y: number; width: number; height: number }>): void {
+    const texture = this.textures.get(textureKey);
+    for (const [key, rect] of Object.entries(frames)) {
+      texture.add(key, 0, rect.x, rect.y, rect.width, rect.height);
+    }
+    texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
   }
 
   private devCandidateForProfile(): CandidateId | null {
     if (!import.meta.env.DEV) return null;
+    if (this.pixel32RuntimeRequested()) return null;
     const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), true);
     return candidateForProfile(profile.id);
   }

@@ -145,17 +145,16 @@ function step(direction) {
   setPressed(document.querySelector('#directions'), 'direction', direction);
 }
 
-document.querySelector('#directions').addEventListener('click', (event) => {
-  const direction = event.target.closest('[data-direction]')?.dataset.direction;
-  if (direction) step(direction);
-});
+for (const button of document.querySelectorAll('#directions button[data-direction]')) {
+  button.addEventListener('click', () => step(button.dataset.direction));
+}
 document.querySelector('#walk-step').addEventListener('click', () => step(state.direction));
-document.querySelector('#seasons').addEventListener('click', (event) => {
-  const season = event.target.closest('[data-season]')?.dataset.season;
-  if (!season) return;
-  state.season = season;
-  setPressed(document.querySelector('#seasons'), 'season', season);
-});
+for (const button of document.querySelectorAll('#seasons button[data-season]')) {
+  button.addEventListener('click', () => {
+    state.season = button.dataset.season;
+    setPressed(document.querySelector('#seasons'), 'season', state.season);
+  });
+}
 document.querySelector('#behind-canopy').addEventListener('change', (event) => {
   canvas.dataset.occlusion = event.currentTarget.checked ? 'behind-canopy' : 'in-front';
 });
