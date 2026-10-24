@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Pixel32 整合候選預覽｜Dewhollow Farm</title>
+    <link rel="stylesheet" href="./integrated-preview.css">
+    <script type="module" src="./integrated-preview.js"></script>
+  </head>
+  <body>
+    <main class="workspace">
+      <header class="heading">
+        <div>
+          <h1>Pixel32 農場候選整合預覽</h1>
+          <p>同一個場景檢視四向動作、四季地表與前後遮擋</p>
+        </div>
+        <span class="candidate-state">候選 · 尚未核准</span>
+      </header>
+
+      <section class="stage" aria-label="整合候選場景">
+        <div class="canvas-scroll" aria-label="可水平捲動查看完整候選地圖">
+          <canvas id="integrated-preview" width="480" height="288" role="img" aria-label="Pixel32 農場候選整合畫面" data-approved="false"></canvas>
+        </div>
+        <div class="readout" aria-live="polite">
+          <span id="scene-readout">載入候選素材中…</span>
+          <span id="motion-readout">動作：站立</span>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="場景預覽控制">
+        <fieldset>
+          <legend>方向與步伐</legend>
+          <div class="button-row" id="directions">
+            <button type="button" data-direction="down" aria-pressed="true">下</button>
+            <button type="button" data-direction="up" aria-pressed="false">上</button>
+            <button type="button" data-direction="left" aria-pressed="false">左</button>
+            <button type="button" data-direction="right" aria-pressed="false">右</button>
+            <button type="button" id="walk-step">走一步</button>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>場景樣式</legend>
+          <div class="button-row" id="seasons">
+            <button type="button" data-season="spring" aria-pressed="true">春</button>
+            <button type="button" data-season="summer" aria-pressed="false">夏</button>
+            <button type="button" data-season="autumn" aria-pressed="false">秋</button>
+            <button type="button" data-season="winter" aria-pressed="false">冬</button>
+          </div>
+        </fieldset>
+        <label class="toggle"><input id="behind-canopy" type="checkbox"> 角色在樹冠後方</label>
+        <button type="button" id="tool-action">揮動工具</button>
+      </section>
+
+      <footer class="note">
+        <span>動畫與地圖候選合成於固定展示場景；不使用正式地圖、碰撞或遊戲狀態。</span>
+        <span>操作方向鍵移動，或用滑鼠／觸控按鈕。素材維持 candidate，尚未完成 Gate 1 美術驗收。</span>
+      </footer>
+      <p id="error-message" role="alert" hidden></p>
+    </main>
+  </body>
+</html>

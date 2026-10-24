@@ -11,12 +11,15 @@
 - `tools/art/check_gate1_assets.mjs`：唯讀檢查候選規格、atlas PNG 與來源 hash。
 - `palette.json`：兩套候選色票。
 - `generate.mjs`：以逐像素整數圖元繪製候選並輸出 RGBA PNG；沒有縮放既有素材或外部參考圖。
+- [`integrated-preview.html`](./integrated-preview.html)：在固定展示場景中合成四向動畫與四季地圖候選，供同場檢視；不接正式遊戲狀態或素材清單。
 
 固定 keys：`grass`, `tilled`, `road`, `tree`, `cropSeed`, `cropSprout`, `cropMature`, `houseEdge`, `fence`, `playerIdle`, `playerWalk`, `cat`, `quokka`, `tool`, `shadow`。`playerWalk` 目前只有一張靜態姿勢樣張，不代表動畫循環。`cat` 和 `quokka` 都是俯視小型四足寵物的單幀樣張。
 
 候選 atlas 以透明背景儲存；預覽端使用最近鄰取樣，依 `manifest.json` 的 frame rect 裁切。圖集固定 4 欄，每個來源格採原生尺寸儲存；不要把預覽放大後當成實際顯示辨識度驗收。
 
 ## 重現與核對
+
+同場檢視動畫和地圖候選：[開啟整合預覽](./integrated-preview.html)。
 
 在專案根目錄執行以下命令可重新產生候選檔，或檢查目前檔案：
 
@@ -29,6 +32,8 @@ npm run assets:gate1:check
 更完整的格式定義與 checker 限制見 [DF-ART-02 pixel32 規格](DF-ART-02-PIXEL32-SPEC.zh-TW.md)。
 
 候選檔只寫入本目錄。不可把它們當成核准素材，也不可加入正式 `public/` 或 `content/assets.json`；每次修改候選都應重新產生並審閱對應雜湊。
+
+整合預覽只用於查看兩組候選在同一個 15×9 示範畫面中的配色、步態與遮擋。它不是正式 Phaser runtime，也不取代 Gate 1 所需的同一份遊戲地圖、農務操作、完整 viewport／DPR 或實機驗收。
 
 ## 尚缺 Gate 1 證據
 
