@@ -25,6 +25,8 @@ test('integrated pixel32 preview composes unapproved animation and map candidate
   expect(Object.values(animationManifest.frames).every((frame) => frame.approved !== true)).toBe(true);
   expect(Object.values(mapManifest.frames).every((frame: { approved?: boolean }) => frame.approved === false)).toBe(true);
 
+  await page.getByRole('button', { name: '揮動工具' }).click();
+  await expect(canvas).toHaveAttribute('data-motion', 'tool');
   await page.getByRole('button', { name: '右', exact: true }).click();
   await expect(canvas).toHaveAttribute('data-direction', 'right');
   await expect(canvas).toHaveAttribute('data-motion', 'walk');
@@ -33,8 +35,6 @@ test('integrated pixel32 preview composes unapproved animation and map candidate
   await expect(canvas).toHaveAttribute('data-season', 'winter');
   await page.getByLabel('角色在樹冠後方').check();
   await expect(canvas).toHaveAttribute('data-occlusion', 'behind-canopy');
-  await page.getByRole('button', { name: '揮動工具' }).click();
-  await expect(canvas).toHaveAttribute('data-motion', 'tool');
   await expect(page.locator('body')).toHaveJSProperty('scrollWidth', 390);
   await page.screenshot({ path: testInfo.outputPath('integrated-candidate-preview.png'), fullPage: true });
 
