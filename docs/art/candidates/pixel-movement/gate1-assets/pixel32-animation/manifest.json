@@ -6,7 +6,7 @@
   "source": {
     "method": "hand-authored integer pixel primitives",
     "generator": "tools/art/generate_gate1_animation.mjs",
-    "generatorSha256": "f4aff3c6bd4c743fa0381da6e44f1438ff466a97bec05126191cdb8822df63c1"
+    "generatorSha256": "782937ffe90056e891a6cf7b4bd9492b86fda385603689dca91e7c9adb4c6fa6"
   },
   "pixelContract": {
     "frameWidth": 32,
@@ -21,7 +21,7 @@
     "file": "player-4dir.png",
     "width": 128,
     "height": 192,
-    "sha256": "d27f4deaeb1207c7b9e120fb829ac8af7d139865c7347aec7f15e37976c26266"
+    "sha256": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3"
   },
   "directions": [
     "down",

@@ -4,7 +4,6 @@ import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { deflateSync } from 'node:zlib';
 
 const DEFAULT_OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../../docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation');
 const OUT = outputDirectory(process.argv.slice(2));
@@ -145,8 +144,34 @@ function pngBytes(c) {
   header[8] = 8; header[9] = 6;
   return Buffer.concat([
     Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
-    pngChunk('IHDR', header), pngChunk('IDAT', deflateSync(raw, { level: 9 })), pngChunk('IEND', Buffer.alloc(0)),
+    pngChunk('IHDR', header), pngChunk('IDAT', storedZlib(raw)), pngChunk('IEND', Buffer.alloc(0)),
   ]);
+}
+
+/** Fixed stored-DEFLATE blocks avoid Node/zlib-version-dependent PNG bytes. */
+function storedZlib(input) {
+  const chunks = [Buffer.from([0x78, 0x01])];
+  const maxBlockSize = 65_535;
+  for (let offset = 0; offset < input.length; offset += maxBlockSize) {
+    const block = input.subarray(offset, Math.min(input.length, offset + maxBlockSize));
+    const final = offset + block.length === input.length;
+    const header = Buffer.alloc(5);
+    header[0] = final ? 1 : 0;
+    header.writeUInt16LE(block.length, 1);
+    header.writeUInt16LE(block.length ^ 0xffff, 3);
+    chunks.push(header, block);
+  }
+
+  let a = 1;
+  let b = 0;
+  for (const byte of input) {
+    a = (a + byte) % 65_521;
+    b = (b + a) % 65_521;
+  }
+  const checksum = Buffer.alloc(4);
+  checksum.writeUInt32BE(((b << 16) | a) >>> 0);
+  chunks.push(checksum);
+  return Buffer.concat(chunks);
 }
 
 async function main() {
