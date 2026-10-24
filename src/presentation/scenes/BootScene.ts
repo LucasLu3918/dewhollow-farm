@@ -18,6 +18,25 @@ import { registerAnimalTextures } from '../animal-art';
 import { MapScene, type MapSceneDeps } from './MapScene';
 import { TILE_SIZE, UNIT } from '../constants';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
+import {
+  CANDIDATE_ATLAS_TEXTURE,
+  CANDIDATE_MANIFEST_CACHE_KEY,
+  candidateForProfile,
+  type CandidateId,
+} from '../candidate-art';
+import { renderProfileFor } from '../pixel-viewport/profiles';
+
+interface CandidateManifest {
+  status: string;
+  approved: boolean;
+  candidates: Array<{
+    id: CandidateId;
+    status: string;
+    approved: boolean;
+    atlas: string;
+    frames: Record<string, { x: number; y: number; width: number; height: number }>;
+  }>;
+}
 
 
 export interface BootDeps {
@@ -54,9 +73,17 @@ export class BootScene extends Phaser.Scene {
     for (const entry of this.deps.assets.assets) {
       if (entry.file) this.load.image(entry.id, entry.file);
     }
+    const candidate = this.devCandidateForProfile();
+    if (candidate) {
+      const root = '/docs/art/candidates/pixel-movement/gate1-assets';
+      const atlas = candidate === '8bit' ? '8bit.png' : '16bit.png';
+      this.load.json(CANDIDATE_MANIFEST_CACHE_KEY, `${root}/manifest.json`);
+      this.load.image(CANDIDATE_ATLAS_TEXTURE, `${root}/${atlas}`);
+    }
   }
 
   create(): void {
+    const candidateId = this.registerCandidateAtlas();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
     registerAnimalTextures(this);
     for (const entry of this.deps.assets.assets) {
@@ -95,7 +122,30 @@ export class BootScene extends Phaser.Scene {
       onReady: this.deps.onReady,
       controls: this.deps.controls,
     };
+    this.registry.set('gate1-candidate-id', candidateId);
     this.scene.start('map', sceneDeps);
+  }
+
+  private devCandidateForProfile(): CandidateId | null {
+    if (!import.meta.env.DEV) return null;
+    const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), true);
+    return candidateForProfile(profile.id);
+  }
+
+  private registerCandidateAtlas(): CandidateId | null {
+    const candidateId = this.devCandidateForProfile();
+    if (!candidateId || !this.textures.exists(CANDIDATE_ATLAS_TEXTURE)) return null;
+    const manifest = this.cache.json.get(CANDIDATE_MANIFEST_CACHE_KEY) as CandidateManifest | undefined;
+    const candidate = manifest?.candidates.find((entry) => entry.id === candidateId);
+    if (!manifest || manifest.status !== 'candidate' || manifest.approved || !candidate
+      || candidate.status !== 'candidate' || candidate.approved) return null;
+
+    const texture = this.textures.get(CANDIDATE_ATLAS_TEXTURE);
+    for (const [key, rect] of Object.entries(candidate.frames)) {
+      texture.add(key, 0, rect.x, rect.y, rect.width, rect.height);
+    }
+    texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+    return candidateId;
   }
 
   private makePlaceholder(entry: AssetEntry): void {

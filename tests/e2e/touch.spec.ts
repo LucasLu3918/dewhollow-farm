@@ -443,9 +443,23 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
     await send('pointermove', center.x + 58, center.y);
     await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(before.x);
     await send('pointercancel', center.x + 58, center.y);
-    const stopped = await playerPosition(page);
+    const cancelled = await page.evaluate(() => {
+      const movement = window.__dewhollow?.movement();
+      return movement ? { tile: movement.tile, inFlight: movement.moving || movement.pending } : null;
+    });
+    expect(cancelled).not.toBeNull();
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null)).toBeNull();
+    await expect.poll(() => page.evaluate(() => {
+      const movement = window.__dewhollow?.movement();
+      return Boolean(movement && !movement.moving && !movement.pending && movement.queuedTaps === 0);
+    })).toBe(true);
+    const settled = await page.evaluate(() => window.__dewhollow?.movement().tile);
+    const extraTiles = cancelled && settled
+      ? Math.abs(settled.x - cancelled.tile.x) + Math.abs(settled.y - cancelled.tile.y)
+      : Infinity;
+    expect(extraTiles).toBeLessThanOrEqual(cancelled?.inFlight ? 1 : 0);
     await page.waitForTimeout(350);
-    expect(await playerPosition(page)).toEqual(stopped);
+    expect(await page.evaluate(() => window.__dewhollow?.movement().tile)).toEqual(settled);
   });
 
   test('orientation change cancels a held floating joystick until a new gesture', async ({ page }) => {
