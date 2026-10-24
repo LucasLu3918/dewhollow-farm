@@ -1,0 +1,1403 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tests/e2e/gate1-runtime-evidence.spec.ts",
+  "evidenceMode": "saved-to-repository",
+  "claim": "Chromium runtime render-profile and viewport/DPR evidence; not native 8-bit/16-bit art or physical-device evidence.",
+  "measurements": [
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "requestedDpr": 1,
+      "profile": "legacy",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 576,
+        "height": 832
+      },
+      "renderResolution": {
+        "width": 576,
+        "height": 832
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-phone-portrait-390x844-dpr-1.png",
+      "sha256": "c765a425c0cfc9a1d0605ffdfcd8ea68f65ee23adb68c0373769ddc4acad5c31"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390
+      },
+      "requestedDpr": 1,
+      "profile": "legacy",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 896,
+        "height": 704
+      },
+      "renderResolution": {
+        "width": 896,
+        "height": 704
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-phone-landscape-844x390-dpr-1.png",
+      "sha256": "f589b1168c90bc51bfaf3d0675bb62059ab179b3fa98faac38528b11021532f4"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "requestedDpr": 1,
+      "profile": "legacy",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 576,
+        "height": 448
+      },
+      "renderResolution": {
+        "width": 576,
+        "height": 448
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-tablet-portrait-768x1024-dpr-1.png",
+      "sha256": "bca02b3e5028eab2580fa0f81fdc6346a91a94084896409fc0bb2dc029a14ae0"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1,
+      "profile": "legacy",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 1024,
+        "height": 768
+      },
+      "renderResolution": {
+        "width": 1024,
+        "height": 768
+      },
+      "visibleTiles": {
+        "width": 16,
+        "height": 12
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-desktop-landscape-1280x720-dpr-1.png",
+      "sha256": "6d37c301715367b26ee1a843035301f66222514ec7bd8d569e1d834df5afc088"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "requestedDpr": 1,
+      "profile": "legacy",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 1024,
+        "height": 768
+      },
+      "renderResolution": {
+        "width": 1024,
+        "height": 768
+      },
+      "visibleTiles": {
+        "width": 16,
+        "height": 12
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-desktop-fullhd-1920x1080-dpr-1.png",
+      "sha256": "b1e6de25bfbdde9a41f5f0dd298579762d696075eb960e8bbb4316c54c7e1620"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "requestedDpr": 2,
+      "profile": "legacy",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 576,
+        "height": 832
+      },
+      "renderResolution": {
+        "width": 576,
+        "height": 832
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-phone-portrait-390x844-dpr-2.png",
+      "sha256": "c765a425c0cfc9a1d0605ffdfcd8ea68f65ee23adb68c0373769ddc4acad5c31"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390
+      },
+      "requestedDpr": 2,
+      "profile": "legacy",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 896,
+        "height": 704
+      },
+      "renderResolution": {
+        "width": 896,
+        "height": 704
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-phone-landscape-844x390-dpr-2.png",
+      "sha256": "f589b1168c90bc51bfaf3d0675bb62059ab179b3fa98faac38528b11021532f4"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "requestedDpr": 2,
+      "profile": "legacy",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 576,
+        "height": 448
+      },
+      "renderResolution": {
+        "width": 576,
+        "height": 448
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-tablet-portrait-768x1024-dpr-2.png",
+      "sha256": "bca02b3e5028eab2580fa0f81fdc6346a91a94084896409fc0bb2dc029a14ae0"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 2,
+      "profile": "legacy",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 1024,
+        "height": 768
+      },
+      "renderResolution": {
+        "width": 1024,
+        "height": 768
+      },
+      "visibleTiles": {
+        "width": 16,
+        "height": 12
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-desktop-landscape-1280x720-dpr-2.png",
+      "sha256": "6d37c301715367b26ee1a843035301f66222514ec7bd8d569e1d834df5afc088"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "requestedDpr": 2,
+      "profile": "legacy",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 1024,
+        "height": 768
+      },
+      "renderResolution": {
+        "width": 1024,
+        "height": 768
+      },
+      "visibleTiles": {
+        "width": 16,
+        "height": 12
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-desktop-fullhd-1920x1080-dpr-2.png",
+      "sha256": "b1e6de25bfbdde9a41f5f0dd298579762d696075eb960e8bbb4316c54c7e1620"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "requestedDpr": 3,
+      "profile": "legacy",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 576,
+        "height": 832
+      },
+      "renderResolution": {
+        "width": 576,
+        "height": 832
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-phone-portrait-390x844-dpr-3.png",
+      "sha256": "c765a425c0cfc9a1d0605ffdfcd8ea68f65ee23adb68c0373769ddc4acad5c31"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390
+      },
+      "requestedDpr": 3,
+      "profile": "legacy",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 896,
+        "height": 704
+      },
+      "renderResolution": {
+        "width": 896,
+        "height": 704
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-phone-landscape-844x390-dpr-3.png",
+      "sha256": "5b08f9a9429dc6f83820cfbf011604d6b0d816494cff647e2b24ef278823178d"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "requestedDpr": 3,
+      "profile": "legacy",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 576,
+        "height": 448
+      },
+      "renderResolution": {
+        "width": 576,
+        "height": 448
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-tablet-portrait-768x1024-dpr-3.png",
+      "sha256": "bca02b3e5028eab2580fa0f81fdc6346a91a94084896409fc0bb2dc029a14ae0"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 3,
+      "profile": "legacy",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 1024,
+        "height": 768
+      },
+      "renderResolution": {
+        "width": 1024,
+        "height": 768
+      },
+      "visibleTiles": {
+        "width": 16,
+        "height": 12
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-desktop-landscape-1280x720-dpr-3.png",
+      "sha256": "6d37c301715367b26ee1a843035301f66222514ec7bd8d569e1d834df5afc088"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "requestedDpr": 3,
+      "profile": "legacy",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 1024,
+        "height": 768
+      },
+      "renderResolution": {
+        "width": 1024,
+        "height": 768
+      },
+      "visibleTiles": {
+        "width": 16,
+        "height": 12
+      },
+      "cameraZoom": 1,
+      "screenshot": "screenshots/legacy-desktop-fullhd-1920x1080-dpr-3.png",
+      "sha256": "b1e6de25bfbdde9a41f5f0dd298579762d696075eb960e8bbb4316c54c7e1620"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "requestedDpr": 1,
+      "profile": "pixel32",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-phone-portrait-390x844-dpr-1.png",
+      "sha256": "e8b21665dd10edacddc4fa2126624f37eee4032f4c30ab40b7deae699f393258"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390
+      },
+      "requestedDpr": 1,
+      "profile": "pixel32",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 448,
+        "height": 352
+      },
+      "renderResolution": {
+        "width": 448,
+        "height": 352
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-phone-landscape-844x390-dpr-1.png",
+      "sha256": "95a2cfd18a223c364066e7a08314af219f749b1287e05ec5ae2b51ca2b7310f4"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "requestedDpr": 1,
+      "profile": "pixel32",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 224
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 224
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-tablet-portrait-768x1024-dpr-1.png",
+      "sha256": "aee22afbd2da67f6757fb48e61579a25886865e7245a4534049709f0f173ae69"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1,
+      "profile": "pixel32",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-desktop-landscape-1280x720-dpr-1.png",
+      "sha256": "2e96d977c1cbe536306989e465e40eb6bc162b6e29451b36475f74091043a3c6"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "requestedDpr": 1,
+      "profile": "pixel32",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 480
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 480
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 15
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-desktop-fullhd-1920x1080-dpr-1.png",
+      "sha256": "01eba9c9c7aaccd32e27b00aee18df8008ea13d2e04d7acd58fe62ada77260c8"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "requestedDpr": 2,
+      "profile": "pixel32",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-phone-portrait-390x844-dpr-2.png",
+      "sha256": "e8b21665dd10edacddc4fa2126624f37eee4032f4c30ab40b7deae699f393258"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390
+      },
+      "requestedDpr": 2,
+      "profile": "pixel32",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 448,
+        "height": 352
+      },
+      "renderResolution": {
+        "width": 448,
+        "height": 352
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-phone-landscape-844x390-dpr-2.png",
+      "sha256": "95a2cfd18a223c364066e7a08314af219f749b1287e05ec5ae2b51ca2b7310f4"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "requestedDpr": 2,
+      "profile": "pixel32",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 224
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 224
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-tablet-portrait-768x1024-dpr-2.png",
+      "sha256": "aee22afbd2da67f6757fb48e61579a25886865e7245a4534049709f0f173ae69"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 2,
+      "profile": "pixel32",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-desktop-landscape-1280x720-dpr-2.png",
+      "sha256": "2e96d977c1cbe536306989e465e40eb6bc162b6e29451b36475f74091043a3c6"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "requestedDpr": 2,
+      "profile": "pixel32",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 480
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 480
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 15
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-desktop-fullhd-1920x1080-dpr-2.png",
+      "sha256": "01eba9c9c7aaccd32e27b00aee18df8008ea13d2e04d7acd58fe62ada77260c8"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "requestedDpr": 3,
+      "profile": "pixel32",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-phone-portrait-390x844-dpr-3.png",
+      "sha256": "e8b21665dd10edacddc4fa2126624f37eee4032f4c30ab40b7deae699f393258"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390
+      },
+      "requestedDpr": 3,
+      "profile": "pixel32",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 448,
+        "height": 352
+      },
+      "renderResolution": {
+        "width": 448,
+        "height": 352
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-phone-landscape-844x390-dpr-3.png",
+      "sha256": "18e29b72f4beedf05bb6d4599193cf403f2432414b2c31ef51583b5d38fc28a0"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "requestedDpr": 3,
+      "profile": "pixel32",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 224
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 224
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-tablet-portrait-768x1024-dpr-3.png",
+      "sha256": "aee22afbd2da67f6757fb48e61579a25886865e7245a4534049709f0f173ae69"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 3,
+      "profile": "pixel32",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-desktop-landscape-1280x720-dpr-3.png",
+      "sha256": "2e96d977c1cbe536306989e465e40eb6bc162b6e29451b36475f74091043a3c6"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "requestedDpr": 3,
+      "profile": "pixel32",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 480
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 480
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 15
+      },
+      "cameraZoom": 0.5,
+      "screenshot": "screenshots/pixel32-desktop-fullhd-1920x1080-dpr-3.png",
+      "sha256": "01eba9c9c7aaccd32e27b00aee18df8008ea13d2e04d7acd58fe62ada77260c8"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "requestedDpr": 1,
+      "profile": "pixel16",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 144,
+        "height": 208
+      },
+      "renderResolution": {
+        "width": 144,
+        "height": 208
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-phone-portrait-390x844-dpr-1.png",
+      "sha256": "b8c549bfce0379c4b7bab8cfada3a7e38a7c6a80aa420a291e02b02378e2c988"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390
+      },
+      "requestedDpr": 1,
+      "profile": "pixel16",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 224,
+        "height": 176
+      },
+      "renderResolution": {
+        "width": 224,
+        "height": 176
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-phone-landscape-844x390-dpr-1.png",
+      "sha256": "b4df0f5d38bf394066b3f8e65ea309855e5ec65e813af8111412eeba2fd17139"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "requestedDpr": 1,
+      "profile": "pixel16",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 144,
+        "height": 112
+      },
+      "renderResolution": {
+        "width": 144,
+        "height": 112
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-tablet-portrait-768x1024-dpr-1.png",
+      "sha256": "caeb6005e2e1131fb06d1f1fec0c65676317dc2a49a39d9a889576bbd756b118"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1,
+      "profile": "pixel16",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 272,
+        "height": 208
+      },
+      "renderResolution": {
+        "width": 272,
+        "height": 208
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 13
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-desktop-landscape-1280x720-dpr-1.png",
+      "sha256": "998502e76d284675728a0ff229e5a4887be051c8aadcc1e43b46ccda8d71339e"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "requestedDpr": 1,
+      "profile": "pixel16",
+      "browserDpr": 1,
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 272,
+        "height": 240
+      },
+      "renderResolution": {
+        "width": 272,
+        "height": 240
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 15
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-desktop-fullhd-1920x1080-dpr-1.png",
+      "sha256": "ba71e3460580815d4ac1f2aeaf53f76d3973e975d28b7478aaedf4d2a379a6b5"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "requestedDpr": 2,
+      "profile": "pixel16",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 144,
+        "height": 208
+      },
+      "renderResolution": {
+        "width": 144,
+        "height": 208
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-phone-portrait-390x844-dpr-2.png",
+      "sha256": "b8c549bfce0379c4b7bab8cfada3a7e38a7c6a80aa420a291e02b02378e2c988"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390
+      },
+      "requestedDpr": 2,
+      "profile": "pixel16",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 224,
+        "height": 176
+      },
+      "renderResolution": {
+        "width": 224,
+        "height": 176
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-phone-landscape-844x390-dpr-2.png",
+      "sha256": "b4df0f5d38bf394066b3f8e65ea309855e5ec65e813af8111412eeba2fd17139"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "requestedDpr": 2,
+      "profile": "pixel16",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 144,
+        "height": 112
+      },
+      "renderResolution": {
+        "width": 144,
+        "height": 112
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-tablet-portrait-768x1024-dpr-2.png",
+      "sha256": "caeb6005e2e1131fb06d1f1fec0c65676317dc2a49a39d9a889576bbd756b118"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 2,
+      "profile": "pixel16",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 272,
+        "height": 208
+      },
+      "renderResolution": {
+        "width": 272,
+        "height": 208
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 13
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-desktop-landscape-1280x720-dpr-2.png",
+      "sha256": "998502e76d284675728a0ff229e5a4887be051c8aadcc1e43b46ccda8d71339e"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "requestedDpr": 2,
+      "profile": "pixel16",
+      "browserDpr": 2,
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 272,
+        "height": 240
+      },
+      "renderResolution": {
+        "width": 272,
+        "height": 240
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 15
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-desktop-fullhd-1920x1080-dpr-2.png",
+      "sha256": "ba71e3460580815d4ac1f2aeaf53f76d3973e975d28b7478aaedf4d2a379a6b5"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844
+      },
+      "requestedDpr": 3,
+      "profile": "pixel16",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 144,
+        "height": 208
+      },
+      "renderResolution": {
+        "width": 144,
+        "height": 208
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-phone-portrait-390x844-dpr-3.png",
+      "sha256": "b8c549bfce0379c4b7bab8cfada3a7e38a7c6a80aa420a291e02b02378e2c988"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390
+      },
+      "requestedDpr": 3,
+      "profile": "pixel16",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 224,
+        "height": 176
+      },
+      "renderResolution": {
+        "width": 224,
+        "height": 176
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-phone-landscape-844x390-dpr-3.png",
+      "sha256": "34ea065312cb2f6a7b76b744863be25eca564696b38bbe426eac2a8d5e8cbf3c"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024
+      },
+      "requestedDpr": 3,
+      "profile": "pixel16",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 144,
+        "height": 112
+      },
+      "renderResolution": {
+        "width": 144,
+        "height": 112
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-tablet-portrait-768x1024-dpr-3.png",
+      "sha256": "caeb6005e2e1131fb06d1f1fec0c65676317dc2a49a39d9a889576bbd756b118"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 3,
+      "profile": "pixel16",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 272,
+        "height": 208
+      },
+      "renderResolution": {
+        "width": 272,
+        "height": 208
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 13
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-desktop-landscape-1280x720-dpr-3.png",
+      "sha256": "998502e76d284675728a0ff229e5a4887be051c8aadcc1e43b46ccda8d71339e"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "requestedDpr": 3,
+      "profile": "pixel16",
+      "browserDpr": 3,
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 272,
+        "height": 240
+      },
+      "renderResolution": {
+        "width": 272,
+        "height": 240
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 15
+      },
+      "cameraZoom": 0.25,
+      "screenshot": "screenshots/pixel16-desktop-fullhd-1920x1080-dpr-3.png",
+      "sha256": "ba71e3460580815d4ac1f2aeaf53f76d3973e975d28b7478aaedf4d2a379a6b5"
+    }
+  ]
+}

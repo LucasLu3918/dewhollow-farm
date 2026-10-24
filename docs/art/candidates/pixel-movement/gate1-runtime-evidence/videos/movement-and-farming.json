@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "claim": "Chromium input timeline and recording; simultaneous directions use the existing grid input resolver and do not imply diagonal world movement.",
+  "recordings": [
+    {
+      "profile": "legacy",
+      "video": "videos/legacy-movement-and-farming.webm",
+      "viewport": "390x844 CSS px",
+      "dpr": 2,
+      "start": {
+        "x": 7,
+        "y": 9,
+        "actorIds": [
+          "player",
+          "cat"
+        ],
+        "followers": [
+          {
+            "id": "cat",
+            "x": 7,
+            "y": 8
+          }
+        ]
+      },
+      "events": [
+        {
+          "event": "idle",
+          "elapsedMs": 823,
+          "tile": {
+            "x": 7,
+            "y": 9,
+            "actorIds": [
+              "player",
+              "cat"
+            ],
+            "followers": [
+              {
+                "id": "cat",
+                "x": 7,
+                "y": 8
+              }
+            ]
+          }
+        },
+        {
+          "event": "held-right-10-tiles",
+          "elapsedMs": 3221,
+          "tile": {
+            "x": 17,
+            "y": 9
+          },
+          "followers": [
+            {
+              "id": "cat",
+              "x": 16,
+              "y": 9
+            }
+          ]
+        },
+        {
+          "event": "held-left-return",
+          "elapsedMs": 4850,
+          "tile": {
+            "x": 7,
+            "y": 9,
+            "facing": "left"
+          }
+        },
+        {
+          "event": "four-direction-turns",
+          "elapsedMs": 6298,
+          "tile": {
+            "x": 7,
+            "y": 9,
+            "facing": "left"
+          }
+        },
+        {
+          "event": "simultaneous-up-right-resolves-through-grid-input",
+          "elapsedMs": 6868,
+          "before": {
+            "x": 7,
+            "y": 9,
+            "facing": "left"
+          },
+          "after": {
+            "x": 8,
+            "y": 7,
+            "facing": "up"
+          }
+        },
+        {
+          "event": "hoe-farm-plot",
+          "elapsedMs": 9434,
+          "tile": {
+            "x": 7,
+            "y": 5,
+            "facing": "up"
+          },
+          "energy": "98 / 100"
+        }
+      ],
+      "output": "Chromium Playwright emulation; existing game assets remain active."
+    },
+    {
+      "profile": "pixel32",
+      "video": "videos/pixel32-movement-and-farming.webm",
+      "viewport": "390x844 CSS px",
+      "dpr": 2,
+      "start": {
+        "x": 7,
+        "y": 9,
+        "actorIds": [
+          "player",
+          "cat"
+        ],
+        "followers": [
+          {
+            "id": "cat",
+            "x": 7,
+            "y": 8
+          }
+        ]
+      },
+      "events": [
+        {
+          "event": "idle",
+          "elapsedMs": 832,
+          "tile": {
+            "x": 7,
+            "y": 9,
+            "actorIds": [
+              "player",
+              "cat"
+            ],
+            "followers": [
+              {
+                "id": "cat",
+                "x": 7,
+                "y": 8
+              }
+            ]
+          }
+        },
+        {
+          "event": "held-right-10-tiles",
+          "elapsedMs": 3255,
+          "tile": {
+            "x": 17,
+            "y": 9
+          },
+          "followers": [
+            {
+              "id": "cat",
+              "x": 16,
+              "y": 9
+            }
+          ]
+        },
+        {
+          "event": "held-left-return",
+          "elapsedMs": 4883,
+          "tile": {
+            "x": 7,
+            "y": 9,
+            "facing": "left"
+          }
+        },
+        {
+          "event": "four-direction-turns",
+          "elapsedMs": 6330,
+          "tile": {
+            "x": 7,
+            "y": 9,
+            "facing": "left"
+          }
+        },
+        {
+          "event": "simultaneous-up-right-resolves-through-grid-input",
+          "elapsedMs": 7156,
+          "before": {
+            "x": 7,
+            "y": 9,
+            "facing": "left"
+          },
+          "after": {
+            "x": 8,
+            "y": 6,
+            "facing": "up"
+          }
+        },
+        {
+          "event": "hoe-farm-plot",
+          "elapsedMs": 10099,
+          "tile": {
+            "x": 7,
+            "y": 5,
+            "facing": "up"
+          },
+          "energy": "98 / 100"
+        }
+      ],
+      "output": "Chromium Playwright emulation; existing game assets remain active."
+    },
+    {
+      "profile": "pixel16",
+      "video": "videos/pixel16-movement-and-farming.webm",
+      "viewport": "390x844 CSS px",
+      "dpr": 2,
+      "start": {
+        "x": 7,
+        "y": 9,
+        "actorIds": [
+          "player",
+          "cat"
+        ],
+        "followers": [
+          {
+            "id": "cat",
+            "x": 7,
+            "y": 8
+          }
+        ]
+      },
+      "events": [
+        {
+          "event": "idle",
+          "elapsedMs": 856,
+          "tile": {
+            "x": 7,
+            "y": 9,
+            "actorIds": [
+              "player",
+              "cat"
+            ],
+            "followers": [
+              {
+                "id": "cat",
+                "x": 7,
+                "y": 8
+              }
+            ]
+          }
+        },
+        {
+          "event": "held-right-10-tiles",
+          "elapsedMs": 3239,
+          "tile": {
+            "x": 17,
+            "y": 9
+          },
+          "followers": [
+            {
+              "id": "cat",
+              "x": 16,
+              "y": 9
+            }
+          ]
+        },
+        {
+          "event": "held-left-return",
+          "elapsedMs": 4887,
+          "tile": {
+            "x": 7,
+            "y": 9,
+            "facing": "left"
+          }
+        },
+        {
+          "event": "four-direction-turns",
+          "elapsedMs": 6338,
+          "tile": {
+            "x": 7,
+            "y": 9,
+            "facing": "left"
+          }
+        },
+        {
+          "event": "simultaneous-up-right-resolves-through-grid-input",
+          "elapsedMs": 7169,
+          "before": {
+            "x": 7,
+            "y": 9,
+            "facing": "left"
+          },
+          "after": {
+            "x": 8,
+            "y": 6,
+            "facing": "up"
+          }
+        },
+        {
+          "event": "hoe-farm-plot",
+          "elapsedMs": 10104,
+          "tile": {
+            "x": 7,
+            "y": 5,
+            "facing": "up"
+          },
+          "energy": "98 / 100"
+        }
+      ],
+      "output": "Chromium Playwright emulation; existing game assets remain active."
+    }
+  ]
+}
