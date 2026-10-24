@@ -16,6 +16,15 @@ const CYCLE_MS = 220;
 const TOOL_DURATION_MS = 420;
 let motionStartedAt = performance.now();
 
+function syncPreviewState(frame = null) {
+  if (!canvas) return;
+  canvas.dataset.direction = state.direction;
+  canvas.dataset.motion = state.motion;
+  if (frame) canvas.dataset.frame = frame;
+  canvas.dataset.impact = String(state.impactSeen);
+  canvas.dataset.reducedMotion = String(state.reducedMotion);
+}
+
 function fail(error) {
   if (errorMessage) {
     errorMessage.hidden = false;
@@ -35,6 +44,7 @@ function startMotion(motion) {
   motionStartedAt = performance.now();
   pressed(document.querySelector('#motions'), 'motion', motion);
   if (impactReadout) impactReadout.textContent = motion === 'tool' ? '工具命中：等待中' : '工具命中：尚未觸發';
+  syncPreviewState();
 }
 
 function draw(time) {
@@ -87,24 +97,20 @@ function draw(time) {
   }
 
   if (frameReadout) frameReadout.textContent = `方向：${{ down: '下', up: '上', left: '左', right: '右' }[state.direction]} · 狀態：${state.motion === 'walk' ? (state.reducedMotion ? '走路（靜止預覽）' : '走路') : state.motion === 'tool' ? '工具動作' : '站立'} · 幀：${state.motion === 'tool' && state.impactSeen ? `${frame.frame} · 命中` : frame.frame}`;
-  canvas.dataset.direction = state.direction;
-  canvas.dataset.motion = state.motion;
-  canvas.dataset.frame = frame.frame;
-  canvas.dataset.impact = String(state.impactSeen);
-  canvas.dataset.reducedMotion = String(state.reducedMotion);
+  syncPreviewState(frame.frame);
   requestAnimationFrame(draw);
 }
 
-document.querySelector('#directions')?.addEventListener('click', (event) => {
-  const button = event.target.closest('button[data-direction]');
-  if (!button) return;
-  state.direction = button.dataset.direction;
-  pressed(document.querySelector('#directions'), 'direction', state.direction);
-});
-document.querySelector('#motions')?.addEventListener('click', (event) => {
-  const button = event.target.closest('button[data-motion]');
-  if (button) startMotion(button.dataset.motion);
-});
+for (const button of document.querySelectorAll('#directions button[data-direction]')) {
+  button.addEventListener('click', () => {
+    state.direction = button.dataset.direction;
+    pressed(document.querySelector('#directions'), 'direction', state.direction);
+    syncPreviewState();
+  });
+}
+for (const button of document.querySelectorAll('#motions button[data-motion]')) {
+  button.addEventListener('click', () => startMotion(button.dataset.motion));
+}
 if (reducedMotionToggle) reducedMotionToggle.checked = state.reducedMotion;
 reducedMotionPreference.addEventListener('change', (event) => {
   state.reducedMotion = event.matches;

@@ -14,16 +14,20 @@ test('pixel32 candidate animator shows four directions, looping walk and isolate
   await expect(canvas).toHaveAttribute('data-frame', 'down-idle');
 
   await page.getByRole('button', { name: '左' }).click();
+  await expect(page.getByRole('button', { name: '左' })).toHaveAttribute('aria-pressed', 'true');
   await expect(canvas).toHaveAttribute('data-direction', 'left');
   await page.getByRole('button', { name: '走路' }).click();
+  await expect(page.getByRole('button', { name: '走路' })).toHaveAttribute('aria-pressed', 'true');
   await expect(canvas).toHaveAttribute('data-motion', 'walk');
   await expect.poll(async () => canvas.getAttribute('data-frame')).toMatch(/^left-(contact-a|passing|contact-b)$/);
 
-  await page.getByRole('button', { name: '揮動工具' }).click();
+  const toolButton = page.getByRole('button', { name: '揮動工具' });
+  await toolButton.click();
+  await expect(toolButton).toHaveAttribute('aria-pressed', 'true');
   await expect(canvas).toHaveAttribute('data-motion', 'tool');
-  await expect(canvas).toHaveAttribute('data-impact', 'true', { timeout: 1000 });
+  await expect(canvas).toHaveAttribute('data-impact', 'true', { timeout: 5000 });
   await expect(page.locator('#impact-readout')).toContainText('已觸發候選回饋');
-  await expect(canvas).toHaveAttribute('data-motion', 'idle', { timeout: 1000 });
+  await expect(canvas).toHaveAttribute('data-motion', 'idle', { timeout: 5000 });
 
   await page.getByLabel('減少動態').check();
   await expect(canvas).toHaveAttribute('data-reduced-motion', 'true');

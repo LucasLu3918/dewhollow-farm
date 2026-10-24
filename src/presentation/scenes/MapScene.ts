@@ -76,6 +76,12 @@ import { ContinuousFarmActions, farmActionTarget } from '../continuous-farm-acti
 import { calculatePixelViewportPolicy } from '../pixel-viewport/policy';
 import { renderProfileFor } from '../pixel-viewport/profiles';
 import { resolveCandidateArt, type CandidateCropStage, type CandidateId } from '../candidate-art';
+import { candidateFrameAt, type CandidateDirection } from '../candidate-sprite-animator';
+import {
+  PIXEL32_ANIMATION_ATLAS_KEY,
+  PIXEL32_MAP_ATLAS_KEY,
+  pixel32MapFrameFor,
+} from '../pixel32-candidate-runtime';
 import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
 import { advanceMovement, cancelMovement, commitStep, createMovementScheduler, queueMovementTap, rejectStep, requestNextStep, setMovementIntent, type MovementSchedulerState } from '../movement-scheduler/movement-scheduler';
 
@@ -282,6 +288,8 @@ declare global {
       };
       /** 貼圖的原始圖片大小；占位圖與入庫圖片可以由此分辨。 */
       textureSize(key: string): { width: number; height: number } | null;
+      /** DEV-only pixel32 runtime candidate load state and the visible player animation frame. */
+      pixel32CandidateRuntime(): { enabled: boolean; mapFrames: string[]; animationFrames: string[]; playerFrame: string | null };
       /** 玩家目前的走路姿勢（見 walk-pose.ts）。 */
       pose(): { y: number; rotation: number; scaleX: number; scaleY: number; legA: number; legB: number; stretch: number };
       /** 玩家骨架目前的方向、腳的做法與看得見的切塊。 */
@@ -331,6 +339,8 @@ export class MapScene extends Phaser.Scene {
   private interactionTargetGfx: Phaser.GameObjects.Graphics | null = null;
   private interactionTargetCell: Point | null = null;
   private rig!: CharacterRig;
+  private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
+  private pixel32CandidateRuntime = false;
   /** 目前地圖上的居民（依行程站位），見 syncResidents。毛毛有骨架，其他人是占位。 */
   private npcRigs = new Map<string, ResidentView>();
   /** 居民的最新行程目標與路線代次；行程變動時先走完當前一步，再重新規劃。 */
@@ -513,6 +523,19 @@ export class MapScene extends Phaser.Scene {
     // 玩家骨架：腳底中心站在格子底邊中央，上半身與腳分開動作。
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
     this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
+    this.pixel32CandidateRuntime = this.registry.get('gate1-pixel32-candidate-runtime') === true;
+    if (this.pixel32CandidateRuntime && this.textures.exists(PIXEL32_ANIMATION_ATLAS_KEY)
+      && this.textures.get(PIXEL32_ANIMATION_ATLAS_KEY).has('down-idle')) {
+      // Keep the rig root as the authoritative movement/camera/depth anchor while swapping only its visible body.
+      this.rig.body.setVisible(false);
+      this.pixel32CandidateSprite = this.add
+        .image(0, 0, PIXEL32_ANIMATION_ATLAS_KEY, 'down-idle')
+        .setOrigin(0.5, 47 / 48)
+        .setScale(2);
+      this.rig.root.add(this.pixel32CandidateSprite);
+    } else {
+      this.pixel32CandidateRuntime = false;
+    }
     const initialPlayer = this.deps.session.state.player;
     this.movementScheduler = createMovementScheduler({ x: initialPlayer.x, y: initialPlayer.y }, {
       initialFacing: initialPlayer.facing,
@@ -532,6 +555,8 @@ export class MapScene extends Phaser.Scene {
       this.continuousFarmActions.stop('scene-shutdown');
       // Phaser may already have removed the DisplayList; settle animation promises without drawing shutdown impacts.
       this.rig.shutdown();
+      this.pixel32CandidateSprite?.destroy();
+      this.pixel32CandidateSprite = null;
       for (const rig of this.npcRigs.values()) if (rig instanceof CharacterRig) rig.shutdown();
       this.residentWalks.clear();
       for (const state of this.companions.values()) state.rig.shutdown();
@@ -679,6 +704,16 @@ export class MapScene extends Phaser.Scene {
           const source = this.textures.get(key).getSourceImage();
           return { width: source.width, height: source.height };
         },
+        pixel32CandidateRuntime: () => ({
+          enabled: this.pixel32CandidateRuntime,
+          mapFrames: this.pixel32CandidateRuntime && this.textures.exists(PIXEL32_MAP_ATLAS_KEY)
+            ? this.textures.get(PIXEL32_MAP_ATLAS_KEY).getFrameNames()
+            : [],
+          animationFrames: this.pixel32CandidateRuntime && this.textures.exists(PIXEL32_ANIMATION_ATLAS_KEY)
+            ? this.textures.get(PIXEL32_ANIMATION_ATLAS_KEY).getFrameNames()
+            : [],
+          playerFrame: this.pixel32CandidateSprite?.frame.name ?? null,
+        }),
       };
     }
   }
@@ -1487,6 +1522,9 @@ export class MapScene extends Phaser.Scene {
     const tint = seasonGrassTint(season);
     for (const sprite of this.tileSprites) {
       if (sprite.groundImage.texture.key === 'tile.grass') sprite.groundImage.setTint(tint);
+      else if (this.pixel32CandidateRuntime && sprite.groundImage.texture.key === PIXEL32_MAP_ATLAS_KEY) {
+        this.applyAsset(sprite.groundImage, `tile.${sprite.ground}`);
+      }
     }
   }
 
@@ -1554,7 +1592,9 @@ export class MapScene extends Phaser.Scene {
       const ground = isGroundLayer(kind) ? kind : sprite.ground;
       const groundKey = `tile.${ground}`;
       if (sprite.groundImage.texture.key !== groundKey) this.applyAsset(sprite.groundImage, groundKey);
-      if (ground === 'grass' && this.shownSeason) sprite.groundImage.setTint(seasonGrassTint(this.shownSeason));
+      if (ground === 'grass' && this.shownSeason && sprite.groundImage.texture.key !== PIXEL32_MAP_ATLAS_KEY) {
+        sprite.groundImage.setTint(seasonGrassTint(this.shownSeason));
+      }
       else sprite.groundImage.clearTint();
 
       if (isGroundLayer(kind)) {
@@ -1757,6 +1797,12 @@ export class MapScene extends Phaser.Scene {
       if (!this.movementScheduler.step && !this.movementScheduler.pendingRequest) this.requestMovementStep();
       this.runDeferredPlayerAction();
     }
+    if (this.pixel32CandidateSprite) {
+      const direction = (this.movementScheduler?.step?.direction ?? this.movementScheduler?.facing ?? this.shownFacing) as CandidateDirection;
+      const motion = this.movementScheduler?.step ? 'walk' : 'idle';
+      const frame = candidateFrameAt(direction, motion, time).frame;
+      if (this.pixel32CandidateSprite.frame.name !== frame) this.pixel32CandidateSprite.setFrame(frame);
+    }
     this.moveWearBadge();
     for (const rig of this.npcRigs.values()) rig.update(delta);
     for (const state of this.companions.values()) state.rig.update(delta);
@@ -1825,6 +1871,14 @@ export class MapScene extends Phaser.Scene {
    * 並記下基準縮放，讓壓扁伸展等效果以它為準。
    */
   private applyAsset(image: Phaser.GameObjects.Image, assetId: string): void {
+    const pixel32Frame = this.pixel32MapFrame(assetId, image.x, image.y);
+    if (pixel32Frame) {
+      image.setTexture(PIXEL32_MAP_ATLAS_KEY, pixel32Frame);
+      image.setFlipX(false);
+      image.setScale(2);
+      image.setData('baseScale', 2);
+      return;
+    }
     const candidate = this.resolveCandidateFrame(assetId);
     if (candidate) {
       image.setTexture(candidate.atlas, candidate.frame);
@@ -1921,6 +1975,14 @@ export class MapScene extends Phaser.Scene {
 
   /** 格子的圖：2x 母版以 0.5 倍顯示，仍是 64 px 的格子（占位圖的縮放是 1）。 */
   private image(key: string, x: number, y: number, depth: number, cropStage?: CandidateCropStage): Phaser.GameObjects.Image {
+    const pixel32Frame = this.pixel32MapFrame(key, x * TILE_SIZE, y * TILE_SIZE);
+    if (pixel32Frame) {
+      return this.add
+        .image(x * TILE_SIZE, y * TILE_SIZE, PIXEL32_MAP_ATLAS_KEY, pixel32Frame)
+        .setOrigin(0)
+        .setScale(2)
+        .setDepth(depth);
+    }
     const candidate = this.resolveCandidateFrame(key, cropStage);
     if (candidate) {
       return this.add
@@ -1935,5 +1997,22 @@ export class MapScene extends Phaser.Scene {
       .setOrigin(0)
       .setScale(scale)
       .setDepth(depth);
+  }
+
+  private pixel32MapFrame(assetId: string, worldX: number, worldY: number): string | null {
+    if (!this.pixel32CandidateRuntime || !this.textures.exists(PIXEL32_MAP_ATLAS_KEY)) return null;
+    const map = this.deps.index.map(this.deps.session.state.mapId);
+    const frame = pixel32MapFrameFor(
+      assetId,
+      this.deps.session.state.calendar.season,
+      map,
+      Math.round(worldX / TILE_SIZE),
+      Math.round(worldY / TILE_SIZE),
+      (tileX, tileY) => {
+        const tile = tileAt(map, tileX, tileY);
+        return tile ? effectiveKind(tile.kind, changeAt(this.deps.session.state.worldChanges, map.id, tileX, tileY)) : null;
+      },
+    );
+    return frame && this.textures.get(PIXEL32_MAP_ATLAS_KEY).has(frame) ? frame : null;
   }
 }

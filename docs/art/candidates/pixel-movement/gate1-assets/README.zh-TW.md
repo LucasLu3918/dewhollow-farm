@@ -35,6 +35,18 @@ npm run assets:gate1:check
 
 整合預覽只用於查看兩組候選在同一個 15×9 示範畫面中的配色、步態與遮擋。它不是正式 Phaser runtime，也不取代 Gate 1 所需的同一份遊戲地圖、農務操作、完整 viewport／DPR 或實機驗收。
 
+### MapScene QA 候選 runtime
+
+開發伺服器可用以下明確 opt-in，在正式 `MapScene` 檢視 pixel32 地圖與玩家四向動畫候選：
+
+```text
+/?renderProfile=pixel32&gate1Runtime=pixel32-map-animation
+```
+
+此模式只在 DEV 載入 `pixel32-map` 與 `pixel32-animation` 的候選 atlas。兩份 manifest 必須維持 `status: candidate`、`approved: false`，否則 atlas 不會註冊。它沿用正式 farm 地圖、移動與農務指令；地圖表面依季節取候選 frame，田地邊緣依四向相鄰地格取 autotile frame。玩家骨架 root 繼續作為位置與鏡頭錨點，僅替換可見角色圖。
+
+這是 QA-only 的部分覆蓋：建築、樹、土壤、作物、NPC、夥伴與工具仍使用既有素材；候選角色只呈現 idle／walk 四向影格，不會承接骨架的揮工具表演。正式建置不載入上述 atlas，未帶完整 opt-in 的開發畫面也維持原路由。此預覽不代表 Gate 1、實機表現或正式素材核准。
+
 ## 尚缺 Gate 1 證據
 
 目前只有 tiles 與核心角色／寵物的少量靜態樣張。仍需整合到同一份 12×10 固定農場資料，完成地形接縫和組合檢查、四方向動作與 10 格移動錄影、農地操作、遮擋、寵物跟隨，以及指定 5 種 viewport × DPR 1/2/3 的遊戲畫面。主角只有向下 idle／walk 姿勢，沒有完整方向與動畫影格；三階作物目前是透明覆蓋樣張；樹、房屋、柵欄、工具、陰影亦只供場景組合初看。未做真實手機辨識度或效能測試。
