@@ -75,6 +75,7 @@ import { ToolSeedSelector } from '../tool-seed-selector';
 import { ContinuousFarmActions, farmActionTarget } from '../continuous-farm-actions';
 import { calculatePixelViewportPolicy } from '../pixel-viewport/policy';
 import { renderProfileFor } from '../pixel-viewport/profiles';
+import { resolveCandidateArt, type CandidateCropStage, type CandidateId } from '../candidate-art';
 import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
 import { advanceMovement, cancelMovement, commitStep, createMovementScheduler, queueMovementTap, rejectStep, requestNextStep, setMovementIntent, type MovementSchedulerState } from '../movement-scheduler/movement-scheduler';
 
@@ -199,6 +200,7 @@ const FOLLOW_LERP = 0.15;
 /** 開發模式下供端對端測試讀取的畫面資訊；正式建置會被移除。 */
 interface SpriteDebugInfo {
   key: string;
+  frame: string | null;
   left: number;
   top: number;
   width: number;
@@ -270,6 +272,14 @@ declare global {
       mapId(): string;
       /** 玩家與地圖上所有圖片的貼圖名稱與畫面範圍（世界座標）。 */
       sprites(): SpriteDebugInfo[];
+      /** 開發用候選貼圖啟用狀態、實際覆蓋 key 與 fallback 清單。 */
+      candidateArt(): {
+        profile: string;
+        candidate: CandidateId | null;
+        candidateAssetIds: string[];
+        fallbackAssetIds: string[];
+        registeredFrames: string[];
+      };
       /** 貼圖的原始圖片大小；占位圖與入庫圖片可以由此分辨。 */
       textureSize(key: string): { width: number; height: number } | null;
       /** 玩家目前的走路姿勢（見 walk-pose.ts）。 */
@@ -620,6 +630,7 @@ export class MapScene extends Phaser.Scene {
         cameraView: () => ({ x: camera.x, y: camera.y, width: camera.width / camera.zoom, height: camera.height / camera.zoom, zoom: camera.zoom, bounds: { ...camera.getBounds() } }),
         mapId: () => this.deps.session.state.mapId,
         sprites: () => this.debugSprites(),
+        candidateArt: () => this.candidateArtDebugInfo(),
         pose: () => ({ ...this.rig.currentPose() }),
         rig: () => {
           const { view, mode, visible } = this.rig.debugInfo();
@@ -705,6 +716,38 @@ export class MapScene extends Phaser.Scene {
       actualWorldTilesVisible: { width: camera.width / camera.zoom / TILE_SIZE, height: camera.height / camera.zoom / TILE_SIZE },
       actualCanvasResolution: { width: this.game.canvas.width, height: this.game.canvas.height },
       cameraZoom: camera.zoom,
+    };
+  }
+
+  private currentRenderProfile() {
+    return renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
+  }
+
+  private resolveCandidateFrame(assetId: string, cropStage?: CandidateCropStage) {
+    const candidate = resolveCandidateArt(this.currentRenderProfile().id, assetId, cropStage);
+    const activeCandidate = this.registry.get('gate1-candidate-id') as CandidateId | null | undefined;
+    if (!candidate || candidate.candidate !== activeCandidate || !this.textures.exists(candidate.atlas)) return null;
+    return this.textures.get(candidate.atlas).has(candidate.frame) ? candidate : null;
+  }
+
+  private candidateArtDebugInfo() {
+    const profile = this.currentRenderProfile().id;
+    const activeCandidate = this.registry.get('gate1-candidate-id') as CandidateId | null | undefined ?? null;
+    const candidateAssetIds = this.deps.assets.assets
+      .filter((entry) => this.resolveCandidateFrame(entry.id) !== null)
+      .map((entry) => entry.id);
+    const fallbackAssetIds = this.deps.assets.assets
+      .filter((entry) => this.resolveCandidateFrame(entry.id) === null)
+      .map((entry) => entry.id);
+    const texture = this.textures.exists('gate1-candidate-atlas')
+      ? this.textures.get('gate1-candidate-atlas')
+      : null;
+    return {
+      profile,
+      candidate: activeCandidate,
+      candidateAssetIds,
+      fallbackAssetIds,
+      registeredFrames: texture ? Object.keys(texture.frames).filter((key) => key !== '__BASE') : [],
     };
   }
 
@@ -1672,8 +1715,13 @@ export class MapScene extends Phaser.Scene {
       if (plot.crop) {
         const crop = this.deps.index.crop(plot.crop.cropId);
         const ratio = Math.min(1, plot.crop.growthDays / crop.growthDays);
-        const sprite = this.image(`crop.${crop.id}`, x, y, 2);
-        sprite.setScale(0.5 + 0.5 * ratio);
+        const stage: CandidateCropStage = ratio < 0.25 ? 'seed' : ratio < 0.7 ? 'sprout' : 'mature';
+        const sprite = this.image(`crop.${crop.id}`, x, y, 2, stage);
+        const growthScale = 0.5 + 0.5 * ratio;
+        const displayScale = sprite.texture.key === 'gate1-candidate-atlas'
+          ? sprite.scaleX * growthScale
+          : growthScale;
+        sprite.setScale(displayScale);
         sprite.setAlpha(0.5 + 0.5 * ratio);
         sprite.setData('plot', true);
         this.world.add(sprite);
@@ -1777,6 +1825,14 @@ export class MapScene extends Phaser.Scene {
    * 並記下基準縮放，讓壓扁伸展等效果以它為準。
    */
   private applyAsset(image: Phaser.GameObjects.Image, assetId: string): void {
+    const candidate = this.resolveCandidateFrame(assetId);
+    if (candidate) {
+      image.setTexture(candidate.atlas, candidate.frame);
+      image.setFlipX(false);
+      image.setScale(candidate.scale);
+      image.setData('baseScale', candidate.scale);
+      return;
+    }
     const { textureId, flipX, scale } = resolveAsset(this.deps.assets, assetId);
     image.setTexture(textureId);
     image.setFlipX(flipX);
@@ -1797,6 +1853,7 @@ export class MapScene extends Phaser.Scene {
       const bounds = image.getBounds();
       return {
         key: image.texture.key,
+        frame: image.frame?.name ?? null,
         left: Math.round(bounds.x),
         top: Math.round(bounds.y),
         width: Math.round(bounds.width),
@@ -1807,6 +1864,7 @@ export class MapScene extends Phaser.Scene {
     });
     const asSprite = (info: RigDebugInfo, depth: number): SpriteDebugInfo => ({
       key: info.key,
+      frame: null,
       left: info.left,
       top: info.top,
       width: info.width,
@@ -1862,7 +1920,15 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 格子的圖：2x 母版以 0.5 倍顯示，仍是 64 px 的格子（占位圖的縮放是 1）。 */
-  private image(key: string, x: number, y: number, depth: number): Phaser.GameObjects.Image {
+  private image(key: string, x: number, y: number, depth: number, cropStage?: CandidateCropStage): Phaser.GameObjects.Image {
+    const candidate = this.resolveCandidateFrame(key, cropStage);
+    if (candidate) {
+      return this.add
+        .image(x * TILE_SIZE, y * TILE_SIZE, candidate.atlas, candidate.frame)
+        .setOrigin(0)
+        .setScale(candidate.scale)
+        .setDepth(depth);
+    }
     const { textureId, scale } = resolveAsset(this.deps.assets, key);
     return this.add
       .image(x * TILE_SIZE, y * TILE_SIZE, textureId)
