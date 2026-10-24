@@ -64,7 +64,7 @@ import type { View } from '../walk-pose';
 import type { SettingsService } from '../../application/settings';
 import { actionForKey, type ActionId } from '../../domain/keybindings';
 import { SettingsPanel, type SettingsLabels } from '../settings-panel';
-import { TouchControls } from '../touch-controls';
+import { isJoystickMovementSource, TouchControls } from '../touch-controls';
 import type { TouchLabels, TouchText } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
 import type { OpenablePanel } from '../panel-dialog';
@@ -727,7 +727,7 @@ export class MapScene extends Phaser.Scene {
     else this.unifiedMovementInput = holdDirection(this.unifiedMovementInput, source, direction);
     if (this.movementScheduler) {
       this.movementScheduler = setMovementIntent(this.movementScheduler, activeDirection(this.unifiedMovementInput));
-      if (direction !== null && !alreadyHeld
+      if (direction !== null && !alreadyHeld && !isJoystickMovementSource(source)
         && (this.movementScheduler.step || this.movementScheduler.pendingRequest)) {
         this.movementScheduler = queueMovementTap(this.movementScheduler, direction);
       }

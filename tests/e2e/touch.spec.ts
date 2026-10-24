@@ -469,7 +469,13 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
     await send('pointermove', center.x + 58, center.y);
     await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(before.x);
     await send('pointerup', center.x + 58, center.y);
+    const atRelease = await playerPosition(page);
+    await expect.poll(() => page.evaluate(() => {
+      const movement = window.__dewhollow?.movement();
+      return movement && movement.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
+    })).toBe(true);
     const stopped = await playerPosition(page);
+    expect(stopped.x - atRelease.x).toBeLessThanOrEqual(1);
     await page.waitForTimeout(350);
     expect(await playerPosition(page)).toEqual(stopped);
   });
