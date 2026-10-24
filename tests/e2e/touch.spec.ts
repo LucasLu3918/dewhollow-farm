@@ -667,7 +667,8 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
         return Boolean(movementState && !movementState.moving && !movementState.pending && movementState.queuedTaps === 0);
       })).toBe(true);
       const stopped = await playerPosition(page);
-      expect(stopped).toEqual(committedAfter);
+      expect(stopped.x).toBe(committedAfter!.x);
+      expect(stopped.y).toBe(committedAfter!.y);
       if (movement.axis === 'x') expect(stopped.y).toBe(before.y);
       else expect(stopped.x).toBe(before.x);
       await page.waitForTimeout(350);
