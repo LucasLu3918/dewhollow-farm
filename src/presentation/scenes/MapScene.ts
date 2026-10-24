@@ -73,9 +73,19 @@ import { cameraViewportFor } from '../responsive/layout';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
 import { ToolSeedSelector } from '../tool-seed-selector';
 import { ContinuousFarmActions, farmActionTarget } from '../continuous-farm-actions';
+import { calculatePixelViewportPolicy } from '../pixel-viewport/policy';
+import { renderProfileFor } from '../pixel-viewport/profiles';
+import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
+import { advanceMovement, cancelMovement, commitStep, createMovementScheduler, queueMovementTap, rejectStep, requestNextStep, setMovementIntent, type MovementSchedulerState } from '../movement-scheduler/movement-scheduler';
 
 /** 鍵盤事件與虛擬按鍵共用的形狀：只需要按鍵名稱與 preventDefault。 */
 type KeyLike = Pick<KeyboardEvent, 'key' | 'preventDefault'>;
+
+interface DeferredPlayerAction {
+  command: Command;
+  waitForFarmAnimation: boolean;
+  resolve: (outcome: CommandOutcome | null) => void;
+}
 
 export interface MapSceneDeps {
   session: GameSession;
@@ -142,6 +152,7 @@ const COMMAND_ACTIONS: Partial<Record<ActionId, Command>> = {
 };
 
 const MOVE_DURATION_MS = 110;
+const CONTINUOUS_STEP_DURATION_MS = 150;
 
 /** 揮一次工具的時間；命中的那一刻由 tool-swing.ts 的 impactAt 決定。 */
 const SWING_DURATION_MS = 420;
@@ -238,6 +249,17 @@ declare global {
   interface Window {
     __dewhollow?: {
       cameraScroll(): { x: number; y: number };
+      pixelViewport(): {
+        profile: string;
+        worldTilesVisible: { width: number; height: number };
+        renderResolution: { width: number; height: number };
+        cssScale: number;
+        devicePixelScale: number;
+        actualWorldTilesVisible: { width: number; height: number };
+        actualCanvasResolution: { width: number; height: number };
+        cameraZoom: number;
+      };
+      movement(): { heldDirection: Direction | null; blockedDirection: Direction | null; moving: boolean; pending: boolean; queuedTaps: number; tile: { x: number; y: number } };
       worldGeneration(): number;
       responsiveLayout(): ReturnType<ResponsiveLayoutController['get']>;
       interaction(): ReturnType<typeof resolveInteraction>;
@@ -363,9 +385,20 @@ export class MapScene extends Phaser.Scene {
   private terrainByKind = new Map<string, TerrainDef>();
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
+  private unifiedMovementInput: UnifiedInputState = createUnifiedInputState();
+  private movementScheduler: MovementSchedulerState | null = null;
+  private readonly keyboardMovementSources = new Set<string>();
+  private deferredPlayerAction: DeferredPlayerAction | null = null;
+  private deferredPlayerActionRunning = false;
   private onKeyDown = (event: KeyboardEvent): void => {
     void this.handleKey(event);
   };
+  private onKeyUp = (event: KeyboardEvent): void => {
+    const source = `keyboard:${event.key.toLowerCase()}`;
+    if (!this.keyboardMovementSources.delete(source)) return;
+    this.releaseMovementInput(source);
+  };
+  private onWindowBlur = (): void => this.cancelMovementInput();
   /** 設定面板（改按鍵、字級、閃光與震動、觸控）。 */
   private settingsPanel!: SettingsPanel;
   /**
@@ -414,7 +447,8 @@ export class MapScene extends Phaser.Scene {
     this.touchControls = new TouchControls(document, (action) => this.pressAction(action), deps.controls.touchButtons, deps.controls.touchMore, deps.settings, (reason) => {
       this.lastContinuousCancelReason = reason;
       this.continuousFarmActions.stop(`touch-controls:${reason}`);
-    });
+      this.cancelMovementInput();
+    }, (source, direction) => this.setMovementInput(source, direction));
     this.toolSeedSelector = new ToolSeedSelector(document, deps.index, (command) => {
       // Direct selectors use distinct gate actions and preserve the selected ID in the command.
       void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command);
@@ -469,11 +503,22 @@ export class MapScene extends Phaser.Scene {
     // 玩家骨架：腳底中心站在格子底邊中央，上半身與腳分開動作。
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
     this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
+    const initialPlayer = this.deps.session.state.player;
+    this.movementScheduler = createMovementScheduler({ x: initialPlayer.x, y: initialPlayer.y }, {
+      initialFacing: initialPlayer.facing,
+      stepDurationMs: CONTINUOUS_STEP_DURATION_MS,
+      gaitCycleMs: CONTINUOUS_STEP_DURATION_MS * 2,
+    });
     this.createFollowers();
     this.setupCamera();
     window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('keyup', this.onKeyUp);
+    window.addEventListener('blur', this.onWindowBlur);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener('keydown', this.onKeyDown);
+      window.removeEventListener('keyup', this.onKeyUp);
+      window.removeEventListener('blur', this.onWindowBlur);
+      this.cancelMovementInput();
       this.continuousFarmActions.stop('scene-shutdown');
       // Phaser may already have removed the DisplayList; settle animation promises without drawing shutdown impacts.
       this.rig.shutdown();
@@ -502,7 +547,7 @@ export class MapScene extends Phaser.Scene {
 
   /** 天色與天氣的遮罩與粒子：固定在畫面上（不隨鏡頭移動）。 */
   private createSky(): void {
-    const { width, height } = VIEW_SIZE;
+    const { width, height } = this.scale.gameSize;
     // 填色不透明度為 1，明暗只由 setAlpha 控制（填色若為 0 會把 setAlpha 乘成 0，什麼也看不見）。
     this.nightShade = this.add.rectangle(0, 0, width, height, NIGHT_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
     this.weatherShade = this.add.rectangle(0, 0, width, height, WEATHER_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
@@ -513,13 +558,34 @@ export class MapScene extends Phaser.Scene {
   private setupCamera(): void {
     const camera = this.cameras.main;
     const applyLayout = (layout: ReturnType<ResponsiveLayoutController['get']>): void => {
-      const viewport = cameraViewportFor(layout, VIEW_SIZE);
+      const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
+      const pixelViewport = calculatePixelViewportPolicy({
+        container: layout.worldRect,
+        safeArea: layout.safeRect,
+        dpr: window.devicePixelRatio || 1,
+        orientation: layout.orientation,
+        profile: profile.id,
+        input: layout.pointer.coarse ? 'touch' : 'pointer',
+      });
+      const canvasHost = this.game.canvas.parentElement;
+      if (canvasHost) {
+        if (profile.id === 'legacy') delete canvasHost.dataset.pixelProfile;
+        else canvasHost.dataset.pixelProfile = profile.id;
+      }
+      if (profile.id !== 'legacy'
+        && (this.scale.gameSize.width !== pixelViewport.renderResolution.width
+          || this.scale.gameSize.height !== pixelViewport.renderResolution.height)) {
+        this.scale.setGameSize(pixelViewport.renderResolution.width, pixelViewport.renderResolution.height);
+      }
+      const designSize = profile.id === 'legacy' ? VIEW_SIZE : pixelViewport.renderResolution;
+      const viewport = cameraViewportFor(layout, designSize);
       camera.setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
-      camera.setZoom(mapZoomFor({
-        width: layout.safeRect.width,
-        coarse: layout.pointer.coarse,
-        portrait: layout.orientation === 'portrait',
-      }));
+      this.nightShade?.setSize(designSize.width, designSize.height);
+      this.weatherShade?.setSize(designSize.width, designSize.height);
+      const zoom = profile.id === 'legacy'
+        ? mapZoomFor({ width: layout.safeRect.width, coarse: layout.pointer.coarse, portrait: layout.orientation === 'portrait' })
+        : camera.width / (pixelViewport.worldTilesVisible.width * TILE_SIZE);
+      camera.setZoom(zoom);
       const zone = deadzoneOf({ width: camera.width / camera.zoom, height: camera.height / camera.zoom });
       camera.setDeadzone(zone.width, zone.height);
       const state = this.deps.session.state;
@@ -532,6 +598,15 @@ export class MapScene extends Phaser.Scene {
     if (import.meta.env.DEV) {
       window.__dewhollow = {
         cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
+        pixelViewport: () => this.pixelViewportDebugInfo(),
+        movement: () => ({
+          heldDirection: this.movementScheduler?.heldDirection ?? null,
+          blockedDirection: this.movementScheduler?.blockedDirection ?? null,
+          moving: Boolean(this.movementScheduler?.step),
+          pending: Boolean(this.movementScheduler?.pendingRequest),
+          queuedTaps: this.movementScheduler?.queuedTaps.length ?? 0,
+          tile: { ...this.deps.session.state.player },
+        }),
         worldGeneration: () => this.worldGeneration,
         responsiveLayout: () => this.deps.responsive.get(),
         interaction: () => resolveInteraction(this.deps.session.state, this.deps.index),
@@ -610,6 +685,30 @@ export class MapScene extends Phaser.Scene {
     camera.centerOn(center.x, center.y);
   }
 
+  private pixelViewportDebugInfo() {
+    const camera = this.cameras.main;
+    const layout = this.deps.responsive.get();
+    const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
+    const pixelViewport = calculatePixelViewportPolicy({
+      container: layout.worldRect,
+      safeArea: layout.safeRect,
+      dpr: window.devicePixelRatio || 1,
+      orientation: layout.orientation,
+      profile: profile.id,
+      input: layout.pointer.coarse ? 'touch' : 'pointer',
+    });
+    return {
+      profile: profile.id,
+      worldTilesVisible: { ...pixelViewport.worldTilesVisible },
+      renderResolution: { ...pixelViewport.renderResolution },
+      cssScale: pixelViewport.cssScale,
+      devicePixelScale: pixelViewport.devicePixelScale,
+      actualWorldTilesVisible: { width: camera.width / camera.zoom / TILE_SIZE, height: camera.height / camera.zoom / TILE_SIZE },
+      actualCanvasResolution: { width: this.game.canvas.width, height: this.game.canvas.height },
+      cameraZoom: camera.zoom,
+    };
+  }
+
   /** 虛擬按鍵直接送出語意動作；按鍵重綁只影響鍵盤 adapter。 */
   private pressAction(action: ActionId): void {
     if (!isMovementAction(action)) this.continuousFarmActions.stop('non-movement-touch-action');
@@ -620,6 +719,103 @@ export class MapScene extends Phaser.Scene {
     if (this.hasTouchInputBlocker()) return;
     this.touchControls.cancelAll();
     this.toolSeedSelector.open(mode, wheel, this.deps.session.state, pointer);
+  }
+
+  /** Resolve the latest held keyboard/touch direction into one presentation scheduler. */
+  private setMovementInput(source: string, direction: Direction | null): void {
+    const alreadyHeld = this.unifiedMovementInput.heldDirections.some((held) => held.source === source);
+    if (direction === null) this.unifiedMovementInput = releaseDirection(this.unifiedMovementInput, source);
+    else this.unifiedMovementInput = holdDirection(this.unifiedMovementInput, source, direction);
+    if (this.movementScheduler) {
+      this.movementScheduler = setMovementIntent(this.movementScheduler, activeDirection(this.unifiedMovementInput));
+      if (direction !== null && !alreadyHeld
+        && (this.movementScheduler.step || this.movementScheduler.pendingRequest)) {
+        this.movementScheduler = queueMovementTap(this.movementScheduler, direction);
+      }
+    }
+    if (direction !== null) this.requestMovementStep();
+  }
+
+  private releaseMovementInput(source: string): void {
+    this.unifiedMovementInput = releaseDirection(this.unifiedMovementInput, source);
+    if (this.movementScheduler) {
+      this.movementScheduler = setMovementIntent(this.movementScheduler, activeDirection(this.unifiedMovementInput));
+    }
+  }
+
+  /** Clear every source and settle on the authoritative domain tile after focus loss or a blocker. */
+  private cancelMovementInput(): void {
+    this.unifiedMovementInput = cancelUnifiedInput(this.unifiedMovementInput);
+    this.keyboardMovementSources.clear();
+    this.deferredPlayerAction?.resolve(null);
+    this.deferredPlayerAction = null;
+    if (!this.movementScheduler) return;
+    this.movementScheduler = cancelMovement(this.movementScheduler);
+    const player = this.deps.session.state.player;
+    this.movementScheduler = {
+      ...this.movementScheduler,
+      committedTile: { x: player.x, y: player.y },
+      visualPosition: { x: player.x, y: player.y },
+      facing: player.facing,
+    };
+    const stand = standOf(player.x, player.y);
+    this.rig?.root.setPosition(stand.x, stand.y);
+    this.rig?.preview(player.facing, 0, 0);
+  }
+
+  private requestMovementStep(): void {
+    const current = this.movementScheduler;
+    if (!current || this.hasTouchInputBlocker()) return;
+    const proposal = requestNextStep(current);
+    if (!proposal) return;
+    this.movementScheduler = proposal.state;
+    const mapId = this.deps.session.state.mapId;
+    void this.run({ type: 'move', direction: proposal.request.direction }).then((outcome) => {
+      const current = this.movementScheduler;
+      if (!current || current.pendingRequest?.id !== proposal.request.id) return;
+      const state = this.deps.session.state;
+      const player = state.player;
+      const sameMap = state.mapId === mapId;
+      const reachedStep = sameMap && player.x === proposal.request.to.x && player.y === proposal.request.to.y;
+      const teleportedWithinMap = sameMap && (player.x !== proposal.request.from.x || player.y !== proposal.request.from.y)
+        && !reachedStep;
+      if (outcome && reachedStep) {
+        this.movementScheduler = commitStep(current, proposal.request.id);
+      } else if (outcome && teleportedWithinMap) {
+        // A door can change coordinates while keeping the same map ID (the greenhouse is a farm area).
+        this.movementScheduler = createMovementScheduler({ x: player.x, y: player.y }, {
+          initialFacing: player.facing,
+          stepDurationMs: CONTINUOUS_STEP_DURATION_MS,
+          gaitCycleMs: CONTINUOUS_STEP_DURATION_MS * 2,
+        });
+        const stand = standOf(player.x, player.y);
+        this.rig.root.setPosition(stand.x, stand.y);
+        this.rig.preview(player.facing, 0, 0);
+        this.frameCamera(this.deps.index.map(state.mapId), player);
+      } else {
+        this.movementScheduler = rejectStep(current, proposal.request.id);
+      }
+    });
+  }
+
+  private movementIsActive(): boolean {
+    return Boolean(
+      this.movementScheduler?.step
+      || this.movementScheduler?.pendingRequest
+      || this.movementScheduler?.queuedTaps.length
+      || this.movementScheduler?.heldDirection,
+    );
+  }
+
+  private runDeferredPlayerAction(): void {
+    if (this.deferredPlayerActionRunning || this.movementIsActive()) return;
+    const action = this.deferredPlayerAction;
+    if (!action) return;
+    this.deferredPlayerAction = null;
+    this.deferredPlayerActionRunning = true;
+    void this.run(action.command, action.waitForFarmAnimation).then(action.resolve).finally(() => {
+      this.deferredPlayerActionRunning = false;
+    });
   }
 
   /** 目前的效果開關：系統「減少動態」或玩家關掉的效果都不出現（見 accessibility.ts）。 */
@@ -636,6 +832,19 @@ export class MapScene extends Phaser.Scene {
     }
     // 按鍵只查偏好的按鍵表（見 domain/keybindings.ts），不寫死字元。
     const action = actionForKey(this.deps.settings.get().bindings, event.key);
+    const direction = action && action in MOVE_ACTIONS ? MOVE_ACTIONS[action as ActionId] : undefined;
+    if (direction) {
+      if (this.hasTouchInputBlocker()) {
+        event.preventDefault();
+        this.cancelMovementInput();
+        return;
+      }
+      const source = `keyboard:${event.key.toLowerCase()}`;
+      this.keyboardMovementSources.add(source);
+      this.setMovementInput(source, direction);
+      event.preventDefault();
+      return;
+    }
     await this.handleAction(action, event);
   }
 
@@ -750,6 +959,15 @@ export class MapScene extends Phaser.Scene {
     const command: Command | undefined = commandOverride ?? (direction ? { type: 'move', direction } : mappedCommand);
     if (!command) return null;
     event?.preventDefault();
+    if (this.movementIsActive()) {
+      return new Promise((resolve) => {
+        if (this.deferredPlayerAction) {
+          resolve(null);
+          return;
+        }
+        this.deferredPlayerAction = { command, waitForFarmAnimation, resolve };
+      });
+    }
     let run: Promise<CommandOutcome | null>;
     try {
       // run() applies the command synchronously before its first await; keep the gate closed only
@@ -798,7 +1016,7 @@ export class MapScene extends Phaser.Scene {
     const rules = this.deps.index.festivals.find((f) => f.stars)?.stars;
     if (!this.starTimer || !rules) return;
     const elapsed = performance.now() - this.starStartedAt;
-    const x = (VIEW_SIZE.width - STAR_METER_WIDTH) / 2;
+    const x = (this.scale.gameSize.width - STAR_METER_WIDTH) / 2;
     const y = 40;
     this.starMeter.fillStyle(0x000000, 0.5).fillRect(x - 4, y - 4, STAR_METER_WIDTH + 8, 16);
     const zone = rules.zone;
@@ -1082,6 +1300,12 @@ export class MapScene extends Phaser.Scene {
 
     const mapChanged = this.renderedMapId !== map.id;
     if (mapChanged) {
+      this.cancelMovementInput();
+      this.movementScheduler = createMovementScheduler({ x: state.player.x, y: state.player.y }, {
+        initialFacing: state.player.facing,
+        stepDurationMs: CONTINUOUS_STEP_DURATION_MS,
+        gaitCycleMs: CONTINUOUS_STEP_DURATION_MS * 2,
+      });
       this.renderedMapId = map.id;
       this.drawMap(map.id);
       const stand = standOf(state.player.x, state.player.y);
@@ -1459,14 +1683,33 @@ export class MapScene extends Phaser.Scene {
   }
 
   private movePlayer(x: number, y: number): void {
+    if (this.movementScheduler) return;
     const stand = standOf(x, y);
     this.rig.walkTo(stand.x, stand.y, MOVE_DURATION_MS);
   }
 
   override update(time: number, delta: number): void {
-    if (this.hasTouchInputBlocker()) this.touchControls.cancelAll();
+    if (this.hasTouchInputBlocker()) {
+      this.cancelMovementInput();
+      this.touchControls.cancelAll();
+    }
     this.updateSky(time);
     this.rig.update(delta);
+    if (this.movementScheduler) {
+      const wasMoving = this.movementScheduler.step !== null;
+      this.movementScheduler = advanceMovement(this.movementScheduler, delta);
+      const { x, y } = this.movementScheduler.visualPosition;
+      const stand = standOf(x, y);
+      this.rig.root.setPosition(stand.x, stand.y);
+      if (this.movementScheduler.step) {
+        const phase = this.movementScheduler.gaitPhase * 2;
+        if (!this.rig.isBusy()) this.rig.preview(this.movementScheduler.step.direction, Math.floor(phase), phase % 1);
+      } else if (wasMoving && !this.movementIsActive() && !this.rig.isBusy()) {
+        this.rig.preview(this.movementScheduler.facing, 0, 0);
+      }
+      if (!this.movementScheduler.step && !this.movementScheduler.pendingRequest) this.requestMovementStep();
+      this.runDeferredPlayerAction();
+    }
     this.moveWearBadge();
     for (const rig of this.npcRigs.values()) rig.update(delta);
     for (const state of this.companions.values()) state.rig.update(delta);
@@ -1519,7 +1762,7 @@ export class MapScene extends Phaser.Scene {
     const base = weather === 'storm' ? 70 : kind === 'streak' ? 46 : 30;
     const count = prefersReducedMotion() ? Math.ceil(base / 4) : base;
     for (let i = 0; i < count; i += 1) {
-      const p = particlePosition(i, time, VIEW_SIZE.width, VIEW_SIZE.height, kind);
+      const p = particlePosition(i, time, this.scale.gameSize.width, this.scale.gameSize.height, kind);
       if (kind === 'streak') {
         this.weatherGfx.lineStyle(1, 0xcfe6ff, 0.55).lineBetween(p.x, p.y, p.x - 3, p.y + 8);
       } else if (kind === 'flake') {
@@ -1607,7 +1850,12 @@ export class MapScene extends Phaser.Scene {
         height: info.height,
         pose: { ...rig.currentPose() },
         tool: rig.currentTool(),
-        busy: rig.isBusy(),
+        busy: rig.isBusy() || (id === 'player' && Boolean(
+          this.movementScheduler?.step
+          || this.movementScheduler?.pendingRequest
+          || this.movementScheduler?.queuedTaps.length
+          || this.movementScheduler?.heldDirection,
+        )),
         depth: rig.root.depth,
       };
     };

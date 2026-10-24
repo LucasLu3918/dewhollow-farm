@@ -55,6 +55,8 @@ export interface MovementSchedulerState {
   gaitCycleMs: number;
   nextRequestId: number;
   pendingRequest: MovementStepRequest | null;
+/** The one explicit tap buffered during a step, independent of held-direction state. */
+  queuedTaps: readonly Direction[];
 }
 
 export function createMovementScheduler(
@@ -78,6 +80,7 @@ export function createMovementScheduler(
     gaitCycleMs,
     nextRequestId: 1,
     pendingRequest: null,
+    queuedTaps: [],
   };
 }
 
@@ -89,6 +92,7 @@ export function setMovementIntent(state: MovementSchedulerState, direction: Dire
   let preInputDirection = state.preInputDirection;
   if (direction === null) {
     blockedDirection = null;
+    preInputDirection = null;
   } else {
     if (blockedDirection !== direction) blockedDirection = null;
     if (state.step) {
@@ -103,6 +107,11 @@ export function setMovementIntent(state: MovementSchedulerState, direction: Dire
   return { ...state, heldDirection: direction, blockedDirection, preInputDirection };
 }
 
+/** Preserve a discrete key/button tap that arrives while an earlier step is active. */
+export function queueMovementTap(state: MovementSchedulerState, direction: Direction): MovementSchedulerState {
+  return { ...state, queuedTaps: [direction] };
+}
+
 /**
  * Return and reserve at most one grid-step proposal. Calling this from a frame
  * update is safe: an outstanding request suppresses duplicate domain dispatches.
@@ -111,7 +120,8 @@ export function requestNextStep(
   state: MovementSchedulerState,
 ): { state: MovementSchedulerState; request: MovementStepRequest } | null {
   if (state.step || state.pendingRequest) return null;
-  const direction = state.preInputDirection ?? state.heldDirection;
+  const queuedTap = state.queuedTaps[0];
+  const direction = queuedTap ?? state.preInputDirection ?? state.heldDirection;
   if (!direction || direction === state.blockedDirection) return null;
 
   const request: MovementStepRequest = {
@@ -124,6 +134,7 @@ export function requestNextStep(
     state: {
       ...state,
       preInputDirection: null,
+      queuedTaps: queuedTap ? state.queuedTaps.slice(1) : state.queuedTaps,
       nextRequestId: state.nextRequestId + 1,
       pendingRequest: request,
     },
@@ -169,6 +180,7 @@ export function rejectStep(state: MovementSchedulerState, requestId: number): Mo
     facing: request.direction,
     blockedDirection: request.direction,
     pendingRequest: null,
+    queuedTaps: state.queuedTaps.filter((direction) => direction !== request.direction),
   };
 }
 
@@ -217,6 +229,7 @@ export function cancelMovement(state: MovementSchedulerState): MovementScheduler
     preInputDirection: null,
     blockedDirection: null,
     pendingRequest: null,
+    queuedTaps: [],
   };
 }
 

@@ -48,16 +48,17 @@ function targetTileRange(orientation: ViewportOrientation, input: ViewportInput)
  * coordinates, game state, camera state, or the DOM.
  */
 export function calculatePixelViewportPolicy(input: PixelViewportPolicyInput): PixelViewportPolicy {
-  const profile = renderProfileFor(input.profile);
+  const profile = renderProfileFor(input.profile, true);
   const fit = input.fit ?? 'contain';
   const range = targetTileRange(input.orientation, input.input ?? 'pointer');
-  const visibleWidth = Math.round((range.min + range.max) / 2);
+  const visibleWidth = profile.id === 'legacy' ? 16 : Math.round((range.min + range.max) / 2);
   const safeWidth = positiveFinite(Math.min(input.container.width, input.safeArea.width), 1);
   const safeHeight = positiveFinite(Math.min(input.container.height, input.safeArea.height), 1);
-  const safeRatio = safeWidth / safeHeight;
-  const visibleHeight = Math.max(1, Math.round(visibleWidth / safeRatio));
-  const renderWidth = visibleWidth * profile.tilePixels;
-  const renderHeight = visibleHeight * profile.tilePixels;
+  // Candidate canvases match the safe viewport aspect so Phaser does not stretch
+  // a 4:3 backing buffer across the portrait stage.
+  const visibleHeight = profile.id === 'legacy' ? 12 : Math.max(1, Math.round(visibleWidth / (safeWidth / safeHeight)));
+  const renderWidth = profile.id === 'legacy' ? 1024 : visibleWidth * profile.tilePixels;
+  const renderHeight = profile.id === 'legacy' ? 768 : visibleHeight * profile.tilePixels;
   const widthScale = safeWidth / renderWidth;
   const heightScale = safeHeight / renderHeight;
   const cssScale = fit === 'cover' ? Math.max(widthScale, heightScale) : Math.min(widthScale, heightScale);

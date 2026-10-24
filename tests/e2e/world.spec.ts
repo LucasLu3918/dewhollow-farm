@@ -145,6 +145,7 @@ test('the forest\'s north door leads to the mine entrance, where a fallen rock b
   await walk(page, 'ArrowUp', 6);
   await walk(page, 'ArrowUp', 1);
   await expect.poll(() => mapId(page)).toBe('mine-entrance');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.actors().some((actor) => actor.id === 'player') ?? false)).toBe(true);
 
   // 礦坑入口的出生點 (8,8) → 往上到 (8,2)，左一步到 (7,2)，朝上碰到洞口。
   await walk(page, 'ArrowUp', 6);

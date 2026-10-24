@@ -186,6 +186,11 @@ a:focus-visible {
   image-rendering: pixelated;
 }
 
+/* 候選低解析度畫布等比置入，避免被 4:3 舞台拉伸。 */
+.stage[data-pixel-profile] canvas {
+  object-fit: contain;
+}
+
 /* 桌機橫向短視窗：讓遊戲列使用狀態列與回饋列以外的高度，完整顯示首屏。 */
 @media (orientation: landscape) and (min-width: 601px) and (min-height: 521px) {
   .app:has(#touch-controls[hidden]) {

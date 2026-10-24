@@ -3,7 +3,6 @@ import type { Direction } from '../domain/content';
 import type { Handedness, MobileSettings } from '../domain/settings';
 import type { SettingsService } from '../application/settings';
 import {
-  MoveInputScheduler,
   buildTouchButtons,
   directionForJoystick,
   type TouchButton,
@@ -21,6 +20,7 @@ const MOVE_DIRECTION: Partial<Record<ActionId, Direction>> = {
 const JOYSTICK_SIZE = 144;
 const JOYSTICK_RADIUS = JOYSTICK_SIZE / 2 - 24;
 const FLOATING_ACTIVATION_OUTSET = 12;
+const POINTER_SOURCE_PREFIX = 'touch-controls:pointer:';
 
 interface PointerGesture {
   kind: 'move-button' | 'action-button' | 'joystick';
@@ -29,6 +29,30 @@ interface PointerGesture {
 
 export function becameHidden(previous: boolean, current: boolean): boolean {
   return !previous && current;
+}
+
+/** Tracks per-gesture directional holds and emits only source state changes. */
+export class DirectionalHoldEmitter {
+  private readonly active = new Map<string, Direction>();
+
+  constructor(private readonly onMovementInput: (source: string, direction: Direction | null) => void) {}
+
+  set(source: string, direction: Direction): void {
+    if (this.active.get(source) === direction) return;
+    this.active.set(source, direction);
+    this.onMovementInput(source, direction);
+  }
+
+  release(source: string): void {
+    if (!this.active.delete(source)) return;
+    this.onMovementInput(source, null);
+  }
+
+  releaseAll(): void {
+    const sources = [...this.active.keys()];
+    this.active.clear();
+    for (const source of sources) this.onMovementInput(source, null);
+  }
 }
 
 /** DOM adapter for mobile input. Pointer state and repeat timing stay outside game state. */
@@ -40,7 +64,7 @@ export class TouchControls {
   private readonly moreToggle: HTMLButtonElement;
   private readonly morePanel: HTMLElement;
   private readonly gestures = new Map<number, PointerGesture>();
-  private readonly movement: MoveInputScheduler;
+  private readonly directionalHolds: DirectionalHoldEmitter;
   private readonly stopOnResize = (): void => this.cancelAll('viewport-change');
   private readonly stopWhenHidden = (): void => {
     if (this.doc.visibilityState === 'hidden') this.cancelAll('document-hidden');
@@ -54,6 +78,7 @@ export class TouchControls {
   private readonly observer: MutationObserver;
   private readonly unsubscribeSettings: () => void;
   private joystickPointerId: number | null = null;
+  private joystickDirection: Direction | null = null;
   private joystickCenter = { x: 0, y: 0 };
   private joystickStyle: MobileSettings['controlStyle'] = 'dpad';
   private handedness: Handedness = 'right';
@@ -66,13 +91,14 @@ export class TouchControls {
     more: TouchText,
     settings: SettingsService,
     private readonly onCancelAll: (reason: string) => void = () => undefined,
+    onMovementInput: (source: string, direction: Direction | null) => void = () => undefined,
   ) {
     const root = doc.querySelector<HTMLElement>('#touch-controls');
     if (!root) throw new Error('頁面缺少必要元素 #touch-controls');
     this.root = root;
     this.rootWasHidden = root.hidden;
     root.replaceChildren();
-    this.movement = new MoveInputScheduler((direction) => this.onPress(actionForDirection(direction)));
+    this.directionalHolds = new DirectionalHoldEmitter(onMovementInput);
 
     const buttons = buildTouchButtons(labels);
     const common = doc.createElement('div');
@@ -127,7 +153,8 @@ export class TouchControls {
     this.onCancelAll(reason);
     const active = [...this.gestures.entries()];
     this.gestures.clear();
-    this.movement.cancelAll();
+    this.directionalHolds.releaseAll();
+    this.joystickDirection = null;
     this.joystickPointerId = null;
     this.resetJoystick();
     for (const [pointerId, gesture] of active) {
@@ -180,7 +207,7 @@ export class TouchControls {
       const kind = direction ? 'move-button' : 'action-button';
       this.gestures.set(event.pointerId, { kind, target: el });
       this.capture(el, event.pointerId);
-      if (direction) this.movement.setPointer(event.pointerId, direction);
+      if (direction) this.directionalHolds.set(pointerSource(event.pointerId), direction);
       else onPick(entry.action);
     });
     el.addEventListener('pointerup', this.onPointerEnd);
@@ -252,9 +279,10 @@ export class TouchControls {
     }
     const dx = (event.clientX - this.joystickCenter.x) / JOYSTICK_RADIUS;
     const dy = (event.clientY - this.joystickCenter.y) / JOYSTICK_RADIUS;
-    const direction = directionForJoystick(dx, dy, this.movement.activeDirection);
-    if (direction) this.movement.setPointer(event.pointerId, direction);
-    else this.movement.releasePointer(event.pointerId);
+    const direction = directionForJoystick(dx, dy, this.joystickDirection);
+    this.joystickDirection = direction;
+    if (direction) this.directionalHolds.set(pointerSource(event.pointerId), direction);
+    else this.directionalHolds.release(pointerSource(event.pointerId));
 
     const length = Math.hypot(dx, dy);
     const scale = length > 1 ? 1 / length : 1;
@@ -268,9 +296,10 @@ export class TouchControls {
     if (!gesture) return;
     event.preventDefault();
     this.gestures.delete(event.pointerId);
-    this.movement.releasePointer(event.pointerId);
+    this.directionalHolds.release(pointerSource(event.pointerId));
     if (gesture.kind === 'joystick') {
       this.joystickPointerId = null;
+      this.joystickDirection = null;
       this.resetJoystick();
     }
   };
@@ -313,13 +342,8 @@ export class TouchControls {
   }
 }
 
-function actionForDirection(direction: Direction): ActionId {
-  switch (direction) {
-    case 'up': return 'moveUp';
-    case 'down': return 'moveDown';
-    case 'left': return 'moveLeft';
-    case 'right': return 'moveRight';
-  }
+function pointerSource(pointerId: number): string {
+  return `${POINTER_SOURCE_PREFIX}${pointerId}`;
 }
 
 function clamp(value: number, min: number, max: number): number {

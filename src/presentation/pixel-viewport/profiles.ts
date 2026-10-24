@@ -17,6 +17,8 @@ export const RENDER_PROFILES: Readonly<Record<RenderProfileId, RenderProfile>> =
 };
 
 /** Resolve an experiment profile without changing production defaults for unknown input. */
-export function renderProfileFor(id: string | null | undefined): RenderProfile {
-  return id === 'pixel32' || id === 'pixel16' ? RENDER_PROFILES[id] : RENDER_PROFILES.legacy;
+export function renderProfileFor(id: string | null | undefined, allowQaProfiles = false): RenderProfile {
+  return allowQaProfiles && (id === 'pixel32' || id === 'pixel16')
+    ? RENDER_PROFILES[id]
+    : RENDER_PROFILES.legacy;
 }

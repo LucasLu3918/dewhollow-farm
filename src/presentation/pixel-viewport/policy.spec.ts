@@ -12,6 +12,7 @@ describe('calculatePixelViewportPolicy', () => {
     expect(result.worldTilesVisible.width).toBeLessThanOrEqual(10);
     expect(result.renderResolution.width).toBe(result.worldTilesVisible.width * 32);
     expect(result.renderResolution.height).toBe(result.worldTilesVisible.height * 32);
+    expect(result.worldTilesVisible.height).toBeGreaterThan(10);
     expect(result.cssScale).toBeGreaterThan(0);
     expect(result.devicePixelScale).toBeCloseTo(result.cssScale * 3);
   });
@@ -32,13 +33,14 @@ describe('calculatePixelViewportPolicy', () => {
     expect(desktop.worldTilesVisible.width).toBeLessThanOrEqual(20);
   });
 
-  it('preserves the safe area aspect ratio and reports centered letterboxing', () => {
+  it('keeps the legacy render target stable and reports centered letterboxing', () => {
     const result = calculatePixelViewportPolicy({
       container: { width: 800, height: 600 }, safeArea: { x: 20, y: 30, width: 760, height: 540 },
       dpr: 1, orientation: 'landscape', profile: 'legacy', input: 'pointer', fit: 'contain',
     });
 
     expect(result.profile.tilePixels).toBe(64);
+    expect(result.renderResolution).toEqual({ width: 1024, height: 768 });
     expect(result.cssViewport.x).toBeGreaterThanOrEqual(20);
     expect(result.cssViewport.y).toBeGreaterThanOrEqual(30);
     expect(result.cssViewport.x + result.cssViewport.width).toBeLessThanOrEqual(780);

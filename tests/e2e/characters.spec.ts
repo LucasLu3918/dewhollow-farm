@@ -37,6 +37,14 @@ async function waitForGame(page: Page): Promise<void> {
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 }
 
+async function pressMovement(page: Page, key: string): Promise<void> {
+  await page.keyboard.press(key);
+  await expect.poll(() => page.evaluate(() => {
+    const movement = window.__dewhollow?.movement();
+    return !movement || (!movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null);
+  })).toBe(true);
+}
+
 test('the player is drawn from the real 2x image at half scale, standing on her tile', async ({ page }) => {
   const requested: string[] = [];
   page.on('response', (r) => {
@@ -101,7 +109,7 @@ test('each direction has its own image, and facing right mirrors the side image'
 test('Maomao in the village uses the real image and stands on his tile', async ({ page }) => {
   await waitForGame(page);
   // 從 (7,9) 往南走 20 格，穿過農場南門 (7,29) 進入村莊。
-  for (let i = 0; i < 20; i += 1) await page.keyboard.press('ArrowDown');
+  for (let i = 0; i < 20; i += 1) await pressMovement(page, 'ArrowDown');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
 
   expect(await textureSize(page, 'npc.maomao')).toEqual({ width: 128, height: 160 });

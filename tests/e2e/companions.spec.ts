@@ -52,7 +52,17 @@ async function waitForGame(page: Page): Promise<void> {
 }
 
 async function press(page: Page, key: string, times = 1): Promise<void> {
-  for (let i = 0; i < times; i += 1) await page.keyboard.press(key);
+  for (let i = 0; i < times; i += 1) {
+    await page.keyboard.press(key);
+    if (key.startsWith('Arrow')) await waitForMovementIdle(page);
+  }
+}
+
+async function waitForMovementIdle(page: Page): Promise<void> {
+  await expect.poll(() => page.evaluate(() => {
+    const movement = window.__dewhollow?.movement();
+    return !movement || (!movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null);
+  })).toBe(true);
 }
 
 /** 按下一個鍵，同時每個畫面更新記錄一次所有角色的姿勢。 */

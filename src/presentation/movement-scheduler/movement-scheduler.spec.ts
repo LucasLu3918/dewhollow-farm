@@ -6,6 +6,7 @@ import {
   createMovementScheduler,
   rejectStep,
   requestNextStep,
+  queueMovementTap,
   setMovementIntent,
 } from './movement-scheduler';
 
@@ -118,6 +119,59 @@ describe('movement scheduler', () => {
     blocked = setMovementIntent(blocked, 'up');
 
     expect(requestNextStep(blocked)?.request.direction).toBe('up');
+  });
+
+  it('drops a near-end buffered turn when the direction is released', () => {
+    const started = startStep();
+    let moving = commitStep(started.state, started.request.id);
+    moving = advanceMovement(moving, 90);
+    moving = setMovementIntent(moving, 'up');
+    expect(moving.preInputDirection).toBe('up');
+
+    moving = setMovementIntent(moving, null);
+    expect(moving.preInputDirection).toBeNull();
+    moving = advanceMovement(moving, 50);
+    expect(requestNextStep(moving)).toBeNull();
+  });
+
+  it('preserves a discrete tap received during an active step after the hold is released', () => {
+    const started = startStep();
+    let moving = commitStep(started.state, started.request.id);
+    moving = queueMovementTap(moving, 'left');
+    moving = setMovementIntent(moving, null);
+    moving = advanceMovement(moving, 150);
+
+    const queued = requestNextStep(moving);
+    expect(queued?.request.direction).toBe('left');
+    expect(queued?.state.queuedTaps).toEqual([]);
+    expect(queued?.request.from).toEqual({ x: 1, y: 0 });
+  });
+
+  it('buffers only the latest direction during a burst of taps', () => {
+    const started = startStep();
+    let queued = started.state;
+    for (const direction of ['down', 'left', 'up', 'right', 'down'] as const) {
+      queued = queueMovementTap(queued, direction);
+    }
+    expect(queued.queuedTaps).toEqual(['down']);
+    let moving = commitStep(queued, started.request.id);
+    moving = advanceMovement(moving, 150);
+    const proposal = requestNextStep(moving);
+    expect(proposal?.request.direction).toBe('down');
+    moving = commitStep(proposal!.state, proposal!.request.id);
+    moving = advanceMovement(moving, 150);
+    expect(moving.committedTile).toEqual({ x: 1, y: 1 });
+    expect(moving.queuedTaps).toEqual([]);
+  });
+
+  it('drops queued taps into a direction rejected by the domain', () => {
+    const started = startStep();
+    let moving = queueMovementTap(started.state, 'right');
+    moving = queueMovementTap(moving, 'up');
+    const blocked = rejectStep(moving, started.request.id);
+
+    expect(blocked.queuedTaps).toEqual(['up']);
+    expect(blocked.blockedDirection).toBe('right');
   });
 
   it('releasing before the boundary drops the hold without queuing an extra tile', () => {

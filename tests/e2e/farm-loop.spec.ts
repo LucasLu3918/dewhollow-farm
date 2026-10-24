@@ -6,7 +6,17 @@ import { expect, test, type Page } from '@playwright/test';
  * 地圖座標依 content/maps/farm.json、house.json 與 forest.json。
  */
 async function press(page: Page, keys: string[]): Promise<void> {
-  for (const key of keys) await page.keyboard.press(key);
+  for (const key of keys) {
+    await page.keyboard.press(key);
+    if (key.startsWith('Arrow')) await waitForMovementIdle(page);
+  }
+}
+
+async function waitForMovementIdle(page: Page): Promise<void> {
+  await expect.poll(() => page.evaluate(() => {
+    const movement = window.__dewhollow?.movement();
+    return !movement || (!movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null);
+  })).toBe(true);
 }
 
 async function walk(page: Page, key: string, steps: number): Promise<void> {
