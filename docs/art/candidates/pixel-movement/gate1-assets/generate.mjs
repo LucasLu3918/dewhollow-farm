@@ -312,6 +312,22 @@ function pngBytes(c) {
   return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw, { level: 9 })), chunk('IEND', Buffer.alloc(0))]);
 }
 
+function pixelDigest(c) {
+  const bytes = Buffer.alloc(8 + c.w * c.h * 4);
+  bytes.writeUInt32BE(c.w, 0);
+  bytes.writeUInt32BE(c.h, 4);
+  for (let y = 0; y < c.h; y++) for (let x = 0; x < c.w; x++) {
+    const key = [...Object.keys(c.palette)][c.get(x, y) - 1];
+    const color = key ? Number.parseInt(c.palette[key].slice(1), 16) : 0;
+    const at = 8 + (y * c.w + x) * 4;
+    bytes[at] = key ? (color >> 16) & 255 : 0;
+    bytes[at + 1] = key ? (color >> 8) & 255 : 0;
+    bytes[at + 2] = key ? color & 255 : 0;
+    bytes[at + 3] = key === 'shadow' ? 148 : key ? 255 : 0;
+  }
+  return sha256(bytes);
+}
+
 const entries = [
   ['grass', grass16, grass32, 'tile', [8,15], [16,31]],
   ['tilled', field16, field32, 'tile', [8,15], [16,31]],
@@ -347,10 +363,10 @@ async function main() {
       const sprite = (spec.grid === 16 ? drawA : drawB)();
       const col = i % columns, row = Math.floor(i / columns), x = col * cellW, y = row * cellH;
       for (let sy = 0; sy < sprite.h; sy++) for (let sx = 0; sx < sprite.w; sx++) atlas.dot(x + sx, y + sy, sprite.get(sx, sy));
+      const footAnchor = { x: spec.grid === 16 ? anchorA[0] : anchorB[0], y: spec.grid === 16 ? anchorA[1] : anchorB[1] };
       frames[key] = { x, y, width: sprite.w, height: sprite.h, nativeWidth: sprite.w, nativeHeight: sprite.h,
-        tileWidth: spec.grid, tileHeight: spec.grid, kind,
-        footAnchor: { x: spec.grid === 16 ? anchorA[0] : anchorB[0], y: spec.grid === 16 ? anchorA[1] : anchorB[1] },
-        sha256: sha256(pngBytes(sprite)) };
+        tileWidth: spec.grid, tileHeight: spec.grid, kind, footAnchor, pivot: { ...footAnchor }, tags: [kind, 'candidate'],
+        sha256: pixelDigest(sprite) };
     }
     // Atlas pixel indices are palette-local. Keep the atlas palette, then encode as RGBA PNG.
     atlas.palette = spec.palette;
@@ -362,12 +378,24 @@ async function main() {
   }
   await writeFile(join(OUT, 'palette.json'), `${JSON.stringify({ status: 'candidate', palettes }, null, 2)}\n`);
   const manifest = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     title: 'Dewhollow Farm Gate 1 native pixel-grid prototypes',
     status: 'candidate',
     approved: false,
     source: { method: 'hand-authored integer pixel primitives in generate.mjs; no source image scaling', generator: 'generate.mjs', generatorSha256: scriptHash },
     paletteFile: 'palette.json',
+    pixelContract: {
+      version: 1,
+      nativeTileSize: 32,
+      worldTileSize: 64,
+      displayScale: 2,
+      sampling: 'nearest-neighbor',
+      origin: 'top-left',
+      rectConvention: 'half-open',
+      anchorConvention: 'integer-pixel-index',
+      pivotConvention: 'integer-pixel-index',
+      atlasCell: { width: 32, height: 48, columns: 4, rows: 4 },
+    },
     candidates,
     limitations: [
       'These are static candidate studies, not approved or production game assets.',

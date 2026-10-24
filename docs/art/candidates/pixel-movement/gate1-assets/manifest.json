@@ -1,14 +1,31 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "Dewhollow Farm Gate 1 native pixel-grid prototypes",
   "status": "candidate",
   "approved": false,
   "source": {
     "method": "hand-authored integer pixel primitives in generate.mjs; no source image scaling",
     "generator": "generate.mjs",
-    "generatorSha256": "1b3378556fa87106445f81ef00243ccd3a3566e6cce71894e8493a3e2f1a8383"
+    "generatorSha256": "638cc70a5b81abfe634b3f6a31a55a85ca06cd2031332f528c7f9b1203fe2d3a"
   },
   "paletteFile": "palette.json",
+  "pixelContract": {
+    "version": 1,
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "anchorConvention": "integer-pixel-index",
+    "pivotConvention": "integer-pixel-index",
+    "atlasCell": {
+      "width": 32,
+      "height": 48,
+      "columns": 4,
+      "rows": 4
+    }
+  },
   "candidates": [
     {
       "id": "8bit",
@@ -35,7 +52,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "986038a917c2780b046e31a1f7633c456b37cdca147a01a78129092602765d50"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "051b75a289f77181fab8919acb9ad4545daebd5e2d7a82a8ab32143006e28063"
         },
         "tilled": {
           "x": 16,
@@ -51,7 +76,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "c1ae24984fa212c9df43f8ffd744fe787145e58989804380266a3dac77293b6d"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "3aeee274a5b55cf3496963ef37212a97bf9b6e3469e5a43bd44d510dedc1081f"
         },
         "road": {
           "x": 32,
@@ -67,7 +100,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "462479a47bafaa5aaf98dd62e455ec0749159826b8eaa3fdb5d96c294b8bb723"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "c1c6be4284185795b97d4d2ddf36a3dc86a8dc8d73c4f99cd8ff6d8676ad0c30"
         },
         "tree": {
           "x": 48,
@@ -83,7 +124,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "f865a325442b701efc32f4096546b4d5265e0a149425113f7ae49a1cc960bd18"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "fd76cbf5ff7a0c50612cc602e5e079a4e0ff8a31442be88775a0bcfe26f97f8e"
         },
         "cropSeed": {
           "x": 0,
@@ -99,7 +148,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "e7702df2d442153baa08096f496d75ba35c7a3f972aa3d26bafb8f513c9f2fcd"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "tileOverlay",
+            "candidate"
+          ],
+          "sha256": "f763bbf8171edede96e53db3a24711802ffe21ca12422152d86b9c05afd0b2e2"
         },
         "cropSprout": {
           "x": 16,
@@ -115,7 +172,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "47110085cb8d9e7026128610bb2624c8f19ea3669c7d6544f7c27fad6cd04cf5"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "tileOverlay",
+            "candidate"
+          ],
+          "sha256": "ca2e54206a3e6b57f554da86b00f6191b22bb09bf6995da95a148062a210c7fb"
         },
         "cropMature": {
           "x": 32,
@@ -131,7 +196,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "0e5cc73147afda15fac05ee18ca4dc4cdd038dae175b91ebe853a19462bf3453"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "tileOverlay",
+            "candidate"
+          ],
+          "sha256": "7364a85af3b6bd18cf07b1b55af2223118ad616696af51446dcc39ad3f025c73"
         },
         "houseEdge": {
           "x": 48,
@@ -147,7 +220,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "e2be919a7b70e6d984cf8a77b3bbd2b747a3f9752886ffb0e14c17f8796ee412"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "541f9b8da5471a80beab3826f75cb06bcad7d6e699b9b61c25c548b901319d3d"
         },
         "fence": {
           "x": 0,
@@ -163,7 +244,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "b6287948d508ba28c87de43be62649c71b6e0f37c3e9d3ffaa387427639ce5c0"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "tileOverlay",
+            "candidate"
+          ],
+          "sha256": "dc0a66778f76724410b50122560ed8de3e3188de6a5b84b117814b3c08b79472"
         },
         "playerIdle": {
           "x": 16,
@@ -179,7 +268,15 @@
             "x": 8,
             "y": 23
           },
-          "sha256": "fb1609037ac78600f195828c37a2a8172e66078c7acc54a6725f538e01b642b6"
+          "pivot": {
+            "x": 8,
+            "y": 23
+          },
+          "tags": [
+            "character",
+            "candidate"
+          ],
+          "sha256": "4d5b849bb40a4fc9c2f3006a2ca009419955da5539d15e3c15b393f098f056cb"
         },
         "playerWalk": {
           "x": 32,
@@ -195,7 +292,15 @@
             "x": 8,
             "y": 23
           },
-          "sha256": "80bb4aa8b1316ed6797015ac732e3cb199199ff9339e36795aec2a8a2a9521fc"
+          "pivot": {
+            "x": 8,
+            "y": 23
+          },
+          "tags": [
+            "character",
+            "candidate"
+          ],
+          "sha256": "5a41863abaf7696933101be3fa884b29f9d32b5e8f474ddf3ef72cda38e5f3b6"
         },
         "cat": {
           "x": 48,
@@ -211,7 +316,15 @@
             "x": 8,
             "y": 14
           },
-          "sha256": "47073eb8c0e48230c6097801104a45582381ada1d3c4ee2acaed4d8e4d7532e3"
+          "pivot": {
+            "x": 8,
+            "y": 14
+          },
+          "tags": [
+            "pet",
+            "candidate"
+          ],
+          "sha256": "07685c8ca71b68e8ed6cc417520f318529fdd67135d0d7fd848905f1e288de08"
         },
         "quokka": {
           "x": 0,
@@ -227,7 +340,15 @@
             "x": 8,
             "y": 14
           },
-          "sha256": "55340424b31604f7ca61715fd869acad1b624df714d927fe852ce88bf698b665"
+          "pivot": {
+            "x": 8,
+            "y": 14
+          },
+          "tags": [
+            "pet",
+            "candidate"
+          ],
+          "sha256": "4dd5595acf5c6376af220d7ba4fb196a1da01e51c143c8b7989a0b32fe869c4f"
         },
         "tool": {
           "x": 16,
@@ -243,7 +364,15 @@
             "x": 8,
             "y": 15
           },
-          "sha256": "038ec00150cc22948e841888a8ac5b10b1160cb04cfba5c236deb44e4a8e03a1"
+          "pivot": {
+            "x": 8,
+            "y": 15
+          },
+          "tags": [
+            "object",
+            "candidate"
+          ],
+          "sha256": "f4dfe6b6a79be86fd46dac3d0ad1f10c1a1592b07d146b43c2598a438a3c1579"
         },
         "shadow": {
           "x": 32,
@@ -259,7 +388,15 @@
             "x": 8,
             "y": 7
           },
-          "sha256": "4f7871e260aac5547efc542c14a14072472a2d5473d9474cb0f666dc3fdc5542"
+          "pivot": {
+            "x": 8,
+            "y": 7
+          },
+          "tags": [
+            "shadow",
+            "candidate"
+          ],
+          "sha256": "0a8c773cdb149a2c56d0091359918afd2a8f1a26124fb2397eb10b8faffec73c"
         }
       },
       "sha256": "c577db439d5b485af70cf1c5e6bd18d9507b3e8ac378bcedd5971b578ae89975"
@@ -289,7 +426,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "23059e0aec05a24cca3d9eee8680b32e535bbc4aefa75b0a2461b158f13f3408"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "7ab38e78dec84c12c025e938b5ed2c670b477e394f16487bab73f27421aba17b"
         },
         "tilled": {
           "x": 32,
@@ -305,7 +450,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "4df4bea2ffcf65844ba764b2258ef9626ca599412c59075fa4981e95848a69b0"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "bb74af21c7e75050a472f473c75e1d6ae6bd355b614eb45fddba01a947fb6c75"
         },
         "road": {
           "x": 64,
@@ -321,7 +474,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "5919d038ad4a2486a95e648065024adcd125c4222d4d627119953fb2f5da0fdb"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "bf330be0884086f53ad2edb7e98da1a9e7d99208d8f0157775e413f7d251ae38"
         },
         "tree": {
           "x": 96,
@@ -337,7 +498,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "bf66ad9d36109c808efee6e7ad364d7577828b45aa461f22ae3fbc6cb79eadeb"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "6104ab2f13fbb795334db9d2aa8329118c1eb5d1d061c463ad71c7ca2fc49d61"
         },
         "cropSeed": {
           "x": 0,
@@ -353,7 +522,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "5eb64b1ff30239404ce3332b2f146540d1ecf1b719f4ed7bd4bf392d9e3eca06"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "tileOverlay",
+            "candidate"
+          ],
+          "sha256": "c9edde0e10d632b3434e90b31cf2f2ef03d0563c118b8c972de3cd93418f077b"
         },
         "cropSprout": {
           "x": 32,
@@ -369,7 +546,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "3785266c2f6106d1c855bf0bdffa03ac3647a1edf070e64b935289c07aafff2b"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "tileOverlay",
+            "candidate"
+          ],
+          "sha256": "e2a97c5ec5dc77e018d21eaf1e7bd475b62f2a02980730a4b2b37f6948078bbc"
         },
         "cropMature": {
           "x": 64,
@@ -385,7 +570,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "47c1193f067d4586b0848b22fdc09c6cb6fa1b363a36622f2d3d43913c7fc87d"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "tileOverlay",
+            "candidate"
+          ],
+          "sha256": "993a32eaf1eee37148c93838df1723440e83306533204da6379c7dab617667e1"
         },
         "houseEdge": {
           "x": 96,
@@ -401,7 +594,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "71942d4972c9e5710841c476f433adafc3436cedfb4aadbcede99f380123960a"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "tile",
+            "candidate"
+          ],
+          "sha256": "f7f446c1238ccfebc2d9883c708170b8df2ce0a4a76b1f60de415710354d6696"
         },
         "fence": {
           "x": 0,
@@ -417,7 +618,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "07ca89efd49540404e9935fa14ff006c062e1d66f1a50e113f7cc2b28b2457e8"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "tileOverlay",
+            "candidate"
+          ],
+          "sha256": "354e7b6b93ac49935f665589af7a453c162b89854b92b818b069d5ad14aa7647"
         },
         "playerIdle": {
           "x": 32,
@@ -433,7 +642,15 @@
             "x": 16,
             "y": 47
           },
-          "sha256": "792143b2d59dde364a2cb46d18659ecd05b21f0c5229e5788a4444e8c09baa29"
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "tags": [
+            "character",
+            "candidate"
+          ],
+          "sha256": "3689f4e4d052c12e6e2963154b017d84e118f9d6399bec8d371776496ed467a7"
         },
         "playerWalk": {
           "x": 64,
@@ -449,7 +666,15 @@
             "x": 16,
             "y": 47
           },
-          "sha256": "811436e9bb4575bd3b44c8385cb0e33953b86089933671f31f5d6b9a8a30ee61"
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "tags": [
+            "character",
+            "candidate"
+          ],
+          "sha256": "ed1166346c8b991813a9538a2534b306021faad607a7e4e2862622df173efebe"
         },
         "cat": {
           "x": 96,
@@ -465,7 +690,15 @@
             "x": 16,
             "y": 28
           },
-          "sha256": "5b67bb5e5ad8d1f711e24709c83cd1809b71fbe86932cbecefea51042d3bc0ec"
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "tags": [
+            "pet",
+            "candidate"
+          ],
+          "sha256": "656ad0cfe5c4337293a6706da9b175b9f2b858b56ec9f6b30360df149e8c8e09"
         },
         "quokka": {
           "x": 0,
@@ -481,7 +714,15 @@
             "x": 16,
             "y": 28
           },
-          "sha256": "64e2324573859cc495a0242e5873c16e91f1f9a8a44995800cc5af9c26b0a06d"
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "tags": [
+            "pet",
+            "candidate"
+          ],
+          "sha256": "a11e860c1e834e64ab29083ffce2915225f99bbcb16d527a3b1cdbcbc3318241"
         },
         "tool": {
           "x": 32,
@@ -497,7 +738,15 @@
             "x": 16,
             "y": 31
           },
-          "sha256": "29ad3c02484bf9eee9c60c7cfbf0145e129184d74c83f71357baaed8d55d80af"
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "tags": [
+            "object",
+            "candidate"
+          ],
+          "sha256": "93bd4a26e7da983fd9d721a1f499564dc4f7fe0139901f6333aacaa8845aa6b2"
         },
         "shadow": {
           "x": 64,
@@ -513,7 +762,15 @@
             "x": 16,
             "y": 11
           },
-          "sha256": "fbb8b84cab8c5f24db87c1946848d48aefccbe20a16e0d210ab7416e79aa18e8"
+          "pivot": {
+            "x": 16,
+            "y": 11
+          },
+          "tags": [
+            "shadow",
+            "candidate"
+          ],
+          "sha256": "ce48f6bdfc658ef86cb7fae60822439b55ee935a5f4dff0b372cd64799e9c7de"
         }
       },
       "sha256": "26999d1a77433112b5f2e6993ce69ac774aef9a41cb6f7c90cadf17bca9d584b"

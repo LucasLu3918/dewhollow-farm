@@ -49,8 +49,25 @@ async function startFarm(page: Page, profile: string): Promise<void> {
 async function idle(page: Page): Promise<void> {
   await expect.poll(() => page.evaluate(() => {
     const movement = window.__dewhollow?.movement();
-    return movement && movement.heldDirection === null && !movement.moving && !movement.pending;
+    return movement && movement.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
   })).toBe(true);
+}
+
+async function moveExactly(page: Page, key: string, steps: number): Promise<void> {
+  const delta = key === 'ArrowRight' ? { x: 1, y: 0 }
+    : key === 'ArrowLeft' ? { x: -1, y: 0 }
+      : key === 'ArrowDown' ? { x: 0, y: 1 }
+        : { x: 0, y: -1 };
+  for (let step = 0; step < steps; step += 1) {
+    const before = await page.evaluate(() => window.__dewhollow?.movement()?.tile);
+    if (!before) throw new Error('缺少玩家移動格座標');
+    await page.keyboard.press(key);
+    await page.waitForFunction(({ x, y, dx, dy }) => {
+      const tile = window.__dewhollow?.movement()?.tile;
+      return tile !== undefined && tile.x === x + dx && tile.y === y + dy;
+    }, { x: before.x, y: before.y, dx: delta.x, dy: delta.y }, { timeout: 15_000 });
+    await idle(page);
+  }
 }
 
 async function openEvidenceContext(browser: Browser, viewport: typeof viewports[number], dpr: number): Promise<BrowserContext> {
@@ -166,29 +183,19 @@ test('records comparable farm movement and farming input clips for all render pr
     const timeline: Array<Record<string, unknown>> = [{ event: 'idle', elapsedMs: elapsedMs(), tile: start }];
 
     await page.waitForTimeout(700);
-    await page.keyboard.down('ArrowRight');
-    await page.waitForFunction((targetX) => {
-      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
-      return player !== undefined && player.tileX >= targetX;
-    }, start.x + 10, { timeout: 15_000 });
-    await page.keyboard.up('ArrowRight');
-    await idle(page);
+    await moveExactly(page, 'ArrowRight', 10);
     const outbound = await page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player'));
     const followersAfterMove = await page.evaluate(() => (window.__dewhollow?.actors() ?? [])
       .filter((actor) => actor.id !== 'player')
       .map((actor) => ({ id: actor.id, x: actor.tileX, y: actor.tileY })));
-    timeline.push({ event: 'held-right-10-tiles', elapsedMs: elapsedMs(), tile: outbound && { x: outbound.tileX, y: outbound.tileY }, followers: followersAfterMove });
+    timeline.push({ event: 'pressed-right-10-tiles', elapsedMs: elapsedMs(), tile: outbound && { x: outbound.tileX, y: outbound.tileY }, followers: followersAfterMove });
     expect((outbound?.tileX ?? start.x) - start.x).toBe(10);
     expect(start.followers.some((follower) => followersAfterMove.some((after) => after.id === follower.id && (after.x !== follower.x || after.y !== follower.y)))).toBe(true);
 
-    await page.keyboard.down('ArrowLeft');
-    await page.waitForFunction((targetX) => {
-      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
-      return player !== undefined && player.tileX <= targetX;
-    }, start.x, { timeout: 15_000 });
-    await page.keyboard.up('ArrowLeft');
-    await idle(page);
-    timeline.push({ event: 'held-left-return', elapsedMs: elapsedMs(), tile: await page.evaluate(() => window.__dewhollow?.movement()?.tile) });
+    await moveExactly(page, 'ArrowLeft', 10);
+    const returned = await page.evaluate(() => window.__dewhollow?.movement()?.tile);
+    expect(returned).toMatchObject({ x: start.x, y: start.y });
+    timeline.push({ event: 'pressed-left-return', elapsedMs: elapsedMs(), tile: returned });
 
     for (const key of ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft']) {
       await page.keyboard.press(key);
