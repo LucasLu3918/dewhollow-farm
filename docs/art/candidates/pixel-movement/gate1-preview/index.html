@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>Gate 1｜像素美術候選預覽</title>
+    <link rel="stylesheet" href="./preview.css" />
+  </head>
+  <body>
+    <main class="review">
+      <header class="intro">
+        <p class="eyebrow">DEWHOLLOW FARM · GATE 1</p>
+        <h1>同一塊農場，三種像素尺度</h1>
+        <p class="lede">用固定的 12 × 10 場景比較原生候選素材。這是美術樣張，尚未接入遊戲玩法，也未獲核准。</p>
+      </header>
+
+      <section class="toolbar" aria-label="候選預覽設定">
+        <div class="segmented" role="group" aria-label="候選風格">
+          <button type="button" data-candidate="legacy" aria-pressed="true">現況</button>
+          <button type="button" data-candidate="8bit" aria-pressed="false">A · 8-bit</button>
+          <button type="button" data-candidate="16bit" aria-pressed="false">B · 16-bit</button>
+        </div>
+        <label class="scale-control">顯示比例
+          <select id="display-scale" aria-label="顯示比例">
+            <option value="1">100% CSS</option>
+            <option value="2">200% 放大</option>
+          </select>
+        </label>
+        <span class="status-pill">CANDIDATE · 未核准</span>
+      </section>
+
+      <section class="stage-grid" aria-live="polite">
+        <article class="preview-card">
+          <div class="card-heading">
+            <div><p class="card-kicker" id="candidate-kicker">現行素材</p><h2 id="candidate-title">Legacy</h2></div>
+            <span class="grid-badge" id="grid-badge">目前版本</span>
+          </div>
+          <div class="viewport-frame" id="viewport-frame">
+            <canvas id="farm-preview" width="384" height="320" aria-label="12 乘 10 格固定農場候選樣張"></canvas>
+          </div>
+          <p class="caption" id="candidate-caption">現行畫面截自同一遊戲版本；用於提供舊素材尺度參考。</p>
+        </article>
+
+        <aside class="scene-notes">
+          <p class="card-kicker">固定場景內容</p>
+          <h2>同座標、同構圖</h2>
+          <ul>
+            <li>草地、耕地、道路與樹</li>
+            <li>種子、幼苗、成熟作物</li>
+            <li>屋緣與柵欄</li>
+            <li>主角、黑貓、矮袋鼠</li>
+            <li>工具與腳底陰影</li>
+          </ul>
+          <div class="evidence-note">
+            <strong>本頁能比較</strong>
+            <p>原生像素輪廓、色塊密度、角色與物件相對比例。</p>
+          </div>
+          <div class="evidence-note muted">
+            <strong>仍待補齊</strong>
+            <p>遊戲內移動、互動、遮擋、存檔一致性、完整 viewport／DPR 矩陣與實機效能。</p>
+          </div>
+        </aside>
+      </section>
+
+      <footer class="provenance" id="provenance">讀取候選素材來源中…</footer>
+      <p class="error" id="error-message" role="alert" hidden></p>
+    </main>
+    <script type="module" src="./preview.js"></script>
+  </body>
+</html>

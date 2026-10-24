@@ -4,6 +4,10 @@
 >
 > 本文件只封存待比較的靜態概念候選，不代表使用者已選定風格，也不構成 Gate 1 通過或完整驗收證據。圖片不得匯入 `public/`、不得登錄於 `content/assets.json`，亦不得視為已核准素材。
 
+## Gate 1 原生網格樣張
+
+已新增 [固定 12×10 候選預覽頁](gate1-preview/index.html)、[A/B 原生網格素材及 manifest](gate1-assets/README.zh-TW.md)與[預覽證據](gate1-preview/evidence.zh-TW.md)。新素材由逐像素圖元繪製，A 使用 16×16 格，B 使用 32×32 格，均為 `candidate` 且 `approved: false`。預覽頁只提供靜態美術比較，不代表遊戲執行畫面、移動或農務驗收。
+
 ## 候選檔案與來源
 
 以下兩張圖由 OpenAI Image Generation 產生，依主 Agent 提供的來源路徑以原始位元組複製，未裁切、縮放、重採樣、調色或重繪。來源 PNG 均為 1568 × 1003、RGB、每色彩通道 8-bit；「8-bit／16-bit」在此僅描述像素美術風格候選，並非檔案色深或 PNG 編碼規格。

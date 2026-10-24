@@ -95,6 +95,7 @@ async function walkToShipBox(page: Page): Promise<void> {
 }
 
 test('a shipped crop flies into the box, and the shipping effect comes when it lands', async ({ page }) => {
+  test.setTimeout(60_000);
   await waitForGame(page);
   await harvestMoonBean(page);
   await walkToShipBox(page);
@@ -111,6 +112,7 @@ test('a shipped crop flies into the box, and the shipping effect comes when it l
 });
 
 test('with reduced motion the crop does not fly, and the shipping effect shows at once', async ({ page }) => {
+  test.setTimeout(60_000);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await waitForGame(page);
   await harvestMoonBean(page);

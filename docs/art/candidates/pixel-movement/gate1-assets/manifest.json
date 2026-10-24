@@ -1,0 +1,528 @@
+{
+  "schemaVersion": 1,
+  "title": "Dewhollow Farm Gate 1 native pixel-grid prototypes",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "hand-authored integer pixel primitives in generate.mjs; no source image scaling",
+    "generator": "generate.mjs",
+    "generatorSha256": "1b3378556fa87106445f81ef00243ccd3a3566e6cce71894e8493a3e2f1a8383"
+  },
+  "paletteFile": "palette.json",
+  "candidates": [
+    {
+      "id": "8bit",
+      "candidateId": "gate1-a-native16",
+      "label": "8-bit 時代風格／原生 16×16 網格",
+      "status": "candidate",
+      "approved": false,
+      "tileSize": 16,
+      "atlas": "8bit.png",
+      "atlasWidth": 64,
+      "atlasHeight": 96,
+      "frames": {
+        "grass": {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "986038a917c2780b046e31a1f7633c456b37cdca147a01a78129092602765d50"
+        },
+        "tilled": {
+          "x": 16,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "c1ae24984fa212c9df43f8ffd744fe787145e58989804380266a3dac77293b6d"
+        },
+        "road": {
+          "x": 32,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "462479a47bafaa5aaf98dd62e455ec0749159826b8eaa3fdb5d96c294b8bb723"
+        },
+        "tree": {
+          "x": 48,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "f865a325442b701efc32f4096546b4d5265e0a149425113f7ae49a1cc960bd18"
+        },
+        "cropSeed": {
+          "x": 0,
+          "y": 24,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "tileOverlay",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "e7702df2d442153baa08096f496d75ba35c7a3f972aa3d26bafb8f513c9f2fcd"
+        },
+        "cropSprout": {
+          "x": 16,
+          "y": 24,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "tileOverlay",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "47110085cb8d9e7026128610bb2624c8f19ea3669c7d6544f7c27fad6cd04cf5"
+        },
+        "cropMature": {
+          "x": 32,
+          "y": 24,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "tileOverlay",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "0e5cc73147afda15fac05ee18ca4dc4cdd038dae175b91ebe853a19462bf3453"
+        },
+        "houseEdge": {
+          "x": 48,
+          "y": 24,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "e2be919a7b70e6d984cf8a77b3bbd2b747a3f9752886ffb0e14c17f8796ee412"
+        },
+        "fence": {
+          "x": 0,
+          "y": 48,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "tileOverlay",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "b6287948d508ba28c87de43be62649c71b6e0f37c3e9d3ffaa387427639ce5c0"
+        },
+        "playerIdle": {
+          "x": 16,
+          "y": 48,
+          "width": 16,
+          "height": 24,
+          "nativeWidth": 16,
+          "nativeHeight": 24,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "character",
+          "footAnchor": {
+            "x": 8,
+            "y": 23
+          },
+          "sha256": "fb1609037ac78600f195828c37a2a8172e66078c7acc54a6725f538e01b642b6"
+        },
+        "playerWalk": {
+          "x": 32,
+          "y": 48,
+          "width": 16,
+          "height": 24,
+          "nativeWidth": 16,
+          "nativeHeight": 24,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "character",
+          "footAnchor": {
+            "x": 8,
+            "y": 23
+          },
+          "sha256": "80bb4aa8b1316ed6797015ac732e3cb199199ff9339e36795aec2a8a2a9521fc"
+        },
+        "cat": {
+          "x": 48,
+          "y": 48,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "pet",
+          "footAnchor": {
+            "x": 8,
+            "y": 14
+          },
+          "sha256": "47073eb8c0e48230c6097801104a45582381ada1d3c4ee2acaed4d8e4d7532e3"
+        },
+        "quokka": {
+          "x": 0,
+          "y": 72,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "pet",
+          "footAnchor": {
+            "x": 8,
+            "y": 14
+          },
+          "sha256": "55340424b31604f7ca61715fd869acad1b624df714d927fe852ce88bf698b665"
+        },
+        "tool": {
+          "x": 16,
+          "y": 72,
+          "width": 16,
+          "height": 16,
+          "nativeWidth": 16,
+          "nativeHeight": 16,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "object",
+          "footAnchor": {
+            "x": 8,
+            "y": 15
+          },
+          "sha256": "038ec00150cc22948e841888a8ac5b10b1160cb04cfba5c236deb44e4a8e03a1"
+        },
+        "shadow": {
+          "x": 32,
+          "y": 72,
+          "width": 16,
+          "height": 8,
+          "nativeWidth": 16,
+          "nativeHeight": 8,
+          "tileWidth": 16,
+          "tileHeight": 16,
+          "kind": "shadow",
+          "footAnchor": {
+            "x": 8,
+            "y": 7
+          },
+          "sha256": "4f7871e260aac5547efc542c14a14072472a2d5473d9474cb0f666dc3fdc5542"
+        }
+      },
+      "sha256": "c577db439d5b485af70cf1c5e6bd18d9507b3e8ac378bcedd5971b578ae89975"
+    },
+    {
+      "id": "16bit",
+      "candidateId": "gate1-b-native32",
+      "label": "16-bit 時代風格／原生 32×32 網格",
+      "status": "candidate",
+      "approved": false,
+      "tileSize": 32,
+      "atlas": "16bit.png",
+      "atlasWidth": 128,
+      "atlasHeight": 192,
+      "frames": {
+        "grass": {
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "23059e0aec05a24cca3d9eee8680b32e535bbc4aefa75b0a2461b158f13f3408"
+        },
+        "tilled": {
+          "x": 32,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "4df4bea2ffcf65844ba764b2258ef9626ca599412c59075fa4981e95848a69b0"
+        },
+        "road": {
+          "x": 64,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "5919d038ad4a2486a95e648065024adcd125c4222d4d627119953fb2f5da0fdb"
+        },
+        "tree": {
+          "x": 96,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "bf66ad9d36109c808efee6e7ad364d7577828b45aa461f22ae3fbc6cb79eadeb"
+        },
+        "cropSeed": {
+          "x": 0,
+          "y": 48,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "tileOverlay",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "5eb64b1ff30239404ce3332b2f146540d1ecf1b719f4ed7bd4bf392d9e3eca06"
+        },
+        "cropSprout": {
+          "x": 32,
+          "y": 48,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "tileOverlay",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "3785266c2f6106d1c855bf0bdffa03ac3647a1edf070e64b935289c07aafff2b"
+        },
+        "cropMature": {
+          "x": 64,
+          "y": 48,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "tileOverlay",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "47c1193f067d4586b0848b22fdc09c6cb6fa1b363a36622f2d3d43913c7fc87d"
+        },
+        "houseEdge": {
+          "x": 96,
+          "y": 48,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "tile",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "71942d4972c9e5710841c476f433adafc3436cedfb4aadbcede99f380123960a"
+        },
+        "fence": {
+          "x": 0,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "tileOverlay",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "07ca89efd49540404e9935fa14ff006c062e1d66f1a50e113f7cc2b28b2457e8"
+        },
+        "playerIdle": {
+          "x": 32,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "character",
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "sha256": "792143b2d59dde364a2cb46d18659ecd05b21f0c5229e5788a4444e8c09baa29"
+        },
+        "playerWalk": {
+          "x": 64,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "character",
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "sha256": "811436e9bb4575bd3b44c8385cb0e33953b86089933671f31f5d6b9a8a30ee61"
+        },
+        "cat": {
+          "x": 96,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "pet",
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "5b67bb5e5ad8d1f711e24709c83cd1809b71fbe86932cbecefea51042d3bc0ec"
+        },
+        "quokka": {
+          "x": 0,
+          "y": 144,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "pet",
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "64e2324573859cc495a0242e5873c16e91f1f9a8a44995800cc5af9c26b0a06d"
+        },
+        "tool": {
+          "x": 32,
+          "y": 144,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "object",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "sha256": "29ad3c02484bf9eee9c60c7cfbf0145e129184d74c83f71357baaed8d55d80af"
+        },
+        "shadow": {
+          "x": 64,
+          "y": 144,
+          "width": 32,
+          "height": 12,
+          "nativeWidth": 32,
+          "nativeHeight": 12,
+          "tileWidth": 32,
+          "tileHeight": 32,
+          "kind": "shadow",
+          "footAnchor": {
+            "x": 16,
+            "y": 11
+          },
+          "sha256": "fbb8b84cab8c5f24db87c1946848d48aefccbe20a16e0d210ab7416e79aa18e8"
+        }
+      },
+      "sha256": "26999d1a77433112b5f2e6993ce69ac774aef9a41cb6f7c90cadf17bca9d584b"
+    }
+  ],
+  "limitations": [
+    "These are static candidate studies, not approved or production game assets.",
+    "playerWalk is one static pose study, not an animation strip; no four-direction motion set is included.",
+    "No rendered 12×10 in-game scene, viewport/DPR matrix, motion video or real-device review is included.",
+    "The B player is one 32×48 down-facing idle sample; A uses the 16×24 outline option from the plan."
+  ]
+}
