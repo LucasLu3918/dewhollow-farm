@@ -30,14 +30,22 @@ describe('deadzoneOf', () => {
 });
 
 describe('mapZoomFor', () => {
-  it('zooms in on a narrow touch screen held upright', () => {
-    expect(mapZoomFor({ width: 375, coarse: true, portrait: true })).toBe(PORTRAIT_TOUCH_ZOOM);
-    expect(PORTRAIT_TOUCH_ZOOM).toBeGreaterThan(1);
+  it('keeps a touch portrait viewport within the 8–10 tile target', () => {
+    const cameraWidth = 1024;
+    const zoom = mapZoomFor({ cameraWidth, coarse: true, portrait: true });
+
+    expect(cameraWidth / zoom / 64).toBe(9);
+    expect(zoom).toBe(PORTRAIT_TOUCH_ZOOM);
   });
 
-  it('stays at 1x on a mouse, on landscape, and on a wide screen', () => {
-    expect(mapZoomFor({ width: 375, coarse: false, portrait: true })).toBe(1);
-    expect(mapZoomFor({ width: 844, coarse: true, portrait: false })).toBe(1);
-    expect(mapZoomFor({ width: 1024, coarse: true, portrait: true })).toBe(1);
+  it('fits 14 tiles across a landscape touch viewport', () => {
+    const cameraWidth = 616;
+    const zoom = mapZoomFor({ cameraWidth, coarse: true, portrait: false });
+
+    expect(cameraWidth / zoom / 64).toBe(14);
+  });
+
+  it('keeps the desktop pointer camera at 1x', () => {
+    expect(mapZoomFor({ cameraWidth: 1024, coarse: false, portrait: false })).toBe(1);
   });
 });

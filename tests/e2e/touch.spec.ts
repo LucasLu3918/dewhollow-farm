@@ -267,6 +267,28 @@ test.describe('MB-06 工具與種子直接選取（合成 pointer input）', () 
     await expect(page.locator('#hud-tool')).toHaveText('鋤頭');
   });
 
+  test('遊戲內快捷鍵切換工具與種子時不打開選擇面板', async ({ page }) => {
+    await seedTouchMode(page, 'on');
+    await startGame(page);
+    const tool = page.locator('#hud-tool');
+    const seed = page.locator('#hud-seed');
+    const initialTool = await tool.innerText();
+    const initialSeed = await seed.innerText();
+
+    const cycleTool = page.locator('#touch-controls button[data-action="cycleTool"]');
+    const cycleSeed = page.locator('#touch-controls button[data-action="cycleSeed"]');
+    for (const button of [cycleTool, cycleSeed]) {
+      const box = await button.boundingBox();
+      expect(box?.width).toBeGreaterThanOrEqual(44);
+      expect(box?.height).toBeGreaterThanOrEqual(44);
+    }
+    await cycleTool.tap();
+    await expect(tool).not.toHaveText(initialTool);
+    await cycleSeed.tap();
+    await expect(seed).not.toHaveText(initialSeed);
+    await expect(page.locator('#tool-seed-panel')).toBeHidden();
+  });
+
   test('長按後滑到工具項目並放開會直接選取', async ({ page }) => {
     await seedTouchMode(page, 'on');
     await startGame(page);
@@ -421,6 +443,32 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
     await send('pointermove', center.x + 58, center.y);
     await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(before.x);
     await send('pointercancel', center.x + 58, center.y);
+    const stopped = await playerPosition(page);
+    await page.waitForTimeout(350);
+    expect(await playerPosition(page)).toEqual(stopped);
+  });
+
+  test('fixed joystick moves on a cardinal axis and stops on release', async ({ page }) => {
+    await seedMobileControls(page, 'fixed-joystick');
+    await startGame(page);
+    const before = await playerPosition(page);
+    const pad = page.locator('.touch-move');
+    const box = await pad.boundingBox();
+    expect(box).not.toBeNull();
+    const center = { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 };
+    const send = (type: string, x: number, y: number) => pad.dispatchEvent(type, {
+      pointerId: 51,
+      pointerType: 'touch',
+      bubbles: true,
+      cancelable: true,
+      clientX: x,
+      clientY: y,
+    });
+
+    await send('pointerdown', center.x, center.y);
+    await send('pointermove', center.x + 58, center.y);
+    await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(before.x);
+    await send('pointerup', center.x + 58, center.y);
     const stopped = await playerPosition(page);
     await page.waitForTimeout(350);
     expect(await playerPosition(page)).toEqual(stopped);

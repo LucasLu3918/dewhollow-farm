@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page, type TestInfo } from '@playwright/test';
 
 async function startGame(page: Page, query = ''): Promise<void> {
   await page.goto(`/${query}`);
@@ -126,6 +126,42 @@ test('pixel render profile is selectable for controlled viewport comparison', as
   expect(experiment?.worldTilesVisible.width).toBeLessThanOrEqual(10);
   expect(experiment?.actualCanvasResolution).toEqual({ width: experiment?.renderResolution.width, height: experiment?.renderResolution.height });
   await expect(page.locator('#game canvas')).toHaveCSS('object-fit', 'contain');
+});
+
+test('legacy production camera meets touch FOV targets after orientation changes', async ({ browser }, testInfo: TestInfo) => {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const page = await context.newPage();
+  await startGame(page);
+
+  const readViewport = () => page.evaluate(() => window.__dewhollow?.pixelViewport());
+  await expect.poll(async () => (await readViewport())?.actualWorldTilesVisible.width ?? 0).toBeGreaterThanOrEqual(8);
+  let result = await readViewport();
+  expect(result?.profile).toBe('legacy');
+  expect(result?.actualWorldTilesVisible.width).toBeGreaterThanOrEqual(8);
+  expect(result?.actualWorldTilesVisible.width).toBeLessThanOrEqual(10);
+  expect(result?.actualWorldTilesVisible.width).toBeCloseTo(result?.worldTilesVisible.width ?? 0, 3);
+  const portraitShot = testInfo.outputPath('production-portrait-390x844.png');
+  await page.screenshot({ path: portraitShot, fullPage: true, animations: 'disabled' });
+  await testInfo.attach('production portrait 390x844', { path: portraitShot, contentType: 'image/png' });
+
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.responsiveLayout().orientation)).toBe('landscape');
+  await expect.poll(async () => Math.round((await readViewport())?.actualWorldTilesVisible.width ?? 0)).toBe(14);
+  result = await readViewport();
+  expect(result?.profile).toBe('legacy');
+  expect(result?.actualWorldTilesVisible.width).toBeGreaterThanOrEqual(12);
+  expect(result?.actualWorldTilesVisible.width).toBeLessThanOrEqual(16);
+  expect(result?.actualWorldTilesVisible.width).toBeCloseTo(result?.worldTilesVisible.width ?? 0, 3);
+  const landscapeShot = testInfo.outputPath('production-landscape-844x390.png');
+  await page.screenshot({ path: landscapeShot, fullPage: true, animations: 'disabled' });
+  await testInfo.attach('production landscape 844x390', { path: landscapeShot, contentType: 'image/png' });
+
+  await context.close();
 });
 
 test('captures same-size gameplay comparisons for legacy, pixel32 and pixel16 profiles', async ({ page }) => {

@@ -118,8 +118,9 @@ test.describe('響應式版面整合', () => {
       const host = document.querySelector<HTMLElement>('#game');
       const canvas = host?.querySelector('canvas');
       const camera = window.__dewhollow?.cameraView();
+      const pixelViewport = window.__dewhollow?.pixelViewport();
       const layout = window.__dewhollow?.responsiveLayout();
-      if (!host || !canvas || !camera || !layout) return null;
+      if (!host || !canvas || !camera || !pixelViewport || !layout) return null;
 
       const hostBounds = host.getBoundingClientRect();
       const localRect = (element: Element | null): { x: number; y: number; width: number; height: number } | null => {
@@ -129,8 +130,8 @@ test.describe('響應式版面整合', () => {
       };
       const canvasRect = localRect(canvas);
       if (!canvasRect) return null;
-      const scaleX = canvasRect.width / 1024;
-      const scaleY = canvasRect.height / 768;
+      const scaleX = canvasRect.width / pixelViewport.renderResolution.width;
+      const scaleY = canvasRect.height / pixelViewport.renderResolution.height;
       return {
         safeRect: layout.safeRect,
         controls: ['.touch-move', '.touch-act'].map((selector) => localRect(host.parentElement?.querySelector(selector) ?? null)),

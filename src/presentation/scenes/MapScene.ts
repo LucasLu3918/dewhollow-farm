@@ -16,7 +16,7 @@ import type { HeldPointerStart, Hud } from '../hud';
 import type { HelpPanel } from '../help-panel';
 import type { SavePanel } from '../save-panel';
 import { cameraBounds, deadzoneOf, mapZoomFor } from '../camera';
-import { TILE_SIZE, VIEW_SIZE } from '../constants';
+import { TILE_SIZE } from '../constants';
 import { nightAlpha, particleKind, particlePosition, seasonGrassTint, weatherDim } from '../atmosphere';
 import type { Season } from '../../domain/calendar';
 import type { TileKind } from '../../domain/content';
@@ -569,21 +569,20 @@ export class MapScene extends Phaser.Scene {
       });
       const canvasHost = this.game.canvas.parentElement;
       if (canvasHost) {
-        if (profile.id === 'legacy') delete canvasHost.dataset.pixelProfile;
+        if (profile.id === 'legacy' && !layout.pointer.coarse) delete canvasHost.dataset.pixelProfile;
         else canvasHost.dataset.pixelProfile = profile.id;
       }
-      if (profile.id !== 'legacy'
-        && (this.scale.gameSize.width !== pixelViewport.renderResolution.width
-          || this.scale.gameSize.height !== pixelViewport.renderResolution.height)) {
+      if (this.scale.gameSize.width !== pixelViewport.renderResolution.width
+        || this.scale.gameSize.height !== pixelViewport.renderResolution.height) {
         this.scale.setGameSize(pixelViewport.renderResolution.width, pixelViewport.renderResolution.height);
       }
-      const designSize = profile.id === 'legacy' ? VIEW_SIZE : pixelViewport.renderResolution;
+      const designSize = pixelViewport.renderResolution;
       const viewport = cameraViewportFor(layout, designSize);
       camera.setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
       this.nightShade?.setSize(designSize.width, designSize.height);
       this.weatherShade?.setSize(designSize.width, designSize.height);
       const zoom = profile.id === 'legacy'
-        ? mapZoomFor({ width: layout.safeRect.width, coarse: layout.pointer.coarse, portrait: layout.orientation === 'portrait' })
+        ? mapZoomFor({ cameraWidth: camera.width, coarse: layout.pointer.coarse, portrait: layout.orientation === 'portrait' })
         : camera.width / (pixelViewport.worldTilesVisible.width * TILE_SIZE);
       camera.setZoom(zoom);
       const zone = deadzoneOf({ width: camera.width / camera.zoom, height: camera.height / camera.zoom });

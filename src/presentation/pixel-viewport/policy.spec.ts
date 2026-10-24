@@ -48,6 +48,25 @@ describe('calculatePixelViewportPolicy', () => {
     expect(result.diagnostics.scaleMode).toMatch(/integer|fractional/);
   });
 
+  it('sets legacy touch FOV targets without changing its 64px render asset scale', () => {
+    const portrait = calculatePixelViewportPolicy({
+      container: { width: 390, height: 844 }, safeArea: { x: 0, y: 24, width: 390, height: 800 },
+      dpr: 2, orientation: 'portrait', profile: 'legacy', input: 'touch',
+    });
+    const landscape = calculatePixelViewportPolicy({
+      container: { width: 844, height: 390 }, safeArea: { x: 0, y: 0, width: 844, height: 390 },
+      dpr: 2, orientation: 'landscape', profile: 'legacy', input: 'touch',
+    });
+
+    expect(portrait.worldTilesVisible.width).toBe(9);
+    expect(portrait.worldTilesVisible.height).toBeGreaterThan(10);
+    expect(portrait.renderResolution.width).toBe(9 * 64);
+    expect(portrait.renderResolution.height).toBe(portrait.worldTilesVisible.height * 64);
+    expect(landscape.worldTilesVisible.width).toBe(14);
+    expect(landscape.renderResolution.width).toBe(14 * 64);
+    expect(landscape.renderResolution.height).toBe(landscape.worldTilesVisible.height * 64);
+  });
+
   it('supports cover by reporting the amount cropped outside the safe area', () => {
     const result = calculatePixelViewportPolicy({
       container: { width: 800, height: 600 }, safeArea: { x: 0, y: 0, width: 800, height: 600 },
