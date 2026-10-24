@@ -1,0 +1,1778 @@
+{
+  "schemaVersion": 1,
+  "title": "Dewhollow pixel32 map and tileset candidate",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "hand-authored integer pixel primitives; fixed stored-DEFLATE PNG encoding",
+    "generator": "tools/art/generate_gate1_map.mjs",
+    "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+  },
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "anchorConvention": "integer-pixel-index"
+  },
+  "atlas": {
+    "file": "map-atlas.png",
+    "width": 512,
+    "height": 512,
+    "sha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184"
+  },
+  "seasons": [
+    "spring",
+    "summer",
+    "autumn",
+    "winter"
+  ],
+  "autotile": {
+    "surface": "field",
+    "edgeSurface": "grass",
+    "maskBits": {
+      "north": 1,
+      "east": 2,
+      "south": 4,
+      "west": 8
+    },
+    "variantsPerSeason": 16
+  },
+  "frames": {
+    "spring-grass": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "grass",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field": {
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-path": {
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "path",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-water": {
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "water",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-0": {
+      "x": 128,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 0,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-1": {
+      "x": 160,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 1,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-2": {
+      "x": 192,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 2,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-3": {
+      "x": 224,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 3,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-4": {
+      "x": 256,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 4,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-5": {
+      "x": 288,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 5,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-6": {
+      "x": 320,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 6,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-7": {
+      "x": 352,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 7,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-8": {
+      "x": 384,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 8,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-9": {
+      "x": 416,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 9,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-a": {
+      "x": 448,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 10,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-b": {
+      "x": 480,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 11,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-c": {
+      "x": 0,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 12,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-d": {
+      "x": 32,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 13,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-e": {
+      "x": 64,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 14,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-field-edge-f": {
+      "x": 96,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "field",
+      "autotileMask": 15,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-grass": {
+      "x": 128,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "grass",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field": {
+      "x": 160,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-path": {
+      "x": 192,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "path",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-water": {
+      "x": 224,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "water",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-0": {
+      "x": 256,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 0,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-1": {
+      "x": 288,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 1,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-2": {
+      "x": 320,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 2,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-3": {
+      "x": 352,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 3,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-4": {
+      "x": 384,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 4,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-5": {
+      "x": 416,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 5,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-6": {
+      "x": 448,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 6,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-7": {
+      "x": 480,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 7,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-8": {
+      "x": 0,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 8,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-9": {
+      "x": 32,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 9,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-a": {
+      "x": 64,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 10,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-b": {
+      "x": 96,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 11,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-c": {
+      "x": 128,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 12,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-d": {
+      "x": 160,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 13,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-e": {
+      "x": 192,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 14,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-field-edge-f": {
+      "x": 224,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "field",
+      "autotileMask": 15,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-grass": {
+      "x": 256,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "grass",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field": {
+      "x": 288,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-path": {
+      "x": 320,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "path",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-water": {
+      "x": 352,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "water",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-0": {
+      "x": 384,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 0,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-1": {
+      "x": 416,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 1,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-2": {
+      "x": 448,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 2,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-3": {
+      "x": 480,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 3,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-4": {
+      "x": 0,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 4,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-5": {
+      "x": 32,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 5,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-6": {
+      "x": 64,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 6,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-7": {
+      "x": 96,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 7,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-8": {
+      "x": 128,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 8,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-9": {
+      "x": 160,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 9,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-a": {
+      "x": 192,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 10,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-b": {
+      "x": 224,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 11,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-c": {
+      "x": 256,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 12,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-d": {
+      "x": 288,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 13,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-e": {
+      "x": 320,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 14,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-field-edge-f": {
+      "x": 352,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "field",
+      "autotileMask": 15,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-grass": {
+      "x": 384,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "grass",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field": {
+      "x": 416,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-path": {
+      "x": 448,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "path",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-water": {
+      "x": 480,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "water",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-0": {
+      "x": 0,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 0,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-1": {
+      "x": 32,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 1,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-2": {
+      "x": 64,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 2,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-3": {
+      "x": 96,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 3,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-4": {
+      "x": 128,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 4,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-5": {
+      "x": 160,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 5,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-6": {
+      "x": 192,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 6,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-7": {
+      "x": 224,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 7,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-8": {
+      "x": 256,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 8,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-9": {
+      "x": 288,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 9,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-a": {
+      "x": 320,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 10,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-b": {
+      "x": 352,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 11,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-c": {
+      "x": 384,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 12,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-d": {
+      "x": 416,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 13,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-e": {
+      "x": 448,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 14,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-field-edge-f": {
+      "x": 480,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "field",
+      "autotileMask": 15,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "house-back": {
+      "x": 0,
+      "y": 192,
+      "width": 96,
+      "height": 64,
+      "nativeWidth": 96,
+      "nativeHeight": 64,
+      "kind": "building",
+      "widthTiles": 3,
+      "heightTiles": 2,
+      "footAnchor": {
+        "x": 48,
+        "y": 64
+      },
+      "pivot": {
+        "x": 48,
+        "y": 64
+      },
+      "layer": "back",
+      "approved": false
+    },
+    "house-front": {
+      "x": 0,
+      "y": 256,
+      "width": 96,
+      "height": 64,
+      "nativeWidth": 96,
+      "nativeHeight": 64,
+      "kind": "occlusion",
+      "widthTiles": 3,
+      "heightTiles": 2,
+      "footAnchor": {
+        "x": 48,
+        "y": 64
+      },
+      "pivot": {
+        "x": 48,
+        "y": 64
+      },
+      "layer": "front",
+      "approved": false
+    },
+    "tree-canopy": {
+      "x": 96,
+      "y": 192,
+      "width": 64,
+      "height": 64,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "kind": "occlusion",
+      "widthTiles": 2,
+      "heightTiles": 2,
+      "footAnchor": {
+        "x": 32,
+        "y": 64
+      },
+      "pivot": {
+        "x": 32,
+        "y": 64
+      },
+      "layer": "front",
+      "approved": false
+    }
+  },
+  "limitations": [
+    "Candidate preview only; not approved or registered as production assets.",
+    "Seasonal variants and autotile masks are hand-authored visual studies, not production game map rules.",
+    "Building and canopy demonstrate layer ordering and do not alter collision or map data.",
+    "Final colors, tile readability, seamless edges, building silhouette, and mobile readability require Gate 1 human review."
+  ]
+}

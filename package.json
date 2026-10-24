@@ -16,9 +16,10 @@
     "budget": "node tools/build/check-dist.mjs",
     "assets:gate1:check": "node tools/art/check_gate1_assets.mjs",
     "assets:gate1:animation:check": "node tools/art/check_gate1_animation.mjs",
+    "assets:gate1:map:check": "node tools/art/check_gate1_map.mjs",
     "licenses": "node tools/licenses/generate.mjs",
     "icons": "node tools/pwa/make-icons.mjs",
-    "check": "npm run assets:gate1:check && npm run assets:gate1:animation:check && npm run typecheck && npm test && npm run build && npm run budget"
+    "check": "npm run assets:gate1:check && npm run assets:gate1:animation:check && npm run assets:gate1:map:check && npm run typecheck && npm test && npm run build && npm run budget"
   },
   "dependencies": {
     "dexie": "^4.4.6",
