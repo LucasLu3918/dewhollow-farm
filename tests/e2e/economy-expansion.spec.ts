@@ -26,23 +26,28 @@ async function waitForMovementIdle(page: Page, context: string): Promise<void> {
       })
       .toBe(true);
   } catch (cause) {
-    const snapshot = await page.evaluate(() => {
-      const actors = window.__dewhollow?.actors() ?? [];
-      const player = actors.find((actor) => actor.id === 'player');
-      return {
-        map: window.__dewhollow?.mapId() ?? '',
-        movement: window.__dewhollow?.movement(),
-        player: player && {
-          tileX: player.tileX,
-          tileY: player.tileY,
-          footX: player.footX,
-          footY: player.footY,
-          busy: player.busy,
-        },
-        visibilityState: document.visibilityState,
-        hasFocus: document.hasFocus(),
-      };
-    });
+    let snapshot: unknown;
+    try {
+      snapshot = await page.evaluate(() => {
+        const actors = window.__dewhollow?.actors() ?? [];
+        const player = actors.find((actor) => actor.id === 'player');
+        return {
+          map: window.__dewhollow?.mapId() ?? '',
+          movement: window.__dewhollow?.movement(),
+          player: player && {
+            tileX: player.tileX,
+            tileY: player.tileY,
+            footX: player.footX,
+            footY: player.footY,
+            busy: player.busy,
+          },
+          visibilityState: document.visibilityState,
+          hasFocus: document.hasFocus(),
+        };
+      });
+    } catch (snapshotCause) {
+      snapshot = { unavailable: snapshotCause instanceof Error ? snapshotCause.message : String(snapshotCause) };
+    }
     throw new Error(`Movement scheduler did not become idle (${context}); snapshot=${JSON.stringify(snapshot)}`, { cause });
   }
 }
@@ -174,6 +179,8 @@ const WING_BOUGHT = {
 };
 
 test('a sheep in the pasture pen is fed at the trough, then petted, then sheared once its wool is ready', async ({ page }) => {
+  // The hosted Chromium worker is slower than local runs for the many one-step scheduler handshakes.
+  test.setTimeout(120_000);
   await waitForGame(page);
   await putRecord(page, DAY_FIFTEEN_WITH_SHEEP);
   await page.reload();
