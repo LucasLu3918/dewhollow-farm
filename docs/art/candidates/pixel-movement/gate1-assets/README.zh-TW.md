@@ -1,12 +1,14 @@
 # Gate 1 原生像素網格候選
 
-> **狀態：candidate／未核准。** 這些是供 Gate 1 A/B 場景預覽使用的原創像素候選稿，不是正式遊戲素材。尚未由使用者選定風格，也未完成 Gate 1 驗收。
+> **狀態：pixel32／16-bit 方向已選定；候選素材仍未核准。** 這些是供 Gate 1 A/B 場景預覽使用的原創像素候選稿，不是正式遊戲素材；Gate 1 尚未完成。
 
 ## 檔案
 
 - `8bit.png`：A 候選圖集，64×96 像素，16×16 地形格；角色畫格 16×24。
 - `16bit.png`：B 候選圖集，128×192 像素，32×32 地形格；主角畫格 32×48。
-- `manifest.json`：候選 ID、圖集路徑、15 個固定 key 的 atlas source rect、原生尺寸、格尺寸、腳底 anchor 和每格 SHA-256。
+- `manifest.json`：版本化候選 ID、圖集路徑、15 個固定 key 的 atlas source rect、原生尺寸、格尺寸、foot anchor、pivot、tags 和每格 canonical RGBA SHA-256。
+- `DF-ART-02-PIXEL32-SPEC.zh-TW.md`：32px 網格、座標、atlas cell、pivot/foot anchor 與 checker 驗收範圍。
+- `tools/art/check_gate1_assets.mjs`：唯讀檢查候選規格、atlas PNG 與來源 hash。
 - `palette.json`：兩套候選色票。
 - `generate.mjs`：以逐像素整數圖元繪製候選並輸出 RGBA PNG；沒有縮放既有素材或外部參考圖。
 
@@ -16,17 +18,15 @@
 
 ## 重現與核對
 
-在專案根目錄執行：
+在專案根目錄執行以下命令可重新產生候選檔，或檢查目前檔案：
 
 ```bash
 node docs/art/candidates/pixel-movement/gate1-assets/generate.mjs
+npm run assets:gate1:check
 ```
 
-可用下列 Node 命令核對圖集 SHA-256 與 PNG IHDR 尺寸是否吻合 manifest：
 
-```bash
-node --input-type=module -e 'import fs from "node:fs"; import crypto from "node:crypto"; const root="docs/art/candidates/pixel-movement/gate1-assets"; const m=JSON.parse(fs.readFileSync(`${root}/manifest.json`)); for (const c of m.candidates) { const b=fs.readFileSync(`${root}/${c.atlas}`); const hash=crypto.createHash("sha256").update(b).digest("hex"); const w=b.readUInt32BE(16), h=b.readUInt32BE(20); if(hash!==c.sha256 || w!==c.atlasWidth || h!==c.atlasHeight) throw Error(`invalid ${c.id}`); console.log(`${c.id}: ${w}x${h}, sha256 ${hash}`); }'
-```
+更完整的格式定義與 checker 限制見 [DF-ART-02 pixel32 規格](DF-ART-02-PIXEL32-SPEC.zh-TW.md)。
 
 候選檔只寫入本目錄。不可把它們當成核准素材，也不可加入正式 `public/` 或 `content/assets.json`；每次修改候選都應重新產生並審閱對應雜湊。
 
