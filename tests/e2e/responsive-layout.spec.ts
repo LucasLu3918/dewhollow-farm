@@ -61,6 +61,39 @@ test.describe('響應式版面整合', () => {
     await expect(pad).toBeHidden();
   });
 
+  test('手機狀態列尊重頂端安全區，功能文字至少 14 CSS px', async ({ page }) => {
+    await seed(page, 'external');
+    await start(page);
+    await page.addStyleTag({ content: '.app { --responsive-safe-top: 24px !important; }' });
+
+    const measureMobileHud = async () => page.evaluate(() => {
+      const app = document.querySelector<HTMLElement>('.app');
+      if (!app) throw new Error('找不到 app layout');
+      return {
+        topPadding: Number.parseFloat(getComputedStyle(app).paddingTop),
+        fontSizes: Object.fromEntries([
+          '#hud-day', '#hud-clock', '#hud-weather', '#hud-gold', '#hud-tool', '#hud-seed',
+          '#hud-action', '#hud-saves', '#hud-settings', '#hud-help', '.log',
+        ]
+          .map((selector) => [selector, Number.parseFloat(getComputedStyle(document.querySelector(selector)!).fontSize)])),
+      };
+    });
+
+    const portrait = await measureMobileHud();
+    expect(portrait.topPadding).toBeGreaterThanOrEqual(24);
+    for (const [selector, fontSize] of Object.entries(portrait.fontSizes)) {
+      expect(fontSize, `${selector} portrait font size`).toBeGreaterThanOrEqual(14);
+    }
+
+    await page.setViewportSize({ width: 844, height: 390 });
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.responsiveLayout().orientation ?? '')).toBe('landscape');
+    const landscape = await measureMobileHud();
+    expect(landscape.topPadding).toBeGreaterThanOrEqual(24);
+    for (const [selector, fontSize] of Object.entries(landscape.fontSizes)) {
+      expect(fontSize, `${selector} landscape font size`).toBeGreaterThanOrEqual(14);
+    }
+  });
+
   test('轉向十次時不重建世界、不改遊戲狀態，開啟面板和文字輸入也維持穩定', async ({ page }) => {
     await seed(page, 'external');
     await start(page);
