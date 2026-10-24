@@ -10,6 +10,8 @@ import { expect, test, type Page } from '@playwright/test';
 interface Actor {
   id: string;
   busy: boolean;
+  tileX: number;
+  tileY: number;
 }
 
 async function waitForGame(page: Page): Promise<void> {
@@ -24,11 +26,29 @@ async function mapId(page: Page): Promise<string> {
 
 async function walk(page: Page, key: string, steps: number): Promise<void> {
   for (let i = 0; i < steps; i += 1) {
+    const before = await page.evaluate(() => {
+      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
+      return { map: window.__dewhollow?.mapId() ?? '', x: player?.tileX ?? -1, y: player?.tileY ?? -1 };
+    });
     await page.keyboard.press(key);
     await expect
       .poll(async () => {
         const actors = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
-        return actors.find((a) => a.id === 'player')?.busy ?? true;
+        const player = actors.find((actor) => actor.id === 'player');
+        const currentMap = await mapId(page);
+        return Boolean(player && (currentMap !== before.map || player.tileX !== before.x || player.tileY !== before.y));
+      })
+      .toBe(true);
+    await expect
+      .poll(async () => {
+        const movement = await page.evaluate(() => window.__dewhollow?.movement());
+        return movement && movement.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
+      })
+      .toBe(true);
+    await expect
+      .poll(async () => {
+        const actors = (await page.evaluate(() => window.__dewhollow?.actors() ?? [])) as Actor[];
+        return actors.find((actor) => actor.id === 'player')?.busy ?? true;
       })
       .toBe(false);
   }
