@@ -3,3 +3,10 @@
 - [x] 任務 1：在獨立候選路徑整合 pixel32 地圖與四向動畫候選。
 - [x] 任務 2：新增 E2E 驗證控制互動、候選狀態與正式入口隔離。
 - [x] Checkpoint：完成檢查器、`npm run check`、`npm run test:e2e` 和瀏覽器目視驗收後提交 PR。
+
+## MapScene pixel32 QA 候選 runtime
+
+- [x] 1. 新增候選 manifest 驗證、frame 註冊與 pixel32 地圖 mapping 單元測試。
+- [x] 2. 新增 DEV-only opt-in，在同一 MapScene 使用 pixel32 地圖與玩家四向候選動畫；缺少覆蓋時回退正式素材。
+- [x] 3. 新增 E2E 驗證 farm MapScene 地圖／移動／農務行為、候選素材狀態與 production 隔離。
+- [x] Checkpoint：`npm run check`、完整 `npm run test:e2e`、瀏覽器截圖目視與 AIPS Impact reconciliation 均通過，再 commit、PR、merge。
