@@ -37,11 +37,16 @@ async function startCandidateFarm(browser: Browser) {
 async function waitForMovementIdle(page: import('@playwright/test').Page): Promise<void> {
   await expect.poll(() => page.evaluate(() => {
     const movement = window.__dewhollow?.movement();
-    return movement !== undefined && !movement.moving && !movement.pending;
+    return movement !== undefined
+      && movement.heldDirection === null
+      && !movement.moving
+      && !movement.pending
+      && movement.queuedTaps === 0;
   })).toBe(true);
 }
 
 async function moveOneTile(page: Page, key: string, axis: 'x' | 'y', delta: number): Promise<void> {
+  await waitForMovementIdle(page);
   const before = await page.evaluate(() => window.__dewhollow!.movement().tile);
   await page.keyboard.press(key);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile), { timeout: 10_000 }).not.toEqual(before);
@@ -52,16 +57,20 @@ async function moveOneTile(page: Page, key: string, axis: 'x' | 'y', delta: numb
 }
 
 async function animateOneTile(page: Page, key: string, direction: string, axis: 'x' | 'y', delta: number): Promise<void> {
+  await waitForMovementIdle(page);
   const before = await page.evaluate(() => window.__dewhollow!.movement().tile);
   await page.keyboard.down(key);
-  await expect.poll(() => page.evaluate(({ expectedDirection }) => {
-    const debug = window.__dewhollow;
-    const frame = debug?.pixel32CandidateRuntime().playerFrame ?? '';
-    return debug?.movement().moving === true
-      && frame.startsWith(`${expectedDirection}-`)
-      && !frame.endsWith('-idle');
-  }, { expectedDirection: direction }), { intervals: [10, 20, 50], timeout: 5_000 }).toBe(true);
-  await page.keyboard.up(key);
+  try {
+    await expect.poll(() => page.evaluate(({ expectedDirection }) => {
+      const debug = window.__dewhollow;
+      const frame = debug?.pixel32CandidateRuntime().playerFrame ?? '';
+      return debug?.movement().moving === true
+        && frame.startsWith(`${expectedDirection}-`)
+        && !frame.endsWith('-idle');
+    }, { expectedDirection: direction }), { intervals: [10, 20, 50], timeout: 5_000 }).toBe(true);
+  } finally {
+    await page.keyboard.up(key);
+  }
   await waitForMovementIdle(page);
   const after = await page.evaluate(() => window.__dewhollow!.movement().tile);
   expect(after[axis]).toBe(before[axis] + delta);
