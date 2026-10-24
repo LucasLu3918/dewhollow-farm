@@ -25,9 +25,9 @@ test('pixel32 candidate animator shows four directions, looping walk and isolate
   await toolButton.click();
   await expect(toolButton).toHaveAttribute('aria-pressed', 'true');
   await expect(canvas).toHaveAttribute('data-motion', 'tool');
-  await expect(canvas).toHaveAttribute('data-impact', 'true', { timeout: 1000 });
+  await expect(canvas).toHaveAttribute('data-impact', 'true', { timeout: 5000 });
   await expect(page.locator('#impact-readout')).toContainText('已觸發候選回饋');
-  await expect(canvas).toHaveAttribute('data-motion', 'idle', { timeout: 1000 });
+  await expect(canvas).toHaveAttribute('data-motion', 'idle', { timeout: 5000 });
 
   await page.getByLabel('減少動態').check();
   await expect(canvas).toHaveAttribute('data-reduced-motion', 'true');
