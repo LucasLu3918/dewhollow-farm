@@ -1,0 +1,1412 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tests/e2e/gate1-mapscene-pixel32-overlay-runtime-matrix.spec.ts",
+  "evidenceMode": "saved-to-repository",
+  "candidate": {
+    "map": {
+      "status": "candidate",
+      "approved": false
+    },
+    "animation": {
+      "status": "candidate",
+      "approved": false
+    },
+    "inputs": {
+      "mapManifestSha256": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+      "mapAtlasSha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+      "animationManifestSha256": "ebeb2be797d5e6b16d643aeb8a2e7d8b090fc427099d892957b94f2f626692f8",
+      "animationAtlasSha256": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3"
+    },
+    "overlayFrames": [
+      {
+        "id": "house-back",
+        "frame": "house-back",
+        "layer": "back",
+        "tileX": 3,
+        "tileY": 3,
+        "displayList": "world"
+      },
+      {
+        "id": "tree-canopy",
+        "frame": "tree-canopy",
+        "layer": "front",
+        "tileX": 8,
+        "tileY": 3,
+        "displayList": "scene"
+      },
+      {
+        "id": "house-front",
+        "frame": "house-front",
+        "layer": "front",
+        "tileX": 3,
+        "tileY": 3,
+        "displayList": "scene"
+      }
+    ]
+  },
+  "claim": "15 Chromium-emulated CSS-scale screenshots of the same DEV-only pixel32 farm MapScene with the unapproved house/tree overlay fixture and a deterministic QA save at player tile (5,5). This does not establish native-device rendering, exact DPR raster output, art approval, complete asset coverage, or Gate 1 completion.",
+  "viewports": [
+    {
+      "id": "phone-portrait-390x844",
+      "width": 390,
+      "height": 844,
+      "touch": true
+    },
+    {
+      "id": "phone-landscape-844x390",
+      "width": 844,
+      "height": 390,
+      "touch": true
+    },
+    {
+      "id": "tablet-portrait-768x1024",
+      "width": 768,
+      "height": 1024,
+      "touch": true
+    },
+    {
+      "id": "desktop-landscape-1280x720",
+      "width": 1280,
+      "height": 720,
+      "touch": false
+    },
+    {
+      "id": "desktop-fullhd-1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "touch": false
+    }
+  ],
+  "dprs": [
+    1,
+    2,
+    3
+  ],
+  "measurements": [
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/phone-portrait-390x844-dpr-1.png",
+      "screenshotScale": "css",
+      "sha256": "2d1fdee64c677c4b68ac245c02d00f66bc6a8b306ea6430a780c04a1ce723fe4"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/phone-portrait-390x844-dpr-2.png",
+      "screenshotScale": "css",
+      "sha256": "2d1fdee64c677c4b68ac245c02d00f66bc6a8b306ea6430a780c04a1ce723fe4"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/phone-portrait-390x844-dpr-3.png",
+      "screenshotScale": "css",
+      "sha256": "2d1fdee64c677c4b68ac245c02d00f66bc6a8b306ea6430a780c04a1ce723fe4"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390,
+        "touch": true
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 448,
+        "height": 352
+      },
+      "renderResolution": {
+        "width": 448,
+        "height": 352
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/phone-landscape-844x390-dpr-1.png",
+      "screenshotScale": "css",
+      "sha256": "0d62e00ccf77fc0f4da17f122f9bf24dc88057912a4dfe15b33534e08a4f7919"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390,
+        "touch": true
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 448,
+        "height": 352
+      },
+      "renderResolution": {
+        "width": 448,
+        "height": 352
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/phone-landscape-844x390-dpr-2.png",
+      "screenshotScale": "css",
+      "sha256": "0d62e00ccf77fc0f4da17f122f9bf24dc88057912a4dfe15b33534e08a4f7919"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390,
+        "touch": true
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 448,
+        "height": 352
+      },
+      "renderResolution": {
+        "width": 448,
+        "height": 352
+      },
+      "visibleTiles": {
+        "width": 14,
+        "height": 11
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/phone-landscape-844x390-dpr-3.png",
+      "screenshotScale": "css",
+      "sha256": "b32553b7b252394884198cd1ebd3cb2e85cdb83b8407575e136760690e9d6a6c"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024,
+        "touch": true
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 224
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 224
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/tablet-portrait-768x1024-dpr-1.png",
+      "screenshotScale": "css",
+      "sha256": "9ff0fd2f250f910af145247f0ccedf369e6f58a2e9ddc90952cd39373c69d1cf"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024,
+        "touch": true
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 224
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 224
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/tablet-portrait-768x1024-dpr-2.png",
+      "screenshotScale": "css",
+      "sha256": "9ff0fd2f250f910af145247f0ccedf369e6f58a2e9ddc90952cd39373c69d1cf"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024,
+        "touch": true
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 224
+      },
+      "renderResolution": {
+        "width": 288,
+        "height": 224
+      },
+      "visibleTiles": {
+        "width": 9,
+        "height": 7
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/tablet-portrait-768x1024-dpr-3.png",
+      "screenshotScale": "css",
+      "sha256": "9ff0fd2f250f910af145247f0ccedf369e6f58a2e9ddc90952cd39373c69d1cf"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720,
+        "touch": false
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/desktop-landscape-1280x720-dpr-1.png",
+      "screenshotScale": "css",
+      "sha256": "720ab64f621203d60d91c724fedfcf0ba4f494d58994a3b746a2ff67fe54e87c"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720,
+        "touch": false
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/desktop-landscape-1280x720-dpr-2.png",
+      "screenshotScale": "css",
+      "sha256": "720ab64f621203d60d91c724fedfcf0ba4f494d58994a3b746a2ff67fe54e87c"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720,
+        "touch": false
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 416
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 416
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 13
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/desktop-landscape-1280x720-dpr-3.png",
+      "screenshotScale": "css",
+      "sha256": "720ab64f621203d60d91c724fedfcf0ba4f494d58994a3b746a2ff67fe54e87c"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "touch": false
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 480
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 480
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 15
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/desktop-fullhd-1920x1080-dpr-1.png",
+      "screenshotScale": "css",
+      "sha256": "052b844ad6a5352cadd23d26a1f95508146693b88605e2735fa1888d816ee6fd"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "touch": false
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 480
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 480
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 15
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/desktop-fullhd-1920x1080-dpr-2.png",
+      "screenshotScale": "css",
+      "sha256": "052b844ad6a5352cadd23d26a1f95508146693b88605e2735fa1888d816ee6fd"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "touch": false
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "runtimeEnabled": true,
+      "playerFrame": "down-idle",
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 480
+      },
+      "renderResolution": {
+        "width": 544,
+        "height": 480
+      },
+      "visibleTiles": {
+        "width": 17,
+        "height": 15
+      },
+      "cameraZoom": 0.5,
+      "overlayState": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshot": "screenshots/desktop-fullhd-1920x1080-dpr-3.png",
+      "screenshotScale": "css",
+      "sha256": "052b844ad6a5352cadd23d26a1f95508146693b88605e2735fa1888d816ee6fd"
+    }
+  ],
+  "limitations": [
+    "Chromium viewport and deviceScaleFactor emulation only; screenshots are CSS-scale, not native DPR raster evidence.",
+    "The overlay layer positions and candidate loading are machine-checked; visual readability, artistic quality, seams, movement stability, and exact art approval remain human review items.",
+    "All candidate inputs remain status candidate and approved false; native iOS/Android behavior remains DEVICE_PENDING."
+  ]
+}

@@ -176,3 +176,24 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 在既有 DEV-only pixel32 overlay 候選場景，以固定玩家座標和原始 renderer snapshot 記錄玩家顯示／隱藏時的差分像素數。結果、四張 Chromium 截圖與 SHA-256 見 [遮擋候選報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-occlusion.zh-TW.md)。
 
 本階段只驗證候選圖層遮擋方向，不核准素材或 Gate 1，不改正式地圖、碰撞、存檔及玩法；原生裝置仍為 `DEVICE_PENDING`。
+
+---
+
+# DF-G1-OVERLAY-RUNTIME-MATRIX pixel32 房屋／樹冠候選 viewport／DPR 證據
+
+沿用精確 DEV-only pixel32 MapScene 與 overlay opt-in，在五種 viewport × Chromium DPR 1／2／3 擷取 15 張 house／tree overlay 候選畫面，驗證圖層、資產載入、Canvas／camera 量測及候選輸入與截圖 SHA-256。結果見 [overlay runtime 矩陣報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-runtime-matrix.zh-TW.md)。
+
+此工作只新增候選 E2E、PNG／JSON 證據、報告與稽核狀態；不變更正式 runtime、地圖、碰撞、存檔、玩法、`content/assets.json` 或素材核准狀態。Chromium CSS-scale 截圖不代表原生 DPR raster、實機表現或 Gate 1 通過。
+
+## 完成條件
+
+- [x] 15 個 viewport／DPR context 都載入同一 farm MapScene、精確候選 opt-in 與三個未核准 overlay layer。
+- [x] 每個 context 確認候選資產請求無失敗、無頁面錯誤，記錄 viewport／DPR／Canvas／camera／overlay layer 與 SHA-256。
+- [x] 保存 15 張截圖，重算 hash 全部相符；抽查代表圖並更新 Gate 1 稽核矩陣。
+- [x] `npm run check` 通過（1,616 passed／1 skipped、build／8 MB 預算）；完整 Playwright E2E 231/231 通過，再進行 Impact reconciliation、提交、開 PR 並依 required checks 合併。
+
+## 後續限制
+
+- 完整 12×10 場景與 legacy／pixel16／pixel32 同 runtime 比較仍缺。
+- 10 情境可讀性、seam／閃爍、動作腳錨人工評分與原生 iOS／Android 驗收仍待完成；實機維持 `DEVICE_PENDING`。
+- 候選仍為 `candidate`／`approved: false`；確切素材人工核准與 Gate 1 簽核不在本任務授權內。
