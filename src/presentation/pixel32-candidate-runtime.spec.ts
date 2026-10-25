@@ -4,6 +4,7 @@ import type { MapDef } from '../domain/content';
 import {
   PIXEL32_CANDIDATE_OVERLAYS,
   candidateFramesFromManifest,
+  pixel32CandidateReviewRequested,
   pixel32CandidateRuntimeRequested,
   pixel32MapFrameFor,
   pixel32OverlayPreviewRequested,
@@ -86,5 +87,15 @@ describe('pixel32 overlay candidate preview', () => {
     ]);
     expect(PIXEL32_CANDIDATE_OVERLAYS[0]).toMatchObject({ tileX: 3, tileY: 3, widthTiles: 3, heightTiles: 2 });
     expect(PIXEL32_CANDIDATE_OVERLAYS[2]).toMatchObject({ tileX: 3, tileY: 3, widthTiles: 3, heightTiles: 2 });
+  });
+});
+
+describe('pixel32 candidate asset review opt-in', () => {
+  it('requires DEV, the base runtime, and the exact review query', () => {
+    const query = new URLSearchParams('gate1AssetPreview=pixel32-candidates');
+    expect(pixel32CandidateReviewRequested(query, true, true)).toBe(true);
+    expect(pixel32CandidateReviewRequested(query, false, true)).toBe(false);
+    expect(pixel32CandidateReviewRequested(query, true, false)).toBe(false);
+    expect(pixel32CandidateReviewRequested(new URLSearchParams('gate1AssetPreview=true'), true, true)).toBe(false);
   });
 });

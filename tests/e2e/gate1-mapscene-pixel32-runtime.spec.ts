@@ -8,6 +8,14 @@ const candidatePaths = [
   `${candidateRoot}/pixel32-animation/manifest.json`,
   `${candidateRoot}/pixel32-animation/player-4dir.png`,
 ];
+const candidateReviewPaths = [
+  `${candidateRoot}/pixel32-crops/manifest.json`,
+  `${candidateRoot}/pixel32-crops/sweet-radish-stages.png`,
+  `${candidateRoot}/pixel32-interactables/manifest.json`,
+  `${candidateRoot}/pixel32-interactables/interactables-atlas.png`,
+  '/docs/art/candidates/pixel-movement/gate1-pets-pixel32/manifest.json',
+  '/docs/art/candidates/pixel-movement/gate1-pets-pixel32/pets-pixel32.png',
+];
 
 async function startCandidateFarm(browser: Browser) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
@@ -146,10 +154,10 @@ test('pixel32 candidate runtime stays off without its exact DEV opt-in and in pr
   const productionPage = await productionContext.newPage();
   const productionRequests: string[] = [];
   productionPage.on('request', (request) => {
-    if (candidatePaths.some((path) => request.url().includes(path))) productionRequests.push(request.url());
+    if ([...candidatePaths, ...candidateReviewPaths].some((path) => request.url().includes(path))) productionRequests.push(request.url());
   });
   const baseUrl = (globalThis as typeof globalThis & { process?: { env?: Record<string, string | undefined> } }).process?.env?.PWA_BASE_URL ?? 'http://127.0.0.1:4173';
-  await productionPage.goto(`${baseUrl}/${candidateQuery}`);
+  await productionPage.goto(`${baseUrl}/${candidateQuery}&gate1AssetPreview=pixel32-candidates`);
   await expect(productionPage.locator('#game canvas')).toBeVisible();
   expect(productionRequests).toEqual([]);
   await productionContext.close();

@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tests/e2e/gate1-candidate-assets-review.spec.ts",
+  "capturedAt": "2026-10-25T17:02:11.886Z",
+  "captureProvider": "Playwright Chromium desktop context",
+  "sourceRevision": "70b350d49603657f53b877649a86402bb8997e9f",
+  "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates",
+  "claim": "DEV-only Pixel32 visual contact sheet for three crop stages, cat/quokka cardinal idle frames, held-preview tools, and static door/shipbox states; sweet-radish candidate is also rendered in the fixed farm save.",
+  "candidateState": {
+    "status": "candidate",
+    "approved": false
+  },
+  "inputs": [
+    {
+      "path": "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-crops/manifest.json",
+      "sha256": "6e7b3c847eb026c2980dfd22da2cfcd43dc6288781a89bfc2b9ff480a10d00dd",
+      "bytes": 3510
+    },
+    {
+      "path": "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-crops/sweet-radish-stages.png",
+      "sha256": "6fa85cde285fa70538f932f4ebeabcdcdb709ae2e65b43298ce232fcdb78ba40",
+      "bytes": 12388
+    },
+    {
+      "path": "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json",
+      "sha256": "53cc94ee54e5917cf8e761a1e77afd3d043ed863874a308b99fe5fa836ca714f",
+      "bytes": 8542
+    },
+    {
+      "path": "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+      "sha256": "b2c38612200c90b87eb1a937adcac077c4f80891b4683b8f8b1853670e687915",
+      "bytes": 49316
+    },
+    {
+      "path": "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/manifest.json",
+      "sha256": "bc1cbc0d39091702d58867513fd029168b57bc348e3e21a80a50c90745de86ea",
+      "bytes": 18974
+    },
+    {
+      "path": "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/pets-pixel32.png",
+      "sha256": "720411831a56879143ff3f6dd6877b0f2138744c1e81e9aff9c669c259e442f3",
+      "bytes": 131278
+    }
+  ],
+  "visibleFrames": [
+    {
+      "group": "crops",
+      "frame": "seed",
+      "texture": "gate1-pixel32-crops-atlas",
+      "x": 176,
+      "y": 53,
+      "scale": 2,
+      "frameSha256": "ec1d77968ae959c1249d65b7880a0a9587f8991b03655ba6012b6eb342cffe5e"
+    },
+    {
+      "group": "crops",
+      "frame": "sprout",
+      "texture": "gate1-pixel32-crops-atlas",
+      "x": 248,
+      "y": 53,
+      "scale": 2,
+      "frameSha256": "80180381dda78aeb99b901d173398cbc436d0e665a79cda75a2461ea2910ea18"
+    },
+    {
+      "group": "crops",
+      "frame": "mature",
+      "texture": "gate1-pixel32-crops-atlas",
+      "x": 320,
+      "y": 53,
+      "scale": 2,
+      "frameSha256": "cad4faea12942ef8fbdefb2089f989731c5154b2e28e8baeabc8faca1df32734"
+    },
+    {
+      "group": "cat",
+      "frame": "cat-down-idle",
+      "texture": "gate1-pixel32-pets-atlas",
+      "x": 176,
+      "y": 116,
+      "scale": 2,
+      "frameSha256": "3ef717d9c2e1c78d20bfcd6f64c626bfc7f19de6a3d38a3eed1cc70e10e85d08"
+    },
+    {
+      "group": "cat",
+      "frame": "cat-up-idle",
+      "texture": "gate1-pixel32-pets-atlas",
+      "x": 248,
+      "y": 116,
+      "scale": 2,
+      "frameSha256": "db4caacd6aa8305cb9cf5c40936b7510127ed8bee0df6ce110c7d4223de89a7b"
+    },
+    {
+      "group": "cat",
+      "frame": "cat-left-idle",
+      "texture": "gate1-pixel32-pets-atlas",
+      "x": 320,
+      "y": 116,
+      "scale": 2,
+      "frameSha256": "40b1f262135a4caa988999c3b1f6706ab079439df79057512e882c158492cd95"
+    },
+    {
+      "group": "cat",
+      "frame": "cat-right-idle",
+      "texture": "gate1-pixel32-pets-atlas",
+      "x": 392,
+      "y": 116,
+      "scale": 2,
+      "frameSha256": "8fd1680c7d418a99aa885f712d21b8da2a827c935c081b240080acfed5c6a30e"
+    },
+    {
+      "group": "quokka",
+      "frame": "quokka-down-idle",
+      "texture": "gate1-pixel32-pets-atlas",
+      "x": 176,
+      "y": 179,
+      "scale": 2,
+      "frameSha256": "12d75669e228e4f24e1fc03a8c2cc3436894f3912bf0d2fe80f7c24145f7e138"
+    },
+    {
+      "group": "quokka",
+      "frame": "quokka-up-idle",
+      "texture": "gate1-pixel32-pets-atlas",
+      "x": 248,
+      "y": 179,
+      "scale": 2,
+      "frameSha256": "84b14257f9ae44d745aa96284d2109122fa8d36dbd06abd89b87d7b714e1255e"
+    },
+    {
+      "group": "quokka",
+      "frame": "quokka-left-idle",
+      "texture": "gate1-pixel32-pets-atlas",
+      "x": 320,
+      "y": 179,
+      "scale": 2,
+      "frameSha256": "1cf868c859f656315382419bf81b6af27cde5984656ccb550533ceba9e19d8f7"
+    },
+    {
+      "group": "quokka",
+      "frame": "quokka-right-idle",
+      "texture": "gate1-pixel32-pets-atlas",
+      "x": 392,
+      "y": 179,
+      "scale": 2,
+      "frameSha256": "f78253ea3d58a95d8aa8334794ae511452748e821c59177581a1c5d31fe2bfc5"
+    },
+    {
+      "group": "tools",
+      "frame": "tool-hoe",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 176,
+      "y": 242,
+      "scale": 1.2647058823529411,
+      "frameSha256": "84b47a21cc4df7281a35362e1d662bc808ae29bafee5568c85a7f1ccee611b95"
+    },
+    {
+      "group": "tools",
+      "frame": "tool-can",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 224,
+      "y": 242,
+      "scale": 1.2647058823529411,
+      "frameSha256": "5f389b6737e26b31b5dcb2df8dd4b5d7ce9079c89719ef7db60a80ae9b2689ae"
+    },
+    {
+      "group": "tools",
+      "frame": "tool-seedbag",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 273,
+      "y": 242,
+      "scale": 1.2647058823529411,
+      "frameSha256": "9b6c8c4b3107670dc2b96fe04b99326ead9a4ed62ced642fa9eb5ba83277efe5"
+    },
+    {
+      "group": "tools",
+      "frame": "tool-axe",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 321,
+      "y": 242,
+      "scale": 1.2647058823529411,
+      "frameSha256": "704e4c23efbfbb89f1dbfd02695a276e69f8e55f33827ce62c89bdd008088c49"
+    },
+    {
+      "group": "tools",
+      "frame": "tool-pick",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 370,
+      "y": 242,
+      "scale": 1.2647058823529411,
+      "frameSha256": "0bcbef5bedadc966bd2583a45b821a2c130475067d37b274ebab99b2cff56561"
+    },
+    {
+      "group": "tools",
+      "frame": "tool-rod",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 418,
+      "y": 242,
+      "scale": 1.2647058823529411,
+      "frameSha256": "fdd6ced426675752da4804cf12a7b4878023131e43791da0d937fc65a8811a23"
+    },
+    {
+      "group": "tools",
+      "frame": "tool-sickle",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 467,
+      "y": 242,
+      "scale": 1.2647058823529411,
+      "frameSha256": "02a36f4834354bb02cc82550c9c44125fa8e2a79112d5c45d38062442f104619"
+    },
+    {
+      "group": "objects",
+      "frame": "door-closed",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 176,
+      "y": 305,
+      "scale": 2,
+      "frameSha256": "b79a9ae2732feeec9ac25497d52476643c9efe7cdf6a3c771c029058b1b4726b"
+    },
+    {
+      "group": "objects",
+      "frame": "door-open",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 248,
+      "y": 305,
+      "scale": 2,
+      "frameSha256": "1dac80ea9501682faacd68da0cb62ecdda97f60d5bbb5114bc07e115ad7dd490"
+    },
+    {
+      "group": "objects",
+      "frame": "shipbox-closed",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 320,
+      "y": 305,
+      "scale": 2,
+      "frameSha256": "f47ef5735a125b679bcd65777059eb1c883eb5d75aae9832d377d6b42b297ac2"
+    },
+    {
+      "group": "objects",
+      "frame": "shipbox-open",
+      "texture": "gate1-pixel32-interactables-atlas",
+      "x": 392,
+      "y": 305,
+      "scale": 2,
+      "frameSha256": "a2b80a6966589f4ead8940a61d71033dde995260d38928cf94cd699ccccb4087"
+    }
+  ],
+  "viewport": {
+    "width": 1280,
+    "height": 900,
+    "dpr": 1,
+    "screenshotScale": "css",
+    "canvasCss": {
+      "width": 820.4375,
+      "height": 614.828125
+    }
+  },
+  "productionIsolation": {
+    "formalPetTextures": [
+      {
+        "width": 96,
+        "height": 96
+      },
+      {
+        "width": 96,
+        "height": 96
+      }
+    ],
+    "candidateTextures": [
+      "gate1-pixel32-crops-atlas",
+      "gate1-pixel32-pets-atlas",
+      "gate1-pixel32-interactables-atlas"
+    ]
+  },
+  "requests": [
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-crops/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-crops/sweet-radish-stages.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/pets-pixel32.png"
+  ],
+  "failures": [],
+  "consoleWarningsOrErrors": [
+    "warning: [.WebGL-0x11c00454c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "warning: [.WebGL-0x11c00454c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "warning: [.WebGL-0x11c00454c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "warning: [.WebGL-0x11c00454c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ],
+  "pageErrors": [],
+  "screenshot": {
+    "path": "screenshots/candidate-assets-1280x900.png",
+    "sha256": "3d2f245be931c4401fe4b3f747575a0f58d1d74520cea0b81a2f9d90aaac000e",
+    "bytes": 139985
+  },
+  "farmSceneScreenshot": {
+    "path": "screenshots/farm-candidate-crops-1280x900.png",
+    "sha256": "03e72f7080dcb64ac71c084cc26901d8f02975b58888a3e74c6560a0849de10b",
+    "bytes": 120504,
+    "visibleCropFrames": [
+      "seed",
+      "sprout",
+      "mature"
+    ]
+  },
+  "limitations": [
+    "Sprites are candidate-only review samples; the board does not change tools, collisions, companion AI, or save data.",
+    "Pet frames are static directional samples; movement and follow animation remain production behavior.",
+    "Tool frames are held-preview art only; no grip, swing, or gameplay integration is implied.",
+    "This is a CSS-scale Chromium capture, not native DPR raster or iOS/Android device evidence.",
+    "Manifest hash/checker evidence does not establish visual quality or exact-hash approval.",
+    "The candidate atlas and preview are not registered in content/assets.json or public assets."
+  ]
+}

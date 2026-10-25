@@ -43,7 +43,7 @@ export function resolveCandidateArt(
   const candidate = candidateForProfile(profile);
   if (!candidate) return null;
 
-  const frame = assetId.startsWith('crop.')
+  const frame = assetId === 'crop.sweet-radish'
     ? CROP_FRAME_BY_STAGE[cropStage]
     : CANDIDATE_FRAME_BY_ASSET[assetId];
   if (!frame) return null;

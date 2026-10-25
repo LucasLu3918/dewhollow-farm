@@ -29,8 +29,15 @@ import {
   candidateFramesFromManifest,
   PIXEL32_ANIMATION_ATLAS_KEY,
   PIXEL32_ANIMATION_MANIFEST_KEY,
+  PIXEL32_CROPS_ATLAS_KEY,
+  PIXEL32_CROPS_MANIFEST_KEY,
+  PIXEL32_INTERACTABLES_ATLAS_KEY,
+  PIXEL32_INTERACTABLES_MANIFEST_KEY,
+  PIXEL32_PETS_ATLAS_KEY,
+  PIXEL32_PETS_MANIFEST_KEY,
   PIXEL32_MAP_ATLAS_KEY,
   PIXEL32_MAP_MANIFEST_KEY,
+  pixel32CandidateReviewRequested,
   pixel32CandidateRuntimeRequested,
 } from '../pixel32-candidate-runtime';
 
@@ -95,11 +102,21 @@ export class BootScene extends Phaser.Scene {
       this.load.json(PIXEL32_ANIMATION_MANIFEST_KEY, `${root}/pixel32-animation/manifest.json`);
       this.load.image(PIXEL32_ANIMATION_ATLAS_KEY, `${root}/pixel32-animation/player-4dir.png`);
     }
+    if (this.pixel32CandidateReviewRequested()) {
+      const root = '/docs/art/candidates/pixel-movement';
+      this.load.json(PIXEL32_CROPS_MANIFEST_KEY, `${root}/gate1-assets/pixel32-crops/manifest.json`);
+      this.load.image(PIXEL32_CROPS_ATLAS_KEY, `${root}/gate1-assets/pixel32-crops/sweet-radish-stages.png`);
+      this.load.json(PIXEL32_INTERACTABLES_MANIFEST_KEY, `${root}/gate1-assets/pixel32-interactables/manifest.json`);
+      this.load.image(PIXEL32_INTERACTABLES_ATLAS_KEY, `${root}/gate1-assets/pixel32-interactables/interactables-atlas.png`);
+      this.load.json(PIXEL32_PETS_MANIFEST_KEY, `${root}/gate1-pets-pixel32/manifest.json`);
+      this.load.image(PIXEL32_PETS_ATLAS_KEY, `${root}/gate1-pets-pixel32/pets-pixel32.png`);
+    }
   }
 
   create(): void {
     const candidateId = this.registerCandidateAtlas();
     const pixel32CandidateRuntime = this.registerPixel32CandidateAtlases();
+    const pixel32CandidateAssets = this.registerPixel32CandidateReviewAtlases();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
     registerAnimalTextures(this);
     for (const entry of this.deps.assets.assets) {
@@ -140,11 +157,20 @@ export class BootScene extends Phaser.Scene {
     };
     this.registry.set('gate1-candidate-id', candidateId);
     this.registry.set('gate1-pixel32-candidate-runtime', pixel32CandidateRuntime);
+    this.registry.set('gate1-pixel32-candidate-assets', pixel32CandidateAssets);
     this.scene.start('map', sceneDeps);
   }
 
   private pixel32RuntimeRequested(): boolean {
     return pixel32CandidateRuntimeRequested(new URLSearchParams(window.location.search), import.meta.env.DEV);
+  }
+
+  private pixel32CandidateReviewRequested(): boolean {
+    return pixel32CandidateReviewRequested(
+      new URLSearchParams(window.location.search),
+      import.meta.env.DEV,
+      this.pixel32RuntimeRequested(),
+    );
   }
 
   private registerPixel32CandidateAtlases(): boolean {
@@ -158,6 +184,22 @@ export class BootScene extends Phaser.Scene {
 
     this.registerFrames(PIXEL32_MAP_ATLAS_KEY, mapFrames);
     this.registerFrames(PIXEL32_ANIMATION_ATLAS_KEY, animationFrames);
+    return true;
+  }
+
+  private registerPixel32CandidateReviewAtlases(): boolean {
+    if (!this.pixel32CandidateReviewRequested()) return false;
+    const entries = [
+      { key: PIXEL32_CROPS_ATLAS_KEY, manifestKey: PIXEL32_CROPS_MANIFEST_KEY, file: 'sweet-radish-stages.png' },
+      { key: PIXEL32_INTERACTABLES_ATLAS_KEY, manifestKey: PIXEL32_INTERACTABLES_MANIFEST_KEY, file: 'interactables-atlas.png' },
+      { key: PIXEL32_PETS_ATLAS_KEY, manifestKey: PIXEL32_PETS_MANIFEST_KEY, file: 'pets-pixel32.png' },
+    ];
+    const frames = entries.map((entry) => ({
+      ...entry,
+      frames: candidateFramesFromManifest(this.cache.json.get(entry.manifestKey), entry.file),
+    }));
+    if (frames.some(({ key, frames: candidateFrames }) => !this.textures.exists(key) || !candidateFrames)) return false;
+    for (const entry of frames) this.registerFrames(entry.key, entry.frames!);
     return true;
   }
 
