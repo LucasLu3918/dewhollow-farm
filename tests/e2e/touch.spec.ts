@@ -584,6 +584,132 @@ test.describe('搖桿、多指與生命週期（合成 PointerEvent）', () => {
     expect(await playerPosition(page)).toEqual(stopped);
   });
 
+  test('fixed joystick maps all four cardinal axes to one grid axis at a time', async ({ page }) => {
+    await seedMobileControls(page, 'fixed-joystick');
+    await startGame(page);
+    const pad = page.locator('.touch-move');
+    const box = await pad.boundingBox();
+    expect(box).not.toBeNull();
+    const center = { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 };
+    const cases = [
+      { direction: 'right', dx: 58, dy: 0, axis: 'x', delta: 1 },
+      { direction: 'down', dx: 0, dy: 58, axis: 'y', delta: 1 },
+      { direction: 'left', dx: -58, dy: 0, axis: 'x', delta: -1 },
+      { direction: 'up', dx: 0, dy: -58, axis: 'y', delta: -1 },
+    ] as const;
+
+    for (const [index, movement] of cases.entries()) {
+      const before = await playerPosition(page);
+      const pointerId = 90 + index;
+      await page.evaluate(({ id, x, y, dx, dy, direction, axis, delta, start }) => new Promise<void>((resolve, reject) => {
+        const target = document.querySelector<HTMLElement>('.touch-move');
+        if (!target) return reject(new Error('找不到固定搖桿'));
+        const dispatch = (type: string, clientX: number, clientY: number) => target.dispatchEvent(new PointerEvent(type, {
+          pointerId: id,
+          pointerType: 'touch',
+          bubbles: true,
+          cancelable: true,
+          clientX,
+          clientY,
+        }));
+        dispatch('pointerdown', x, y);
+        dispatch('pointermove', x + dx, y + dy);
+        const deadline = performance.now() + 3000;
+        const confirmFirstStep = () => {
+          const state = window.__dewhollow?.movement();
+          if (!state) {
+            dispatch('pointerup', x + dx, y + dy);
+            reject(new Error('無法讀取移動狀態'));
+            return;
+          }
+          if (state.heldDirection && state.heldDirection !== direction) {
+            dispatch('pointerup', x + dx, y + dy);
+            reject(new Error(`搖桿方向錯誤：預期 ${direction}，實際 ${state.heldDirection}`));
+            return;
+          }
+          const expectedTile = {
+            x: start.x + (axis === 'x' ? delta : 0),
+            y: start.y + (axis === 'y' ? delta : 0),
+          };
+          if (state.moving && state.tile.x === expectedTile.x && state.tile.y === expectedTile.y) {
+            dispatch('pointerup', x + dx, y + dy);
+            resolve();
+            return;
+          }
+          if (performance.now() >= deadline) {
+            dispatch('pointerup', x + dx, y + dy);
+            reject(new Error('搖桿未在時限內啟動第一個移動步驟'));
+            return;
+          }
+          requestAnimationFrame(confirmFirstStep);
+        };
+        requestAnimationFrame(confirmFirstStep);
+      }), {
+        id: pointerId,
+        x: center.x,
+        y: center.y,
+        dx: movement.dx,
+        dy: movement.dy,
+        direction: movement.direction,
+        axis: movement.axis,
+        delta: movement.delta,
+        start: before,
+      });
+      const committedAfter = await page.evaluate(() => window.__dewhollow?.movement().tile ?? null);
+      expect(committedAfter).not.toBeNull();
+      if (movement.axis === 'x') expect(committedAfter!.x - before.x).toBe(movement.delta);
+      else expect(committedAfter!.y - before.y).toBe(movement.delta);
+      if (movement.axis === 'x') expect(committedAfter!.y).toBe(before.y);
+      else expect(committedAfter!.x).toBe(before.x);
+      await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null)).toBeNull();
+      await expect.poll(() => page.evaluate(() => {
+        const movementState = window.__dewhollow?.movement();
+        return Boolean(movementState && !movementState.moving && !movementState.pending && movementState.queuedTaps === 0);
+      })).toBe(true);
+      const stopped = await playerPosition(page);
+      expect(stopped.x).toBe(committedAfter!.x);
+      expect(stopped.y).toBe(committedAfter!.y);
+      if (movement.axis === 'x') expect(stopped.y).toBe(before.y);
+      else expect(stopped.x).toBe(before.x);
+      await page.waitForTimeout(350);
+      expect(await playerPosition(page)).toEqual(stopped);
+    }
+  });
+
+  test('a second joystick gesture can cycle tools without releasing the movement finger', async ({ page }) => {
+    await seedMobileControls(page, 'fixed-joystick');
+    await startGame(page);
+    const before = await playerPosition(page);
+    const pad = page.locator('.touch-move');
+    const box = await pad.boundingBox();
+    expect(box).not.toBeNull();
+    const center = { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 };
+    await pad.dispatchEvent('pointerdown', {
+      pointerId: 101, pointerType: 'touch', bubbles: true, cancelable: true,
+      clientX: center.x, clientY: center.y,
+    });
+    await pad.dispatchEvent('pointermove', {
+      pointerId: 101, pointerType: 'touch', bubbles: true, cancelable: true,
+      clientX: center.x + 58, clientY: center.y,
+    });
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null)).toBe('right');
+    const initialTool = await page.locator('#hud-tool').innerText();
+    const cycleTool = page.locator('#touch-controls button[data-action="cycleTool"]');
+    await cycleTool.dispatchEvent('pointerdown', { pointerId: 102, pointerType: 'touch', bubbles: true, cancelable: true });
+    // World actions wait for the current held movement to finish; releasing this
+    // second finger must leave the joystick gesture active until its own release.
+    await cycleTool.dispatchEvent('pointerup', { pointerId: 102, pointerType: 'touch', bubbles: true, cancelable: true });
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null)).toBe('right');
+    await expect(page.locator('#hud-tool')).toHaveText(initialTool);
+    await expect.poll(async () => (await playerPosition(page)).x).toBeGreaterThan(before.x);
+    await pad.dispatchEvent('pointerup', {
+      pointerId: 101, pointerType: 'touch', bubbles: true, cancelable: true,
+      clientX: center.x + 58, clientY: center.y,
+    });
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().heldDirection ?? null)).toBeNull();
+    await expect(page.locator('#hud-tool')).not.toHaveText(initialTool);
+  });
+
   test('releasing the action finger leaves movement active; opening a modal cancels all held gestures', async ({ page }) => {
     await seedMobileControls(page, 'dpad');
     await startGame(page);

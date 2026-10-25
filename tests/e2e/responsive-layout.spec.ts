@@ -47,6 +47,48 @@ test.describe('響應式版面整合', () => {
     await fakePointerCapabilities(page, false, 2);
     await start(page);
     await expect(page.locator('#touch-controls')).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixelViewport().worldTilesVisible.width ?? 0))
+      .toBeGreaterThanOrEqual(8);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixelViewport().worldTilesVisible.width ?? 0))
+      .toBeLessThanOrEqual(10);
+  });
+
+  test('mobile camera FOV follows touch targets across portrait, short portrait, and landscape sizes', async ({ page }) => {
+    await seed(page, 'external');
+    await start(page);
+    for (const viewport of [
+      { width: 390, height: 844, orientation: 'portrait', min: 8, max: 10 },
+      { width: 320, height: 568, orientation: 'portrait', min: 8, max: 10 },
+      { width: 844, height: 390, orientation: 'landscape', min: 12, max: 16 },
+    ] as const) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await expect.poll(() => page.evaluate(() => window.__dewhollow?.responsiveLayout().orientation ?? ''))
+        .toBe(viewport.orientation);
+      await expect.poll(() => page.evaluate(() => {
+        const framing = window.__dewhollow?.pixelViewport();
+        if (!framing) return null;
+        return {
+          width: framing.actualWorldTilesVisible.width,
+          height: framing.actualWorldTilesVisible.height,
+          targetWidth: framing.worldTilesVisible.width,
+          targetHeight: framing.worldTilesVisible.height,
+        };
+      })).toMatchObject({
+        targetWidth: expect.any(Number),
+        targetHeight: expect.any(Number),
+      });
+      await expect.poll(() => page.evaluate(() => {
+        const framing = window.__dewhollow?.pixelViewport();
+        return framing && Math.abs(framing.actualWorldTilesVisible.width - framing.worldTilesVisible.width) <= 0.1 &&
+          Math.abs(framing.actualWorldTilesVisible.height - framing.worldTilesVisible.height) <= 0.1;
+      })).toBe(true);
+      const framing = await page.evaluate(() => window.__dewhollow?.pixelViewport() ?? null);
+      expect(framing).not.toBeNull();
+      expect(framing!.worldTilesVisible.width).toBeGreaterThanOrEqual(viewport.min);
+      expect(framing!.worldTilesVisible.width).toBeLessThanOrEqual(viewport.max);
+      expect(framing!.actualWorldTilesVisible.width).toBeCloseTo(framing!.worldTilesVisible.width, 1);
+      expect(framing!.actualWorldTilesVisible.height).toBeCloseTo(framing!.worldTilesVisible.height, 1);
+    }
   });
 
   test('auto visibility follows pointer media-query changes without changing settings', async ({ page }) => {
@@ -197,6 +239,23 @@ test.describe('響應式版面整合', () => {
       expect(overlapsCamera, `rendered control group ${index} intersects the actual camera viewport`).toBe(false);
     }
     await expect(page.locator('#settings-placement')).toHaveValue('overlay');
+  });
+
+  test('旋轉 viewport 會收合「更多」並同步更新搖桿快捷狀態', async ({ page }) => {
+    await seed(page, 'overlay');
+    await start(page);
+    const toggle = page.locator('#touch-controls .touch-more-toggle');
+    await toggle.dispatchEvent('pointerdown', { pointerId: 81, pointerType: 'touch', bubbles: true, cancelable: true });
+    await expect(page.locator('#touch-more')).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    await page.setViewportSize({ width: 844, height: 390 });
+
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.responsiveLayout().orientation ?? '')).toBe('landscape');
+    await expect(page.locator('#touch-more')).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await toggle.dispatchEvent('pointerdown', { pointerId: 82, pointerType: 'touch', bubbles: true, cancelable: true });
+    await expect(page.locator('#touch-more')).toBeVisible();
   });
 });
 

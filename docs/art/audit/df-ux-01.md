@@ -1,5 +1,22 @@
 # DF-UX-01 手機版面與 HUD 驗收紀錄
 
+## 2026-10-25 後續驗收
+
+### 變更
+
+- 混合指標裝置只要回報觸控點，就使用 touch field-of-view policy；使鏡頭視野和 touch controls 的顯示判斷一致。
+- resize、方向切換、失焦及其他 `cancelAll()` 情境同步收合「更多」面板，並將 `aria-expanded` 設為 `false`。
+- 保留既有 HUD 工具／種子循環快捷操作；觸控按鈕不打開工具選擇器。
+
+### 驗收證據
+
+- `tests/e2e/responsive-layout.spec.ts` 新增混合觸控 FOV、390×844、320×568、844×390 實際 camera FOV matrix，以及 viewport 旋轉後「更多」收合／重新展開案例。
+- `tests/e2e/touch.spec.ts` 新增固定 joystick 四向單軸移動與雙指「移動＋切換工具」案例。
+- Codex 內建瀏覽器以 390×844 直式與 844×390 矮橫式檢查；確認 controls 在安全區內、遊戲畫面可見，viewport 旋轉會收合「更多」。此瀏覽器手動檢視為 Chromium 模擬，非 iOS／Android 實機。
+- `npm run check` 通過：159 個測試檔、1,614 項通過、1 項既有 skip，production build 與 8 MB 預算通過。
+- 完整 Playwright E2E 尚待此次 PR 的 GitHub Chromium CI。沙箱內執行先被代理 Host 設定攔截；核准的隔離代理重跑逾 60 秒無輸出後停止。不得將其視為 E2E 通過。
+- 瀏覽器的 `pixelViewport()` debug 介面未在該 IAB 執行上下文提供；FOV 數值以本次 GitHub E2E 結果為準，CI 未通過前不宣稱矩陣驗收完成。
+
 ## 範圍
 
 - 直式手機與矮橫式版面採用 responsive safe-top token，並以瀏覽器 safe-area 值作為備援，避免狀態列貼近瀏海或系統列。

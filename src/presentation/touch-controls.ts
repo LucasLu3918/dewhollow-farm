@@ -157,6 +157,7 @@ export class TouchControls {
   /** Cancel every active gesture when a modal opens, the map changes or the scene shuts down. */
   cancelAll(reason = 'explicit'): void {
     this.onCancelAll(reason);
+    this.setMoreOpen(false);
     const active = [...this.gestures.entries()];
     this.gestures.clear();
     this.directionalHolds.releaseAll();

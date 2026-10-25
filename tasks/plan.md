@@ -1,3 +1,23 @@
+# DF-UX-01 手機 FOV、joystick 與 HUD 快捷流程
+
+## 範圍與限制
+
+- 依 PROT-01 與 MOVE-02 的既有呈現與移動介面，驗證直式 8–10 格、橫式 12–16 格 touch FOV，並在混合觸控裝置採用 touch framing。
+- 讓 viewport／方向／焦點等輸入取消事件同步清空搖桿和展開中的「更多」快捷面板；放手後不再新增移動格。
+- 驗證 HUD 顯示的工具、種子與現有 touch cycle 快捷操作同步，快捷切換不打開選擇面板。
+- 不修改遊戲規則、存檔、地圖資料、碰撞、正式素材或 Gate 1 核准狀態。
+- Chromium viewport/input 測試不等同 iOS／Android 實機驗收；實機項目維持 `DEVICE_PENDING`。
+
+## 驗收
+
+- [ ] 混合指標裝置採 touch FOV；直式、短直式與矮橫式實際鏡頭範圍符合目標。
+- [ ] 旋轉 viewport 會取消 held input 並收合「更多」；需新手勢才可繼續操作。
+- [ ] 工具與種子 shortcut 更新 HUD，不開啟 selector；既有農務流程與存檔回歸通過。
+- [ ] `npm run check`、完整 `npm run test:e2e`、瀏覽器畫面檢視及 PR CI 通過。
+- [ ] 更新 Impact reconciliation，單一功能 commit、推送同一分支並開 PR。
+
+---
+
 # Gate 1 整合候選預覽計畫
 
 ## 下一階段：MapScene pixel32 QA 候選 runtime
