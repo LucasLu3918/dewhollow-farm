@@ -119,6 +119,11 @@ function render(time = performance.now()) {
   drawActor(time);
   drawHouseFront();
   if (behindCanopy) drawCanopy();
+  updateReadouts(time);
+  requestAnimationFrame(render);
+}
+
+function updateReadouts(time = performance.now()) {
   const labels = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
   const direction = { down: '下', up: '上', left: '左', right: '右' }[state.direction];
   const motion = time < state.walkingUntil ? 'walk' : state.toolStartedAt !== null ? 'tool' : 'idle';
@@ -128,7 +133,6 @@ function render(time = performance.now()) {
   canvas.dataset.season = state.season;
   canvas.dataset.motion = motion;
   canvas.dataset.occlusion = document.querySelector('#behind-canopy').checked ? 'behind-canopy' : 'in-front';
-  requestAnimationFrame(render);
 }
 
 function setPressed(container, attribute, value) {
@@ -143,6 +147,7 @@ function step(direction) {
   state.walkingUntil = performance.now() + WALK_CYCLE_MS;
   state.toolStartedAt = null;
   setPressed(document.querySelector('#directions'), 'direction', direction);
+  updateReadouts();
 }
 
 for (const button of document.querySelectorAll('#directions button[data-direction]')) {
@@ -153,6 +158,7 @@ for (const button of document.querySelectorAll('#seasons button[data-season]')) 
   button.addEventListener('click', () => {
     state.season = button.dataset.season;
     setPressed(document.querySelector('#seasons'), 'season', state.season);
+    updateReadouts();
   });
 }
 document.querySelector('#behind-canopy').addEventListener('change', (event) => {
@@ -160,6 +166,7 @@ document.querySelector('#behind-canopy').addEventListener('change', (event) => {
 });
 document.querySelector('#tool-action').addEventListener('click', () => {
   state.walkingUntil = 0; state.toolStartedAt = performance.now(); state.previousToolProgress = 0; state.impactSeen = false;
+  updateReadouts();
 });
 window.addEventListener('keydown', (event) => {
   const direction = { ArrowDown: 'down', ArrowUp: 'up', ArrowLeft: 'left', ArrowRight: 'right' }[event.key];

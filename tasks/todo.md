@@ -100,6 +100,17 @@
 - [x] 保存兩張穿越後場景、逐幀 JSON、SHA-256 與中文候選證據報告；未宣稱藝術品質或 Gate 1 通過。
 - [x] 專項 Chromium E2E 1/1 通過；`npm run build` 通過。
 - [x] `npm run check` 通過（1,616 passed／1 skipped）；完整 Chromium E2E 233/233 通過（4 workers）。
-- [ ] Impact reconciliation、commit、PR、Required Checks 和 merge。
+- [x] Impact reconciliation、commit `cce4bdd`、PR #40 Required Checks 通過並合併至 `main`；merge commit `e1c02ba9e11892e0634b022416d339ded7f70cfe`。
 
 詳見 [pixel32 overlay 移動幀與深度交錯證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-walkframe-depth.zh-TW.md)。
+
+
+---
+
+# DF-G1-SCENE-COMPOSITION-12X10 pixel32 候選完整場景構圖
+
+- [x] 以現有精確 DEV-only opt-in 和隔離 IndexedDB fixture 擷取 farm MapScene 候選組合；畫面至少包含 12×10 世界格及地面、玩家、house/tree overlays、代表作物與夥伴。
+- [x] 記錄實際 viewport／camera、候選 manifest／atlas SHA、未覆蓋素材 fallback、載入錯誤及 screenshot SHA；Chromium CSS-scale 限制清楚標示。
+- [x] 更新 DF-QA-01 報告及本任務狀態；候選維持 `candidate`／`approved: false`，不觸碰正式素材或 Gate 1 核准。
+- [x] 專項 E2E 1/1、`npm run check` 與完整 Chromium E2E 234/234（4 workers）通過。
+- [ ] Impact reconciliation、commit、PR、Required Checks 通過後 merge。
