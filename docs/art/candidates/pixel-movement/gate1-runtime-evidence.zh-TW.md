@@ -45,8 +45,9 @@ npm run test:e2e -- tests/e2e/gate1-runtime-evidence.spec.ts --workers=1
 
 ## 尚待完成的 Gate 1 項目
 
-- 候選 `8bit.png`／`16bit.png` 尚未接到同一遊戲 runtime；本組畫面沒有用新 atlas 取代地形、玩家、作物或寵物。
-- 沒有矮袋鼠、樹／建築移動遮擋、斜向輸入壓力循環、每方向連續 5 秒與 60/120 fps frame-time 證據；影片 fps 為 25，不作為這些條件的驗收。
-- 未完成 100% 畫面尺寸下的 10 情境辨識率與地面接縫人工評分；代表畫面僅做截圖完整性 spot-check。
+- 另有一項 DEV-only pixel32 MapScene 候選 runtime，見 [`gate1-mapscene-pixel32-runtime.spec.ts`](../../../../tests/e2e/gate1-mapscene-pixel32-runtime.spec.ts)。它在正式 farm `MapScene` 使用候選地圖與玩家四向動畫，驗證方向切換、一般農務命令及存檔重新載入；測試附有 1280×720、DPR 1 截圖。這是新候選的單一 viewport／DPR 證據，不能與本頁 45 張舊素材 renderer-profile 矩陣合併解讀。
+- pixel32 MapScene 候選只覆蓋部分地圖地表及玩家可見角色。建築、樹、土壤、作物、NPC、夥伴和工具仍沿用舊素材；沒有 pixel16 候選接入此 runtime，也沒有完整固定 12×10 場景的同 runtime A/B。
+- 沒有候選 runtime 的矮袋鼠跟隨、樹／建築移動遮擋影片、每方向連續 5 秒、碰撞不穿越或 60/120 fps frame-time 證據；本頁影片是舊素材，25 fps 不作為這些條件的驗收。
+- 尚未完成新候選在 Gate 1 要求 viewport／DPR 矩陣的遊戲畫面、100% 顯示尺寸下的 10 情境辨識率、接縫／閃爍／腳底錨點人工評分；現有新候選 runtime 截圖不代表這些條件已驗收。
 - 原生 iOS／Android 安全區、觸控、效能與實機像素抖動仍為 **`DEVICE_PENDING`**。
-- 8-bit、16-bit 與 legacy 方向仍待使用者依同 runtime 候選證據選擇。此報告不替使用者核准風格，也不批准正式素材整合。
+- 使用者已選擇 pixel32／16-bit 方向並核准候選進入下一階段；這不等於核准任何特定素材版本。候選 manifest 仍須維持 `approved: false`，正式素材整合須按 [素材審核流程](../../asset-review.md) 對確切版本取得明確核准。此報告不宣稱 Gate 1 或實機驗收通過。

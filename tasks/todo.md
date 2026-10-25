@@ -1,10 +1,23 @@
-# DF-UX-01 手機 FOV、joystick 與 HUD 快捷流程
+# DF-UX-01 手機 FOV、joystick 與 HUD 快捷流程（PR #31 已合併）
 
-- [ ] 確認 hybrid touch 的 FOV、手機直橫式鏡頭矩陣與實際 camera viewport。
-- [ ] viewport 取消時收合 touch「更多」面板並同步 ARIA 狀態。
-- [ ] 驗證 joystick／touch cancel 與 HUD 工具、種子快捷流程。
-- [ ] 更新 DF-UX-01 驗收證據並保留 `DEVICE_PENDING` 實機狀態。
-- [ ] 執行完整檢查與 E2E、commit、push、PR、CI 與 merge。
+- [x] 確認 hybrid touch 的 FOV、手機直橫式鏡頭矩陣與 camera viewport。
+- [x] viewport 取消時收合 touch「更多」面板並同步 ARIA 狀態。
+- [x] 驗證 joystick／touch cancel 與 HUD 工具、種子快捷流程。
+- [x] 更新 DF-UX-01 驗收證據並保留 `DEVICE_PENDING` 實機狀態。
+- [x] 完整檢查與 E2E、PR #31 CI、merge；完整 E2E 為 226 passed。
+
+---
+
+# DF-QA-01 Gate 1 證據稽核
+
+- [x] 區分舊素材 45 張 viewport／DPR 矩陣、舊素材同場景 A/B 與 pixel32 DEV MapScene runtime 證據。
+- [x] 記錄 pixel32 runtime 的方向動畫、農務、存檔／重新載入和 production 隔離覆蓋。
+- [x] 列明 Gate 1 尚缺的候選 viewport／DPR 矩陣、固定組合、持續移動、碰撞／遮擋、可讀性及實機測試。
+- [x] 更新 DF-UX-01 的 CI 結果和使用者候選方向決策狀態。
+- [ ] 執行完整檢查、Impact reconciliation、commit、push、PR、Required Checks 和 merge。
+- [ ] 下一階段補齊 pixel32 候選覆蓋並提供確切版本供人眼審查；未核准素材不得正式整合，實機維持 `DEVICE_PENDING`。
+
+詳見 [DF-QA-01 稽核矩陣](../docs/art/audit/df-qa-01.md)。
 
 ---
 

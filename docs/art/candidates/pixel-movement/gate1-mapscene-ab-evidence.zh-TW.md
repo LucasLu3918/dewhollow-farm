@@ -43,4 +43,4 @@
 
 仍待補齊：固定 12×10 場景所需全部素材與組合、四方向角色動畫、作物品種辨識、完整農務與遮擋影片、更多 viewport/DPR 下的候選遊戲畫面、100% 顯示尺寸人眼可讀性審查及真實 iOS/Android 裝置測試。故本次只交付可比較的局部候選畫面；**不代表 Gate 1、手機驗收或任何 art direction 已通過**。
 
-素材來源與候選狀態見 [gate1-assets/README.zh-TW.md](gate1-assets/README.zh-TW.md)。候選 manifest 必須維持 `approved: false`；使用者看過 A/B 後仍需明確選擇下一步方向。
+素材來源與候選狀態見 [gate1-assets/README.zh-TW.md](gate1-assets/README.zh-TW.md)。使用者已選擇 pixel32／16-bit 方向並核准候選進入下一階段；這不是對本報告任何確切素材版本的正式核准。候選 manifest 必須維持 `approved: false`，正式素材整合仍須依 [素材審核流程](../../asset-review.md) 取得精確版本核准。
