@@ -3,11 +3,14 @@ import farm from '../../content/maps/farm.json';
 import type { MapDef } from '../domain/content';
 import {
   PIXEL32_CANDIDATE_OVERLAYS,
+  PIXEL32_CANDIDATE_INTERACTABLES,
   candidateFramesFromManifest,
+  explicitlyUnapprovedCandidateFramesFromManifest,
   pixel32CandidateCatFrame,
   pixel32CandidatePetFollowRequested,
   pixel32CandidateReviewRequested,
   pixel32CandidateRuntimeRequested,
+  pixel32InteractablesPreviewRequested,
   pixel32MapFrameFor,
   pixel32OverlayPreviewRequested,
 } from './pixel32-candidate-runtime';
@@ -43,6 +46,18 @@ describe('pixel32 candidate manifest frames', () => {
       unmarked: { x: 0, y: 0, width: 32, height: 32 },
     });
     expect(candidateFramesFromManifest({ ...valid, frames: { approved: { x: 0, y: 0, width: 32, height: 32, approved: true } } }, 'map-atlas.png')).toBeNull();
+  });
+
+  it('can require an explicit approved:false marker on every frame for gated assets', () => {
+    expect(explicitlyUnapprovedCandidateFramesFromManifest(valid, 'map-atlas.png')).toEqual(valid.frames);
+    expect(explicitlyUnapprovedCandidateFramesFromManifest({
+      ...valid,
+      frames: { missing: { x: 0, y: 0, width: 32, height: 32 } },
+    }, 'map-atlas.png')).toBeNull();
+    expect(explicitlyUnapprovedCandidateFramesFromManifest({
+      ...valid,
+      frames: { approved: { x: 0, y: 0, width: 32, height: 32, approved: true } },
+    }, 'map-atlas.png')).toBeNull();
   });
 });
 
@@ -89,6 +104,27 @@ describe('pixel32 overlay candidate preview', () => {
     ]);
     expect(PIXEL32_CANDIDATE_OVERLAYS[0]).toMatchObject({ tileX: 3, tileY: 3, widthTiles: 3, heightTiles: 2 });
     expect(PIXEL32_CANDIDATE_OVERLAYS[2]).toMatchObject({ tileX: 3, tileY: 3, widthTiles: 3, heightTiles: 2 });
+  });
+});
+
+describe('pixel32 interactables candidate preview', () => {
+  it('requires DEV mode, the base pixel32 runtime, and the exact interactables query', () => {
+    const query = new URLSearchParams('gate1InteractablePreview=pixel32-interactables');
+
+    expect(pixel32InteractablesPreviewRequested(query, true, true)).toBe(true);
+    expect(pixel32InteractablesPreviewRequested(query, false, true)).toBe(false);
+    expect(pixel32InteractablesPreviewRequested(query, true, false)).toBe(false);
+    expect(pixel32InteractablesPreviewRequested(new URLSearchParams('gate1InteractablePreview=true'), true, true)).toBe(false);
+    expect(pixel32InteractablesPreviewRequested(new URLSearchParams(), true, true)).toBe(false);
+  });
+
+  it('keeps four fixed, collision-free samples beside the farm door and shipbox', () => {
+    expect(PIXEL32_CANDIDATE_INTERACTABLES).toEqual([
+      { id: 'door-closed', frame: 'door-closed', tileX: 2, tileY: 4 },
+      { id: 'door-open', frame: 'door-open', tileX: 4, tileY: 4 },
+      { id: 'shipbox-closed', frame: 'shipbox-closed', tileX: 2, tileY: 7 },
+      { id: 'shipbox-open', frame: 'shipbox-open', tileX: 4, tileY: 7 },
+    ]);
   });
 });
 

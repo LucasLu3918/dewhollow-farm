@@ -81,11 +81,14 @@ import {
   PIXEL32_ANIMATION_ATLAS_KEY,
   PIXEL32_CROPS_ATLAS_KEY,
   PIXEL32_INTERACTABLES_ATLAS_KEY,
+  PIXEL32_INTERACTABLES_MANIFEST_KEY,
   PIXEL32_PETS_ATLAS_KEY,
   PIXEL32_CANDIDATE_OVERLAYS,
+  PIXEL32_CANDIDATE_INTERACTABLES,
   PIXEL32_MAP_ATLAS_KEY,
   PIXEL32_PETS_MANIFEST_KEY,
   pixel32CandidateCatFrame,
+  pixel32InteractablesPreviewRequested,
   pixel32CandidatePetFollowRequested,
   pixel32MapFrameFor,
   pixel32OverlayPreviewRequested,
@@ -234,6 +237,15 @@ interface Pixel32OverlayDebugInfo {
   visible: boolean;
 }
 
+interface Pixel32InteractableDebugInfo {
+  id: string;
+  frame: string;
+  tileX: number;
+  tileY: number;
+  depth: number;
+  visible: boolean;
+}
+
 /** 開發模式下的角色資訊：站的格子、外框與姿勢。 */
 interface ActorDebugInfo {
   id: string;
@@ -321,6 +333,9 @@ declare global {
       };
       /** DEV-only, unapproved pixel32 map overlay fixture. */
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
+      /** DEV-only unapproved door/shipbox candidates, isolated from map and interaction state. */
+      pixel32CandidateInteractables(): { enabled: boolean; status: string | null; approved: boolean | null; items: Pixel32InteractableDebugInfo[] };
+      setCandidateInteractableFrame(id: string, frame: string): boolean;
       /** DEV-only contact sheet for unapproved crops, pet directions, held tools, and object states. */
       candidateAssetReview(): { enabled: boolean; items: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }>; limitations: string[] };
       /** DEV-only candidate cat follower visual; existing follow path and depth remain authoritative. */
@@ -387,6 +402,8 @@ export class MapScene extends Phaser.Scene {
   private pixel32CandidateReviewContainer: Phaser.GameObjects.Container | null = null;
   private pixel32OverlayPreview = false;
   private pixel32CandidateOverlaySprites: { descriptor: (typeof PIXEL32_CANDIDATE_OVERLAYS)[number]; image: Phaser.GameObjects.Image }[] = [];
+  private pixel32InteractablesPreview = false;
+  private pixel32CandidateInteractableSprites: { descriptor: (typeof PIXEL32_CANDIDATE_INTERACTABLES)[number]; image: Phaser.GameObjects.Image }[] = [];
   /** 目前地圖上的居民（依行程站位），見 syncResidents。毛毛有骨架，其他人是占位。 */
   private npcRigs = new Map<string, ResidentView>();
   /** 居民的最新行程目標與路線代次；行程變動時先走完當前一步，再重新規劃。 */
@@ -582,6 +599,12 @@ export class MapScene extends Phaser.Scene {
       import.meta.env.DEV,
       this.pixel32CandidateRuntime,
     );
+    this.pixel32InteractablesPreview = this.registry.get('gate1-pixel32-interactables-preview') === true
+      && pixel32InteractablesPreviewRequested(
+        new URLSearchParams(window.location.search),
+        import.meta.env.DEV,
+        this.pixel32CandidateRuntime,
+      );
     if (this.pixel32CandidateRuntime && this.textures.exists(PIXEL32_ANIMATION_ATLAS_KEY)
       && this.textures.get(PIXEL32_ANIMATION_ATLAS_KEY).has('down-idle')) {
       // Keep the rig root as the authoritative movement/camera/depth anchor while swapping only its visible body.
@@ -617,6 +640,7 @@ export class MapScene extends Phaser.Scene {
       this.pixel32CandidateSprite?.destroy();
       this.pixel32CandidateSprite = null;
       this.clearPixel32CandidateOverlays();
+      this.clearPixel32CandidateInteractables();
       this.pixel32CandidateReviewContainer?.destroy(true);
       this.pixel32CandidateReviewContainer = null;
       this.pixel32CandidateReviewItems = [];
@@ -794,6 +818,33 @@ export class MapScene extends Phaser.Scene {
             visible: image.visible,
           })),
         }),
+        pixel32CandidateInteractables: () => {
+          const manifest = this.pixel32InteractablesPreview
+            ? this.cache.json.get(PIXEL32_INTERACTABLES_MANIFEST_KEY) as { status?: unknown; approved?: unknown } | undefined
+            : undefined;
+          return {
+            enabled: this.pixel32InteractablesPreview && this.pixel32CandidateInteractableSprites.length === PIXEL32_CANDIDATE_INTERACTABLES.length,
+            status: typeof manifest?.status === 'string' ? manifest.status : null,
+            approved: typeof manifest?.approved === 'boolean' ? manifest.approved : null,
+            items: this.pixel32CandidateInteractableSprites.map(({ descriptor, image }) => ({
+              id: descriptor.id,
+              frame: image.frame.name,
+              tileX: descriptor.tileX,
+              tileY: descriptor.tileY,
+              depth: image.depth,
+              visible: image.visible,
+            })),
+          };
+        },
+        setCandidateInteractableFrame: (id, frame) => {
+          if (!this.pixel32InteractablesPreview || !this.textures.exists(PIXEL32_INTERACTABLES_ATLAS_KEY)) return false;
+          const entry = this.pixel32CandidateInteractableSprites.find(({ descriptor }) => descriptor.id === id);
+          const validFrames = id.startsWith('door-') ? ['door-closed', 'door-open']
+            : id.startsWith('shipbox-') ? ['shipbox-closed', 'shipbox-open'] : [];
+          if (!entry || !validFrames.includes(frame) || !this.textures.get(PIXEL32_INTERACTABLES_ATLAS_KEY).has(frame)) return false;
+          entry.image.setFrame(frame);
+          return true;
+        },
         candidateAssetReview: () => ({
           enabled: this.pixel32CandidateAssets && this.pixel32CandidateReviewContainer?.active === true,
           items: this.pixel32CandidateReviewItems.map((item) => ({ ...item })),
@@ -1788,6 +1839,7 @@ export class MapScene extends Phaser.Scene {
 
   private drawMap(mapId: string): void {
     this.clearPixel32CandidateOverlays();
+    this.clearPixel32CandidateInteractables();
     // Tree overlays live on the scene display list so their foot depth can sort
     // against actor roots. Destroy those roots explicitly before clearing the tile container.
     for (const sprite of this.tileSprites) {
@@ -1814,6 +1866,7 @@ export class MapScene extends Phaser.Scene {
     this.clearActors();
     this.createResidents(map);
     this.drawPixel32CandidateOverlays(mapId);
+    this.drawPixel32CandidateInteractables(mapId);
   }
 
   private clearPixel32CandidateOverlays(): void {
@@ -1840,6 +1893,28 @@ export class MapScene extends Phaser.Scene {
         image.setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
       }
       this.pixel32CandidateOverlaySprites.push({ descriptor, image });
+    }
+  }
+
+  private clearPixel32CandidateInteractables(): void {
+    for (const { image } of this.pixel32CandidateInteractableSprites) image.destroy();
+    this.pixel32CandidateInteractableSprites = [];
+  }
+
+  /** Draw candidate-only interaction samples beside their farm objects without changing gameplay state. */
+  private drawPixel32CandidateInteractables(mapId: string): void {
+    if (!this.pixel32InteractablesPreview || mapId !== 'farm'
+      || !this.textures.exists(PIXEL32_INTERACTABLES_ATLAS_KEY)) return;
+    const texture = this.textures.get(PIXEL32_INTERACTABLES_ATLAS_KEY);
+    for (const descriptor of PIXEL32_CANDIDATE_INTERACTABLES) {
+      if (!texture.has(descriptor.frame)) continue;
+      const footX = (descriptor.tileX + 0.5) * TILE_SIZE;
+      const footY = (descriptor.tileY + 1) * TILE_SIZE;
+      const image = this.add.image(footX, footY, PIXEL32_INTERACTABLES_ATLAS_KEY, descriptor.frame)
+        .setOrigin(0.5, 1)
+        .setScale(2)
+        .setDepth(this.actorDepth(footY, true));
+      this.pixel32CandidateInteractableSprites.push({ descriptor, image });
     }
   }
 

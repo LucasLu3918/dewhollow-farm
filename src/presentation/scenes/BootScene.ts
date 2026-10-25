@@ -27,6 +27,7 @@ import {
 import { renderProfileFor } from '../pixel-viewport/profiles';
 import {
   candidateFramesFromManifest,
+  explicitlyUnapprovedCandidateFramesFromManifest,
   PIXEL32_ANIMATION_ATLAS_KEY,
   PIXEL32_ANIMATION_MANIFEST_KEY,
   PIXEL32_CROPS_ATLAS_KEY,
@@ -38,6 +39,7 @@ import {
   PIXEL32_MAP_ATLAS_KEY,
   PIXEL32_MAP_MANIFEST_KEY,
   pixel32CandidateReviewRequested,
+  pixel32InteractablesPreviewRequested,
   pixel32CandidateRuntimeRequested,
 } from '../pixel32-candidate-runtime';
 
@@ -110,6 +112,10 @@ export class BootScene extends Phaser.Scene {
       this.load.image(PIXEL32_INTERACTABLES_ATLAS_KEY, `${root}/gate1-assets/pixel32-interactables/interactables-atlas.png`);
       this.load.json(PIXEL32_PETS_MANIFEST_KEY, `${root}/gate1-pets-pixel32/manifest.json`);
       this.load.image(PIXEL32_PETS_ATLAS_KEY, `${root}/gate1-pets-pixel32/pets-pixel32.png`);
+    } else if (this.pixel32InteractablesPreviewRequested()) {
+      const root = '/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables';
+      this.load.json(PIXEL32_INTERACTABLES_MANIFEST_KEY, `${root}/manifest.json`);
+      this.load.image(PIXEL32_INTERACTABLES_ATLAS_KEY, `${root}/interactables-atlas.png`);
     }
   }
 
@@ -117,6 +123,7 @@ export class BootScene extends Phaser.Scene {
     const candidateId = this.registerCandidateAtlas();
     const pixel32CandidateRuntime = this.registerPixel32CandidateAtlases();
     const pixel32CandidateAssets = this.registerPixel32CandidateReviewAtlases();
+    const pixel32InteractablesPreview = this.registerPixel32InteractablesPreviewAtlas();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
     registerAnimalTextures(this);
     for (const entry of this.deps.assets.assets) {
@@ -158,6 +165,7 @@ export class BootScene extends Phaser.Scene {
     this.registry.set('gate1-candidate-id', candidateId);
     this.registry.set('gate1-pixel32-candidate-runtime', pixel32CandidateRuntime);
     this.registry.set('gate1-pixel32-candidate-assets', pixel32CandidateAssets);
+    this.registry.set('gate1-pixel32-interactables-preview', pixel32InteractablesPreview);
     this.scene.start('map', sceneDeps);
   }
 
@@ -167,6 +175,14 @@ export class BootScene extends Phaser.Scene {
 
   private pixel32CandidateReviewRequested(): boolean {
     return pixel32CandidateReviewRequested(
+      new URLSearchParams(window.location.search),
+      import.meta.env.DEV,
+      this.pixel32RuntimeRequested(),
+    );
+  }
+
+  private pixel32InteractablesPreviewRequested(): boolean {
+    return pixel32InteractablesPreviewRequested(
       new URLSearchParams(window.location.search),
       import.meta.env.DEV,
       this.pixel32RuntimeRequested(),
@@ -203,10 +219,22 @@ export class BootScene extends Phaser.Scene {
     return true;
   }
 
+  private registerPixel32InteractablesPreviewAtlas(): boolean {
+    if (!this.pixel32InteractablesPreviewRequested() || !this.textures.exists(PIXEL32_INTERACTABLES_ATLAS_KEY)) return false;
+    const frames = explicitlyUnapprovedCandidateFramesFromManifest(
+      this.cache.json.get(PIXEL32_INTERACTABLES_MANIFEST_KEY),
+      'interactables-atlas.png',
+    );
+    const requiredFrames = ['door-closed', 'door-open', 'shipbox-closed', 'shipbox-open'];
+    if (!frames || requiredFrames.some((frame) => !frames[frame])) return false;
+    this.registerFrames(PIXEL32_INTERACTABLES_ATLAS_KEY, frames);
+    return true;
+  }
+
   private registerFrames(textureKey: string, frames: Record<string, { x: number; y: number; width: number; height: number }>): void {
     const texture = this.textures.get(textureKey);
     for (const [key, rect] of Object.entries(frames)) {
-      texture.add(key, 0, rect.x, rect.y, rect.width, rect.height);
+      if (!texture.has(key)) texture.add(key, 0, rect.x, rect.y, rect.width, rect.height);
     }
     texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
   }

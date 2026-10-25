@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "status": "candidate",
+  "approved": false,
+  "scope": "DEV farm MapScene visual preview only; no interaction, collision, transport, inventory, or save behavior changes",
+  "viewport": {
+    "width": 1280,
+    "height": 900,
+    "deviceScaleFactor": 1
+  },
+  "inputHashes": {
+    "manifestSha256": "53cc94ee54e5917cf8e761a1e77afd3d043ed863874a308b99fe5fa836ca714f",
+    "atlasSha256": "b2c38612200c90b87eb1a937adcac077c4f80891b4683b8f8b1853670e687915",
+    "frameSha256": {
+      "door-closed": "b79a9ae2732feeec9ac25497d52476643c9efe7cdf6a3c771c029058b1b4726b",
+      "door-open": "1dac80ea9501682faacd68da0cb62ecdda97f60d5bbb5114bc07e115ad7dd490",
+      "shipbox-closed": "f47ef5735a125b679bcd65777059eb1c883eb5d75aae9832d377d6b42b297ac2",
+      "shipbox-open": "a2b80a6966589f4ead8940a61d71033dde995260d38928cf94cd699ccccb4087"
+    }
+  },
+  "requestPaths": [
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+  ],
+  "preview": {
+    "enabled": true,
+    "status": "candidate",
+    "approved": false,
+    "items": [
+      {
+        "id": "door-closed",
+        "frame": "door-closed",
+        "tileX": 2,
+        "tileY": 4,
+        "depth": 15.001,
+        "visible": true
+      },
+      {
+        "id": "door-open",
+        "frame": "door-open",
+        "tileX": 4,
+        "tileY": 4,
+        "depth": 15.001,
+        "visible": true
+      },
+      {
+        "id": "shipbox-closed",
+        "frame": "shipbox-closed",
+        "tileX": 2,
+        "tileY": 7,
+        "depth": 18.001,
+        "visible": true
+      },
+      {
+        "id": "shipbox-open",
+        "frame": "shipbox-open",
+        "tileX": 4,
+        "tileY": 7,
+        "depth": 18.001,
+        "visible": true
+      }
+    ]
+  },
+  "testOnlySwitch": {
+    "from": "door-closed",
+    "to": "door-open",
+    "rejectedCrossFamilyFrame": "shipbox-open",
+    "runtimeStateUnchanged": true
+  },
+  "requestsFailed": [],
+  "httpFailures": [],
+  "pageErrors": [],
+  "screenshotSha256": "046cec8e60e42515b3e2010d8a23a2fcef283831cc12b7199275f5d51d5d8037"
+}

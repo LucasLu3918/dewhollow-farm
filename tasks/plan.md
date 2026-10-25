@@ -286,4 +286,22 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 專項 Chromium E2E 通過（1/1）。
 - [x] `npm run check` 通過（162 個測試檔，1,640 passed／1 skipped；production build 2.805 MB）；完整 Chromium E2E 238/238 通過（9 workers）。
 - [x] AIPS Impact Graph traversal 與人工影響檢視完成；MapScene callers 完整，runtime consumers 可辨識，API／consumer／data／event 圖譜覆蓋有限，未發現本次資料或事件變更。
-- [ ] 以最終 commit SHA 完成 Change Impact reconciliation、commit、PR Required Checks 與合併。
+- [x] PR #47 已於 `main` 合併（merge commit `995d170b8daddf9313d21d15b9fbca5b3259ad72`）；Required Checks 通過。
+
+# DF-G1-INTERACTABLE-MAP-PREVIEW pixel32 門／出貨箱候選場景預覽
+
+## 範圍與限制
+
+在 pixel32 DEV-only farm `MapScene` 中以精確第二旗標呈現既有互動物候選 atlas 的 `door-closed`／`door-open` 與 `shipbox-closed`／`shipbox-open` 四幀。候選圖只作為原場景中的視覺樣本，使用獨立隔離旗標；測試 setter 僅切換同類候選 sprite frame。
+
+不接真實互動、碰撞、地圖／運輸／庫存／存檔狀態；不改 `public/`、`content/assets.json` 或素材核准狀態。這是單一 viewport／DPR 的候選場景檢視，不代表 Gate 1、完整覆蓋或實機通過。證據見 [pixel32 門與出貨箱場景候選預覽](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-interactables-preview.zh-TW.md)。
+
+## 任務與驗收
+
+- [x] 新增 DEV、pixel32 runtime 與精確 interactables query 閘門；manifest 必須保持 `candidate`／`approved: false`。
+- [x] 在農場固定位置呈現四個可見候選 frame，並提供 DEV-only 診斷及同類 frame 測試切換。
+- [x] 專項 Chromium E2E 1/1；驗證未帶互動物預覽旗標及 production build 時不請求圖集、錯誤分類切換被拒、遊戲移動／互動目標／能量不變。
+- [x] 保存 atlas／manifest／frame／screenshot SHA、請求及錯誤清單，並完成畫面檢視。
+- [x] `npm run check` 通過（162 個測試檔，1,643 passed／1 skipped；production build 2.808 MB）。
+- [x] 完整 Chromium E2E 通過（239/239，9 workers）。
+- [ ] AIPS 最終 Change Impact reconciliation、commit、PR Required Checks 與合併。

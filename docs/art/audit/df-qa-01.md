@@ -36,6 +36,7 @@
 - [`12×10 場景構圖證據`](../candidates/pixel-movement/gate1-mapscene-pixel32-scene-composition-12x10.zh-TW.md) 在固定 farm fixture 中擷取 17×13 camera 視野，含候選地面／玩家／overlay 與明列的既有素材 fallback；不構成完整素材覆蓋、art approval 或 Gate 1 通過。
 - [`候選素材同場景檢視`](../candidates/pixel-movement/gate1-candidate-assets-review/README.zh-TW.md) 顯示 22 個作物、寵物方向、工具持握預覽與門／出貨箱狀態畫格；新增五種 viewport × DPR 1／2／3 的接觸表與 farm 截圖，甜蘿蔔候選在 MapScene 中對應三個生長階段，月豆仍使用正式 fallback。寵物與互動物件仍是靜態 QA 展示，非 runtime 行為驗收。
 - [`pixel32 候選貓咪跟隨報告`](../candidates/pixel-movement/gate1-mapscene-pixel32-pet-follow.zh-TW.md) 記錄候選 cat atlas 在精確 DEV opt-in 下跟隨既有路徑、四方向 hop-a／hop-b／land／idle、資產 SHA 與場景截圖；manifest 保持未核准，不代表 Gate 1 或美術評分完成。
+- [`pixel32 門與出貨箱場景候選預覽`](../candidates/pixel-movement/gate1-mapscene-pixel32-interactables-preview.zh-TW.md) 將既有四個候選狀態 frame 放入 farm MapScene，記錄 manifest／atlas／frame／截圖 SHA，並驗證無互動、碰撞或存檔副作用；只覆蓋 Chromium 1280×900、DPR 1，候選仍未核准。
 
 ## Gate 1 尚需完成
 
