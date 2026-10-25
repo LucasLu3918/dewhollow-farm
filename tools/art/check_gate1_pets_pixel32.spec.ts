@@ -42,6 +42,27 @@ describe('pixel32 cat and quokka candidate checker', () => {
     } finally { await f.cleanup(); }
   });
 
+  it('rejects cross-direction clips, looping hops, and altered return semantics', async () => {
+    const f = await fixture();
+    try {
+      const original = await f.readManifest();
+      const crossDirection = structuredClone(original);
+      crossDirection.animations.cat.down.hop.frames[0] = 'cat-up-hop-a';
+      await f.writeManifest(crossDirection);
+      expect((await validateCandidatePets(f.directory)).join('\n')).toContain('same-direction hop-a/hop-b/land');
+
+      const loopingHop = structuredClone(original);
+      loopingHop.animations.quokka.left.hop.loop = true;
+      await f.writeManifest(loopingHop);
+      expect((await validateCandidatePets(f.directory)).join('\n')).toContain('non-looping');
+
+      const wrongReturn = structuredClone(original);
+      wrongReturn.animations.cat.right.hop.returnTo = 'walk';
+      await f.writeManifest(wrongReturn);
+      expect((await validateCandidatePets(f.directory)).join('\n')).toContain('returning to idle');
+    } finally { await f.cleanup(); }
+  });
+
   it('rejects atlas byte corruption', async () => {
     const f = await fixture();
     try {

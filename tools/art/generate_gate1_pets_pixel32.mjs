@@ -58,8 +58,11 @@ function drawCat(direction, pose) {
   p.rect(9, 16 + lift, 13, 8, 'catDark'); p.rect(10, 17 + lift, 11, 6, 'cat');
   p.rect(12, 18 + lift, 7, 2, 'catLight'); p.rect(11, 21 + lift, 9, 2, 'cat');
   const stride = pose === 'hop-a' ? -1 : pose === 'hop-b' ? 1 : pose === 'land' ? 2 : 0;
-  p.rect(10 + stride, 23 + lift, 3, 4 - lift, 'catDark'); p.rect(18 - stride, 23 + lift, 3, 4 - lift, 'catDark');
-  p.rect(9 + stride, 27, 5, 2, 'cat'); p.rect(17 - stride, 27, 5, 2, 'cat');
+  // Four separated paws keep the front/back silhouette quadrupedal at native size.
+  p.rect(8 + stride, 20 + lift, 2, 4, 'catDark'); p.rect(13 + stride, 20 + lift, 2, 4, 'catLight');
+  p.rect(20 - stride, 23 + lift, 2, 4 - lift, 'catDark'); p.rect(25 - stride, 23 + lift, 2, 4 - lift, 'cat');
+  p.rect(7 + stride, 24, 3, 2, 'cat'); p.rect(12 + stride, 24, 3, 2, 'catLight');
+  p.rect(19 - stride, 27, 3, 2, 'cat'); p.rect(24 - stride, 27, 3, 2, 'catLight');
 
   if (direction === 'down') {
     p.rect(11, 9 + lift, 4, 4, 'ink'); p.rect(17, 9 + lift, 4, 4, 'ink');
@@ -81,7 +84,7 @@ function drawCat(direction, pose) {
     p.rect(20, 17 + lift, 3, 2, 'catDark'); p.rect(22, 18 + lift, 2, 1, 'nose');
     p.rect(20, 19 + lift, 4, 1, 'whisker'); p.rect(8, 18 + lift, 3, 1, 'whisker');
   }
-  return direction === 'right' ? mirror(p) : p;
+  return direction === 'left' ? mirror(p) : p;
 }
 
 function drawQuokka(direction, pose) {
@@ -92,8 +95,11 @@ function drawQuokka(direction, pose) {
   p.rect(7, 21 + lift, 3, 2, 'quokkaDark'); p.rect(6, 19 + lift, 2, 3, 'quokka'); p.rect(5, 18 + lift, 2, 2, 'quokkaDark');
   p.rect(9, 17 + lift, 14, 7, 'quokkaDark'); p.rect(10, 18 + lift, 12, 5, 'quokka');
   p.rect(13, 19 + lift, 7, 2, 'quokkaLight'); p.rect(11, 22 + lift, 9, 2, 'quokka');
-  p.rect(10 + stride, 23 + lift, 3, 4 - lift, 'quokkaDark'); p.rect(18 - stride, 23 + lift, 3, 4 - lift, 'quokkaDark');
-  p.rect(9 + stride, 27, 5, 2, 'quokka'); p.rect(17 - stride, 27, 5, 2, 'quokka');
+  // Four separated paws keep the short, sturdy animal silhouette quadrupedal.
+  p.rect(8 + stride, 20 + lift, 2, 4, 'quokkaDark'); p.rect(13 + stride, 20 + lift, 2, 4, 'quokkaLight');
+  p.rect(20 - stride, 23 + lift, 2, 4 - lift, 'quokkaDark'); p.rect(25 - stride, 23 + lift, 2, 4 - lift, 'quokka');
+  p.rect(7 + stride, 24, 3, 2, 'quokka'); p.rect(12 + stride, 24, 3, 2, 'quokkaLight');
+  p.rect(19 - stride, 27, 3, 2, 'quokka'); p.rect(24 - stride, 27, 3, 2, 'quokkaLight');
 
   if (direction === 'down') {
     p.rect(11, 11 + lift, 4, 4, 'quokkaDark'); p.rect(17, 11 + lift, 4, 4, 'quokkaDark');
@@ -113,7 +119,7 @@ function drawQuokka(direction, pose) {
     p.rect(14, 16 + lift, 5, 3, 'muzzle'); p.rect(12, 16 + lift, 2, 2, 'ink');
     p.rect(21, 18 + lift, 3, 2, 'muzzleShade'); p.dot(23, 18 + lift, 'quokkaDark');
   }
-  return direction === 'right' ? mirror(p) : p;
+  return direction === 'left' ? mirror(p) : p;
 }
 
 function draw(species, direction, pose) {
@@ -192,7 +198,7 @@ async function main() {
   const atlasBytes = pngBytes(sheet);
   await writeFile(resolve(out, 'pets-pixel32.png'), atlasBytes);
   const manifest = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     title: 'Dewhollow pixel32 black cat and quokka candidate animation atlas',
     status: 'candidate',
     approved: false,
@@ -203,10 +209,10 @@ async function main() {
     directions: DIRECTIONS,
     poses: POSES,
     frames,
-    clips: Object.fromEntries(SPECIES.map((species) => [species, {
-      idle: { loop: true, frames: DIRECTIONS.map((direction) => `${species}-${direction}-idle`) },
-      hop: { loop: true, frameDurationMs: 130, frames: DIRECTIONS.flatMap((direction) => [`${species}-${direction}-hop-a`, `${species}-${direction}-hop-b`, `${species}-${direction}-land`, `${species}-${direction}-idle`]) },
-    }])),
+    animations: Object.fromEntries(SPECIES.map((species) => [species, Object.fromEntries(DIRECTIONS.map((direction) => [direction, {
+      idle: { loop: true, frames: [`${species}-${direction}-idle`] },
+      hop: { loop: false, frameDurationMs: 130, frames: [`${species}-${direction}-hop-a`, `${species}-${direction}-hop-b`, `${species}-${direction}-land`], returnTo: 'idle' },
+    }]))])),
     referenceAssets: {
       cat: { file: 'public/assets/characters/cat-2x.png', purpose: 'species traits only; new directions and animation are not approved', sha256: 'e128d8295d4d1fc8cf3ff52dc70d176b3b0ea8b6087a6f350b6feeef4c8468e5' },
       quokka: { file: 'public/assets/characters/marsupial-2x.png', purpose: 'species traits only; new directions and animation are not approved', sha256: '614fc13c48dab042962c7dc39f2353890d5f038e04076205a99cad27aed822d7' },

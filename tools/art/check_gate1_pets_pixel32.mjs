@@ -94,9 +94,9 @@ function framePixels(image, x, y, width, height) {
 }
 
 function validateShape(manifest, generatorHash, atlasBytes) {
-  const rootKeys = ['schemaVersion', 'title', 'status', 'approved', 'source', 'pixelContract', 'atlas', 'species', 'directions', 'poses', 'frames', 'clips', 'referenceAssets', 'limitations'];
+  const rootKeys = ['schemaVersion', 'title', 'status', 'approved', 'source', 'pixelContract', 'atlas', 'species', 'directions', 'poses', 'frames', 'animations', 'referenceAssets', 'limitations'];
   if (!exactKeys(manifest, rootKeys)) throw new Error('manifest has missing or unexpected fields');
-  if (manifest.schemaVersion !== 1 || manifest.status !== 'candidate' || manifest.approved !== false) throw new Error('manifest must stay schemaVersion=1, status=candidate, approved=false');
+  if (manifest.schemaVersion !== 2 || manifest.status !== 'candidate' || manifest.approved !== false) throw new Error('manifest must stay schemaVersion=2, status=candidate, approved=false');
   if (!exactKeys(manifest.source, ['method', 'generator', 'generatorSha256'])
     || manifest.source.method !== 'hand-authored integer pixel primitives; approved static assets used only as species references'
     || manifest.source.generator !== 'tools/art/generate_gate1_pets_pixel32.mjs'
@@ -136,12 +136,28 @@ function validateShape(manifest, generatorHash, atlasBytes) {
     quokka: { file: 'public/assets/characters/marsupial-2x.png', purpose: 'species traits only; new directions and animation are not approved', sha256: '614fc13c48dab042962c7dc39f2353890d5f038e04076205a99cad27aed822d7' },
   };
   if (JSON.stringify(manifest.referenceAssets) !== JSON.stringify(references)) throw new Error('reference asset provenance or scope does not match');
+  if (!exactKeys(manifest.animations, SPECIES)) throw new Error('animations must contain exactly cat and quokka');
   for (const species of SPECIES) {
-    const clips = manifest.clips?.[species];
-    if (!exactKeys(clips, ['idle', 'hop']) || clips.idle.loop !== true || clips.hop.loop !== true || clips.hop.frameDurationMs !== 130) throw new Error(`${species} clips are incomplete`);
-    const idleFrames = DIRECTIONS.map((direction) => `${species}-${direction}-idle`);
-    const hopFrames = DIRECTIONS.flatMap((direction) => [`${species}-${direction}-hop-a`, `${species}-${direction}-hop-b`, `${species}-${direction}-land`, `${species}-${direction}-idle`]);
-    if (JSON.stringify(clips.idle.frames) !== JSON.stringify(idleFrames) || JSON.stringify(clips.hop.frames) !== JSON.stringify(hopFrames)) throw new Error(`${species} clip frame references do not match`);
+    const directions = manifest.animations[species];
+    if (!exactKeys(directions, DIRECTIONS)) throw new Error(`${species} animations must contain exactly four directions`);
+    for (const direction of DIRECTIONS) {
+      const clips = directions[direction];
+      if (!exactKeys(clips, ['idle', 'hop'])) throw new Error(`${species}-${direction} animations must contain idle and hop`);
+      if (!exactKeys(clips.idle, ['loop', 'frames']) || clips.idle.loop !== true
+        || JSON.stringify(clips.idle.frames) !== JSON.stringify([`${species}-${direction}-idle`])) {
+        throw new Error(`${species}-${direction} idle must loop one matching idle frame`);
+      }
+      const expectedHop = [`${species}-${direction}-hop-a`, `${species}-${direction}-hop-b`, `${species}-${direction}-land`];
+      if (!exactKeys(clips.hop, ['loop', 'frameDurationMs', 'frames', 'returnTo']) || clips.hop.loop !== false
+        || clips.hop.frameDurationMs !== 130 || clips.hop.returnTo !== 'idle'
+        || JSON.stringify(clips.hop.frames) !== JSON.stringify(expectedHop)) {
+        throw new Error(`${species}-${direction} hop must be a non-looping same-direction hop-a/hop-b/land sequence returning to idle`);
+      }
+      for (const key of [...clips.idle.frames, ...clips.hop.frames]) {
+        const frame = manifest.frames[key];
+        if (!frame || frame.species !== species || frame.direction !== direction) throw new Error(`${species}-${direction} animation references a missing or cross-direction frame`);
+      }
+    }
   }
   if (!Array.isArray(manifest.limitations) || manifest.limitations.length !== 4 || manifest.limitations.some((item) => typeof item !== 'string')) throw new Error('candidate limitations must be present');
   return image;

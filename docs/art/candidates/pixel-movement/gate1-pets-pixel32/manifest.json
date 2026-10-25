@@ -1,12 +1,12 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "title": "Dewhollow pixel32 black cat and quokka candidate animation atlas",
   "status": "candidate",
   "approved": false,
   "source": {
     "method": "hand-authored integer pixel primitives; approved static assets used only as species references",
     "generator": "tools/art/generate_gate1_pets_pixel32.mjs",
-    "generatorSha256": "3ae73887121c4a6281bb0860230b812f685fd14b292185af822cb12aa4c23545"
+    "generatorSha256": "f1bc412078115d44811ce71f3bbac85f6f0eac68b5503a650049d7377f66952c"
   },
   "pixelContract": {
     "frameWidth": 32,
@@ -22,7 +22,7 @@
     "file": "pets-pixel32.png",
     "width": 256,
     "height": 128,
-    "sha256": "2f65719918f3dad297dd480d6fb678d8756877a68df61a1e3c64efdd373f7812"
+    "sha256": "720411831a56879143ff3f6dd6877b0f2138744c1e81e9aff9c669c259e442f3"
   },
   "species": [
     "cat",
@@ -59,7 +59,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "59c9c01b9f6bb7810053281a2c775cb19f67a4bf63275a88e632674c3d13d4d2"
+      "sha256": "3ef717d9c2e1c78d20bfcd6f64c626bfc7f19de6a3d38a3eed1cc70e10e85d08"
     },
     "cat-down-hop-a": {
       "species": "cat",
@@ -79,7 +79,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "6d0b59401024b8f067a74c32352af1cbd3e65dd98a55afbd813d4cd3d2f90423"
+      "sha256": "9c5b47d97e9d1fac9b5ff2ebac06a4136bc2c21280e9b7b38278bc99a5231159"
     },
     "cat-down-hop-b": {
       "species": "cat",
@@ -99,7 +99,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "21ace9b017ade8cfccd178b8e854b03f1e7cf408251a557487ac646c41eaa85b"
+      "sha256": "ac8425dbf7e51ca0bafc69547063fc4a8e3eb04fb98a8b913b6afce145927dde"
     },
     "cat-down-land": {
       "species": "cat",
@@ -119,7 +119,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "e2affc01a8cb65fa69d06470b2bd5de999a8baef71fd6464fcb68e6bcbf7a923"
+      "sha256": "1f44e5172d529c5b597ac2d134ff0928c0413b12cf5bf19db9e334b63b2eac77"
     },
     "quokka-down-idle": {
       "species": "quokka",
@@ -139,7 +139,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "39ae00679edf3b9ea3eb46e62383cd19c908fd79fd0c6b76d1d5ff805834629c"
+      "sha256": "12d75669e228e4f24e1fc03a8c2cc3436894f3912bf0d2fe80f7c24145f7e138"
     },
     "quokka-down-hop-a": {
       "species": "quokka",
@@ -159,7 +159,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "eed5fa47e4c0e1a93e7d32f37a040656775aef11edee1c097d105063a25cebdc"
+      "sha256": "63871a75c001ff88853e19c9e25cf382e9b58b194df3c03570c3bd59efa19674"
     },
     "quokka-down-hop-b": {
       "species": "quokka",
@@ -179,7 +179,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "f47d386bfe60f3826778f1d8e7805ccb3ac86fbe9867d98af26c9e1e2c46476b"
+      "sha256": "e74b35e56d22bf179dfde56ba171119954f23679adfa4073cd219bd326ff4bdf"
     },
     "quokka-down-land": {
       "species": "quokka",
@@ -199,7 +199,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "a6efd1ab82e31bde9455e5406a02c4a4709c83ba47ce1573ccce377eefa6cd76"
+      "sha256": "4163e8ec050313c1907678bf3da307d011b1d795d510d18b17d3b775375a43b6"
     },
     "cat-up-idle": {
       "species": "cat",
@@ -219,7 +219,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "af8d144e0d68f16e8cd5a400a64a219d98de266d77d87af0c568a5d102475589"
+      "sha256": "db4caacd6aa8305cb9cf5c40936b7510127ed8bee0df6ce110c7d4223de89a7b"
     },
     "cat-up-hop-a": {
       "species": "cat",
@@ -239,7 +239,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "5d50c2f34d03791c24d38bb7f23e7846ae617015c99368b48e23e6b3e4268069"
+      "sha256": "ed1ba3064b43d6a50283a0f8ccb807bd8c4311fef4a0b925c721bd9b4a464a23"
     },
     "cat-up-hop-b": {
       "species": "cat",
@@ -259,7 +259,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "441792a4cbb11bb5b1497f69aabfb35821d45389bf2ef2492cbbfe202811ffa1"
+      "sha256": "cf2b2a922941c8245fb069dd989f4fbe417e6c16fe368563e1700ba12c72d436"
     },
     "cat-up-land": {
       "species": "cat",
@@ -279,7 +279,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "e58e97a4b081a555aef837eae42347757e37ae15c926f53772437e170ed39af3"
+      "sha256": "f172e5c63cd64976afb5235ace9f4c9879459320777b1017d10880e4e5fd3377"
     },
     "quokka-up-idle": {
       "species": "quokka",
@@ -299,7 +299,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "861a2b1e7bf6daf903475b6bf2ca3f5889cff3019018e2ffac0240418c58224d"
+      "sha256": "84b14257f9ae44d745aa96284d2109122fa8d36dbd06abd89b87d7b714e1255e"
     },
     "quokka-up-hop-a": {
       "species": "quokka",
@@ -319,7 +319,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "f13d84372ae314e2b03e2c4ae4e7d24bf94b5ad940f6e20c5f22583c951a5378"
+      "sha256": "64a6ce9e83e9fe29c358b7af1f087c6ece5828236327cb98f49d524234346eb8"
     },
     "quokka-up-hop-b": {
       "species": "quokka",
@@ -339,7 +339,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "7e16a1bca43b49ab7b55340ae2e257a3a8e49d27d21386d2b00fca2d6121060a"
+      "sha256": "b11a19870e923a7cda03fa30ecbaf98df95e363d7ba6d6e0e5229d9cfe4b5a41"
     },
     "quokka-up-land": {
       "species": "quokka",
@@ -359,7 +359,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "68ebb6678a1f38571c3509a10fc256c09e9a1428d386cf2c08dec03f80d6ee29"
+      "sha256": "5f5773f89502a072db1b9665fd9ac0a8bdcf1b288dde8462a23d327d1187d91c"
     },
     "cat-left-idle": {
       "species": "cat",
@@ -379,7 +379,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "45f58e3044e112e1b082c177c961c5cdf142c2da9b831d10221951e3eadb7025"
+      "sha256": "40b1f262135a4caa988999c3b1f6706ab079439df79057512e882c158492cd95"
     },
     "cat-left-hop-a": {
       "species": "cat",
@@ -399,7 +399,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "e15188aaa9c66f1b68d10657309856ca7bd23cdf31078da6652f618bcaa5e802"
+      "sha256": "29c2d6ed4f1b7bf4f78ad19f238028c5a93971560d3ab03ed96d8c5a94e13f28"
     },
     "cat-left-hop-b": {
       "species": "cat",
@@ -419,7 +419,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "c3854d9974754db1a39f6ca9e1bc6c8c74172bf615a04a923ad5a1c57171d368"
+      "sha256": "595a4fda2d7d997d58117ee046fc21a6b4ff4ea04872c9dc9734e61d943a5763"
     },
     "cat-left-land": {
       "species": "cat",
@@ -439,7 +439,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "8fd6c6683e5a0ada1c96368310c5783841212e96a384d2036b1ab658ba9c1eb0"
+      "sha256": "9cd80c9530f0fccc2629e6b51d4acffde345910f3eefe3a9b0695ee5a2e32efc"
     },
     "quokka-left-idle": {
       "species": "quokka",
@@ -459,7 +459,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "c8d6dba0ea904a2faf3deaf7cc300ea36eb51dbab9a91b30803a5dddbe7b0a11"
+      "sha256": "1cf868c859f656315382419bf81b6af27cde5984656ccb550533ceba9e19d8f7"
     },
     "quokka-left-hop-a": {
       "species": "quokka",
@@ -479,7 +479,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "ff53c2eabf0e7807ff2b5a27a3465879733b7f811bd9b31a723f0f262428921d"
+      "sha256": "352608b6b31cb5f42b9a8b1d76736ae6f9288a2121f7b217cf9586ea4923c8b3"
     },
     "quokka-left-hop-b": {
       "species": "quokka",
@@ -499,7 +499,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "61d5867a47c81e271a2023969c0bfe2d7cb9a0560863439c4aa1d2aee344654e"
+      "sha256": "879968384cdf4f0d9596f69937c396f63c24d64d8e87f7c354d219dc49d8a17a"
     },
     "quokka-left-land": {
       "species": "quokka",
@@ -519,7 +519,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "8ed48106892d305919a5772460aaed95a7882709476c36c396ee6a964b15a07c"
+      "sha256": "ec459dd5afc16670d2a647c6570df3949473678c91fd2e57a690ac2f1b5034ac"
     },
     "cat-right-idle": {
       "species": "cat",
@@ -539,7 +539,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "19d2bf7401d0b241d501f2c1e94d6684972990a34cd5cd0c5f68038eeb76b8f7"
+      "sha256": "8fd1680c7d418a99aa885f712d21b8da2a827c935c081b240080acfed5c6a30e"
     },
     "cat-right-hop-a": {
       "species": "cat",
@@ -559,7 +559,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "348ae8b4f31e50999c60075333f6bdd6ce2c7edfc840d9a6a31bbde7f1643175"
+      "sha256": "a04f5ae38c14b83ac16ff5cb3c10f4173d2064977493f3d6c5ce5a2f484138af"
     },
     "cat-right-hop-b": {
       "species": "cat",
@@ -579,7 +579,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "6623b179b2726c8988c5371a4893c072c77383bd12e3fb208e7ce44aac61da19"
+      "sha256": "56943e5781298596391a24d61feb787295f30e6c4e5d11d130a1cfb870c0e941"
     },
     "cat-right-land": {
       "species": "cat",
@@ -599,7 +599,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "72b724435d27d75fa2c16c5e0f35d954aef67cc1ab09d8580d56e6b6a1a19094"
+      "sha256": "161fab74dce65feee83f0aa8c79297b2bdec98388f1a9b52c0721b6c3f795c93"
     },
     "quokka-right-idle": {
       "species": "quokka",
@@ -619,7 +619,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "8f24c50cbd565c7fd774e79d5aec5fb94ab1d4801ec5382a45c0e0f9df05ae19"
+      "sha256": "f78253ea3d58a95d8aa8334794ae511452748e821c59177581a1c5d31fe2bfc5"
     },
     "quokka-right-hop-a": {
       "species": "quokka",
@@ -639,7 +639,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "81a7b4196ca10b70afb63fe975197b9c2a7b3860cbe34cfe7cd1f6552a6c0902"
+      "sha256": "4e0085404fbc12594275caa8e5607e9158ec21c6c4e2a46dafae81481f45bc29"
     },
     "quokka-right-hop-b": {
       "species": "quokka",
@@ -659,7 +659,7 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "c1ffdc4f66dac6d0ab91ef2e08a035a73d22bc28f5aad170d5e5854beb73ef0f"
+      "sha256": "b2681c13a6ff02c092a6437ecf60cd77b4d8a7b93b664bb16844695fed26478d"
     },
     "quokka-right-land": {
       "species": "quokka",
@@ -679,74 +679,156 @@
         "x": 16,
         "y": 28
       },
-      "sha256": "eb99f87d832ff2c8aa8d687b039e8e3f36b8feb1abe8970cc913193c2b597087"
+      "sha256": "d1eb8c2e67c3fc0fd43854bf517d55e3246d58517a3755741417a52bebe8cd64"
     }
   },
-  "clips": {
+  "animations": {
     "cat": {
-      "idle": {
-        "loop": true,
-        "frames": [
-          "cat-down-idle",
-          "cat-up-idle",
-          "cat-left-idle",
-          "cat-right-idle"
-        ]
+      "down": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "cat-down-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "cat-down-hop-a",
+            "cat-down-hop-b",
+            "cat-down-land"
+          ],
+          "returnTo": "idle"
+        }
       },
-      "hop": {
-        "loop": true,
-        "frameDurationMs": 130,
-        "frames": [
-          "cat-down-hop-a",
-          "cat-down-hop-b",
-          "cat-down-land",
-          "cat-down-idle",
-          "cat-up-hop-a",
-          "cat-up-hop-b",
-          "cat-up-land",
-          "cat-up-idle",
-          "cat-left-hop-a",
-          "cat-left-hop-b",
-          "cat-left-land",
-          "cat-left-idle",
-          "cat-right-hop-a",
-          "cat-right-hop-b",
-          "cat-right-land",
-          "cat-right-idle"
-        ]
+      "up": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "cat-up-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "cat-up-hop-a",
+            "cat-up-hop-b",
+            "cat-up-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "left": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "cat-left-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "cat-left-hop-a",
+            "cat-left-hop-b",
+            "cat-left-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "right": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "cat-right-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "cat-right-hop-a",
+            "cat-right-hop-b",
+            "cat-right-land"
+          ],
+          "returnTo": "idle"
+        }
       }
     },
     "quokka": {
-      "idle": {
-        "loop": true,
-        "frames": [
-          "quokka-down-idle",
-          "quokka-up-idle",
-          "quokka-left-idle",
-          "quokka-right-idle"
-        ]
+      "down": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "quokka-down-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "quokka-down-hop-a",
+            "quokka-down-hop-b",
+            "quokka-down-land"
+          ],
+          "returnTo": "idle"
+        }
       },
-      "hop": {
-        "loop": true,
-        "frameDurationMs": 130,
-        "frames": [
-          "quokka-down-hop-a",
-          "quokka-down-hop-b",
-          "quokka-down-land",
-          "quokka-down-idle",
-          "quokka-up-hop-a",
-          "quokka-up-hop-b",
-          "quokka-up-land",
-          "quokka-up-idle",
-          "quokka-left-hop-a",
-          "quokka-left-hop-b",
-          "quokka-left-land",
-          "quokka-left-idle",
-          "quokka-right-hop-a",
-          "quokka-right-hop-b",
-          "quokka-right-land",
-          "quokka-right-idle"
-        ]
+      "up": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "quokka-up-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "quokka-up-hop-a",
+            "quokka-up-hop-b",
+            "quokka-up-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "left": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "quokka-left-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "quokka-left-hop-a",
+            "quokka-left-hop-b",
+            "quokka-left-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "right": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "quokka-right-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "quokka-right-hop-a",
+            "quokka-right-hop-b",
+            "quokka-right-land"
+          ],
+          "returnTo": "idle"
+        }
       }
     }
   },

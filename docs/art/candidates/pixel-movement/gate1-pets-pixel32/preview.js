@@ -18,8 +18,7 @@ const canvas = document.querySelector('#sprite');
 const context = canvas.getContext('2d');
 context.imageSmoothingEnabled = false;
 let timer;
-let poseIndex = 0;
-const loop = ['hop-a', 'hop-b', 'land', 'idle'];
+let animationIndex = 0;
 
 function paint() {
   const species = speciesInput.value;
@@ -43,12 +42,23 @@ function stop() {
 for (const input of [speciesInput, directionInput, poseInput]) input.addEventListener('change', () => { stop(); paint(); });
 playButton.addEventListener('click', () => {
   if (timer) { stop(); return; }
+  const animation = manifest.animations[speciesInput.value][directionInput.value];
+  const hop = animation.hop;
+  animationIndex = 0;
+  poseInput.value = manifest.frames[hop.frames[0]].pose;
+  paint();
   playButton.setAttribute('aria-pressed', 'true');
   playButton.textContent = '停止';
   timer = setInterval(() => {
-    poseIndex = (poseIndex + 1) % loop.length;
-    poseInput.value = loop[poseIndex];
+    animationIndex += 1;
+    if (animationIndex >= hop.frames.length) {
+      poseInput.value = manifest.frames[animation.returnTo === 'idle' ? animation.idle.frames[0] : animation.hop.frames.at(-1)].pose;
+      stop();
+      paint();
+      return;
+    }
+    poseInput.value = manifest.frames[hop.frames[animationIndex]].pose;
     paint();
-  }, 130);
+  }, hop.frameDurationMs);
 });
 paint();
