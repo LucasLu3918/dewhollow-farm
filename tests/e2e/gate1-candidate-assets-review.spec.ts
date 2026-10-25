@@ -107,6 +107,11 @@ test('captures DEV-only crop, pet, tool, and object candidate review board', asy
   expect(state.review.enabled).toBe(true);
   expect(state.review.items.map((item) => item.frame)).toEqual(expectedFrames);
   expect(state.review.items.every((item) => item.x >= 0 && item.x <= state.viewport.actualCanvasResolution.width)).toBe(true);
+  expect(state.review.items.every((item) => item.y + 16 * item.scale <= state.viewport.actualCanvasResolution.height)).toBe(true);
+  expect(state.review.items.every((item) => item.labelY + 20 <= item.y - 16 * item.scale)).toBe(true);
+  const rowCenters = [...new Set(state.review.items.map((item) => item.y))];
+  const largestFrameScale = Math.max(...state.review.items.map((item) => item.scale));
+  expect(rowCenters.slice(1).every((center, index) => center - rowCenters[index]! >= 32 * largestFrameScale)).toBe(true);
   expect(state.review.items.every((item) => item.scale > 0 && item.texture.startsWith('gate1-pixel32-'))).toBe(true);
   expect(state.sprites.filter((sprite) => sprite.key === 'gate1-pixel32-crops-atlas').map((sprite) => sprite.frame))
     .toEqual(expect.arrayContaining(['seed', 'sprout', 'mature']));
