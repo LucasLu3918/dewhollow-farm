@@ -309,7 +309,7 @@ declare global {
       /** DEV-only, unapproved pixel32 map overlay fixture. */
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
       /** DEV-only contact sheet for unapproved crops, pet directions, held tools, and object states. */
-      candidateAssetReview(): { enabled: boolean; items: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelY: number; scale: number }>; limitations: string[] };
+      candidateAssetReview(): { enabled: boolean; items: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }>; limitations: string[] };
       setCandidateAssetReviewVisible(visible: boolean): void;
       /** 玩家目前的走路姿勢（見 walk-pose.ts）。 */
       pose(): { y: number; rotation: number; scaleX: number; scaleY: number; legA: number; legB: number; stretch: number };
@@ -363,7 +363,7 @@ export class MapScene extends Phaser.Scene {
   private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
   private pixel32CandidateRuntime = false;
   private pixel32CandidateAssets = false;
-  private pixel32CandidateReviewItems: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelY: number; scale: number }> = [];
+  private pixel32CandidateReviewItems: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }> = [];
   private pixel32CandidateReviewContainer: Phaser.GameObjects.Container | null = null;
   private pixel32OverlayPreview = false;
   private pixel32CandidateOverlaySprites: { descriptor: (typeof PIXEL32_CANDIDATE_OVERLAYS)[number]; image: Phaser.GameObjects.Image }[] = [];
@@ -870,25 +870,32 @@ export class MapScene extends Phaser.Scene {
       color: '#f4d998', fontFamily: 'monospace', fontSize: '16px', fontStyle: 'bold',
     }));
 
-    const addRow = (group: string, label: string, frames: string[], texture: string, y: number): void => {
-      const labelY = y - 20;
-      board.add(this.add.text(12, labelY, label, { color: '#edf0d8', fontFamily: 'monospace', fontSize: '13px' }));
-      const available = Math.max(32, boardWidth - 184);
-      const scale = Math.min(1.5, available / (frames.length * 32 + Math.max(0, frames.length - 1) * 8));
+    const rowTopInset = 32;
+    const rowStride = Math.max(32, (boardHeight - rowTopInset - 16) / 5);
+    const rowSpriteScaleCap = Math.min(1.5, Math.max(0.5, (rowStride - 30) / 32));
+    const addRow = (group: string, label: string, frames: string[], texture: string, rowTop: number): void => {
+      const labelY = rowTop;
+      const labelText = this.add.text(12, labelY, label, { color: '#edf0d8', fontFamily: 'monospace', fontSize: '13px' });
+      board.add(labelText);
+      const firstItemX = Math.min(176, Math.max(72, boardWidth * 0.4));
+      const available = Math.max(32, boardWidth - firstItemX - 16);
+      const scale = Math.min(rowSpriteScaleCap, available / (frames.length * 32 + Math.max(0, frames.length - 1) * 8));
       const step = 32 * scale + 8;
+      const centerY = rowTop + 22 + 16 * scale;
       frames.forEach((frame, index) => {
-        const x = 176 + index * step;
-        const image = this.add.image(x, y + 32, texture, frame).setOrigin(0.5, 0.5).setScale(scale);
+        const x = firstItemX + index * step;
+        const image = this.add.image(x, centerY, texture, frame).setOrigin(0.5, 0.5).setScale(scale);
         board.add(image);
-        this.pixel32CandidateReviewItems.push({ group, frame, texture, x: Math.round(x), y: y + 32, labelY, scale });
+        this.pixel32CandidateReviewItems.push({ group, frame, texture, x: Math.round(x), y: centerY, labelX: 12, labelY, labelWidth: labelText.width, scale });
       });
     };
 
-    addRow('crops', 'CROPS  ·  sweet radish growth stages', ['seed', 'sprout', 'mature'], PIXEL32_CROPS_ATLAS_KEY, 48);
-    addRow('cat', 'CAT  ·  directional idle', ['cat-down-idle', 'cat-up-idle', 'cat-left-idle', 'cat-right-idle'], PIXEL32_PETS_ATLAS_KEY, 114);
-    addRow('quokka', 'QUOKKA  ·  directional idle', ['quokka-down-idle', 'quokka-up-idle', 'quokka-left-idle', 'quokka-right-idle'], PIXEL32_PETS_ATLAS_KEY, 180);
-    addRow('tools', 'TOOLS  ·  held preview', ['tool-hoe', 'tool-can', 'tool-seedbag', 'tool-axe', 'tool-pick', 'tool-rod', 'tool-sickle'], PIXEL32_INTERACTABLES_ATLAS_KEY, 246);
-    addRow('objects', 'OBJECTS  ·  static states', ['door-closed', 'door-open', 'shipbox-closed', 'shipbox-open'], PIXEL32_INTERACTABLES_ATLAS_KEY, 312);
+    const rowY = (index: number) => rowTopInset + index * rowStride;
+    addRow('crops', 'CROPS  ·  radish growth', ['seed', 'sprout', 'mature'], PIXEL32_CROPS_ATLAS_KEY, rowY(0));
+    addRow('cat', 'CAT  ·  directional idle', ['cat-down-idle', 'cat-up-idle', 'cat-left-idle', 'cat-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(1));
+    addRow('quokka', 'QUOKKA  ·  directional idle', ['quokka-down-idle', 'quokka-up-idle', 'quokka-left-idle', 'quokka-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(2));
+    addRow('tools', 'TOOLS  ·  held preview', ['tool-hoe', 'tool-can', 'tool-seedbag', 'tool-axe', 'tool-pick', 'tool-rod', 'tool-sickle'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(3));
+    addRow('objects', 'OBJECTS  ·  static states', ['door-closed', 'door-open', 'shipbox-closed', 'shipbox-open'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(4));
   }
 
   /** 虛擬按鍵直接送出語意動作；按鍵重綁只影響鍵盤 adapter。 */
