@@ -197,3 +197,16 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - 完整 12×10 場景與 legacy／pixel16／pixel32 同 runtime 比較仍缺。
 - 10 情境可讀性、seam／閃爍、動作腳錨人工評分與原生 iOS／Android 驗收仍待完成；實機維持 `DEVICE_PENDING`。
 - 候選仍為 `candidate`／`approved: false`；確切素材人工核准與 Gate 1 簽核不在本任務授權內。
+
+---
+
+# DF-G1-OVERLAY-WALKFRAME-DEPTH pixel32 候選移動幀與圖層深度交錯
+
+- [x] 從 `(8,3)` 南向穿越 tree canopy 錨點，再從 `(5,5)` 北向穿越 house front 錨點；依逐格按鍵避免略過交界樣本。
+- [x] 逐 RAF 記錄移動方向、實際 walk frame、腳底 Y、角色深度與 overlay signature；確認兩個錨點兩側均有移動中樣本且沒有碰撞阻擋。
+- [x] 保存候選 manifest／atlas 輸入 SHA-256、JSON 測量、兩張 Chromium 場景圖及限制說明；維持候選狀態且不變更正式素材／runtime／地圖／碰撞／存檔／玩法。
+- [x] 專項 Chromium E2E 通過，`npm run build` 通過。
+- [x] `npm run check` 通過（1,616 passed／1 skipped）；完整 Chromium E2E 233/233 通過（4 workers）。
+- [ ] Impact reconciliation、commit、PR Required Checks 與合併。
+
+詳見 [DF-G1 overlay 移動幀與深度交錯證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-walkframe-depth.zh-TW.md)。
