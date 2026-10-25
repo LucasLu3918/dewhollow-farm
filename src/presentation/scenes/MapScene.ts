@@ -312,7 +312,13 @@ declare global {
       /** 貼圖的原始圖片大小；占位圖與入庫圖片可以由此分辨。 */
       textureSize(key: string): { width: number; height: number } | null;
       /** DEV-only pixel32 runtime candidate load state and the visible player animation frame. */
-      pixel32CandidateRuntime(): { enabled: boolean; mapFrames: string[]; animationFrames: string[]; playerFrame: string | null };
+      pixel32CandidateRuntime(): {
+        enabled: boolean;
+        mapFrames: string[];
+        animationFrames: string[];
+        playerFrame: string | null;
+        playerVisible: boolean;
+      };
       /** DEV-only, unapproved pixel32 map overlay fixture. */
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
       /** DEV-only contact sheet for unapproved crops, pet directions, held tools, and object states. */
@@ -771,6 +777,7 @@ export class MapScene extends Phaser.Scene {
             ? this.textures.get(PIXEL32_ANIMATION_ATLAS_KEY).getFrameNames()
             : [],
           playerFrame: this.pixel32CandidateSprite?.frame.name ?? null,
+          playerVisible: this.pixel32CandidateSprite?.visible ?? false,
         }),
         pixel32CandidateOverlays: () => ({
           enabled: this.pixel32OverlayPreview,

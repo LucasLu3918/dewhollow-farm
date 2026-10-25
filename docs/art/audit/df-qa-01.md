@@ -17,7 +17,7 @@
 | 同一 farm 起點、既有玩法與 renderer profile 的截圖矩陣 | 部分 | [`gate1-runtime-evidence.zh-TW.md`](../candidates/pixel-movement/gate1-runtime-evidence.zh-TW.md) 有 45 張圖：legacy／pixel32／pixel16 × 5 viewport × DPR 1/2/3；三者使用相同舊素材，不能證明新素材 A/B。 |
 | 同一 MapScene 舊候選 A/B | 部分 | [`gate1-mapscene-ab-evidence.zh-TW.md`](../candidates/pixel-movement/gate1-mapscene-ab-evidence.zh-TW.md) 有 legacy、pixel16、pixel32 各一張 390×844、DPR 1 截圖及局部地圖／作物候選；不是完整 12×10 場景，亦不含新四向動畫候選。 |
 | pixel32 候選接入正式 farm MapScene 的 QA runtime | 部分 | [`gate1-mapscene-pixel32-runtime.spec.ts`](../../../tests/e2e/gate1-mapscene-pixel32-runtime.spec.ts) 驗證 DEV-only opt-in、候選地圖與玩家四向動畫、方向切換、農務命令、存檔重新載入及 production 不載入。只有 1280×720、DPR 1 候選 runtime 截圖。 |
-| 固定 12×10 場景與 legacy／pixel16／pixel32 同 runtime 比較 | 部分 | [`12×10 場景構圖證據`](../candidates/pixel-movement/gate1-mapscene-pixel32-scene-composition-12x10.zh-TW.md) 以固定 farm 存檔擷取 1280×900 DEV-only runtime；camera 視野 17×13，含 pixel32 地面／玩家／房屋與樹冠候選及既有素材 fallback。仍無 pixel16 同 runtime 對照或完整 pixel32 素材覆蓋。 |
+| 固定 12×10 場景與 legacy／pixel16／pixel32 同 runtime 比較 | 部分 | [`12×10 場景構圖證據`](../candidates/pixel-movement/gate1-mapscene-pixel32-scene-composition-12x10.zh-TW.md) 以固定 farm 存檔擷取 1280×900 DEV-only runtime；camera 視野 17×13。新增 [`pixel16／pixel32 局部覆蓋比較`](../candidates/pixel-movement/gate1-mapscene-pixel16-pixel32-scene-comparison.zh-TW.md)，同一 v13 fixture、viewport、DPR 1 與 camera 下記錄兩種畫面的候選／既有 texture 來源及 SHA。pixel16 使用 8bit atlas；pixel32 使用季節地圖、autotile、玩家動畫與房屋／樹冠 overlay。兩者素材覆蓋不等，pixel32 專屬 overlay／動作沒有 pixel16 對應，完整等覆蓋比較仍缺。 |
 | 作物／工具／夥伴候選同場景檢視 | 部分 | [`Pixel32 候選素材同場景檢視`](../candidates/pixel-movement/gate1-candidate-assets-review/README.zh-TW.md) 與 E2E 證據展示甜蘿蔔三階、cat／quokka 四向 idle、七種 held-preview 工具及門／出貨箱靜態狀態；甜蘿蔔在 farm fixture 使用候選圖，其他作物仍 fallback。新增五種 viewport × Chromium DPR 1／2／3 的 30 張 CSS-scale 截圖、canvas／camera 量測與載入記錄。[`pixel32 候選貓咪跟隨證據`](../candidates/pixel-movement/gate1-mapscene-pixel32-pet-follow.zh-TW.md) 另驗證 DEV-only cat 沿既有跟隨路徑播放四方向 hop 序列；quokka、工具持握／揮動、互動與正式整合仍未覆蓋。 |
 | 移動、碰撞、遮擋與動畫穩定性 | 部分／缺證據 | pixel32 候選已有每方向 1.25 秒移動與牆碰撞證據、固定位置遮擋差分，以及 [`overlay 移動深度證據`](../candidates/pixel-movement/gate1-mapscene-pixel32-overlay-motion-stability.zh-TW.md)：14 次單格移動期間三層穩定，且角色穿過房屋／樹冠腳底錨點時深度前後翻轉。新增 [`walk frame 深度交錯證據`](../candidates/pixel-movement/gate1-mapscene-pixel32-overlay-walkframe-depth.zh-TW.md)，在兩處穿越期間同時捕捉 moving 狀態、方向動畫幀與錨點兩側深度；[`候選貓咪跟隨報告`](../candidates/pixel-movement/gate1-mapscene-pixel32-pet-follow.zh-TW.md) 增加四方向 follower trail 與 hop frame 觀測。仍缺 60/120 fps frame-time、碰撞／遮擋與像素品質整體人工審查；自動化訊號不代表美術核准。 |
 | 候選 viewport／DPR、100% 可讀性、接縫與腳錨人工評分 | 部分 | 地面／玩家 pixel32 MapScene 與 house／tree overlay 各有 5 種 viewport × DPR 1／2／3 的 15 張 Chromium CSS-scale 截圖；作物／寵物／工具／物件候選新增 5 種 viewport × DPR 1／2／3 的 30 張截圖。已修正窄 viewport 檢視板的列距與素材水平邊界，並檢視手機與桌面代表圖；尚無 10 情境辨識評分、接縫／閃爍與腳底錨點審查，也不是原生 DPR raster。 |
@@ -39,7 +39,7 @@
 
 ## Gate 1 尚需完成
 
-1. 擴充 pixel32 QA scene 覆蓋與固定場景證據；保留 DEV-only 載入與候選標籤。已新增 overlay 五種 viewport × DPR 1／2／3 共 15 張 CSS-scale 圖片、SHA 與載入／圖層檢查，固定 12×10 runtime 場景畫面，以及作物／寵物方向／工具／物件 22-frame 候選接觸表和 farm crop 截圖；完整素材覆蓋與 pixel16 同 runtime 對照仍缺。
+1. 擴充 pixel32 QA scene 覆蓋與固定場景證據；保留 DEV-only 載入與候選標籤。已新增 overlay 五種 viewport × DPR 1／2／3 共 15 張 CSS-scale 圖片、SHA 與載入／圖層檢查，固定 12×10 runtime 場景畫面，作物／寵物方向／工具／物件 22-frame 候選接觸表，以及相同 farm fixture／17×13 camera 下的 pixel16／pixel32 局部覆蓋比較；完整等覆蓋素材與 pixel16 動畫／overlay 仍缺。
 2. 取得完整場景在需求 viewport／DPR 下的候選畫面，並補足移動、碰撞、遮擋、工具、作物與夥伴情境。
 3. 以 100% 尺寸審查可讀性、圖塊接縫／閃爍與腳底定位；提交逐項評分與可重現證據。
 4. 執行 iOS／Android 實機驗證，通過後才可清除 `DEVICE_PENDING`。

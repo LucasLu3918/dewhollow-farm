@@ -82,12 +82,12 @@
 - [x] 精確 DEV query 之外不替換正式 cat；manifest 維持 `candidate`／`approved: false`。
 - [x] Chromium 驗證由既有 follower trail 到位、四方向畫格序列、足底錨點、64×64 顯示尺寸、深度、候選資產請求與 page error；保存四向場景截圖及 SHA 證據。
 - [x] `npm run check` 通過（162 個測試檔，1,640 passed／1 skipped；build 2.805 MB）；完整 Chromium E2E 237/237 通過；候選程式與四張逐向場景截圖已記錄 SHA-256。
-- [ ] Impact Graph reconciliation、commit、PR、Required Checks 與合併。
+- [x] Impact Graph reconciliation、commit、PR #46 Required Checks 通過並 squash merge 至 `main`（merge SHA `d120c7b95a7c4ddb801bf9240a3868f87fdb6c51`）。
 
 ## 限制
 
 - 這是 DEV-only cat 視覺候選；quokka、正式 rig／assets／public、遊戲規則與存檔未整合或變更。
-- 沒有人眼美術評分、pixel16 同場景比較、60／120 fps 效能量測或 iOS／Android 實機驗收；不代表 Gate 1 通過或特定素材核准。
+- 沒有人眼美術評分、完整等覆蓋 pixel16 同場景比較、60／120 fps 效能量測或 iOS／Android 實機驗收；不代表 Gate 1 通過或特定素材核准。
 
 ---
 
@@ -268,3 +268,22 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 專項 Chromium E2E 1/1 及畫面檢視。
 - [x] `npm run check`；完整 Chromium E2E 234/234（4 workers）。
 - [ ] AIPS Impact reconciliation、commit、PR、Required Checks 通過後合併。
+
+# DF-G1-PIXEL-PROFILE-COMPARISON pixel16／pixel32 同場景局部覆蓋比較
+
+## 範圍與結果
+
+以隔離 IndexedDB fixture、相同 farm MapScene、1280×900 Chromium viewport、DPR 1 與一致的 17×13 camera 視野，擷取 pixel16 與 pixel32 兩種未核准候選的實際遊戲區畫面。記錄實際渲染的候選 atlas／frame、既有素材來源、runtime map／player frame、overlay、候選請求、錯誤及輸入／截圖 SHA-256。pixel16 profile 使用 8bit atlas；pixel32 profile 使用專用 pixel32 地圖與動畫 atlas。證據見 [pixel16／pixel32 同場景局部覆蓋比較](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel16-pixel32-scene-comparison.zh-TW.md)。
+
+此為覆蓋不等的局部基線，不能將差異歸因於像素尺度或作為整體美術評分。pixel32 專屬季節／autotile／多層 overlay 與完整方向動畫沒有 pixel16 等價畫格；未覆蓋的語意仍使用現有素材。候選維持 `candidate`／`approved: false`，不代表美術核准、Gate 1 通過或原生裝置驗收。
+
+## 任務與驗收
+
+- [x] 兩個隔離 Chromium context 載入相同 v13 farm fixture；記錄 17×13 camera、遊戲區尺寸及玩家／作物位置。
+- [x] 記錄 pixel16 候選 8bit atlas 與 pixel32 map／animation／overlay 的實際畫面來源、fallback textures、manifest 狀態、候選資產請求及錯誤。
+- [x] 直接斷言 pixel32 玩家 `down-idle` frame 與 Image 可見狀態；pixel16 不啟用此候選。
+- [x] 保存兩張遊戲區 PNG、輸入與輸出 SHA-256、fixture hash 及限制；目視確認擷取與構圖。
+- [x] 專項 Chromium E2E 通過（1/1）。
+- [x] `npm run check` 通過（162 個測試檔，1,640 passed／1 skipped；production build 2.805 MB）；完整 Chromium E2E 238/238 通過（9 workers）。
+- [x] AIPS Impact Graph traversal 與人工影響檢視完成；MapScene callers 完整，runtime consumers 可辨識，API／consumer／data／event 圖譜覆蓋有限，未發現本次資料或事件變更。
+- [ ] 以最終 commit SHA 完成 Change Impact reconciliation、commit、PR Required Checks 與合併。
