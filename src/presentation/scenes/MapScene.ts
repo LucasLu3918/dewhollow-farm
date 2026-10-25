@@ -79,6 +79,9 @@ import { resolveCandidateArt, type CandidateCropStage, type CandidateId } from '
 import { candidateFrameAt, type CandidateDirection } from '../candidate-sprite-animator';
 import {
   PIXEL32_ANIMATION_ATLAS_KEY,
+  PIXEL32_CROPS_ATLAS_KEY,
+  PIXEL32_INTERACTABLES_ATLAS_KEY,
+  PIXEL32_PETS_ATLAS_KEY,
   PIXEL32_CANDIDATE_OVERLAYS,
   PIXEL32_MAP_ATLAS_KEY,
   pixel32MapFrameFor,
@@ -305,6 +308,9 @@ declare global {
       pixel32CandidateRuntime(): { enabled: boolean; mapFrames: string[]; animationFrames: string[]; playerFrame: string | null };
       /** DEV-only, unapproved pixel32 map overlay fixture. */
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
+      /** DEV-only contact sheet for unapproved crops, pet directions, held tools, and object states. */
+      candidateAssetReview(): { enabled: boolean; items: Array<{ group: string; frame: string; texture: string; x: number; y: number; scale: number }>; limitations: string[] };
+      setCandidateAssetReviewVisible(visible: boolean): void;
       /** 玩家目前的走路姿勢（見 walk-pose.ts）。 */
       pose(): { y: number; rotation: number; scaleX: number; scaleY: number; legA: number; legB: number; stretch: number };
       /** 玩家骨架目前的方向、腳的做法與看得見的切塊。 */
@@ -356,6 +362,9 @@ export class MapScene extends Phaser.Scene {
   private rig!: CharacterRig;
   private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
   private pixel32CandidateRuntime = false;
+  private pixel32CandidateAssets = false;
+  private pixel32CandidateReviewItems: Array<{ group: string; frame: string; texture: string; x: number; y: number; scale: number }> = [];
+  private pixel32CandidateReviewContainer: Phaser.GameObjects.Container | null = null;
   private pixel32OverlayPreview = false;
   private pixel32CandidateOverlaySprites: { descriptor: (typeof PIXEL32_CANDIDATE_OVERLAYS)[number]; image: Phaser.GameObjects.Image }[] = [];
   /** 目前地圖上的居民（依行程站位），見 syncResidents。毛毛有骨架，其他人是占位。 */
@@ -541,6 +550,7 @@ export class MapScene extends Phaser.Scene {
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
     this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
     this.pixel32CandidateRuntime = this.registry.get('gate1-pixel32-candidate-runtime') === true;
+    this.pixel32CandidateAssets = this.registry.get('gate1-pixel32-candidate-assets') === true && this.pixel32CandidateRuntime;
     this.pixel32OverlayPreview = pixel32OverlayPreviewRequested(
       new URLSearchParams(window.location.search),
       import.meta.env.DEV,
@@ -566,6 +576,7 @@ export class MapScene extends Phaser.Scene {
     });
     this.createFollowers();
     this.setupCamera();
+    if (this.pixel32CandidateAssets) this.createPixel32CandidateReview();
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
     window.addEventListener('blur', this.onWindowBlur);
@@ -580,6 +591,9 @@ export class MapScene extends Phaser.Scene {
       this.pixel32CandidateSprite?.destroy();
       this.pixel32CandidateSprite = null;
       this.clearPixel32CandidateOverlays();
+      this.pixel32CandidateReviewContainer?.destroy(true);
+      this.pixel32CandidateReviewContainer = null;
+      this.pixel32CandidateReviewItems = [];
       for (const rig of this.npcRigs.values()) if (rig instanceof CharacterRig) rig.shutdown();
       this.residentWalks.clear();
       for (const state of this.companions.values()) state.rig.shutdown();
@@ -753,6 +767,16 @@ export class MapScene extends Phaser.Scene {
             visible: image.visible,
           })),
         }),
+        candidateAssetReview: () => ({
+          enabled: this.pixel32CandidateAssets && this.pixel32CandidateReviewContainer?.active === true,
+          items: this.pixel32CandidateReviewItems.map((item) => ({ ...item })),
+          limitations: [
+            'Sprites are candidate-only review samples; the board does not change tools, collisions, companion AI, or save data.',
+            'Pet frames are static directional samples; movement and follow animation remain production behavior.',
+            'Tool frames are held-preview art only; no grip, swing, or gameplay integration is implied.',
+          ],
+        }),
+        setCandidateAssetReviewVisible: (visible) => this.pixel32CandidateReviewContainer?.setVisible(visible),
       };
     }
   }
@@ -799,6 +823,11 @@ export class MapScene extends Phaser.Scene {
   }
 
   private resolveCandidateFrame(assetId: string, cropStage?: CandidateCropStage) {
+    if (this.pixel32CandidateAssets && assetId === 'crop.sweet-radish' && this.textures.exists(PIXEL32_CROPS_ATLAS_KEY)) {
+      const frame = cropStage ?? 'mature';
+      const texture = this.textures.get(PIXEL32_CROPS_ATLAS_KEY);
+      if (texture.has(frame)) return { atlas: PIXEL32_CROPS_ATLAS_KEY, frame, scale: 2, candidate: '16bit' as const };
+    }
     const candidate = resolveCandidateArt(this.currentRenderProfile().id, assetId, cropStage);
     const activeCandidate = this.registry.get('gate1-candidate-id') as CandidateId | null | undefined;
     if (!candidate || candidate.candidate !== activeCandidate || !this.textures.exists(candidate.atlas)) return null;
@@ -824,6 +853,41 @@ export class MapScene extends Phaser.Scene {
       fallbackAssetIds,
       registeredFrames: texture ? Object.keys(texture.frames).filter((key) => key !== '__BASE') : [],
     };
+  }
+
+  private createPixel32CandidateReview(): void {
+    const camera = this.cameras.main;
+    const zoom = camera.zoom || 1;
+    const board = this.add.container(
+      camera.centerX + (camera.x + 8 - camera.centerX) / zoom,
+      camera.centerY + (camera.y + 8 - camera.centerY) / zoom,
+    ).setScrollFactor(0).setScale(1 / zoom).setDepth(100_000);
+    this.pixel32CandidateReviewContainer = board;
+    const boardWidth = Math.max(1, camera.width - 16);
+    const boardHeight = Math.max(1, Math.min(366, camera.height - 16));
+    board.add(this.add.rectangle(0, 0, boardWidth, boardHeight, 0x17251e, 0.96).setOrigin(0).setStrokeStyle(2, 0xc6b580, 0.95));
+    board.add(this.add.text(12, 7, 'PIXEL32 CANDIDATE REVIEW  ·  UNAPPROVED', {
+      color: '#f4d998', fontFamily: 'monospace', fontSize: '16px', fontStyle: 'bold',
+    }));
+
+    const addRow = (group: string, label: string, frames: string[], texture: string, y: number): void => {
+      board.add(this.add.text(12, y - 8, label, { color: '#edf0d8', fontFamily: 'monospace', fontSize: '13px' }));
+      const available = Math.max(32, boardWidth - 184);
+      const scale = Math.min(2, available / (frames.length * 32 + Math.max(0, frames.length - 1) * 8));
+      const step = 32 * scale + 8;
+      frames.forEach((frame, index) => {
+        const x = 176 + index * step;
+        const image = this.add.image(x, y + 20, texture, frame).setOrigin(0.5, 0.5).setScale(scale);
+        board.add(image);
+        this.pixel32CandidateReviewItems.push({ group, frame, texture, x: Math.round(x), y: y + 20, scale });
+      });
+    };
+
+    addRow('crops', 'CROPS  ·  sweet radish growth stages', ['seed', 'sprout', 'mature'], PIXEL32_CROPS_ATLAS_KEY, 33);
+    addRow('cat', 'CAT  ·  directional idle', ['cat-down-idle', 'cat-up-idle', 'cat-left-idle', 'cat-right-idle'], PIXEL32_PETS_ATLAS_KEY, 96);
+    addRow('quokka', 'QUOKKA  ·  directional idle', ['quokka-down-idle', 'quokka-up-idle', 'quokka-left-idle', 'quokka-right-idle'], PIXEL32_PETS_ATLAS_KEY, 159);
+    addRow('tools', 'TOOLS  ·  held preview', ['tool-hoe', 'tool-can', 'tool-seedbag', 'tool-axe', 'tool-pick', 'tool-rod', 'tool-sickle'], PIXEL32_INTERACTABLES_ATLAS_KEY, 222);
+    addRow('objects', 'OBJECTS  ·  static states', ['door-closed', 'door-open', 'shipbox-closed', 'shipbox-open'], PIXEL32_INTERACTABLES_ATLAS_KEY, 285);
   }
 
   /** 虛擬按鍵直接送出語意動作；按鍵重綁只影響鍵盤 adapter。 */
@@ -1827,7 +1891,7 @@ export class MapScene extends Phaser.Scene {
         const stage: CandidateCropStage = ratio < 0.25 ? 'seed' : ratio < 0.7 ? 'sprout' : 'mature';
         const sprite = this.image(`crop.${crop.id}`, x, y, 2, stage);
         const growthScale = 0.5 + 0.5 * ratio;
-        const displayScale = sprite.texture.key === 'gate1-candidate-atlas'
+        const displayScale = sprite.texture.key === 'gate1-candidate-atlas' || sprite.texture.key === PIXEL32_CROPS_ATLAS_KEY
           ? sprite.scaleX * growthScale
           : growthScale;
         sprite.setScale(displayScale);

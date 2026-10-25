@@ -22,6 +22,8 @@ describe('resolveCandidateArt', () => {
 
   it('maps crop overlays to a stage-specific candidate frame', () => {
     expect(resolveCandidateArt('pixel32', 'crop.sweet-radish', 'sprout')?.frame).toBe('cropSprout');
+    expect(resolveCandidateArt('pixel32', 'crop.moon-bean', 'sprout')).toBeNull();
+    expect(resolveCandidateArt('pixel16', 'crop.moon-bean', 'sprout')).toBeNull();
     expect(resolveCandidateArt('pixel16', 'tile.field')?.frame).toBe('tilled');
     expect(resolveCandidateArt('pixel16', 'tile.soil')).toBeNull();
   });

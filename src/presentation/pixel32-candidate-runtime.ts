@@ -10,6 +10,14 @@ export const PIXEL32_MAP_MANIFEST_KEY = 'gate1-pixel32-map-manifest';
 export const PIXEL32_MAP_ATLAS_KEY = 'gate1-pixel32-map-atlas';
 export const PIXEL32_ANIMATION_MANIFEST_KEY = 'gate1-pixel32-animation-manifest';
 export const PIXEL32_ANIMATION_ATLAS_KEY = 'gate1-pixel32-animation-atlas';
+export const PIXEL32_CROPS_ATLAS_KEY = 'gate1-pixel32-crops-atlas';
+export const PIXEL32_CROPS_MANIFEST_KEY = 'gate1-pixel32-crops-manifest';
+export const PIXEL32_INTERACTABLES_ATLAS_KEY = 'gate1-pixel32-interactables-atlas';
+export const PIXEL32_INTERACTABLES_MANIFEST_KEY = 'gate1-pixel32-interactables-manifest';
+export const PIXEL32_PETS_ATLAS_KEY = 'gate1-pixel32-pets-atlas';
+export const PIXEL32_PETS_MANIFEST_KEY = 'gate1-pixel32-pets-manifest';
+export const PIXEL32_CANDIDATE_REVIEW_QUERY = 'gate1AssetPreview';
+export const PIXEL32_CANDIDATE_REVIEW_VALUE = 'pixel32-candidates';
 
 export interface CandidateFrameRect {
   x: number;
@@ -48,6 +56,13 @@ export function pixel32CandidateRuntimeRequested(search: URLSearchParams, isDev:
   return isDev
     && search.get('renderProfile') === 'pixel32'
     && search.get(PIXEL32_RUNTIME_QUERY) === PIXEL32_RUNTIME_VALUE;
+}
+
+/** Optional DEV-only review board; it requires the pixel32 runtime and an exact second opt-in. */
+export function pixel32CandidateReviewRequested(search: URLSearchParams, isDev: boolean, runtimeEnabled: boolean): boolean {
+  return isDev
+    && runtimeEnabled
+    && search.get(PIXEL32_CANDIDATE_REVIEW_QUERY) === PIXEL32_CANDIDATE_REVIEW_VALUE;
 }
 
 /** Overlay review requires the already opt-in pixel32 runtime and a second exact DEV query value. */
