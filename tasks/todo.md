@@ -77,3 +77,16 @@
 - [ ] 更新 Impact reconciliation、commit、PR；Required Checks 通過後依核准流程合併。
 
 詳見 [overlay runtime 矩陣報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-runtime-matrix.zh-TW.md)。完整 12×10 場景、候選素材人眼核准與 iOS／Android 實機驗證仍待後續。
+
+---
+
+# DF-G1-OVERLAY-MOTION-STABILITY pixel32 房屋／樹冠移動深度穩定性
+
+- [x] 在精確 DEV-only overlay opt-in 與隔離 QA 存檔下，沿樹冠與房屋前後錨點完成四向移動。
+- [x] 逐步確認 14 次移動、15 個狀態樣本中的三個候選 overlay signature（ID、frame、layer、tile、depth、display list、visible）與起始樣本一致，並確認角色越過樹冠與房屋腳底錨點時深度前後翻轉。
+- [x] 保存四張場景截圖、候選 manifest／atlas SHA、角色量測與錯誤計數；目視抽查代表圖。
+- [x] 專項 Playwright E2E 通過 1/1。
+- [x] `npm run check` 通過（1,616 passed／1 skipped）；完整 Chromium Playwright E2E 232/232 通過（4 workers）。
+- [ ] Impact reconciliation、commit、PR、Required Checks 和 merge。
+
+詳見 [overlay 移動深度穩定性證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-motion-stability.zh-TW.md)。
