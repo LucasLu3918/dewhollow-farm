@@ -58,44 +58,6 @@ async function waitForMovementIdle(page: Page): Promise<void> {
   }), { timeout: 10_000 }).toBe(true);
 }
 
-async function sampleMovementRemainder(page: Page, targetY: number): Promise<WalkSample[]> {
-  return page.evaluate(async (expectedY) => {
-    const samples: WalkSample[] = [];
-    const startedAt = performance.now();
-    const deadline = startedAt + 5_000;
-    await new Promise<void>((resolve, reject) => {
-      const sample = () => {
-        const debug = window.__dewhollow;
-        if (!debug) { reject(new Error('Missing DEV MapScene diagnostics')); return; }
-        const movement = debug.movement();
-        const actor = debug.actors().find(({ id }) => id === 'player');
-        if (!actor) { reject(new Error('Missing player actor diagnostics')); return; }
-        const runtime = debug.pixel32CandidateRuntime();
-        const overlays = debug.pixel32CandidateOverlays();
-        samples.push({
-          elapsedMs: Math.round(performance.now() - startedAt),
-          moving: movement.moving,
-          heldDirection: movement.heldDirection,
-          blockedDirection: movement.blockedDirection,
-          tile: movement.tile,
-          player: { footY: actor.footY, depth: actor.depth, frame: runtime.playerFrame },
-          overlays: overlays.overlays.map(({ id, frame, layer, tileX, tileY, depth, displayList, visible }) => ({
-            id, frame, layer, tileX, tileY, depth, displayList, visible,
-          })),
-        });
-        if (movement.tile.y === expectedY && !movement.moving && movement.heldDirection === null) { resolve(); return; }
-        if (performance.now() >= deadline) {
-          reject(new Error(`Timed out settling at y=${expectedY}; last movement=${JSON.stringify(movement)}, frame=${runtime.playerFrame}`));
-          return;
-        }
-        requestAnimationFrame(sample);
-      };
-      requestAnimationFrame(sample);
-    });
-    return samples;
-  }, targetY);
-}
-
 async function crossAnchorWhileSampling(page: Page, direction: 'down' | 'up', startY: number, targetY: number): Promise<WalkSample[]> {
   const key = direction === 'down' ? 'ArrowDown' : 'ArrowUp';
   const step = direction === 'down' ? 1 : -1;
@@ -108,6 +70,7 @@ async function crossAnchorWhileSampling(page: Page, direction: 'down' | 'up', st
       const samples: WalkSample[] = [];
       const startedAt = performance.now();
       const deadline = startedAt + 5_000;
+      let inputReleased = false;
       await new Promise<void>((resolve, reject) => {
         const sample = () => {
           const debug = window.__dewhollow;
@@ -128,10 +91,14 @@ async function crossAnchorWhileSampling(page: Page, direction: 'down' | 'up', st
               id, frame, layer, tileX, tileY, depth, displayList, visible,
             })),
           });
-          if (movement.tile.y === nextY) {
+          if (movement.tile.y === nextY && !inputReleased) {
             // Release in the same browser frame that observes the committed tile.
             // A delayed Playwright round trip can otherwise queue another step on slow CI.
             window.dispatchEvent(new KeyboardEvent('keyup', { key, code: key, bubbles: true, cancelable: true }));
+            inputReleased = true;
+          }
+          if (inputReleased && movement.tile.y === nextY && !movement.moving
+            && movement.heldDirection === null && !movement.pending && movement.queuedTaps === 0) {
             resolve();
             return;
           }
@@ -146,8 +113,6 @@ async function crossAnchorWhileSampling(page: Page, direction: 'down' | 'up', st
       return samples;
     }, { nextY, key });
     await page.keyboard.up(key);
-    samples.push(...await sampleMovementRemainder(page, nextY));
-    await waitForMovementIdle(page);
     result.push(...samples);
     currentY = nextY;
   }
