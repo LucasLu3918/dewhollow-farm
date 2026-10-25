@@ -1,0 +1,32 @@
+:root {
+  font-family: ui-rounded, "Avenir Next", system-ui, sans-serif;
+  color: #29362f;
+  background: #edf0e4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+main { max-width: 1120px; margin: 0 auto; padding: 40px 24px 56px; }
+.hero { padding: 30px clamp(20px, 5vw, 56px); border: 1px solid #b8c3aa; border-radius: 20px; background: #f7f7ee; box-shadow: 0 12px 32px #35463114; }
+.eyebrow { margin: 0 0 10px; color: #627b4b; font: 700 12px/1.4 ui-monospace, SFMono-Regular, monospace; letter-spacing: .12em; }
+h1 { margin: 0; color: #293b31; font-size: clamp(28px, 5vw, 44px); line-height: 1.12; }
+.hero > p:not(.eyebrow) { max-width: 700px; margin: 14px 0; color: #526257; line-height: 1.7; }
+.status { display: inline-flex; align-items: center; gap: 9px; padding: 7px 12px; border: 1px solid #d5b46a; border-radius: 999px; color: #755525; background: #fff8df; font: 600 12px/1.2 ui-monospace, SFMono-Regular, monospace; }
+.status span { width: 8px; height: 8px; border-radius: 50%; background: #d4a438; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin: 20px 2px; color: #35483c; }
+.controls label { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+.controls input { accent-color: #698552; }
+.controls p { margin: 0; color: #6c796f; font-size: 13px; }
+.candidate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); gap: 14px; }
+.card { min-width: 0; padding: 18px; border: 1px solid #d3d9c9; border-radius: 16px; background: #fafaf3; box-shadow: 0 5px 16px #3546310c; }
+.card h2 { margin: 13px 0 3px; color: #304238; font-size: 16px; }
+.card .meta { margin: 0; color: #748075; font: 11px/1.5 ui-monospace, SFMono-Regular, monospace; }
+.sprite { display: grid; place-items: center; height: 148px; border: 1px solid #dce1d6; border-radius: 12px; background-color: #f1f2e9; background-image: linear-gradient(45deg, #e3e7dc 25%, transparent 25%), linear-gradient(-45deg, #e3e7dc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e3e7dc 75%), linear-gradient(-45deg, transparent 75%, #e3e7dc 75%); background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0; }
+.sprite canvas { width: 96px; height: 96px; image-rendering: pixelated; image-rendering: crisp-edges; }
+.loading { color: #68766b; }
+footer { margin: 22px 2px 0; padding: 16px 4px 0; border-top: 1px solid #cad2c4; color: #637066; font-size: 13px; line-height: 1.65; }
+footer p { margin: 6px 0; }
+.integrity { overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 11px; }
+.error { padding: 16px; border: 1px solid #cf8982; border-radius: 12px; color: #792e26; background: #fff0ec; }

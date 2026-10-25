@@ -1,0 +1,345 @@
+{
+  "schemaVersion": 1,
+  "title": "Dewhollow Pixel32 interactables candidate",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "hand-authored integer pixel primitives informed by existing original project assets; source images are references, not resized inputs",
+    "generator": "tools/art/generate_gate1_interactables.mjs",
+    "generatorSha256": "192cb94de166885dbc691304b3ec3158493b230ad2c1ffb63f858da67f5dd026",
+    "references": [
+      {
+        "id": "tool.hoe",
+        "path": "public/assets/tools/hoe-2x.png",
+        "sha256": "03165e66002fbfa88fd441e4e16dd57b8e68d18dab1fa2c0631009fbb0a282a9"
+      },
+      {
+        "id": "tool.can",
+        "path": "public/assets/tools/can-2x.png",
+        "sha256": "36c5a163e78ee23d6554b0f8fa9a031254390a1ec84f4fe4d3de86092a10f8dd"
+      },
+      {
+        "id": "tool.seedbag",
+        "path": "public/assets/tools/seedbag-2x.png",
+        "sha256": "853d6e68096df186ebd975528730a9e5b8ea7c547724e40fd74bbc8ab0639ea0"
+      },
+      {
+        "id": "tool.axe",
+        "path": "public/assets/tools/axe-2x.png",
+        "sha256": "90f03f34c83bccae6e627a536c86e4829dd2121b9d2dbd6538266fead3266f14"
+      },
+      {
+        "id": "tool.pick",
+        "path": "public/assets/tools/pick-2x.png",
+        "sha256": "820e5e367cebcefe859a59a0aede6520537dd866242f8e3975afe232753d5ed7"
+      },
+      {
+        "id": "tool.rod",
+        "path": "public/assets/tools/rod-2x.png",
+        "sha256": "9cd6037b12bf08e95696eb6e3e10ca40029f331e1deefc8eec42721a2158a2a7"
+      },
+      {
+        "id": "tool.sickle",
+        "path": "public/assets/tools/sickle-2x.png",
+        "sha256": "eca4d7932b5a5027e093ef47b4f1fc91e2f2f7f9378851ef3fcddff0424efdcc"
+      },
+      {
+        "id": "tile.door",
+        "path": "public/assets/tiles/door-2x.png",
+        "sha256": "c548d4ad9423b1aebb8d5c2992f05af686e63815b8897ef430c0a12013105a42"
+      },
+      {
+        "id": "tile.shipbox",
+        "path": "public/assets/tiles/shipbox-2x.png",
+        "sha256": "82aa495601414f606c8bb1054ab5782186fd0bd2947533fb30d8e5076f642737"
+      }
+    ]
+  },
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "anchorConvention": "integer-pixel-index"
+  },
+  "atlas": {
+    "file": "interactables-atlas.png",
+    "width": 128,
+    "height": 96,
+    "sha256": "b2c38612200c90b87eb1a937adcac077c4f80891b4683b8f8b1853670e687915"
+  },
+  "frameLayout": {
+    "columns": 4,
+    "rows": 3,
+    "cellWidth": 32,
+    "cellHeight": 32
+  },
+  "frames": {
+    "tool-hoe": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "tool",
+      "item": "hoe",
+      "state": "held-preview",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "grip": {
+        "x": 7,
+        "y": 27
+      },
+      "sha256": "84b47a21cc4df7281a35362e1d662bc808ae29bafee5568c85a7f1ccee611b95",
+      "approved": false
+    },
+    "tool-can": {
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "tool",
+      "item": "can",
+      "state": "held-preview",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "grip": {
+        "x": 10,
+        "y": 20
+      },
+      "sha256": "5f389b6737e26b31b5dcb2df8dd4b5d7ce9079c89719ef7db60a80ae9b2689ae",
+      "approved": false
+    },
+    "tool-seedbag": {
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "tool",
+      "item": "seedbag",
+      "state": "held-preview",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "grip": {
+        "x": 16,
+        "y": 13
+      },
+      "sha256": "9b6c8c4b3107670dc2b96fe04b99326ead9a4ed62ced642fa9eb5ba83277efe5",
+      "approved": false
+    },
+    "tool-axe": {
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "tool",
+      "item": "axe",
+      "state": "held-preview",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "grip": {
+        "x": 8,
+        "y": 27
+      },
+      "sha256": "704e4c23efbfbb89f1dbfd02695a276e69f8e55f33827ce62c89bdd008088c49",
+      "approved": false
+    },
+    "tool-pick": {
+      "x": 0,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "tool",
+      "item": "pick",
+      "state": "held-preview",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "grip": {
+        "x": 8,
+        "y": 27
+      },
+      "sha256": "0bcbef5bedadc966bd2583a45b821a2c130475067d37b274ebab99b2cff56561",
+      "approved": false
+    },
+    "tool-rod": {
+      "x": 32,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "tool",
+      "item": "rod",
+      "state": "held-preview",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "grip": {
+        "x": 10,
+        "y": 26
+      },
+      "sha256": "fdd6ced426675752da4804cf12a7b4878023131e43791da0d937fc65a8811a23",
+      "approved": false
+    },
+    "tool-sickle": {
+      "x": 64,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "tool",
+      "item": "sickle",
+      "state": "held-preview",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "grip": {
+        "x": 10,
+        "y": 27
+      },
+      "sha256": "02a36f4834354bb02cc82550c9c44125fa8e2a79112d5c45d38062442f104619",
+      "approved": false
+    },
+    "door-closed": {
+      "x": 96,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "door",
+      "item": "closed",
+      "state": "closed",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "b79a9ae2732feeec9ac25497d52476643c9efe7cdf6a3c771c029058b1b4726b",
+      "approved": false
+    },
+    "door-open": {
+      "x": 0,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "door",
+      "item": "open",
+      "state": "open",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "1dac80ea9501682faacd68da0cb62ecdda97f60d5bbb5114bc07e115ad7dd490",
+      "approved": false
+    },
+    "shipbox-closed": {
+      "x": 32,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "shipbox",
+      "item": "closed",
+      "state": "closed",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "f47ef5735a125b679bcd65777059eb1c883eb5d75aae9832d377d6b42b297ac2",
+      "approved": false
+    },
+    "shipbox-open": {
+      "x": 64,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "category": "shipbox",
+      "item": "open",
+      "state": "open",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "a2b80a6966589f4ead8940a61d71033dde995260d38928cf94cd699ccccb4087",
+      "approved": false
+    }
+  },
+  "limitations": [
+    "Candidate preview only; not approved or registered as production assets.",
+    "Tool grip markers support visual review only; formal tool textureSize, grip, rig, and gameplay are unchanged.",
+    "Door and shipbox states illustrate visual differences only; they do not change map, collision, transport, inventory, or save behavior.",
+    "Original production asset references document visual lineage and are not generator inputs.",
+    "Pixel-level visual quality and device readability require human Gate 1 review."
+  ]
+}
