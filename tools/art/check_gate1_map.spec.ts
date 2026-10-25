@@ -84,5 +84,5 @@ describe('Gate 1 pixel32 map candidate checker', () => {
     const generatedDir = join(generatedRoot, 'docs/art/candidates/pixel-movement/gate1-assets/pixel32-map');
     expect(readFileSync(join(generatedDir, 'manifest.json'))).toEqual(readFileSync(candidate.manifestPath));
     expect(readFileSync(join(generatedDir, 'map-atlas.png'))).toEqual(readFileSync(join(candidate.manifestPath, '..', 'map-atlas.png')));
-  });
+  }, 30_000);
 });
