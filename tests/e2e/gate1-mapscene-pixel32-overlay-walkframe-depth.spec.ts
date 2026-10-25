@@ -104,7 +104,7 @@ async function crossAnchorWhileSampling(page: Page, direction: 'down' | 'up', st
   while (currentY !== targetY) {
     const nextY = currentY + step;
     await page.keyboard.down(key);
-    const samples = await page.evaluate(async ({ nextY }) => {
+    const samples = await page.evaluate(async ({ nextY, key }) => {
       const samples: WalkSample[] = [];
       const startedAt = performance.now();
       const deadline = startedAt + 5_000;
@@ -128,7 +128,13 @@ async function crossAnchorWhileSampling(page: Page, direction: 'down' | 'up', st
               id, frame, layer, tileX, tileY, depth, displayList, visible,
             })),
           });
-          if (movement.tile.y === nextY) { resolve(); return; }
+          if (movement.tile.y === nextY) {
+            // Release in the same browser frame that observes the committed tile.
+            // A delayed Playwright round trip can otherwise queue another step on slow CI.
+            window.dispatchEvent(new KeyboardEvent('keyup', { key, code: key, bubbles: true, cancelable: true }));
+            resolve();
+            return;
+          }
           if (performance.now() >= deadline) {
             reject(new Error(`Timed out crossing to y=${nextY}; last movement=${JSON.stringify(movement)}, frame=${runtime.playerFrame}`));
             return;
@@ -138,7 +144,7 @@ async function crossAnchorWhileSampling(page: Page, direction: 'down' | 'up', st
         requestAnimationFrame(sample);
       });
       return samples;
-    }, { nextY });
+    }, { nextY, key });
     await page.keyboard.up(key);
     samples.push(...await sampleMovementRemainder(page, nextY));
     await waitForMovementIdle(page);
@@ -223,7 +229,7 @@ test('pixel32 candidate walk frames cross tree and house overlay depth anchors w
     && ['up-contact-a', 'up-contact-b', 'up-passing'].includes(player.frame ?? '')), 'house crossing must sample an active directional walk frame').toBe(true);
   const houseNorth = houseSamples.filter(({ player }) => player.footY < 320);
   const houseSouth = houseSamples.filter(({ player }) => player.footY > 320);
-  const houseAnchorWalkSamples = houseSamples.filter(({ moving, heldDirection, player }) => moving && heldDirection === 'up'
+  const houseAnchorWalkSamples = houseSamples.filter(({ moving, player }) => moving
     && ['up-contact-a', 'up-contact-b', 'up-passing'].includes(player.frame ?? '')
     && Math.abs(player.footY - 320) <= 16 && Math.abs(player.depth - houseDepth!) <= 0.3);
   expect(houseAnchorWalkSamples.length > 0,
