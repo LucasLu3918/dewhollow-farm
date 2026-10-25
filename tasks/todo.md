@@ -21,6 +21,19 @@
 
 ---
 
+# DF-G1-RUNTIME-MATRIX pixel32 候選 runtime 證據矩陣
+
+- [x] 為 DEV-only pixel32 farm `MapScene` 產生五種 viewport × DPR 1／2／3 的 15 張 Chromium 模擬截圖。
+- [x] 將四份候選 manifest／圖集與本次各截圖 SHA-256、Canvas、render resolution、可見格數及 browser DPR 收錄於矩陣；SHA-256 識別這批存檔，不承諾跨環境逐位元重現。
+- [x] 抽查手機直式、1280 桌面及 Full HD 高 DPR 畫面；候選圖集未核准且非候選覆蓋物件仍使用舊素材。
+- [x] `npm run check`、本切片 Playwright E2E 與完整 E2E（227/227）通過；renderer compatibility canary 的預期失敗按測試契約計為通過。
+- [ ] Impact reconciliation、commit、PR、Required Checks 和 merge 待完成。
+- [ ] 取得確切候選素材的人眼驗收；完成固定場景、持續移動、碰撞／遮擋、作物／夥伴和原生實機檢查後才評估 Gate 1。
+
+詳見 [pixel32 候選 MapScene viewport／DPR 證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-runtime-evidence.zh-TW.md)。
+
+---
+
 # Gate 1 整合候選預覽任務
 
 - [x] 任務 1：在獨立候選路徑整合 pixel32 地圖與四向動畫候選。

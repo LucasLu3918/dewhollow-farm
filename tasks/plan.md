@@ -24,6 +24,25 @@
 
 整理既有 renderer-profile、同場景 A/B 與 pixel32 MapScene QA runtime 證據，對照 Gate 1 驗收條件並修正過時狀態。此階段只整理證據，不改候選素材或核准狀態。詳見 [DF-QA-01 稽核矩陣](../docs/art/audit/df-qa-01.md)。
 
+---
+
+# DF-G1-RUNTIME-MATRIX pixel32 候選 runtime viewport／DPR 證據
+
+為 DEV-only pixel32 farm `MapScene` 補上五種 viewport × Chromium DPR context 1／2／3 的 15 組 CSS 尺寸截圖與測量，供人眼檢視同一候選版本在不同 CSS 畫幅的呈現；不把這組輸出當作 DPR 專屬 raster 驗收。完整證據見 [候選 runtime viewport／DPR 報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-runtime-evidence.zh-TW.md)。
+
+## 限制
+
+- 截圖只包含現有 pixel32 地面與玩家四向動畫候選；其他角色與物件仍用舊素材。
+- DPR 由 Chromium 模擬，PNG 以 CSS 尺寸輸出；不構成原生實機或實際像素輸出驗收。
+- manifest 和圖集仍是 `candidate`／`approved: false`；未核准正式整合，Gate 1 仍未通過。
+- 固定 12×10 完整場景、5 秒連續移動、碰撞／遮擋、作物／夥伴及實機證據仍待後續階段。
+
+## 完成條件
+
+- [x] 五種 viewport × Chromium DPR context 1／2／3 共 15 張截圖、量測及本次存檔 hash 已整理。
+- [x] `npm run check`、完整 `npm run test:e2e`（227/227）通過，並目視抽查代表截圖。
+- [ ] 更新 Impact Graph reconciliation、commit、PR；Required Checks 通過後依核准發佈流程合併。
+
 ## 任務與完成條件
 
 - [x] 區分 45 張舊素材 viewport／DPR 矩陣與單一 1280×720 DPR1 pixel32 候選 runtime 截圖。
