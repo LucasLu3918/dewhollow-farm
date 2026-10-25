@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "candidate": {
+    "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation",
+    "status": "candidate",
+    "approved": false
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "dpr": 1
+  },
+  "initialTile": {
+    "x": 7,
+    "y": 9,
+    "facing": "down"
+  },
+  "collision": {
+    "heldDirection": "left",
+    "tileBefore": {
+      "x": 7,
+      "y": 9,
+      "facing": "down"
+    },
+    "blockedTile": {
+      "x": 1,
+      "y": 9,
+      "facing": "left"
+    },
+    "stayedInPlaceForMs": 250,
+    "boundary": "farm x=0 is a wall; player remains on a traversable tile"
+  },
+  "fourDirectionMovement": {
+    "right": {
+      "elapsedMs": 1283,
+      "minimumHeldMs": 1250,
+      "tilesMoved": 9,
+      "animatedFrames": [
+        "right-passing",
+        "right-contact-b",
+        "right-contact-a"
+      ],
+      "sampleCount": 76
+    },
+    "down": {
+      "elapsedMs": 1272,
+      "minimumHeldMs": 1250,
+      "tilesMoved": 8,
+      "animatedFrames": [
+        "down-passing",
+        "down-contact-a",
+        "down-contact-b"
+      ],
+      "sampleCount": 76
+    },
+    "left": {
+      "elapsedMs": 1272,
+      "minimumHeldMs": 1250,
+      "tilesMoved": 8,
+      "animatedFrames": [
+        "left-contact-b",
+        "left-passing",
+        "left-contact-a"
+      ],
+      "sampleCount": 76
+    },
+    "up": {
+      "elapsedMs": 1272,
+      "minimumHeldMs": 1250,
+      "tilesMoved": 8,
+      "animatedFrames": [
+        "up-passing",
+        "up-contact-b",
+        "up-contact-a"
+      ],
+      "sampleCount": 76
+    }
+  },
+  "totalHeldInputMs": 5099,
+  "totalObservedSequenceMs": 5260,
+  "claim": "DEV-only Chromium evidence for the existing farm MapScene. This does not establish native-device behavior, formal asset approval, complete scene art, or Gate 1 completion.",
+  "screenshots": {
+    "right.png": {
+      "sha256": "bc29c3e553b3c2201d060d82350d535173ce988ac8ceba4cb714e4201af3ef08",
+      "bytes": 7454
+    },
+    "down.png": {
+      "sha256": "ac3628497944777fbf6f06d11f9cb7734b70fa2f0326baf85c7297ac784413fa",
+      "bytes": 7225
+    },
+    "left.png": {
+      "sha256": "48ac84b1c19667764593e9e573c6a1753c1934efb2c02816715a9ac17ff6b7fb",
+      "bytes": 7307
+    },
+    "up.png": {
+      "sha256": "627463fcd1f0efe04a24a86e106f4e88a8be0c7a120fd007bb12c0d6abf37e30",
+      "bytes": 9813
+    },
+    "wall-stop.png": {
+      "sha256": "5325b45fe9f45be6d0e01ba88efcd7ab63d7909a230f7be67437b4faafce986d",
+      "bytes": 95694
+    },
+    "four-direction-final.png": {
+      "sha256": "3a22976b43e668c08ba10f4bfa2c1327c0a7dd3b84c68b16be9f46bd6b653e73",
+      "bytes": 65909
+    }
+  }
+}

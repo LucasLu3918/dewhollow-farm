@@ -80,7 +80,7 @@ function drawActor(time) {
   drawFrame(animationAtlas, frame, actorX - frame.footAnchor.x, footY - frame.footAnchor.y);
 
   if (state.toolStartedAt !== null) {
-    const progress = Math.min(1, (time - state.toolStartedAt) / TOOL_DURATION_MS);
+    const progress = Math.max(0, Math.min(1, (time - state.toolStartedAt) / TOOL_DURATION_MS));
     const feedback = candidateToolFeedback(progress, state.direction);
     if (candidateToolImpactCrossed(state.previousToolProgress, progress)) state.impactSeen = true;
     state.previousToolProgress = progress;
