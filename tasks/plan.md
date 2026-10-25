@@ -145,3 +145,26 @@
 ## 限制
 
 Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆蓋素材、作物／夥伴辨識、農務動畫、樹冠與建築遮擋、設備效能及確切素材核准仍待後續。
+
+---
+
+# DF-G1-OVERLAY-12X10 pixel32 房屋／樹冠圖層與固定場景
+
+## 範圍與結果
+
+在精確 DEV-only pixel32 runtime opt-in 下，於 farm MapScene 隔離繪製未核准的 `house-back`、`tree-canopy`、`house-front` 候選圖層；另於 Gate 1 預覽頁新增固定 12 × 10 原生 32 × 32 pixel32 地圖圖層樣張。正式地圖、碰撞、存檔、玩法與 `content/assets.json` 不變，所有候選維持 `approved: false`。
+
+驗收結果與畫面見 [pixel32 房屋／樹冠圖層候選報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-scene.zh-TW.md)。本階段不等於確切美術核准或 Gate 1 完成；原生裝置維持 `DEVICE_PENDING`。
+
+## 驗收
+
+- [x] 單元測試驗證 DEV、pixel32 runtime 與第二個精確 query 三者皆為必要條件。
+- [x] 專項 E2E 驗證無第二個 query 時不建立 overlay；完整 opt-in 時載入三個候選 frame、確認 house front/back 共錨點及前景深度。
+- [x] 新增 12 × 10／384 × 320 固定 canvas 預覽、模式對應說明與未核准狀態標示。
+- [x] 保存 MapScene runtime 和固定場景 Chromium 截圖、量測、SHA-256；完成目視檢查。
+- [x] `npm run check` 通過（1,616 passed／1 skipped）；完整 Playwright E2E 230/230 通過（4 workers）。
+
+## 限制
+
+- 目前驗證層次與 frame 錨點，不聲稱已驗證 actor 像素遮擋品質。
+- 明確素材核准、原生裝置測試及正式資產整合均待後續人工驗收。

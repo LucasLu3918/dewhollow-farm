@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import farm from '../../content/maps/farm.json';
 import type { MapDef } from '../domain/content';
 import {
+  PIXEL32_CANDIDATE_OVERLAYS,
   candidateFramesFromManifest,
   pixel32CandidateRuntimeRequested,
   pixel32MapFrameFor,
+  pixel32OverlayPreviewRequested,
 } from './pixel32-candidate-runtime';
 
 const farmMap = farm as MapDef;
@@ -62,5 +64,27 @@ describe('pixel32 seasonal map frames', () => {
     expect(pixel32MapFrameFor('tile.field', 'spring', edgeMap, 1, 1, (x, y) => x === 0 && y === 1 ? 'grass' : 'field'))
       .toBe('spring-field-edge-8');
     expect(pixel32MapFrameFor('tile.soil', 'spring', farmMap, 2, 7)).toBeNull();
+  });
+});
+
+describe('pixel32 overlay candidate preview', () => {
+  it('requires DEV mode, the base pixel32 runtime, and the exact overlay query', () => {
+    const query = new URLSearchParams('gate1OverlayPreview=pixel32-overlay-12x10');
+
+    expect(pixel32OverlayPreviewRequested(query, true, true)).toBe(true);
+    expect(pixel32OverlayPreviewRequested(query, false, true)).toBe(false);
+    expect(pixel32OverlayPreviewRequested(query, true, false)).toBe(false);
+    expect(pixel32OverlayPreviewRequested(new URLSearchParams('gate1OverlayPreview=true'), true, true)).toBe(false);
+    expect(pixel32OverlayPreviewRequested(new URLSearchParams(), true, true)).toBe(false);
+  });
+
+  it('keeps a deterministic 3-layer review layout with the house panels sharing one anchor', () => {
+    expect(PIXEL32_CANDIDATE_OVERLAYS.map(({ id, layer }) => ({ id, layer }))).toEqual([
+      { id: 'house-back', layer: 'back' },
+      { id: 'tree-canopy', layer: 'front' },
+      { id: 'house-front', layer: 'front' },
+    ]);
+    expect(PIXEL32_CANDIDATE_OVERLAYS[0]).toMatchObject({ tileX: 3, tileY: 3, widthTiles: 3, heightTiles: 2 });
+    expect(PIXEL32_CANDIDATE_OVERLAYS[2]).toMatchObject({ tileX: 3, tileY: 3, widthTiles: 3, heightTiles: 2 });
   });
 });

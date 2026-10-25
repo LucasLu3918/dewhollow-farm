@@ -4,6 +4,8 @@ import { tileAt } from '../domain/world';
 
 export const PIXEL32_RUNTIME_QUERY = 'gate1Runtime';
 export const PIXEL32_RUNTIME_VALUE = 'pixel32-map-animation';
+export const PIXEL32_OVERLAY_PREVIEW_QUERY = 'gate1OverlayPreview';
+export const PIXEL32_OVERLAY_PREVIEW_VALUE = 'pixel32-overlay-12x10';
 export const PIXEL32_MAP_MANIFEST_KEY = 'gate1-pixel32-map-manifest';
 export const PIXEL32_MAP_ATLAS_KEY = 'gate1-pixel32-map-atlas';
 export const PIXEL32_ANIMATION_MANIFEST_KEY = 'gate1-pixel32-animation-manifest';
@@ -24,11 +26,35 @@ export interface CandidateAtlasManifest {
   frames: Record<string, CandidateFrameRect>;
 }
 
+export interface Pixel32CandidateOverlay {
+  id: 'house-back' | 'tree-canopy' | 'house-front';
+  frame: 'house-back' | 'tree-canopy' | 'house-front';
+  tileX: number;
+  tileY: number;
+  layer: 'back' | 'front';
+  widthTiles: number;
+  heightTiles: number;
+}
+
+/** Fixed, collision-free DEV review layout. Coordinates are anchored in farm tiles. */
+export const PIXEL32_CANDIDATE_OVERLAYS: readonly Pixel32CandidateOverlay[] = [
+  { id: 'house-back', frame: 'house-back', tileX: 3, tileY: 3, layer: 'back', widthTiles: 3, heightTiles: 2 },
+  { id: 'tree-canopy', frame: 'tree-canopy', tileX: 8, tileY: 3, layer: 'front', widthTiles: 2, heightTiles: 2 },
+  { id: 'house-front', frame: 'house-front', tileX: 3, tileY: 3, layer: 'front', widthTiles: 3, heightTiles: 2 },
+];
+
 /** The candidate runtime requires two explicit development-only query values. */
 export function pixel32CandidateRuntimeRequested(search: URLSearchParams, isDev: boolean): boolean {
   return isDev
     && search.get('renderProfile') === 'pixel32'
     && search.get(PIXEL32_RUNTIME_QUERY) === PIXEL32_RUNTIME_VALUE;
+}
+
+/** Overlay review requires the already opt-in pixel32 runtime and a second exact DEV query value. */
+export function pixel32OverlayPreviewRequested(search: URLSearchParams, isDev: boolean, runtimeEnabled: boolean): boolean {
+  return isDev
+    && runtimeEnabled
+    && search.get(PIXEL32_OVERLAY_PREVIEW_QUERY) === PIXEL32_OVERLAY_PREVIEW_VALUE;
 }
 
 /** Fail closed unless every candidate frame is explicitly unapproved and has valid integer bounds. */

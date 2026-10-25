@@ -58,6 +58,6 @@
 - [x] 資產檢查、TypeScript、單元測試（1,614 passed／1 skipped）、build 與 8 MB 預算通過；單元測試採 4 workers。
 - [x] PR #34 Required Checks 通過並合併至 `main`；merge commit `99f76bab2cc5a7637dd4c649a3da2236d15cb7b0`。
 - [x] 下一階段初步場景證據：pixel32 候選地面／玩家與作物 fallback、cat follow、森林樹木前後深度排序；專項 E2E 1/1、`npm run check`、完整 E2E 229/229 通過。詳見 [場景覆蓋證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-scene-coverage.zh-TW.md)。
-- [ ] 隔離接入 pixel32 tree canopy／house front-back 候選層，完成固定 12×10 場景組合與遮擋審查；不得改正式素材或碰撞，實機維持 `DEVICE_PENDING`。
+- [x] 隔離接入 pixel32 tree canopy／house front-back 候選層，完成固定 12×10 圖層樣張與深度驗證；不得改正式素材或碰撞，實機維持 `DEVICE_PENDING`。詳見 [圖層候選報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-scene.zh-TW.md)。
 
 詳見 [pixel32 候選連續移動與碰撞證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-motion-evidence.zh-TW.md)。
