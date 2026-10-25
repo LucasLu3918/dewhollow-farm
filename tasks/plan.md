@@ -210,3 +210,24 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [ ] Impact reconciliation、commit、PR Required Checks 與合併。
 
 詳見 [DF-G1 overlay 移動幀與深度交錯證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-walkframe-depth.zh-TW.md)。
+
+
+# DF-G1-SCENE-COMPOSITION-12X10 pixel32 候選完整場景構圖
+
+## 範圍
+
+以既有 DEV-only pixel32 farm `MapScene`、候選地圖／玩家 atlas 與 house/tree overlay opt-in，從隔離 IndexedDB fixture 擷取可審查的完整遊戲畫面。使用 1280×900 Chromium view；確認畫面至少包含中央 12×10 世界格，記錄實際 camera 可視範圍與候選／fallback 清單、素材 hash 和 screenshot hash。未覆蓋的作物、夥伴、工具與 NPC 明確標示為現有素材 fallback。
+
+此切片只新增 E2E 與證據文件；不新增或修改 runtime camera、地圖、碰撞、gameplay、存檔 schema、正式素材清單或 `public/`。候選仍維持 `candidate`／`approved: false`，不代表美術核准或 Gate 1 通過。
+
+## 任務與驗收
+
+1. [x] 新增精確 DEV-only route 的 12×10 runtime 場景 E2E；用隔離存檔展示地面、玩家、房屋／樹冠層、代表作物與夥伴，並斷言可視範圍至少 12×10。
+2. [x] 保存候選輸入 hash、視窗／camera 量測、fallback IDs、請求／頁面錯誤、screenshot 與 SHA-256；證據清楚說明 Chromium CSS-scale 限制。
+3. [x] 更新 DF-QA-01 與本任務狀態；候選狀態和正式入口隔離保持不變。
+
+## 驗證
+
+- [x] 專項 Chromium E2E 1/1 及畫面檢視。
+- [x] `npm run check`；完整 Chromium E2E 234/234（4 workers）。
+- [ ] AIPS Impact reconciliation、commit、PR、Required Checks 通過後合併。

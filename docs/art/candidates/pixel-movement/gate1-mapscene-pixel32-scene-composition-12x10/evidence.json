@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tests/e2e/gate1-mapscene-pixel32-scene-composition-12x10.spec.ts",
+  "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1OverlayPreview=pixel32-overlay-12x10",
+  "claim": "DEV-only farm MapScene candidate composition with a 12x10 or larger camera-visible world region. Existing map/player/house/tree candidate inputs are loaded; crops and cat remain existing-art fallbacks.",
+  "candidate": {
+    "map": {
+      "status": "candidate",
+      "approved": false
+    },
+    "animation": {
+      "status": "candidate",
+      "approved": false
+    },
+    "inputs": {
+      "mapManifestSha256": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+      "mapAtlasSha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+      "animationManifestSha256": "ebeb2be797d5e6b16d643aeb8a2e7d8b090fc427099d892957b94f2f626692f8",
+      "animationAtlasSha256": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3"
+    },
+    "groundFrames": [
+      "spring-grass",
+      "spring-field-edge-9",
+      "spring-field-edge-1",
+      "spring-field-edge-3",
+      "spring-field-edge-8",
+      "spring-field-edge-0",
+      "spring-field-edge-2",
+      "spring-field-edge-c",
+      "spring-field-edge-4",
+      "spring-field-edge-6",
+      "spring-path",
+      "house-back"
+    ],
+    "overlays": [
+      {
+        "id": "house-back",
+        "frame": "house-back",
+        "layer": "back",
+        "tileX": 3,
+        "tileY": 3,
+        "depth": 1,
+        "displayList": "world",
+        "visible": true
+      },
+      {
+        "id": "tree-canopy",
+        "frame": "tree-canopy",
+        "layer": "front",
+        "tileX": 8,
+        "tileY": 3,
+        "depth": 15.001999999999999,
+        "displayList": "scene",
+        "visible": true
+      },
+      {
+        "id": "house-front",
+        "frame": "house-front",
+        "layer": "front",
+        "tileX": 3,
+        "tileY": 3,
+        "depth": 15.001999999999999,
+        "displayList": "scene",
+        "visible": true
+      }
+    ]
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 900,
+    "dpr": 1,
+    "screenshotScale": "css",
+    "canvasCss": {
+      "x": 230.78125,
+      "y": 143,
+      "width": 820.4375,
+      "height": 614.828125
+    }
+  },
+  "camera": {
+    "x": 0,
+    "y": 0,
+    "width": 1088,
+    "height": 832,
+    "zoom": 0.5,
+    "bounds": {
+      "type": 5,
+      "x": 0,
+      "y": 0,
+      "width": 2560,
+      "height": 1920
+    },
+    "actualWorldTilesVisible": {
+      "width": 17,
+      "height": 13
+    }
+  },
+  "coverage": {
+    "visibleActors": [
+      {
+        "id": "player",
+        "tileX": 5,
+        "tileY": 5,
+        "depth": 16.001
+      },
+      {
+        "id": "cat",
+        "tileX": 5,
+        "tileY": 4,
+        "depth": 15
+      }
+    ],
+    "fallbackAssetIds": [
+      "tile.grass",
+      "tile.field",
+      "tile.path",
+      "tile.wall",
+      "tile.bed",
+      "tile.shipbox",
+      "tile.door",
+      "tile.soil",
+      "crop.sweet-radish",
+      "crop.moon-bean",
+      "crop.star-pepper",
+      "crop.golden-rice",
+      "crop.bell-pumpkin",
+      "crop.maple-berry",
+      "crop.snow-radish",
+      "crop.frost-mushroom",
+      "crop.ember-onion",
+      "player.up",
+      "player.down",
+      "player.left",
+      "player.right",
+      "npc.maomao",
+      "npc.rong-bo",
+      "npc.a-gan",
+      "npc.shi-shifu",
+      "npc.zhi-lan",
+      "npc.xiao-sui",
+      "crop.dew-grass",
+      "crop.dusk-potato",
+      "crop.silver-wheat",
+      "pet.cat",
+      "pet.marsupial",
+      "tool.hoe",
+      "tool.can",
+      "tool.seedbag",
+      "tile.tree",
+      "tile.water",
+      "tile.floor",
+      "tile.furniture",
+      "tile.cave",
+      "tile.rock",
+      "tool.axe",
+      "tile.shop",
+      "tile.forage",
+      "tool.pick",
+      "tile.ore",
+      "tile.stairs",
+      "tool.rod",
+      "tile.trough",
+      "tile.kitchen",
+      "tile.workshop",
+      "tile.workbench",
+      "tile.tuft",
+      "tool.sickle",
+      "tile.fence",
+      "animal.cow",
+      "item.milk",
+      "item.cheese",
+      "item.butter",
+      "animal.sheep",
+      "item.wool",
+      "item.cloth",
+      "pwa.icon-192",
+      "pwa.icon-512",
+      "pwa.icon-maskable-512"
+    ],
+    "representativeCrops": [
+      {
+        "key": "crop.sweet-radish",
+        "frame": "__BASE",
+        "left": 192,
+        "top": 384,
+        "width": 64,
+        "height": 64,
+        "depth": 2
+      },
+      {
+        "key": "crop.sweet-radish",
+        "frame": "__BASE",
+        "left": 256,
+        "top": 384,
+        "width": 85,
+        "height": 85,
+        "depth": 2
+      },
+      {
+        "key": "crop.sweet-radish",
+        "frame": "__BASE",
+        "left": 320,
+        "top": 384,
+        "width": 128,
+        "height": 128,
+        "depth": 2
+      }
+    ]
+  },
+  "candidateRequests": [
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+  ],
+  "candidateFailures": [],
+  "candidateHttpFailures": [],
+  "pageErrors": [],
+  "screenshot": {
+    "path": "screenshots/scene-12x10.png",
+    "sha256": "57235f5641699e0defe1fe6a990a93abe42cf84bdc754e6b0beeeb8990c27ff2",
+    "bytes": 125741
+  },
+  "limitations": [
+    "The screenshot is a CSS-scale Chromium capture, not native DPR raster or iOS/Android device evidence.",
+    "Crop, cat, tool and NPC art not covered by the candidate atlases remain existing-art fallbacks.",
+    "Candidate manifests remain status candidate and approved false; this is not exact asset approval or Gate 1 acceptance.",
+    "The IndexedDB v13 save is seeded in this isolated Playwright context only."
+  ]
+}
