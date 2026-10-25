@@ -34,6 +34,14 @@ const WALK_FRAME_MS = 55;
 const TOOL_IMPACT_AT = 0.55;
 const TAU = Math.PI * 2;
 
+/** 若繪製取樣早於動畫起點，將經過時間夾到零。 */
+export function nonNegativeElapsedMs(startedAtMs: number, sampledAtMs: number): number {
+  if (!Number.isFinite(startedAtMs) || !Number.isFinite(sampledAtMs)) {
+    throw new RangeError('動畫起點與取樣時間必須是有限數');
+  }
+  return Math.max(0, sampledAtMs - startedAtMs);
+}
+
 /** 取得候選 sheet 的影格；四方向各有 idle、兩個接地姿勢與 passing 姿勢。 */
 export function candidateFrameAt(
   direction: CandidateDirection,

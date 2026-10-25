@@ -2,6 +2,7 @@ import {
   candidateFrameAt,
   candidateToolFeedback,
   candidateToolImpactCrossed,
+  nonNegativeElapsedMs,
 } from '../../../../../src/presentation/candidate-sprite-animator.ts';
 
 const canvas = document.querySelector('#integrated-preview');
@@ -72,7 +73,7 @@ function drawMap() {
 
 function drawActor(time) {
   const walking = time < state.walkingUntil;
-  const elapsed = walking ? WALK_CYCLE_MS - (state.walkingUntil - time) : 0;
+  const elapsed = walking ? nonNegativeElapsedMs(state.walkingUntil - WALK_CYCLE_MS, time) : 0;
   const frameKey = candidateFrameAt(state.direction, walking ? 'walk' : 'idle', elapsed).frame;
   const frame = animationManifest.frames[frameKey];
   const actorX = state.tileX * TILE + TILE / 2;
