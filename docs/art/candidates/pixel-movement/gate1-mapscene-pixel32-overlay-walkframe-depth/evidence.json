@@ -1,0 +1,3977 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tests/e2e/gate1-mapscene-pixel32-overlay-walkframe-depth.spec.ts",
+  "candidate": {
+    "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1OverlayPreview=pixel32-overlay-12x10",
+    "map": {
+      "schemaVersion": 1,
+      "title": "Dewhollow pixel32 map and tileset candidate",
+      "status": "candidate",
+      "approved": false,
+      "source": {
+        "method": "hand-authored integer pixel primitives; fixed stored-DEFLATE PNG encoding",
+        "generator": "tools/art/generate_gate1_map.mjs",
+        "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+      },
+      "pixelContract": {
+        "nativeTileSize": 32,
+        "worldTileSize": 64,
+        "displayScale": 2,
+        "sampling": "nearest-neighbor",
+        "origin": "top-left",
+        "rectConvention": "half-open",
+        "anchorConvention": "integer-pixel-index"
+      },
+      "atlas": {
+        "file": "map-atlas.png",
+        "width": 512,
+        "height": 512,
+        "sha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184"
+      },
+      "seasons": [
+        "spring",
+        "summer",
+        "autumn",
+        "winter"
+      ],
+      "autotile": {
+        "surface": "field",
+        "edgeSurface": "grass",
+        "maskBits": {
+          "north": 1,
+          "east": 2,
+          "south": 4,
+          "west": 8
+        },
+        "variantsPerSeason": 16
+      },
+      "frames": {
+        "spring-grass": {
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field": {
+          "x": 32,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-path": {
+          "x": 64,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-water": {
+          "x": 96,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-0": {
+          "x": 128,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-1": {
+          "x": 160,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-2": {
+          "x": 192,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-3": {
+          "x": 224,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-4": {
+          "x": 256,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-5": {
+          "x": 288,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-6": {
+          "x": 320,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-7": {
+          "x": 352,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-8": {
+          "x": 384,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-9": {
+          "x": 416,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-a": {
+          "x": 448,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-b": {
+          "x": 480,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-c": {
+          "x": 0,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-d": {
+          "x": 32,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-e": {
+          "x": 64,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-f": {
+          "x": 96,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-grass": {
+          "x": 128,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field": {
+          "x": 160,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-path": {
+          "x": 192,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-water": {
+          "x": 224,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-0": {
+          "x": 256,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-1": {
+          "x": 288,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-2": {
+          "x": 320,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-3": {
+          "x": 352,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-4": {
+          "x": 384,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-5": {
+          "x": 416,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-6": {
+          "x": 448,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-7": {
+          "x": 480,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-8": {
+          "x": 0,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-9": {
+          "x": 32,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-a": {
+          "x": 64,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-b": {
+          "x": 96,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-c": {
+          "x": 128,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-d": {
+          "x": 160,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-e": {
+          "x": 192,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-f": {
+          "x": 224,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-grass": {
+          "x": 256,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field": {
+          "x": 288,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-path": {
+          "x": 320,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-water": {
+          "x": 352,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-0": {
+          "x": 384,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-1": {
+          "x": 416,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-2": {
+          "x": 448,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-3": {
+          "x": 480,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-4": {
+          "x": 0,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-5": {
+          "x": 32,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-6": {
+          "x": 64,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-7": {
+          "x": 96,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-8": {
+          "x": 128,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-9": {
+          "x": 160,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-a": {
+          "x": 192,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-b": {
+          "x": 224,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-c": {
+          "x": 256,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-d": {
+          "x": 288,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-e": {
+          "x": 320,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-f": {
+          "x": 352,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-grass": {
+          "x": 384,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field": {
+          "x": 416,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-path": {
+          "x": 448,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-water": {
+          "x": 480,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-0": {
+          "x": 0,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-1": {
+          "x": 32,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-2": {
+          "x": 64,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-3": {
+          "x": 96,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-4": {
+          "x": 128,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-5": {
+          "x": 160,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-6": {
+          "x": 192,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-7": {
+          "x": 224,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-8": {
+          "x": 256,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-9": {
+          "x": 288,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-a": {
+          "x": 320,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-b": {
+          "x": 352,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-c": {
+          "x": 384,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-d": {
+          "x": 416,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-e": {
+          "x": 448,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-f": {
+          "x": 480,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "house-back": {
+          "x": 0,
+          "y": 192,
+          "width": 96,
+          "height": 64,
+          "nativeWidth": 96,
+          "nativeHeight": 64,
+          "kind": "building",
+          "widthTiles": 3,
+          "heightTiles": 2,
+          "footAnchor": {
+            "x": 48,
+            "y": 64
+          },
+          "pivot": {
+            "x": 48,
+            "y": 64
+          },
+          "layer": "back",
+          "approved": false
+        },
+        "house-front": {
+          "x": 0,
+          "y": 256,
+          "width": 96,
+          "height": 64,
+          "nativeWidth": 96,
+          "nativeHeight": 64,
+          "kind": "occlusion",
+          "widthTiles": 3,
+          "heightTiles": 2,
+          "footAnchor": {
+            "x": 48,
+            "y": 64
+          },
+          "pivot": {
+            "x": 48,
+            "y": 64
+          },
+          "layer": "front",
+          "approved": false
+        },
+        "tree-canopy": {
+          "x": 96,
+          "y": 192,
+          "width": 64,
+          "height": 64,
+          "nativeWidth": 64,
+          "nativeHeight": 64,
+          "kind": "occlusion",
+          "widthTiles": 2,
+          "heightTiles": 2,
+          "footAnchor": {
+            "x": 32,
+            "y": 64
+          },
+          "pivot": {
+            "x": 32,
+            "y": 64
+          },
+          "layer": "front",
+          "approved": false
+        }
+      },
+      "limitations": [
+        "Candidate preview only; not approved or registered as production assets.",
+        "Seasonal variants and autotile masks are hand-authored visual studies, not production game map rules.",
+        "Building and canopy demonstrate layer ordering and do not alter collision or map data.",
+        "Final colors, tile readability, seamless edges, building silhouette, and mobile readability require Gate 1 human review."
+      ]
+    },
+    "animation": {
+      "schemaVersion": 1,
+      "title": "Dewhollow pixel32 four-direction animation candidate",
+      "status": "candidate",
+      "approved": false,
+      "source": {
+        "method": "hand-authored integer pixel primitives",
+        "generator": "tools/art/generate_gate1_animation.mjs",
+        "generatorSha256": "782937ffe90056e891a6cf7b4bd9492b86fda385603689dca91e7c9adb4c6fa6"
+      },
+      "pixelContract": {
+        "frameWidth": 32,
+        "frameHeight": 48,
+        "columns": 4,
+        "rows": 4,
+        "sampling": "nearest-neighbor",
+        "origin": "top-left",
+        "rectConvention": "half-open"
+      },
+      "atlas": {
+        "file": "player-4dir.png",
+        "width": 128,
+        "height": 192,
+        "sha256": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3"
+      },
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "frames": {
+        "down-idle": {
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "idle",
+          "sha256": "9827757cf610a6bc51abcf9bf5550160b604af51ec9c4b1d240c9988f2760877"
+        },
+        "down-contact-a": {
+          "x": 32,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "contact-a",
+          "sha256": "fa28309b2cdc0895d12f9ebedcbac6773ed7550554a0bdd7d5698982997f727b"
+        },
+        "down-passing": {
+          "x": 64,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "passing",
+          "sha256": "dcda77bc1ffb96e3e58bd7d0efb1d89a88570cd46e2fd32ac8eea9fcc0e85b77"
+        },
+        "down-contact-b": {
+          "x": 96,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "contact-b",
+          "sha256": "a7a3ed6773bcc782b6333d0e044244d5ea2f134e1c44f454763e5137ecddab38"
+        },
+        "up-idle": {
+          "x": 0,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "idle",
+          "sha256": "53941b3a686e237e2439dd518eacaca7e6d58db0bd7d33c7213af3dd3d9dd366"
+        },
+        "up-contact-a": {
+          "x": 32,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "contact-a",
+          "sha256": "9bec4cf731ce6bb13c2b570312825e0a0ace64115f1b10941393404cb44e121c"
+        },
+        "up-passing": {
+          "x": 64,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "passing",
+          "sha256": "442b4244e5103a3a981777ce5e4fe0c4d9face517998147f6deb6e991f6b6a18"
+        },
+        "up-contact-b": {
+          "x": 96,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "contact-b",
+          "sha256": "6689c4c2da9b83508c137d71dcef2ebd0cc6a3fcb38025765168442ee19bd5de"
+        },
+        "left-idle": {
+          "x": 0,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "idle",
+          "sha256": "9236bb6be4ab78f8bab864755980b6a9ef818c5b45f1a777c38c2df6cec5aa4d"
+        },
+        "left-contact-a": {
+          "x": 32,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "contact-a",
+          "sha256": "e20fdb180ce4174ec55ebf4535b207872592b61230b228f7d1d4c21491d68e2d"
+        },
+        "left-passing": {
+          "x": 64,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "passing",
+          "sha256": "aba31192c949e059dda6aa75cecec7d4080e0776248783c89a334c652040d976"
+        },
+        "left-contact-b": {
+          "x": 96,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "contact-b",
+          "sha256": "2f1d9f2ab7706b05a8bd02d7a1982038247c43d6f609c0c7cc3f6db3318c848f"
+        },
+        "right-idle": {
+          "x": 0,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "idle",
+          "sha256": "c753e0b6fc8200e7b17df6bf1a205628160dbca274ad179d861eade81048e660"
+        },
+        "right-contact-a": {
+          "x": 32,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "contact-a",
+          "sha256": "9aa91b23fcce109124b1d8355b854b837a08932d9ad4b4f86e0a312202a74be1"
+        },
+        "right-passing": {
+          "x": 64,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "passing",
+          "sha256": "5969984fc5ba554e860cb4e7638fafd7b532a731c83624ff84638f188053bfa7"
+        },
+        "right-contact-b": {
+          "x": 96,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "contact-b",
+          "sha256": "6594f8a9be48ec36156c63c30bd5f6ef6ec3056e71eeaefe34ac7bc62d73f5a9"
+        }
+      },
+      "clips": {
+        "idle": {
+          "frames": [
+            "down-idle",
+            "up-idle",
+            "left-idle",
+            "right-idle"
+          ],
+          "loop": true
+        },
+        "walk": {
+          "frameDurationMs": 55,
+          "frames": [
+            "down-contact-a",
+            "down-passing",
+            "down-contact-b",
+            "down-passing",
+            "up-contact-a",
+            "up-passing",
+            "up-contact-b",
+            "up-passing",
+            "left-contact-a",
+            "left-passing",
+            "left-contact-b",
+            "left-passing",
+            "right-contact-a",
+            "right-passing",
+            "right-contact-b",
+            "right-passing"
+          ],
+          "loop": true
+        }
+      },
+      "toolFeedback": {
+        "frameSource": "../16bit.png#tool",
+        "impactAt": 0.55,
+        "reducedMotionScale": 0.4,
+        "status": "candidate-preview-only"
+      },
+      "limitations": [
+        "Candidate art and motion only; not approved or registered as production assets.",
+        "Right-facing frames mirror left-facing poses; Gate 1 visual review must confirm silhouette and foot contact.",
+        "The preview tool overlay demonstrates timing only and does not change farming rules."
+      ]
+    },
+    "inputHashes": {
+      "mapManifest": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+      "mapAtlas": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+      "animationManifest": "ebeb2be797d5e6b16d643aeb8a2e7d8b090fc427099d892957b94f2f626692f8",
+      "animationAtlas": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3"
+    }
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 900,
+    "dpr": 1,
+    "screenshotScale": "css"
+  },
+  "anchors": {
+    "treeCanopy": {
+      "worldFootY": 320,
+      "overlayDepth": 15.001999999999999,
+      "crossing": {
+        "from": {
+          "x": 8,
+          "y": 3
+        },
+        "to": {
+          "x": 8,
+          "y": 5
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 13,
+          "moving": true,
+          "heldDirection": "down",
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 4,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 276.6023111121284,
+            "depth": 14.322911111127006,
+            "frame": "down-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 5,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 4,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 283.70204444546175,
+            "depth": 14.43384444446034,
+            "frame": "down-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 21,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 4,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 290.80177777879504,
+            "depth": 14.544777777793671,
+            "frame": "down-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 38,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 4,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 297.90435555657285,
+            "depth": 14.655755555571451,
+            "frame": "down-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 54,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 4,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 305.0069333343506,
+            "depth": 14.766733333349228,
+            "frame": "down-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 71,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 4,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 312.10666666768395,
+            "depth": 14.877666666682561,
+            "frame": "down-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 88,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 4,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 319.20924444546176,
+            "depth": 14.98864444446034,
+            "frame": "down-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 104,
+          "moving": false,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 4,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 320,
+            "depth": 15.001,
+            "frame": "down-idle"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 13,
+          "moving": true,
+          "heldDirection": "down",
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 5,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 334.20515555555556,
+            "depth": 15.222955555555556,
+            "frame": "down-contact-a"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 9,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 5,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 341.3048888888889,
+            "depth": 15.333888888888888,
+            "frame": "down-contact-a"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 26,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 5,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 348.4074666666667,
+            "depth": 15.444866666666668,
+            "frame": "down-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 42,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 5,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 355.50720000000007,
+            "depth": 15.5558,
+            "frame": "down-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 59,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 5,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 362.6069333333334,
+            "depth": 15.666733333333335,
+            "frame": "down-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 76,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 5,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 369.70666666666676,
+            "depth": 15.777666666666667,
+            "frame": "down-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 92,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 5,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 376.8064000000001,
+            "depth": 15.888600000000002,
+            "frame": "down-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 109,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 5,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 383.90613333333346,
+            "depth": 15.999533333333334,
+            "frame": "down-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 126,
+          "moving": false,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 8,
+            "y": 5,
+            "facing": "down"
+          },
+          "player": {
+            "footY": 384,
+            "depth": 16.001,
+            "frame": "down-idle"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        }
+      ]
+    },
+    "houseFront": {
+      "worldFootY": 320,
+      "overlayDepth": 15.001999999999999,
+      "crossing": {
+        "from": {
+          "x": 5,
+          "y": 5
+        },
+        "to": {
+          "x": 5,
+          "y": 3
+        }
+      },
+      "samples": [
+        {
+          "elapsedMs": 11,
+          "moving": true,
+          "heldDirection": "up",
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 4,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 369.7948444444445,
+            "depth": 15.779044444444445,
+            "frame": "up-contact-a"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 10,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 4,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 362.69511111111115,
+            "depth": 15.668111111111111,
+            "frame": "up-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 26,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 4,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 355.59537777777786,
+            "depth": 15.55717777777778,
+            "frame": "up-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 43,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 4,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 348.4956444444445,
+            "depth": 15.446244444444444,
+            "frame": "up-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 59,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 4,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 341.39306666666675,
+            "depth": 15.335266666666667,
+            "frame": "up-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 76,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 4,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 334.29048888888894,
+            "depth": 15.22428888888889,
+            "frame": "up-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 92,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 4,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 327.19075555555565,
+            "depth": 15.113355555555556,
+            "frame": "up-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 109,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 4,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 320.09102222222236,
+            "depth": 15.002422222222224,
+            "frame": "up-contact-b"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 126,
+          "moving": false,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 4,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 320,
+            "depth": 15.001,
+            "frame": "up-idle"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 4,
+          "moving": true,
+          "heldDirection": "up",
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 312.89742222222225,
+            "depth": 14.890022222222223,
+            "frame": "up-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 9,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 305.79768888888896,
+            "depth": 14.77908888888889,
+            "frame": "up-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 26,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 298.69511111111115,
+            "depth": 14.668111111111111,
+            "frame": "up-contact-a"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 43,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 291.5953777777778,
+            "depth": 14.557177777777778,
+            "frame": "up-contact-a"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 59,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 284.49280000000005,
+            "depth": 14.4462,
+            "frame": "up-contact-a"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 76,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 277.39306666666675,
+            "depth": 14.335266666666667,
+            "frame": "up-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 92,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 270.2933333333334,
+            "depth": 14.224333333333334,
+            "frame": "up-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 109,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 263.19360000000006,
+            "depth": 14.1134,
+            "frame": "up-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 126,
+          "moving": true,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 256.0967111111111,
+            "depth": 14.00251111111111,
+            "frame": "up-passing"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        {
+          "elapsedMs": 142,
+          "moving": false,
+          "heldDirection": null,
+          "blockedDirection": null,
+          "tile": {
+            "x": 5,
+            "y": 3,
+            "facing": "up"
+          },
+          "player": {
+            "footY": 256,
+            "depth": 14.001,
+            "frame": "up-idle"
+          },
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "overlaySignatureStable": true,
+  "screenshots": {
+    "tree-crossing": {
+      "file": "screenshots/tree-crossing.png",
+      "sha256": "b3169b054489af8b81491e5fa6fd40ebb3723ee2a9bb94171c800e431960151e",
+      "bytes": 114426
+    },
+    "house-crossing": {
+      "file": "screenshots/house-crossing.png",
+      "sha256": "22096b630f17704fa0727045d109d82cf4e4ec05bc55c9a3793a62cf7e303889",
+      "bytes": 114522
+    }
+  },
+  "assetRequests": [
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+  ],
+  "assetFailures": [],
+  "assetHttpFailures": [],
+  "pageErrors": [],
+  "isolation": {
+    "exactDevOnlyQuery": true,
+    "productionAssetsModified": false,
+    "mapCollisionSaveSchemaOrGameplayModified": false
+  },
+  "limitations": [
+    "Chromium emulation only; no native iOS or Android evidence.",
+    "This records walk-frame timing and numeric depth ordering, not pixel-perfect occlusion quality or artistic approval.",
+    "The full 12x10 game scene, exact candidate approval, and Gate 1 sign-off remain pending."
+  ]
+}

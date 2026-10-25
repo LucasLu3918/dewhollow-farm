@@ -87,6 +87,19 @@
 - [x] 保存四張場景截圖、候選 manifest／atlas SHA、角色量測與錯誤計數；目視抽查代表圖。
 - [x] 專項 Playwright E2E 通過 1/1。
 - [x] `npm run check` 通過（1,616 passed／1 skipped）；完整 Chromium Playwright E2E 232/232 通過（4 workers）。
-- [ ] Impact reconciliation、commit、PR、Required Checks 和 merge。
+- [x] Impact reconciliation、commit `19adc7d1`、PR #39 Required Checks 通過並合併；merge commit `6ceb50c6fc299404a5eb7f84ba8291816caed783`。
 
 詳見 [overlay 移動深度穩定性證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-motion-stability.zh-TW.md)。
+
+---
+
+# DF-G1-OVERLAY-WALKFRAME-DEPTH pixel32 候選移動幀與圖層深度交錯
+
+- [x] 以 DEV-only Chromium E2E 逐格穿越樹冠與房屋前景錨點，逐 RAF 記錄 moving、方向 walk frame、腳底 Y、角色／overlay depth 與穩定 overlay signature。
+- [x] 確認樹冠南北與房屋前後各有移動中樣本，兩段路線無阻擋，候選 manifest 仍為 `candidate`／`approved: false`。
+- [x] 保存兩張穿越後場景、逐幀 JSON、SHA-256 與中文候選證據報告；未宣稱藝術品質或 Gate 1 通過。
+- [x] 專項 Chromium E2E 1/1 通過；`npm run build` 通過。
+- [x] `npm run check` 通過（1,616 passed／1 skipped）；完整 Chromium E2E 233/233 通過（4 workers）。
+- [ ] Impact reconciliation、commit、PR、Required Checks 和 merge。
+
+詳見 [pixel32 overlay 移動幀與深度交錯證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-walkframe-depth.zh-TW.md)。
