@@ -1,0 +1,1750 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tests/e2e/gate1-mapscene-pixel32-interactables-viewport-matrix.spec.ts",
+  "evidenceMode": "saved-to-repository",
+  "baseRevision": "70717e466311d1ace0d7277e63a20cab3a0ab3ee",
+  "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1InteractablePreview=pixel32-interactables",
+  "status": "candidate",
+  "approved": false,
+  "scope": "DEV farm MapScene candidate visual QA only; no runtime, gameplay, production asset or approval change",
+  "inputHashes": {
+    "manifestSha256": "53cc94ee54e5917cf8e761a1e77afd3d043ed863874a308b99fe5fa836ca714f",
+    "atlasSha256": "b2c38612200c90b87eb1a937adcac077c4f80891b4683b8f8b1853670e687915",
+    "frameSha256": {
+      "door-closed": "b79a9ae2732feeec9ac25497d52476643c9efe7cdf6a3c771c029058b1b4726b",
+      "door-open": "1dac80ea9501682faacd68da0cb62ecdda97f60d5bbb5114bc07e115ad7dd490",
+      "shipbox-closed": "f47ef5735a125b679bcd65777059eb1c883eb5d75aae9832d377d6b42b297ac2",
+      "shipbox-open": "a2b80a6966589f4ead8940a61d71033dde995260d38928cf94cd699ccccb4087"
+    }
+  },
+  "viewports": [
+    {
+      "id": "phone-portrait-390x844",
+      "width": 390,
+      "height": 844,
+      "touch": true
+    },
+    {
+      "id": "phone-landscape-844x390",
+      "width": 844,
+      "height": 390,
+      "touch": true
+    },
+    {
+      "id": "tablet-portrait-768x1024",
+      "width": 768,
+      "height": 1024,
+      "touch": true
+    },
+    {
+      "id": "desktop-landscape-1280x720",
+      "width": 1280,
+      "height": 720,
+      "touch": false
+    },
+    {
+      "id": "desktop-fullhd-1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "touch": false
+    }
+  ],
+  "dprs": [
+    1,
+    2,
+    3
+  ],
+  "captures": [
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 416
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 9,
+          "height": 13
+        },
+        "renderResolution": {
+          "width": 288,
+          "height": 416
+        },
+        "cssScale": 1.2385066105769231,
+        "devicePixelScale": 1.2385066105769231,
+        "actualWorldTilesVisible": {
+          "width": 9,
+          "height": 13
+        },
+        "actualCanvasResolution": {
+          "width": 288,
+          "height": 416
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 576,
+        "height": 832,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [
+        "warning: [.WebGL-0x11c00437e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "warning: [.WebGL-0x11c00437e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "warning: [.WebGL-0x11c00437e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "warning: [.WebGL-0x11c06970000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+      ],
+      "screenshot": "screenshots/phone-portrait-390x844-dpr-1.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "3137ba2f75900f404b2f9c005af57ceb27baf35e31ed1141ba7449f9d1b65ea3"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 416
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 9,
+          "height": 13
+        },
+        "renderResolution": {
+          "width": 288,
+          "height": 416
+        },
+        "cssScale": 1.2385066105769231,
+        "devicePixelScale": 2.4770132211538463,
+        "actualWorldTilesVisible": {
+          "width": 9,
+          "height": 13
+        },
+        "actualCanvasResolution": {
+          "width": 288,
+          "height": 416
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 576,
+        "height": 832,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/phone-portrait-390x844-dpr-2.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "3137ba2f75900f404b2f9c005af57ceb27baf35e31ed1141ba7449f9d1b65ea3"
+    },
+    {
+      "viewport": {
+        "id": "phone-portrait-390x844",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 18,
+        "y": 161.390625,
+        "width": 356,
+        "height": 513.21875
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 416
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 9,
+          "height": 13
+        },
+        "renderResolution": {
+          "width": 288,
+          "height": 416
+        },
+        "cssScale": 1.2385066105769231,
+        "devicePixelScale": 3.715519831730769,
+        "actualWorldTilesVisible": {
+          "width": 9,
+          "height": 13
+        },
+        "actualCanvasResolution": {
+          "width": 288,
+          "height": 416
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 576,
+        "height": 832,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/phone-portrait-390x844-dpr-3.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "3137ba2f75900f404b2f9c005af57ceb27baf35e31ed1141ba7449f9d1b65ea3"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390,
+        "touch": true
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 448,
+        "height": 352
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 14,
+          "height": 11
+        },
+        "renderResolution": {
+          "width": 448,
+          "height": 352
+        },
+        "cssScale": 0.48863636363636365,
+        "devicePixelScale": 0.48863636363636365,
+        "actualWorldTilesVisible": {
+          "width": 14,
+          "height": 11
+        },
+        "actualCanvasResolution": {
+          "width": 448,
+          "height": 352
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 896,
+        "height": 704,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/phone-landscape-844x390-dpr-1.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "d1132b5acfe38ae274e61098548269762843415c8bf507f1347ecd8f289e426f"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390,
+        "touch": true
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 448,
+        "height": 352
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 14,
+          "height": 11
+        },
+        "renderResolution": {
+          "width": 448,
+          "height": 352
+        },
+        "cssScale": 0.48863636363636365,
+        "devicePixelScale": 0.9772727272727273,
+        "actualWorldTilesVisible": {
+          "width": 14,
+          "height": 11
+        },
+        "actualCanvasResolution": {
+          "width": 448,
+          "height": 352
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 896,
+        "height": 704,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/phone-landscape-844x390-dpr-2.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "d1132b5acfe38ae274e61098548269762843415c8bf507f1347ecd8f289e426f"
+    },
+    {
+      "viewport": {
+        "id": "phone-landscape-844x390",
+        "width": 844,
+        "height": 390,
+        "touch": true
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 309.328125,
+        "y": 167,
+        "width": 227.328125,
+        "height": 170
+      },
+      "canvasPixels": {
+        "width": 448,
+        "height": 352
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 14,
+          "height": 11
+        },
+        "renderResolution": {
+          "width": 448,
+          "height": 352
+        },
+        "cssScale": 0.48863636363636365,
+        "devicePixelScale": 1.4659090909090908,
+        "actualWorldTilesVisible": {
+          "width": 14,
+          "height": 11
+        },
+        "actualCanvasResolution": {
+          "width": 448,
+          "height": 352
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 896,
+        "height": 704,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/phone-landscape-844x390-dpr-3.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "054e04611f205485c3211ce0a39f7af6ff0e1f0f9d94f00d3babb64e1f62b7ff"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024,
+        "touch": true
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 224
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 9,
+          "height": 7
+        },
+        "renderResolution": {
+          "width": 288,
+          "height": 224
+        },
+        "cssScale": 2.4642857142857144,
+        "devicePixelScale": 2.4642857142857144,
+        "actualWorldTilesVisible": {
+          "width": 9,
+          "height": 7
+        },
+        "actualCanvasResolution": {
+          "width": 288,
+          "height": 224
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 576,
+        "height": 448,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/tablet-portrait-768x1024-dpr-1.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "040376434a8517d09360141aec7bfdd5f55789679a2b772f267cf645795c9b76"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024,
+        "touch": true
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 224
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 9,
+          "height": 7
+        },
+        "renderResolution": {
+          "width": 288,
+          "height": 224
+        },
+        "cssScale": 2.4642857142857144,
+        "devicePixelScale": 4.928571428571429,
+        "actualWorldTilesVisible": {
+          "width": 9,
+          "height": 7
+        },
+        "actualCanvasResolution": {
+          "width": 288,
+          "height": 224
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 576,
+        "height": 448,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/tablet-portrait-768x1024-dpr-2.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "040376434a8517d09360141aec7bfdd5f55789679a2b772f267cf645795c9b76"
+    },
+    {
+      "viewport": {
+        "id": "tablet-portrait-768x1024",
+        "width": 768,
+        "height": 1024,
+        "touch": true
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 18,
+        "y": 207,
+        "width": 734,
+        "height": 550
+      },
+      "canvasPixels": {
+        "width": 288,
+        "height": 224
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 9,
+          "height": 7
+        },
+        "renderResolution": {
+          "width": 288,
+          "height": 224
+        },
+        "cssScale": 2.4642857142857144,
+        "devicePixelScale": 7.392857142857143,
+        "actualWorldTilesVisible": {
+          "width": 9,
+          "height": 7
+        },
+        "actualCanvasResolution": {
+          "width": 288,
+          "height": 224
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 576,
+        "height": 448,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/tablet-portrait-768x1024-dpr-3.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "040376434a8517d09360141aec7bfdd5f55789679a2b772f267cf645795c9b76"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720,
+        "touch": false
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 416
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 17,
+          "height": 13
+        },
+        "renderResolution": {
+          "width": 544,
+          "height": 416
+        },
+        "cssScale": 1.0500676081730769,
+        "devicePixelScale": 1.0500676081730769,
+        "actualWorldTilesVisible": {
+          "width": 17,
+          "height": 13
+        },
+        "actualCanvasResolution": {
+          "width": 544,
+          "height": 416
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1088,
+        "height": 832,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/desktop-landscape-1280x720-dpr-1.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "2aa797e90f533e6775136f2894e0cbf17de1c7a949086345bb0ad4249e89d9d8"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720,
+        "touch": false
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 416
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 17,
+          "height": 13
+        },
+        "renderResolution": {
+          "width": 544,
+          "height": 416
+        },
+        "cssScale": 1.0500676081730769,
+        "devicePixelScale": 2.1001352163461537,
+        "actualWorldTilesVisible": {
+          "width": 17,
+          "height": 13
+        },
+        "actualCanvasResolution": {
+          "width": 544,
+          "height": 416
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1088,
+        "height": 832,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/desktop-landscape-1280x720-dpr-2.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "2aa797e90f533e6775136f2894e0cbf17de1c7a949086345bb0ad4249e89d9d8"
+    },
+    {
+      "viewport": {
+        "id": "desktop-landscape-1280x720",
+        "width": 1280,
+        "height": 720,
+        "touch": false
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 350.78125,
+        "y": 143,
+        "width": 580.4375,
+        "height": 434.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 416
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 17,
+          "height": 13
+        },
+        "renderResolution": {
+          "width": 544,
+          "height": 416
+        },
+        "cssScale": 1.0500676081730769,
+        "devicePixelScale": 3.150202824519231,
+        "actualWorldTilesVisible": {
+          "width": 17,
+          "height": 13
+        },
+        "actualCanvasResolution": {
+          "width": 544,
+          "height": 416
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1088,
+        "height": 832,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/desktop-landscape-1280x720-dpr-3.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "2aa797e90f533e6775136f2894e0cbf17de1c7a949086345bb0ad4249e89d9d8"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "touch": false
+      },
+      "requestedDpr": 1,
+      "browserDpr": 1,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 480
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 17,
+          "height": 15
+        },
+        "renderResolution": {
+          "width": 544,
+          "height": 480
+        },
+        "cssScale": 1.66005859375,
+        "devicePixelScale": 1.66005859375,
+        "actualWorldTilesVisible": {
+          "width": 17,
+          "height": 15
+        },
+        "actualCanvasResolution": {
+          "width": 544,
+          "height": 480
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1088,
+        "height": 960,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/desktop-fullhd-1920x1080-dpr-1.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "40ed522910629898ff3b4062e1786668a3e901aefd9155393f5a17e89b4957bd"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "touch": false
+      },
+      "requestedDpr": 2,
+      "browserDpr": 2,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 480
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 17,
+          "height": 15
+        },
+        "renderResolution": {
+          "width": 544,
+          "height": 480
+        },
+        "cssScale": 1.66005859375,
+        "devicePixelScale": 3.3201171875,
+        "actualWorldTilesVisible": {
+          "width": 17,
+          "height": 15
+        },
+        "actualCanvasResolution": {
+          "width": 544,
+          "height": 480
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1088,
+        "height": 960,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/desktop-fullhd-1920x1080-dpr-2.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "40ed522910629898ff3b4062e1786668a3e901aefd9155393f5a17e89b4957bd"
+    },
+    {
+      "viewport": {
+        "id": "desktop-fullhd-1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "touch": false
+      },
+      "requestedDpr": 3,
+      "browserDpr": 3,
+      "mapId": "farm",
+      "playerTile": {
+        "x": 4,
+        "y": 5,
+        "facing": "down"
+      },
+      "canvasCss": {
+        "x": 498,
+        "y": 143,
+        "width": 926,
+        "height": 794.828125
+      },
+      "canvasPixels": {
+        "width": 544,
+        "height": 480
+      },
+      "viewportMeasurement": {
+        "profile": "pixel32",
+        "worldTilesVisible": {
+          "width": 17,
+          "height": 15
+        },
+        "renderResolution": {
+          "width": 544,
+          "height": 480
+        },
+        "cssScale": 1.66005859375,
+        "devicePixelScale": 4.980175781250001,
+        "actualWorldTilesVisible": {
+          "width": 17,
+          "height": 15
+        },
+        "actualCanvasResolution": {
+          "width": 544,
+          "height": 480
+        },
+        "cameraZoom": 0.5
+      },
+      "camera": {
+        "x": 0,
+        "y": 0,
+        "width": 1088,
+        "height": 960,
+        "zoom": 0.5,
+        "bounds": {
+          "type": 5,
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1920
+        }
+      },
+      "preview": {
+        "enabled": true,
+        "status": "candidate",
+        "approved": false,
+        "items": [
+          {
+            "id": "door-closed",
+            "frame": "door-closed",
+            "tileX": 2,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "door-open",
+            "frame": "door-open",
+            "tileX": 4,
+            "tileY": 4,
+            "depth": 15.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-closed",
+            "frame": "shipbox-closed",
+            "tileX": 2,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          },
+          {
+            "id": "shipbox-open",
+            "frame": "shipbox-open",
+            "tileX": 4,
+            "tileY": 7,
+            "depth": 18.001,
+            "visible": true
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "consoleWarningsOrErrors": [],
+      "screenshot": "screenshots/desktop-fullhd-1920x1080-dpr-3.png",
+      "screenshotScale": "css",
+      "screenshotSha256": "40ed522910629898ff3b4062e1786668a3e901aefd9155393f5a17e89b4957bd"
+    }
+  ],
+  "limitations": [
+    "Chromium viewport and deviceScaleFactor emulation only; screenshots are CSS-scale, not native DPR raster evidence.",
+    "Machine checks establish loading, frame visibility and canvas/camera measurements, not visual readability, artistic quality, seams or exact asset approval.",
+    "The repository-wide API/consumer/data/event Impact Graph remains partial; this bounded change only extends candidate QA evidence.",
+    "Native iOS/Android behavior remains DEVICE_PENDING."
+  ]
+}

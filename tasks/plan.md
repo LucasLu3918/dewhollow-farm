@@ -304,4 +304,17 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 保存 atlas／manifest／frame／screenshot SHA、請求及錯誤清單，並完成畫面檢視。
 - [x] `npm run check` 通過（162 個測試檔，1,643 passed／1 skipped；production build 2.808 MB）。
 - [x] 完整 Chromium E2E 通過（239/239，9 workers）。
-- [ ] AIPS 最終 Change Impact reconciliation、commit、PR Required Checks 與合併。
+- [x] AIPS 最終 Change Impact reconciliation、commit、PR #48 Required Checks 通過並合併至 `main`（merge commit `70717e466311d1ace0d7277e63a20cab3a0ab3ee`）。
+
+# DF-G1-INTERACTABLE-VIEWPORT-MATRIX pixel32 門／出貨箱候選 viewport／DPR 證據
+
+在已合併的精確 DEV-only pixel32 farm `MapScene` interactables preview 中，以固定 farm fixture 遍歷手機直式／橫式、平板直式、桌面橫式／全高清五種 viewport，以及 Chromium DPR 1／2／3。保存 15 張 CSS-scale 場景截圖、四個未核准 frame 可見狀態、資產請求、候選輸入／截圖 SHA 與 Canvas／camera 量測。完整限制見 [互動物候選 viewport／DPR 報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-interactables-viewport-matrix.zh-TW.md)。
+
+只增加 E2E 與候選證據，不改正式 runtime、互動玩法、地圖、存檔、正式素材或核准狀態。畫面為 Chromium 模擬與 CSS-scale 輸出，不代表原生 DPR raster、實機驗收、特定素材核准或 Gate 1 通過。
+
+## 任務與驗收
+
+- [x] 五種 viewport × DPR 1／2／3 共 15 組 context 載入四個候選 frame，記錄請求／錯誤與尺寸量測。
+- [x] 保存 15 張截圖、manifest／atlas／frame 輸入 hash 與截圖 SHA-256；抽查手機直式及桌面全高清。
+- [x] `npm run check` 通過（162 個測試檔，1,643 passed／1 skipped；production build 2.808 MB）；完整 Chromium E2E 240/240 通過（9 workers）。
+- [ ] AIPS Impact Graph reconciliation、commit、PR Required Checks 通過並合併。
