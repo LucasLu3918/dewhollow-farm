@@ -6,6 +6,8 @@ export const PIXEL32_RUNTIME_QUERY = 'gate1Runtime';
 export const PIXEL32_RUNTIME_VALUE = 'pixel32-map-animation';
 export const PIXEL32_OVERLAY_PREVIEW_QUERY = 'gate1OverlayPreview';
 export const PIXEL32_OVERLAY_PREVIEW_VALUE = 'pixel32-overlay-12x10';
+export const PIXEL32_INTERACTABLES_PREVIEW_QUERY = 'gate1InteractablePreview';
+export const PIXEL32_INTERACTABLES_PREVIEW_VALUE = 'pixel32-interactables';
 export const PIXEL32_MAP_MANIFEST_KEY = 'gate1-pixel32-map-manifest';
 export const PIXEL32_MAP_ATLAS_KEY = 'gate1-pixel32-map-atlas';
 export const PIXEL32_ANIMATION_MANIFEST_KEY = 'gate1-pixel32-animation-manifest';
@@ -46,11 +48,26 @@ export interface Pixel32CandidateOverlay {
   heightTiles: number;
 }
 
+export interface Pixel32CandidateInteractable {
+  id: 'door-closed' | 'door-open' | 'shipbox-closed' | 'shipbox-open';
+  frame: 'door-closed' | 'door-open' | 'shipbox-closed' | 'shipbox-open';
+  tileX: number;
+  tileY: number;
+}
+
 /** Fixed, collision-free DEV review layout. Coordinates are anchored in farm tiles. */
 export const PIXEL32_CANDIDATE_OVERLAYS: readonly Pixel32CandidateOverlay[] = [
   { id: 'house-back', frame: 'house-back', tileX: 3, tileY: 3, layer: 'back', widthTiles: 3, heightTiles: 2 },
   { id: 'tree-canopy', frame: 'tree-canopy', tileX: 8, tileY: 3, layer: 'front', widthTiles: 2, heightTiles: 2 },
   { id: 'house-front', frame: 'house-front', tileX: 3, tileY: 3, layer: 'front', widthTiles: 3, heightTiles: 2 },
+];
+
+/** Fixed DEV review samples placed beside the existing farm door and shipbox. */
+export const PIXEL32_CANDIDATE_INTERACTABLES: readonly Pixel32CandidateInteractable[] = [
+  { id: 'door-closed', frame: 'door-closed', tileX: 2, tileY: 4 },
+  { id: 'door-open', frame: 'door-open', tileX: 4, tileY: 4 },
+  { id: 'shipbox-closed', frame: 'shipbox-closed', tileX: 2, tileY: 7 },
+  { id: 'shipbox-open', frame: 'shipbox-open', tileX: 4, tileY: 7 },
 ];
 
 /** The candidate runtime requires two explicit development-only query values. */
@@ -94,6 +111,13 @@ export function pixel32OverlayPreviewRequested(search: URLSearchParams, isDev: b
     && search.get(PIXEL32_OVERLAY_PREVIEW_QUERY) === PIXEL32_OVERLAY_PREVIEW_VALUE;
 }
 
+/** Interactable previews require the pixel32 runtime and a separate exact DEV query value. */
+export function pixel32InteractablesPreviewRequested(search: URLSearchParams, isDev: boolean, runtimeEnabled: boolean): boolean {
+  return isDev
+    && runtimeEnabled
+    && search.get(PIXEL32_INTERACTABLES_PREVIEW_QUERY) === PIXEL32_INTERACTABLES_PREVIEW_VALUE;
+}
+
 /** Fail closed unless every candidate frame is explicitly unapproved and has valid integer bounds. */
 export function candidateFramesFromManifest(value: unknown, expectedAtlas: string): Record<string, CandidateFrameRect> | null {
   if (!value || typeof value !== 'object') return null;
@@ -114,6 +138,16 @@ export function candidateFramesFromManifest(value: unknown, expectedAtlas: strin
     || frame.y + frame.height > atlas.height
     || frame.approved === true)) return null;
   return manifest.frames as Record<string, CandidateFrameRect>;
+}
+
+/** Require explicit per-frame approved:false for candidate assets with an asset-review gate. */
+export function explicitlyUnapprovedCandidateFramesFromManifest(
+  value: unknown,
+  expectedAtlas: string,
+): Record<string, CandidateFrameRect> | null {
+  const frames = candidateFramesFromManifest(value, expectedAtlas);
+  if (!frames || Object.values(frames).some((frame) => frame.approved !== false)) return null;
+  return frames;
 }
 
 /** Map only supported static ground layers to the seasonal 32 px atlas. */
