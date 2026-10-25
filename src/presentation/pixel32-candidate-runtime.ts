@@ -1,5 +1,5 @@
 import type { Season } from '../domain/calendar';
-import type { MapDef, TileKind } from '../domain/content';
+import type { Direction, MapDef, TileKind } from '../domain/content';
 import { tileAt } from '../domain/world';
 
 export const PIXEL32_RUNTIME_QUERY = 'gate1Runtime';
@@ -18,6 +18,8 @@ export const PIXEL32_PETS_ATLAS_KEY = 'gate1-pixel32-pets-atlas';
 export const PIXEL32_PETS_MANIFEST_KEY = 'gate1-pixel32-pets-manifest';
 export const PIXEL32_CANDIDATE_REVIEW_QUERY = 'gate1AssetPreview';
 export const PIXEL32_CANDIDATE_REVIEW_VALUE = 'pixel32-candidates';
+export const PIXEL32_CANDIDATE_PET_FOLLOW_QUERY = 'gate1CandidatePetFollow';
+export const PIXEL32_CANDIDATE_PET_FOLLOW_VALUE = 'pixel32-cat-follow';
 
 export interface CandidateFrameRect {
   x: number;
@@ -63,6 +65,26 @@ export function pixel32CandidateReviewRequested(search: URLSearchParams, isDev: 
   return isDev
     && runtimeEnabled
     && search.get(PIXEL32_CANDIDATE_REVIEW_QUERY) === PIXEL32_CANDIDATE_REVIEW_VALUE;
+}
+
+/** Candidate cat motion requires all existing review gates plus a separate exact DEV-only opt-in. */
+export function pixel32CandidatePetFollowRequested(
+  search: URLSearchParams,
+  isDev: boolean,
+  runtimeEnabled: boolean,
+  candidateAssetsEnabled: boolean,
+): boolean {
+  return isDev
+    && runtimeEnabled
+    && candidateAssetsEnabled
+    && search.get(PIXEL32_CANDIDATE_PET_FOLLOW_QUERY) === PIXEL32_CANDIDATE_PET_FOLLOW_VALUE;
+}
+
+/** Candidate cat animation frames follow the directional hop sequence in the unapproved atlas contract. */
+export function pixel32CandidateCatFrame(direction: Direction, elapsedMs: number | null): string {
+  if (elapsedMs === null || !Number.isFinite(elapsedMs) || elapsedMs < 0 || elapsedMs >= 390) return `cat-${direction}-idle`;
+  const phase = elapsedMs < 130 ? 'hop-a' : elapsedMs < 260 ? 'hop-b' : 'land';
+  return `cat-${direction}-${phase}`;
 }
 
 /** Overlay review requires the already opt-in pixel32 runtime and a second exact DEV query value. */

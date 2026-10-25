@@ -4,6 +4,8 @@ import type { MapDef } from '../domain/content';
 import {
   PIXEL32_CANDIDATE_OVERLAYS,
   candidateFramesFromManifest,
+  pixel32CandidateCatFrame,
+  pixel32CandidatePetFollowRequested,
   pixel32CandidateReviewRequested,
   pixel32CandidateRuntimeRequested,
   pixel32MapFrameFor,
@@ -97,5 +99,32 @@ describe('pixel32 candidate asset review opt-in', () => {
     expect(pixel32CandidateReviewRequested(query, false, true)).toBe(false);
     expect(pixel32CandidateReviewRequested(query, true, false)).toBe(false);
     expect(pixel32CandidateReviewRequested(new URLSearchParams('gate1AssetPreview=true'), true, true)).toBe(false);
+  });
+});
+
+describe('pixel32 candidate cat follow opt-in', () => {
+  const query = new URLSearchParams(
+    'renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates&gate1CandidatePetFollow=pixel32-cat-follow',
+  );
+
+  it('requires development mode, the pixel32 runtime, candidate assets, and the exact pet-follow query', () => {
+    expect(pixel32CandidatePetFollowRequested(query, true, true, true)).toBe(true);
+    expect(pixel32CandidatePetFollowRequested(query, false, true, true)).toBe(false);
+    expect(pixel32CandidatePetFollowRequested(query, true, false, true)).toBe(false);
+    expect(pixel32CandidatePetFollowRequested(query, true, true, false)).toBe(false);
+    expect(pixel32CandidatePetFollowRequested(new URLSearchParams('gate1CandidatePetFollow=pixel32-cat-follow'), true, false, false)).toBe(false);
+    expect(pixel32CandidatePetFollowRequested(new URLSearchParams('gate1CandidatePetFollow=true'), true, true, true)).toBe(false);
+  });
+
+  it('plays the manifest hop-a, hop-b, land sequence then returns to the directional idle frame', () => {
+    expect(pixel32CandidateCatFrame('down', null)).toBe('cat-down-idle');
+    expect(pixel32CandidateCatFrame('left', 0)).toBe('cat-left-hop-a');
+    expect(pixel32CandidateCatFrame('left', 129)).toBe('cat-left-hop-a');
+    expect(pixel32CandidateCatFrame('left', 130)).toBe('cat-left-hop-b');
+    expect(pixel32CandidateCatFrame('left', 259)).toBe('cat-left-hop-b');
+    expect(pixel32CandidateCatFrame('left', 260)).toBe('cat-left-land');
+    expect(pixel32CandidateCatFrame('left', 389)).toBe('cat-left-land');
+    expect(pixel32CandidateCatFrame('left', 390)).toBe('cat-left-idle');
+    expect(pixel32CandidateCatFrame('right', Number.NaN)).toBe('cat-right-idle');
   });
 });

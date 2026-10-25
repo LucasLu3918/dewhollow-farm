@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 1,
+  "scope": "DEV-only opt-in candidate pet visual; no production asset integration or Gate 1 approval",
+  "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates&gate1CandidatePetFollow=pixel32-cat-follow",
+  "baseRevision": "6568e3e2b665ec7390eee29a9c55cdb00f32cbc4",
+  "sourceHashes": {
+    "src/presentation/scenes/MapScene.ts": "68e6d402c5b373827f1735f81cc9615a7a6c22a967d9dd74f8f0437d8f7d75cb",
+    "src/presentation/pixel32-candidate-runtime.ts": "da3a345ab12b9337cc65ebe91c0da17e8fb8f05362bf59cc88f13a8e3432d38d"
+  },
+  "candidate": {
+    "status": "candidate",
+    "approved": false,
+    "manifestSha256": "bc1cbc0d39091702d58867513fd029168b57bc348e3e21a80a50c90745de86ea",
+    "atlasSha256": "720411831a56879143ff3f6dd6877b0f2138744c1e81e9aff9c669c259e442f3",
+    "frameHashes": {
+      "cat-down-idle": "3ef717d9c2e1c78d20bfcd6f64c626bfc7f19de6a3d38a3eed1cc70e10e85d08",
+      "cat-down-hop-a": "9c5b47d97e9d1fac9b5ff2ebac06a4136bc2c21280e9b7b38278bc99a5231159",
+      "cat-down-hop-b": "ac8425dbf7e51ca0bafc69547063fc4a8e3eb04fb98a8b913b6afce145927dde",
+      "cat-down-land": "1f44e5172d529c5b597ac2d134ff0928c0413b12cf5bf19db9e334b63b2eac77",
+      "cat-up-idle": "db4caacd6aa8305cb9cf5c40936b7510127ed8bee0df6ce110c7d4223de89a7b",
+      "cat-up-hop-a": "ed1ba3064b43d6a50283a0f8ccb807bd8c4311fef4a0b925c721bd9b4a464a23",
+      "cat-up-hop-b": "cf2b2a922941c8245fb069dd989f4fbe417e6c16fe368563e1700ba12c72d436",
+      "cat-up-land": "f172e5c63cd64976afb5235ace9f4c9879459320777b1017d10880e4e5fd3377",
+      "cat-left-idle": "40b1f262135a4caa988999c3b1f6706ab079439df79057512e882c158492cd95",
+      "cat-left-hop-a": "29c2d6ed4f1b7bf4f78ad19f238028c5a93971560d3ab03ed96d8c5a94e13f28",
+      "cat-left-hop-b": "595a4fda2d7d997d58117ee046fc21a6b4ff4ea04872c9dc9734e61d943a5763",
+      "cat-left-land": "9cd80c9530f0fccc2629e6b51d4acffde345910f3eefe3a9b0695ee5a2e32efc",
+      "cat-right-idle": "8fd1680c7d418a99aa885f712d21b8da2a827c935c081b240080acfed5c6a30e",
+      "cat-right-hop-a": "a04f5ae38c14b83ac16ff5cb3c10f4173d2064977493f3d6c5ce5a2f484138af",
+      "cat-right-hop-b": "56943e5781298596391a24d61feb787295f30e6c4e5d11d130a1cfb870c0e941",
+      "cat-right-land": "161fab74dce65feee83f0aa8c79297b2bdec98388f1a9b52c0721b6c3f795c93"
+    }
+  },
+  "initial": {
+    "pet": {
+      "enabled": true,
+      "manifest": {
+        "status": "candidate",
+        "approved": false
+      },
+      "cat": {
+        "direction": "up",
+        "frame": "cat-up-idle",
+        "visible": true,
+        "busy": false,
+        "tile": {
+          "x": 5,
+          "y": 6
+        },
+        "rootX": 352,
+        "rootY": 448,
+        "depth": 17,
+        "bounds": {
+          "left": 320,
+          "top": 392,
+          "width": 64,
+          "height": 64
+        }
+      }
+    },
+    "player": {
+      "x": 5,
+      "y": 5,
+      "facing": "up"
+    }
+  },
+  "movements": [
+    {
+      "playerBefore": {
+        "x": 5,
+        "y": 5,
+        "facing": "up"
+      },
+      "playerAfter": {
+        "x": 6,
+        "y": 5,
+        "facing": "right"
+      },
+      "pet": {
+        "direction": "up",
+        "frame": "cat-up-idle",
+        "visible": true,
+        "busy": false,
+        "tile": {
+          "x": 5,
+          "y": 5
+        },
+        "rootX": 352,
+        "rootY": 384,
+        "depth": 16,
+        "bounds": {
+          "left": 320,
+          "top": 328,
+          "width": 64,
+          "height": 64
+        }
+      },
+      "frames": [
+        "cat-up-hop-a",
+        "cat-up-hop-b",
+        "cat-up-land",
+        "cat-up-idle"
+      ]
+    },
+    {
+      "playerBefore": {
+        "x": 6,
+        "y": 5,
+        "facing": "right"
+      },
+      "playerAfter": {
+        "x": 6,
+        "y": 6,
+        "facing": "down"
+      },
+      "pet": {
+        "direction": "right",
+        "frame": "cat-right-idle",
+        "visible": true,
+        "busy": false,
+        "tile": {
+          "x": 6,
+          "y": 5
+        },
+        "rootX": 416,
+        "rootY": 384,
+        "depth": 16,
+        "bounds": {
+          "left": 384,
+          "top": 328,
+          "width": 64,
+          "height": 64
+        }
+      },
+      "frames": [
+        "cat-right-hop-a",
+        "cat-right-hop-b",
+        "cat-right-land",
+        "cat-right-idle"
+      ]
+    },
+    {
+      "playerBefore": {
+        "x": 6,
+        "y": 6,
+        "facing": "down"
+      },
+      "playerAfter": {
+        "x": 5,
+        "y": 6,
+        "facing": "left"
+      },
+      "pet": {
+        "direction": "down",
+        "frame": "cat-down-idle",
+        "visible": true,
+        "busy": false,
+        "tile": {
+          "x": 6,
+          "y": 6
+        },
+        "rootX": 416,
+        "rootY": 448,
+        "depth": 17,
+        "bounds": {
+          "left": 384,
+          "top": 392,
+          "width": 64,
+          "height": 64
+        }
+      },
+      "frames": [
+        "cat-down-hop-a",
+        "cat-down-hop-b",
+        "cat-down-land",
+        "cat-down-idle"
+      ]
+    },
+    {
+      "playerBefore": {
+        "x": 5,
+        "y": 6,
+        "facing": "left"
+      },
+      "playerAfter": {
+        "x": 5,
+        "y": 5,
+        "facing": "up"
+      },
+      "pet": {
+        "direction": "left",
+        "frame": "cat-left-idle",
+        "visible": true,
+        "busy": false,
+        "tile": {
+          "x": 5,
+          "y": 6
+        },
+        "rootX": 352,
+        "rootY": 448,
+        "depth": 17,
+        "bounds": {
+          "left": 320,
+          "top": 392,
+          "width": 64,
+          "height": 64
+        }
+      },
+      "frames": [
+        "cat-left-hop-a",
+        "cat-left-hop-b",
+        "cat-left-land",
+        "cat-left-idle"
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "direction": "up",
+      "file": "screenshots/01-up-follow.png",
+      "sha256": "e6a47896ba48cff35cd3756a7dfd3fc6bc547386c00a7101301e7df24577c2f7"
+    },
+    {
+      "direction": "right",
+      "file": "screenshots/02-right-follow.png",
+      "sha256": "244c36cd7045f831cade83150858e9262c57118e2096b8e8094b3cdb6ed157e0"
+    },
+    {
+      "direction": "down",
+      "file": "screenshots/03-down-follow.png",
+      "sha256": "e43ffa0c55639ed367c5c8ba2a11c4c7ab6e779f2dd81cab84ae648dd407aa32"
+    },
+    {
+      "direction": "left",
+      "file": "screenshots/04-left-follow.png",
+      "sha256": "03fda6ea6c7902e9b6c111dba6db82f5e2745786eb4f1dc9045231733edc3a4f"
+    }
+  ],
+  "candidateRequests": [
+    "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/pets-pixel32.png",
+    "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/pets-pixel32.png"
+  ],
+  "candidateFailures": [],
+  "candidateHttpFailures": [],
+  "pageErrors": [],
+  "limitations": [
+    "The cat visual alone uses candidate frames; movement targets, 110 ms root motion, trail occupancy, depth ordering, and save behavior remain existing production behavior.",
+    "The manifest and asset remain candidate and unapproved.",
+    "Evidence covers desktop Chromium only; no device performance or art approval is implied."
+  ]
+}
