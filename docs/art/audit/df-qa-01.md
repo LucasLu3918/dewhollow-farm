@@ -20,7 +20,7 @@
 | 固定 12×10 完整場景與 legacy／pixel16／pixel32 同 runtime 比較 | 缺證據 | 現有 12×10 是候選靜態展示組合定義；新 runtime 只接 pixel32 部分覆蓋，沒有 pixel16 同 runtime，也沒有完整組合場景截圖矩陣。 |
 | 完整素材與角色行為 | 缺證據 | 新 pixel32 runtime 的建築、樹、土壤、作物、NPC、夥伴、工具及陰影仍用既有素材；尚無完整作物品種辨識、工具表演及寵物跟隨候選驗收。 |
 | 移動、碰撞、遮擋與動畫穩定性 | 部分／缺證據 | 舊素材影片 [`movement-and-farming.json`](../candidates/pixel-movement/gate1-runtime-evidence/videos/movement-and-farming.json) 記錄格狀移動、轉向、農務及黑貓跟隨；新 pixel32 runtime 驗證四方向狀態，但沒有每方向連續 5 秒、碰撞不穿越、候選樹／建築遮擋、候選夥伴跟隨或 60/120 fps frame-time 證據。 |
-| 候選 viewport／DPR、100% 可讀性、接縫與腳錨人工評分 | 缺證據 | 新候選目前只有單一 viewport／DPR 自動化截圖；尚無 Gate 1 指定矩陣的候選遊戲畫面、10 情境辨識評分、接縫／閃爍與腳底錨點審查。 |
+| 候選 viewport／DPR、100% 可讀性、接縫與腳錨人工評分 | 部分 | 地面／玩家 pixel32 MapScene 與 house／tree overlay 各有 5 種 viewport × DPR 1／2／3 的 15 張 Chromium CSS-scale 截圖。overlay 畫面與輸入 SHA 已記錄於 [`overlay runtime 矩陣`](../candidates/pixel-movement/gate1-mapscene-pixel32-overlay-runtime-matrix.zh-TW.md)；尚無完整候選素材組合、10 情境辨識評分、接縫／閃爍與腳底錨點審查，也不是原生 DPR raster。 |
 | 原生 iOS／Android 裝置 | 待實機 | 未驗證原生安全區、觸控命中率、像素穩定性與效能，維持 `DEVICE_PENDING`。 |
 | 候選狀態與正式素材隔離 | 通過（隔離檢查） | 候選 manifest 維持 `status: candidate`、`approved: false`；MapScene 僅 DEV 且精確 opt-in 載入候選，production 不請求該 atlas。隔離通過不代表 Gate 1 或美術核准。 |
 
@@ -34,7 +34,7 @@
 
 ## Gate 1 尚需完成
 
-1. 擴充 pixel32 QA scene 覆蓋與固定場景證據；保留 DEV-only 載入與候選標籤。
+1. 擴充 pixel32 QA scene 覆蓋與固定場景證據；保留 DEV-only 載入與候選標籤。已新增 overlay 五種 viewport × DPR 1／2／3 共 15 張 CSS-scale 圖片、SHA 與載入／圖層檢查；完整 12×10 遊戲場景仍缺。
 2. 取得完整場景在需求 viewport／DPR 下的候選畫面，並補足移動、碰撞、遮擋、工具、作物與夥伴情境。
 3. 以 100% 尺寸審查可讀性、圖塊接縫／閃爍與腳底定位；提交逐項評分與可重現證據。
 4. 執行 iOS／Android 實機驗證，通過後才可清除 `DEVICE_PENDING`。

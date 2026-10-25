@@ -64,3 +64,16 @@
 - [ ] 人工審查確切 pixel32 地圖與角色素材、原生裝置行為，並依 Gate 1 完整條件決定是否核准；本次自動化證據不取代該驗收。
 
 詳見 [pixel32 候選連續移動與碰撞證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-motion-evidence.zh-TW.md)。
+
+---
+
+# DF-G1-OVERLAY-RUNTIME-MATRIX pixel32 房屋／樹冠候選 viewport／DPR 證據
+
+- [x] 在精確 DEV-only overlay opt-in 下，覆蓋五種 viewport × DPR 1／2／3 的 15 個 Chromium context。
+- [x] 確認三個 house／tree layer、候選資產載入、Canvas／camera 指標與候選狀態，保存每張截圖 SHA-256。
+- [x] 重算 15 張 PNG hash 全數相符，並目視抽查手機、平板與桌面代表圖；未宣稱藝術品質或 Gate 1 通過。
+- [x] 專項 Playwright E2E 1/1 通過（15 組 viewport／DPR）。
+- [x] `npm run check` 通過（1,616 passed／1 skipped、build／8 MB 預算）；完整 Playwright E2E 231/231 通過（4 workers）。
+- [ ] 更新 Impact reconciliation、commit、PR；Required Checks 通過後依核准流程合併。
+
+詳見 [overlay runtime 矩陣報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-runtime-matrix.zh-TW.md)。完整 12×10 場景、候選素材人眼核准與 iOS／Android 實機驗證仍待後續。
