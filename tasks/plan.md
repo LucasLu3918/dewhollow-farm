@@ -54,6 +54,25 @@
 
 ---
 
+# DF-QA-01-CANDIDATE-ASSET-MATRIX 作物／寵物／工具／物件候選 viewport 證據
+
+將原先單一 1280×900 接觸表與 farm 作物截圖擴成五種 viewport × Chromium DPR 1／2／3 共 30 張 CSS-scale 截圖。固定同一 farm save 與候選素材；修正 DEV-only 檢視板在手機畫幅的水平邊界與列間排版。完整量測與 SHA-256 見 [候選素材 viewport／DPR 矩陣](../docs/art/candidates/pixel-movement/gate1-candidate-assets-review/matrix.json)。候選維持 `candidate`／`approved: false`，此證據不代表美術核准、Gate 1 通過或原生裝置驗收。
+
+## 完成條件
+
+- [x] 五種 viewport × DPR 1／2／3 各擷取接觸表與 farm 場景截圖；記錄候選請求、失敗、console／page error、素材雜湊與 canvas／camera 尺寸。
+- [x] 目視抽查手機直式、橫式與桌面代表圖；確認候選項目完整落於 renderer 邊界內。
+- [x] `npm run check` 與完整 `npm run test:e2e` 通過（235 E2E 通過）。
+- [ ] Impact Graph reconciliation、commit、PR；Required Checks 通過後依核准發佈流程合併。
+
+## 限制
+
+- Chromium DPR 為模擬值，PNG 以 CSS 尺寸輸出；未驗證 native DPR raster 或 iOS／Android 實機。
+- 寵物仍是靜態方向預覽，工具是 held-preview，門／出貨箱為靜態狀態；不代表互動或正式 runtime 整合。
+- 不核准特定素材 SHA，不改 `content/assets.json`、正式 `public/`、rig、domain、存檔或遊戲規則。
+
+---
+
 # Gate 1 整合候選預覽計畫
 
 ## 下一階段：MapScene pixel32 QA 候選 runtime
