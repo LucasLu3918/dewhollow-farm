@@ -124,6 +124,16 @@
 
 在 DEV-only pixel32 候選 farm `MapScene` 驗證至少五秒四向持續移動、方向切換與西側牆碰撞，輸出按住期間截圖及量測。只增加測試和候選證據，不改遊戲規則、地圖、存檔、正式素材或核准狀態。
 
+---
+
+# DF-G1-SCENE-COVERAGE pixel32 候選場景覆蓋初步證據
+
+## 範圍與結果
+
+以隔離 DEV-only E2E 在同一 pixel32 MapScene opt-in 中檢視 farm 的候選地面／玩家、三階作物 fallback 和 cat follow，並在 forest 驗證現有樹圖與玩家位於前後深度層時的重疊排序。只新增測試、PNG／JSON 證據與任務文件；不改 runtime、正式素材、地圖或 gameplay。測試會在隔離 IndexedDB 寫入並遷移 v13 fixture，不改正式存檔格式或玩家存檔資料。
+
+證據與限制見 [pixel32 MapScene 場景覆蓋報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-scene-coverage.zh-TW.md)。本切片只驗證現有素材 fallback；pixel32 tree canopy／house layers、完整固定 12×10 場景、確切素材人工核准與原生裝置驗收仍待後續。
+
 ## 驗收
 
 - [x] 向西按住至牆面後停在可通行格，位置至少 250 ms 穩定。

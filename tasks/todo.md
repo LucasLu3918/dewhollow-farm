@@ -56,7 +56,8 @@
 - [x] 保存四向按住影格、牆前／收尾截圖、量測和 hash，並完成目視檢視。
 - [x] 專項 E2E 通過；完整 Playwright E2E 228/228 通過。
 - [x] 資產檢查、TypeScript、單元測試（1,614 passed／1 skipped）、build 與 8 MB 預算通過；單元測試採 4 workers。
-- [ ] Impact reconciliation、commit、push、PR、Required Checks 和 merge。
-- [ ] 下一切片完成 Gate 1 的 runtime 場景覆蓋與遮擋／作物／夥伴驗證；未核准素材不得正式整合，實機維持 `DEVICE_PENDING`。
+- [x] PR #34 Required Checks 通過並合併至 `main`；merge commit `99f76bab2cc5a7637dd4c649a3da2236d15cb7b0`。
+- [x] 下一階段初步場景證據：pixel32 候選地面／玩家與作物 fallback、cat follow、森林樹木前後深度排序；專項 E2E 1/1、`npm run check`、完整 E2E 229/229 通過。詳見 [場景覆蓋證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-scene-coverage.zh-TW.md)。
+- [ ] 隔離接入 pixel32 tree canopy／house front-back 候選層，完成固定 12×10 場景組合與遮擋審查；不得改正式素材或碰撞，實機維持 `DEVICE_PENDING`。
 
 詳見 [pixel32 候選連續移動與碰撞證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-motion-evidence.zh-TW.md)。

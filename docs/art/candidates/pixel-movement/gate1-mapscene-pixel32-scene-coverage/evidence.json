@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "candidate": {
+    "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation",
+    "status": "candidate",
+    "approved": false
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "dpr": 1
+  },
+  "farm": {
+    "pixel32PlayerFrame": "down-idle",
+    "renderedCandidateGroundFrames": [
+      "spring-grass",
+      "spring-field-edge-9",
+      "spring-field-edge-1",
+      "spring-field-edge-3",
+      "spring-field-edge-8",
+      "spring-field-edge-0",
+      "spring-field-edge-2",
+      "spring-field-edge-c",
+      "spring-field-edge-4",
+      "spring-field-edge-6",
+      "spring-path"
+    ],
+    "crops": [
+      {
+        "key": "crop.sweet-radish",
+        "frame": "__BASE",
+        "width": 64
+      },
+      {
+        "key": "crop.sweet-radish",
+        "frame": "__BASE",
+        "width": 85
+      },
+      {
+        "key": "crop.sweet-radish",
+        "frame": "__BASE",
+        "width": 128
+      }
+    ],
+    "fallback": "This v13 save fixture is migrated on load in an isolated test browser context. Crop and cat visuals use existing formal assets; only pixel32 map ground and player body are candidates. No production save format or player save data is changed.",
+    "catFollow": {
+      "playerFrom": {
+        "x": 7,
+        "y": 9
+      },
+      "catFrom": {
+        "x": 7,
+        "y": 8
+      },
+      "playerTo": {
+        "x": 7,
+        "y": 10,
+        "depth": 21.001
+      },
+      "catTo": {
+        "x": 7,
+        "y": 9,
+        "depth": 20
+      }
+    }
+  },
+  "forest": {
+    "tree": {
+      "key": "tile.tree",
+      "frame": "__BASE",
+      "bounds": {
+        "left": 960,
+        "top": 448,
+        "width": 64,
+        "height": 64
+      }
+    },
+    "playerBehindTree": {
+      "tile": {
+        "x": 15,
+        "y": 7
+      },
+      "overlapsTree": true,
+      "treeDepth": 18.002000000000002,
+      "playerDepth": 18.001
+    },
+    "playerInFrontOfTree": {
+      "tile": {
+        "x": 15,
+        "y": 8
+      },
+      "overlapsTree": true,
+      "treeDepth": 18.002000000000002,
+      "playerDepth": 19.001
+    }
+  },
+  "limitations": [
+    "This evidence covers existing farm and forest MapScene regions, not a complete fixed 12x10 candidate scene.",
+    "Tree, crop, and companion art are existing-art fallbacks, not pixel32 candidate assets.",
+    "The test seeds and migrates an isolated IndexedDB fixture; it does not change production save format or user save data.",
+    "Chromium evidence does not establish native-device behavior, exact art approval, or Gate 1 completion."
+  ],
+  "screenshots": {
+    "farm-crops-companion.png": {
+      "sha256": "f73be1e94f06b47bdc4c9df14a2e962016e4b84047907ecacd94d65268373c91",
+      "bytes": 106295
+    },
+    "forest-tree-occlusion.png": {
+      "sha256": "0f6d997559b9d31d9e1d1845b42e1e41c602dc716bc155c84894e7a7ef310a9d",
+      "bytes": 105727
+    }
+  }
+}
