@@ -84,6 +84,9 @@ import {
   PIXEL32_PETS_ATLAS_KEY,
   PIXEL32_CANDIDATE_OVERLAYS,
   PIXEL32_MAP_ATLAS_KEY,
+  PIXEL32_PETS_MANIFEST_KEY,
+  pixel32CandidateCatFrame,
+  pixel32CandidatePetFollowRequested,
   pixel32MapFrameFor,
   pixel32OverlayPreviewRequested,
 } from '../pixel32-candidate-runtime';
@@ -267,6 +270,10 @@ interface CompanionState {
   rig: CharacterRig;
   /** 目前站的格子；null 表示這張地圖沒有地方可站（暫時隱藏）。 */
   tile: Point | null;
+  /** DEV-only unapproved pixel32 cat visual, attached to the existing follower root. */
+  candidatePetSprite?: Phaser.GameObjects.Image;
+  candidatePetDirection?: Direction;
+  candidatePetMoveStartedAt?: number | null;
 }
 
 declare global {
@@ -310,6 +317,12 @@ declare global {
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
       /** DEV-only contact sheet for unapproved crops, pet directions, held tools, and object states. */
       candidateAssetReview(): { enabled: boolean; items: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }>; limitations: string[] };
+      /** DEV-only candidate cat follower visual; existing follow path and depth remain authoritative. */
+      candidatePetFollow(): {
+        enabled: boolean;
+        manifest: { status: string | null; approved: boolean | null };
+        cat: null | { direction: Direction; frame: string | null; visible: boolean; busy: boolean; tile: Point | null; rootX: number; rootY: number; depth: number; bounds: { left: number; top: number; width: number; height: number } };
+      };
       setCandidateAssetReviewVisible(visible: boolean): void;
       /** 玩家目前的走路姿勢（見 walk-pose.ts）。 */
       pose(): { y: number; rotation: number; scaleX: number; scaleY: number; legA: number; legB: number; stretch: number };
@@ -363,6 +376,7 @@ export class MapScene extends Phaser.Scene {
   private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
   private pixel32CandidateRuntime = false;
   private pixel32CandidateAssets = false;
+  private pixel32CandidatePetFollow = false;
   private pixel32CandidateReviewItems: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }> = [];
   private pixel32CandidateReviewContainer: Phaser.GameObjects.Container | null = null;
   private pixel32OverlayPreview = false;
@@ -551,6 +565,12 @@ export class MapScene extends Phaser.Scene {
     this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
     this.pixel32CandidateRuntime = this.registry.get('gate1-pixel32-candidate-runtime') === true;
     this.pixel32CandidateAssets = this.registry.get('gate1-pixel32-candidate-assets') === true && this.pixel32CandidateRuntime;
+    this.pixel32CandidatePetFollow = pixel32CandidatePetFollowRequested(
+      new URLSearchParams(window.location.search),
+      import.meta.env.DEV,
+      this.pixel32CandidateRuntime,
+      this.pixel32CandidateAssets,
+    );
     this.pixel32OverlayPreview = pixel32OverlayPreviewRequested(
       new URLSearchParams(window.location.search),
       import.meta.env.DEV,
@@ -772,11 +792,39 @@ export class MapScene extends Phaser.Scene {
           items: this.pixel32CandidateReviewItems.map((item) => ({ ...item })),
           limitations: [
             'Sprites are candidate-only review samples; the board does not change tools, collisions, companion AI, or save data.',
-            'Pet frames are static directional samples; movement and follow animation remain production behavior.',
+            this.pixel32CandidatePetFollow
+              ? 'Only the cat visual uses candidate hop frames on the existing follower path; quokka and gameplay integration remain unchanged.'
+              : 'Pet frames are static directional samples; movement and follow animation remain production behavior.',
             'Tool frames are held-preview art only; no grip, swing, or gameplay integration is implied.',
           ],
         }),
         setCandidateAssetReviewVisible: (visible) => this.pixel32CandidateReviewContainer?.setVisible(visible),
+        candidatePetFollow: () => {
+          const state = this.companions.get('cat');
+          const manifest = this.pixel32CandidatePetFollow
+            ? this.cache.json.get(PIXEL32_PETS_MANIFEST_KEY) as { status?: unknown; approved?: unknown } | undefined
+            : undefined;
+          const sprite = state?.candidatePetSprite;
+          const bounds = sprite?.getBounds();
+          return {
+            enabled: this.pixel32CandidatePetFollow && Boolean(sprite),
+            manifest: {
+              status: typeof manifest?.status === 'string' ? manifest.status : null,
+              approved: typeof manifest?.approved === 'boolean' ? manifest.approved : null,
+            },
+            cat: state && sprite && bounds ? {
+              direction: state.candidatePetDirection ?? this.deps.session.state.player.facing,
+              frame: sprite.frame.name,
+              visible: sprite.visible && state.rig.root.visible,
+              busy: state.rig.isBusy(),
+              tile: state.tile ? { ...state.tile } : null,
+              rootX: state.rig.root.x,
+              rootY: state.rig.root.y,
+              depth: state.rig.root.depth,
+              bounds: { left: bounds.left, top: bounds.top, width: bounds.width, height: bounds.height },
+            } : null,
+          };
+        },
       };
     }
   }
@@ -1813,7 +1861,27 @@ export class MapScene extends Phaser.Scene {
       if (!def.follows) continue;
       const rig = new CharacterRig(this, this.rigDef(def.rig), this.deps.assets);
       rig.root.setDepth(this.actorDepth(rig.footPosition().y, false)).setVisible(false);
-      this.companions.set(def.id, { def, rig, tile: null });
+      const state: CompanionState = { def, rig, tile: null };
+      if (def.id === 'cat' && this.pixel32CandidatePetFollow
+        && this.textures.exists(PIXEL32_PETS_ATLAS_KEY)) {
+        const direction = this.deps.session.state.player.facing;
+        const frameName = `cat-${direction}-idle`;
+        const frame = this.textures.get(PIXEL32_PETS_ATLAS_KEY).get(frameName);
+        if (frame) {
+          const manifest = this.cache.json.get(PIXEL32_PETS_MANIFEST_KEY) as {
+            frames?: Record<string, { footAnchor?: { x: number; y: number } }>;
+          } | undefined;
+          const anchor = manifest?.frames?.[frameName]?.footAnchor ?? { x: 16, y: 28 };
+          rig.body.setVisible(false);
+          state.candidatePetSprite = this.add.image(0, 0, PIXEL32_PETS_ATLAS_KEY, frameName)
+            .setOrigin(anchor.x / frame.width, anchor.y / frame.height)
+            .setScale(2);
+          rig.root.add(state.candidatePetSprite);
+          state.candidatePetDirection = direction;
+          state.candidatePetMoveStartedAt = null;
+        }
+      }
+      this.companions.set(def.id, state);
     }
   }
 
@@ -1850,9 +1918,20 @@ export class MapScene extends Phaser.Scene {
           const stand = standOf(spot.x, spot.y);
           state.rig.teleport(stand.x, stand.y);
         }
+        if (state.candidatePetSprite) {
+          state.candidatePetDirection = player.facing;
+          state.candidatePetMoveStartedAt = null;
+          state.candidatePetSprite.setFrame(`cat-${player.facing}-idle`);
+        }
       } else if (this.playerTile) {
         const next = nextPetTile(this.playerTile, player, state.tile);
         if (next.x !== state.tile.x || next.y !== state.tile.y) {
+          const dx = next.x - state.tile.x;
+          const dy = next.y - state.tile.y;
+          if (state.candidatePetSprite) {
+            state.candidatePetDirection = dx > 0 ? 'right' : dx < 0 ? 'left' : dy > 0 ? 'down' : 'up';
+            state.candidatePetMoveStartedAt = performance.now();
+          }
           state.tile = next;
           const stand = standOf(next.x, next.y);
           state.rig.walkTo(stand.x, stand.y, MOVE_DURATION_MS);
@@ -1947,8 +2026,23 @@ export class MapScene extends Phaser.Scene {
     this.moveWearBadge();
     for (const rig of this.npcRigs.values()) rig.update(delta);
     for (const state of this.companions.values()) state.rig.update(delta);
+    this.updateCandidatePetFrames();
     this.updateFollowerDepths();
     this.drawStarMeter();
+  }
+
+  /** DEV-only candidate visual timing; root movement remains owned by the existing CharacterRig follower. */
+  private updateCandidatePetFrames(): void {
+    if (!this.pixel32CandidatePetFollow) return;
+    for (const state of this.companions.values()) {
+      if (!state.candidatePetSprite || !state.candidatePetDirection) continue;
+      const elapsed = state.candidatePetMoveStartedAt === null || state.candidatePetMoveStartedAt === undefined
+        ? null
+        : performance.now() - state.candidatePetMoveStartedAt;
+      const frame = pixel32CandidateCatFrame(state.candidatePetDirection, elapsed);
+      if (state.candidatePetSprite.frame.name !== frame
+        && this.textures.get(PIXEL32_PETS_ATLAS_KEY).has(frame)) state.candidatePetSprite.setFrame(frame);
+    }
   }
 
   /** 玩家與跟隨寵物依腳底 Y 排序；腳底較低者畫在前面，同腳底時玩家優先。 */

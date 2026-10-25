@@ -63,13 +63,31 @@
 - [x] 五種 viewport × DPR 1／2／3 各擷取接觸表與 farm 場景截圖；記錄候選請求、失敗、console／page error、素材雜湊與 canvas／camera 尺寸。
 - [x] 目視抽查手機直式、橫式與桌面代表圖；確認候選項目完整落於 renderer 邊界內。
 - [x] `npm run check` 與完整 `npm run test:e2e` 通過（235 E2E 通過）。
-- [ ] Impact Graph reconciliation、commit、PR；Required Checks 通過後依核准發佈流程合併。
+- [x] Impact Graph reconciliation、commit、PR #45 Required Checks 通過並 squash merge 至 `main`（merge SHA `3011256cd982742ba27b6ceb352693fbd2ffb149`）。
 
 ## 限制
 
 - Chromium DPR 為模擬值，PNG 以 CSS 尺寸輸出；未驗證 native DPR raster 或 iOS／Android 實機。
-- 寵物仍是靜態方向預覽，工具是 held-preview，門／出貨箱為靜態狀態；不代表互動或正式 runtime 整合。
+- 寵物方向／工具／門／出貨箱接觸表仍是靜態 QA 預覽；候選貓咪跟隨另有 DEV-only 動畫證據，但不代表互動、正式 runtime 整合或美術核准。
 - 不核准特定素材 SHA，不改 `content/assets.json`、正式 `public/`、rig、domain、存檔或遊戲規則。
+
+---
+
+# DF-G1-PET-FOLLOW pixel32 候選貓咪跟隨動畫證據
+
+在 pixel32 MapScene 的 DEV-only opt-in 中，讓未核准的 cat 候選 atlas 跟隨既有角色骨架移動，記錄四方向 hop-a／hop-b／land／idle 序列與 farm 格位。原有 110 ms 跟隨移動、目標格、深度與存檔不變。完整畫面與 SHA 證據見[候選貓咪跟隨報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-pet-follow.zh-TW.md)。
+
+## 驗收範圍
+
+- [x] 精確 DEV query 之外不替換正式 cat；manifest 維持 `candidate`／`approved: false`。
+- [x] Chromium 驗證由既有 follower trail 到位、四方向畫格序列、足底錨點、64×64 顯示尺寸、深度、候選資產請求與 page error；保存四向場景截圖及 SHA 證據。
+- [x] `npm run check` 通過（162 個測試檔，1,640 passed／1 skipped；build 2.805 MB）；完整 Chromium E2E 237/237 通過；候選程式與四張逐向場景截圖已記錄 SHA-256。
+- [ ] Impact Graph reconciliation、commit、PR、Required Checks 與合併。
+
+## 限制
+
+- 這是 DEV-only cat 視覺候選；quokka、正式 rig／assets／public、遊戲規則與存檔未整合或變更。
+- 沒有人眼美術評分、pixel16 同場景比較、60／120 fps 效能量測或 iOS／Android 實機驗收；不代表 Gate 1 通過或特定素材核准。
 
 ---
 
