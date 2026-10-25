@@ -4,11 +4,14 @@ const previewPath = '/docs/art/candidates/pixel-movement/gate1-assets/pixel32-an
 
 test('pixel32 candidate animator shows four directions, looping walk and isolated tool impact feedback', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   const failures: string[] = [];
   page.on('pageerror', (error) => failures.push(error.message));
   await page.goto(previewPath);
 
   const canvas = page.locator('#preview-canvas');
+  await expect(canvas).toHaveAttribute('data-reduced-motion', 'false');
+  await expect(page.getByLabel('減少動態')).not.toBeChecked();
   await expect(canvas).toHaveAttribute('data-direction', 'down');
   await expect(canvas).toHaveAttribute('data-motion', 'idle');
   await expect(canvas).toHaveAttribute('data-frame', 'down-idle');
