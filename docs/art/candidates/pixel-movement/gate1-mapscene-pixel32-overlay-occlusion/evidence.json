@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tests/e2e/gate1-mapscene-pixel32-overlay-scene.spec.ts",
+  "candidateStatus": "candidate",
+  "approved": false,
+  "method": "Count RGBA pixels that differ between same-render snapshots with the player shown and hidden at a deterministic saved tile; overlay layers and the rest of the scene remain unchanged.",
+  "viewport": {
+    "width": 1280,
+    "height": 900,
+    "deviceScaleFactor": 1
+  },
+  "measurements": [
+    {
+      "scenario": "house-behind",
+      "player": {
+        "x": 4,
+        "y": 3,
+        "footY": 256,
+        "left": 256,
+        "top": 176,
+        "width": 64,
+        "height": 80
+      },
+      "playerSnapshotDiffPixels": 374,
+      "screenshot": "house-behind.png",
+      "sha256": "b4fa8eb012a983b846d6e20b26c8762ff82de8da2c0489e3ed5c3ada9f8da587"
+    },
+    {
+      "scenario": "house-front",
+      "player": {
+        "x": 4,
+        "y": 5,
+        "footY": 384,
+        "left": 256,
+        "top": 304,
+        "width": 64,
+        "height": 80
+      },
+      "playerSnapshotDiffPixels": 510,
+      "screenshot": "house-front.png",
+      "sha256": "93407c71bcfd003567fc2a86e162a4ad694e847340e015f65d8845907b493881"
+    },
+    {
+      "scenario": "tree-behind",
+      "player": {
+        "x": 8,
+        "y": 3,
+        "footY": 256,
+        "left": 512,
+        "top": 176,
+        "width": 64,
+        "height": 80
+      },
+      "playerSnapshotDiffPixels": 336,
+      "screenshot": "tree-behind.png",
+      "sha256": "2c315d39fc4d408d742c206602a7fc537459649701e582c9dc47ec036cded1fa"
+    },
+    {
+      "scenario": "tree-front",
+      "player": {
+        "x": 8,
+        "y": 5,
+        "footY": 384,
+        "left": 512,
+        "top": 304,
+        "width": 64,
+        "height": 80
+      },
+      "playerSnapshotDiffPixels": 510,
+      "screenshot": "tree-front.png",
+      "sha256": "8eaa3d12b406758aed25b98969de9aa8afed8dd9291704509807c41edda2323c"
+    }
+  ],
+  "comparisons": {
+    "houseFrontHasMoreSnapshotDiffPixels": true,
+    "treeFrontHasMoreSnapshotDiffPixels": true
+  },
+  "limitations": [
+    "Chromium browser evidence only.",
+    "Counts are shown-versus-hidden RGBA snapshot differences, not an exact player alpha mask or occluded area; background-aligned colors can reduce counts.",
+    "Artistic quality, native-device rendering, exact art approval and Gate 1 sign-off remain pending human review."
+  ]
+}
