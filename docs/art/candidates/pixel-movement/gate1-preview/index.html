@@ -11,8 +11,8 @@
     <main class="review">
       <header class="intro">
         <p class="eyebrow">DEWHOLLOW FARM · GATE 1</p>
-        <h1>同一塊農場，三種像素尺度</h1>
-        <p class="lede">用固定的 12 × 10 場景比較原生候選素材。這是美術樣張，尚未接入遊戲玩法，也未獲核准。</p>
+        <h1 id="page-title">同一塊農場，三種像素尺度</h1>
+        <p class="lede" id="page-lede">用固定的 12 × 10 場景比較原生候選素材。這是美術樣張，尚未接入遊戲玩法，也未獲核准。</p>
       </header>
 
       <section class="toolbar" aria-label="候選預覽設定">
@@ -20,6 +20,7 @@
           <button type="button" data-candidate="legacy" aria-pressed="true">現況</button>
           <button type="button" data-candidate="8bit" aria-pressed="false">A · 8-bit</button>
           <button type="button" data-candidate="16bit" aria-pressed="false">B · 16-bit</button>
+          <button type="button" data-candidate="pixel32-overlays" aria-pressed="false">B · 地圖圖層</button>
         </div>
         <label class="scale-control">顯示比例
           <select id="display-scale" aria-label="顯示比例">
@@ -43,22 +44,23 @@
         </article>
 
         <aside class="scene-notes">
-          <p class="card-kicker">固定場景內容</p>
-          <h2>同座標、同構圖</h2>
-          <ul>
+          <p class="card-kicker" id="scene-notes-kicker">A／B 固定場景內容</p>
+          <h2 id="scene-notes-title">同座標、同構圖</h2>
+          <ul id="scene-notes-list">
             <li>草地、耕地、道路與樹</li>
             <li>種子、幼苗、成熟作物</li>
             <li>屋緣與柵欄</li>
+            <li>房屋前後層與樹冠遮擋候選</li>
             <li>主角、黑貓、矮袋鼠</li>
             <li>工具與腳底陰影</li>
           </ul>
           <div class="evidence-note">
-            <strong>本頁能比較</strong>
-            <p>原生像素輪廓、色塊密度、角色與物件相對比例。</p>
+            <strong id="comparison-heading">本頁能比較</strong>
+            <p id="comparison-copy">原生像素輪廓、色塊密度、角色與物件相對比例。</p>
           </div>
           <div class="evidence-note muted">
-            <strong>仍待補齊</strong>
-            <p>遊戲內移動、互動、遮擋、存檔一致性、完整 viewport／DPR 矩陣與實機效能。</p>
+            <strong id="limitation-heading">仍待補齊</strong>
+            <p id="limitation-copy">遊戲內移動、互動、遮擋、存檔一致性、完整 viewport／DPR 矩陣與實機效能。</p>
           </div>
         </aside>
       </section>

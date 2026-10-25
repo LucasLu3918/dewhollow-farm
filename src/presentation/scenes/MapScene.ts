@@ -79,8 +79,10 @@ import { resolveCandidateArt, type CandidateCropStage, type CandidateId } from '
 import { candidateFrameAt, type CandidateDirection } from '../candidate-sprite-animator';
 import {
   PIXEL32_ANIMATION_ATLAS_KEY,
+  PIXEL32_CANDIDATE_OVERLAYS,
   PIXEL32_MAP_ATLAS_KEY,
   pixel32MapFrameFor,
+  pixel32OverlayPreviewRequested,
 } from '../pixel32-candidate-runtime';
 import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
 import { advanceMovement, cancelMovement, commitStep, createMovementScheduler, queueMovementTap, rejectStep, requestNextStep, setMovementIntent, type MovementSchedulerState } from '../movement-scheduler/movement-scheduler';
@@ -215,6 +217,17 @@ interface SpriteDebugInfo {
   depth: number;
 }
 
+interface Pixel32OverlayDebugInfo {
+  id: string;
+  frame: string;
+  layer: 'back' | 'front';
+  tileX: number;
+  tileY: number;
+  depth: number;
+  displayList: 'world' | 'scene' | 'other';
+  visible: boolean;
+}
+
 /** 開發模式下的角色資訊：站的格子、外框與姿勢。 */
 interface ActorDebugInfo {
   id: string;
@@ -290,6 +303,8 @@ declare global {
       textureSize(key: string): { width: number; height: number } | null;
       /** DEV-only pixel32 runtime candidate load state and the visible player animation frame. */
       pixel32CandidateRuntime(): { enabled: boolean; mapFrames: string[]; animationFrames: string[]; playerFrame: string | null };
+      /** DEV-only, unapproved pixel32 map overlay fixture. */
+      pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
       /** 玩家目前的走路姿勢（見 walk-pose.ts）。 */
       pose(): { y: number; rotation: number; scaleX: number; scaleY: number; legA: number; legB: number; stretch: number };
       /** 玩家骨架目前的方向、腳的做法與看得見的切塊。 */
@@ -341,6 +356,8 @@ export class MapScene extends Phaser.Scene {
   private rig!: CharacterRig;
   private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
   private pixel32CandidateRuntime = false;
+  private pixel32OverlayPreview = false;
+  private pixel32CandidateOverlaySprites: { descriptor: (typeof PIXEL32_CANDIDATE_OVERLAYS)[number]; image: Phaser.GameObjects.Image }[] = [];
   /** 目前地圖上的居民（依行程站位），見 syncResidents。毛毛有骨架，其他人是占位。 */
   private npcRigs = new Map<string, ResidentView>();
   /** 居民的最新行程目標與路線代次；行程變動時先走完當前一步，再重新規劃。 */
@@ -524,6 +541,11 @@ export class MapScene extends Phaser.Scene {
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
     this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
     this.pixel32CandidateRuntime = this.registry.get('gate1-pixel32-candidate-runtime') === true;
+    this.pixel32OverlayPreview = pixel32OverlayPreviewRequested(
+      new URLSearchParams(window.location.search),
+      import.meta.env.DEV,
+      this.pixel32CandidateRuntime,
+    );
     if (this.pixel32CandidateRuntime && this.textures.exists(PIXEL32_ANIMATION_ATLAS_KEY)
       && this.textures.get(PIXEL32_ANIMATION_ATLAS_KEY).has('down-idle')) {
       // Keep the rig root as the authoritative movement/camera/depth anchor while swapping only its visible body.
@@ -557,6 +579,7 @@ export class MapScene extends Phaser.Scene {
       this.rig.shutdown();
       this.pixel32CandidateSprite?.destroy();
       this.pixel32CandidateSprite = null;
+      this.clearPixel32CandidateOverlays();
       for (const rig of this.npcRigs.values()) if (rig instanceof CharacterRig) rig.shutdown();
       this.residentWalks.clear();
       for (const state of this.companions.values()) state.rig.shutdown();
@@ -714,6 +737,21 @@ export class MapScene extends Phaser.Scene {
             ? this.textures.get(PIXEL32_ANIMATION_ATLAS_KEY).getFrameNames()
             : [],
           playerFrame: this.pixel32CandidateSprite?.frame.name ?? null,
+        }),
+        pixel32CandidateOverlays: () => ({
+          enabled: this.pixel32OverlayPreview,
+          overlays: this.pixel32CandidateOverlaySprites.map(({ descriptor, image }) => ({
+            id: descriptor.id,
+            frame: image.frame.name,
+            layer: descriptor.layer,
+            tileX: descriptor.tileX,
+            tileY: descriptor.tileY,
+            depth: image.depth,
+            displayList: image.parentContainer === this.world
+              ? 'world'
+              : image.displayList === this.sys.displayList ? 'scene' : 'other',
+            visible: image.visible,
+          })),
         }),
       };
     }
@@ -1622,6 +1660,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   private drawMap(mapId: string): void {
+    this.clearPixel32CandidateOverlays();
     // Tree overlays live on the scene display list so their foot depth can sort
     // against actor roots. Destroy those roots explicitly before clearing the tile container.
     for (const sprite of this.tileSprites) {
@@ -1647,6 +1686,34 @@ export class MapScene extends Phaser.Scene {
 
     this.clearActors();
     this.createResidents(map);
+    this.drawPixel32CandidateOverlays(mapId);
+  }
+
+  private clearPixel32CandidateOverlays(): void {
+    for (const { image } of this.pixel32CandidateOverlaySprites) image.destroy();
+    this.pixel32CandidateOverlaySprites = [];
+  }
+
+  /** Paint an opt-in, collision-free composition over farm tiles using unapproved candidate frames. */
+  private drawPixel32CandidateOverlays(mapId: string): void {
+    if (!this.pixel32OverlayPreview || mapId !== 'farm'
+      || !this.textures.exists(PIXEL32_MAP_ATLAS_KEY)) return;
+    const texture = this.textures.get(PIXEL32_MAP_ATLAS_KEY);
+    for (const descriptor of PIXEL32_CANDIDATE_OVERLAYS) {
+      if (!texture.has(descriptor.frame)) continue;
+      const footX = (descriptor.tileX + descriptor.widthTiles / 2) * TILE_SIZE;
+      const footY = (descriptor.tileY + descriptor.heightTiles) * TILE_SIZE;
+      const image = this.add.image(footX, footY, PIXEL32_MAP_ATLAS_KEY, descriptor.frame)
+        .setOrigin(0.5, 1)
+        .setScale(2);
+      if (descriptor.layer === 'back') {
+        this.world.add(image);
+        image.setDepth(1);
+      } else {
+        image.setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
+      }
+      this.pixel32CandidateOverlaySprites.push({ descriptor, image });
+    }
   }
 
   private rigDef(id: string): RigDef {

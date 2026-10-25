@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tests/e2e/gate1-mapscene-pixel32-overlay-scene.spec.ts",
+  "candidateStatus": "candidate",
+  "approved": false,
+  "scene": {
+    "widthTiles": 12,
+    "heightTiles": 10,
+    "nativeTileSize": 32,
+    "cssWidth": 384,
+    "cssHeight": 320
+  },
+  "overlayOrder": [
+    {
+      "id": "house-back",
+      "frame": "house-back",
+      "layer": "back",
+      "tileX": 3,
+      "tileY": 3,
+      "depth": 1,
+      "displayList": "world"
+    },
+    {
+      "id": "tree-canopy",
+      "frame": "tree-canopy",
+      "layer": "front",
+      "tileX": 8,
+      "tileY": 3,
+      "depth": 15.001999999999999,
+      "displayList": "scene"
+    },
+    {
+      "id": "house-front",
+      "frame": "house-front",
+      "layer": "front",
+      "tileX": 3,
+      "tileY": 3,
+      "depth": 15.001999999999999,
+      "displayList": "scene"
+    }
+  ],
+  "runtime": {
+    "enabledOnlyWithExactDevQuery": true,
+    "productionAssetsModified": false,
+    "mapCollisionOrSaveModified": false
+  },
+  "screenshot": "pixel32-overlays-12x10.png",
+  "screenshots": {
+    "overlayRuntime": {
+      "file": "pixel32-mapscene-overlays.png",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "sha256": "9bd484a6f130b16a58b5dea46b0311c174ea51360b6027208cf1454e765bcb8d"
+    },
+    "fixedScene": {
+      "file": "pixel32-overlays-12x10.png",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "sha256": "7f15e6e833a85f685ee4bf50e1fa6a779a961deec2fb200bf1112328e015bb73"
+    }
+  },
+  "limitations": [
+    "Chromium browser evidence only.",
+    "Depth ordering is measured; pixel-level actor occlusion quality is not validated.",
+    "Exact art approval remains pending human review."
+  ]
+}
