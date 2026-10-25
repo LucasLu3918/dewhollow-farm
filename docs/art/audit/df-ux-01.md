@@ -14,8 +14,9 @@
 - `tests/e2e/touch.spec.ts` 新增固定 joystick 四向單軸移動與雙指「移動＋切換工具」案例。
 - Codex 內建瀏覽器以 390×844 直式與 844×390 矮橫式檢查；確認 controls 在安全區內、遊戲畫面可見，viewport 旋轉會收合「更多」。此瀏覽器手動檢視為 Chromium 模擬，非 iOS／Android 實機。
 - `npm run check` 通過：159 個測試檔、1,614 項通過、1 項既有 skip，production build 與 8 MB 預算通過。
-- 完整 Playwright E2E 尚待此次 PR 的 GitHub Chromium CI。沙箱內執行先被代理 Host 設定攔截；核准的隔離代理重跑逾 60 秒無輸出後停止。不得將其視為 E2E 通過。
-- 瀏覽器的 `pixelViewport()` debug 介面未在該 IAB 執行上下文提供；FOV 數值以本次 GitHub E2E 結果為準，CI 未通過前不宣稱矩陣驗收完成。
+- GitHub PR #31 Chromium CI run `40144901191` 通過；完整 E2E 為 226 passed（17.0 分鐘），Required Checks `typecheck, unit tests, build` 與 `end-to-end (Chromium)` 均通過。
+- 本機先前受代理 Host 設定攔截；隔離代理重跑逾 60 秒無輸出後停止。它不是通過證據，驗收以 PR #31 的 GitHub CI 為準。
+- FOV 數值與 viewport matrix 由 `tests/e2e/responsive-layout.spec.ts` 自動驗證；瀏覽器手動檢視及 CI 都是 Chromium 模擬，不代表原生裝置行為。
 
 ## 範圍
 

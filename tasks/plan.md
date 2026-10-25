@@ -8,13 +8,30 @@
 - 不修改遊戲規則、存檔、地圖資料、碰撞、正式素材或 Gate 1 核准狀態。
 - Chromium viewport/input 測試不等同 iOS／Android 實機驗收；實機項目維持 `DEVICE_PENDING`。
 
-## 驗收
+## 驗收（DF-UX-01 已於 PR #31 合併）
 
-- [ ] 混合指標裝置採 touch FOV；直式、短直式與矮橫式實際鏡頭範圍符合目標。
-- [ ] 旋轉 viewport 會取消 held input 並收合「更多」；需新手勢才可繼續操作。
-- [ ] 工具與種子 shortcut 更新 HUD，不開啟 selector；既有農務流程與存檔回歸通過。
-- [ ] `npm run check`、完整 `npm run test:e2e`、瀏覽器畫面檢視及 PR CI 通過。
-- [ ] 更新 Impact reconciliation，單一功能 commit、推送同一分支並開 PR。
+- [x] 混合指標裝置採 touch FOV；直式、短直式與矮橫式 camera FOV matrix 有 E2E 覆蓋。
+- [x] 旋轉 viewport 會取消 held input 並收合「更多」；需新手勢才可繼續操作。
+- [x] 工具與種子 shortcut 更新 HUD，不開啟 selector；既有農務流程與存檔回歸通過。
+- [x] `npm run check`、完整 `npm run test:e2e`、Chromium 畫面檢視及 PR #31 CI 通過；完整 E2E 為 226 passed。
+- [x] 變更已更新 Impact 證據並合併至 `main`；iOS／Android 實機驗收仍為 `DEVICE_PENDING`。
+
+---
+
+# DF-QA-01 Gate 1 證據稽核
+
+## 範圍與結論
+
+整理既有 renderer-profile、同場景 A/B 與 pixel32 MapScene QA runtime 證據，對照 Gate 1 驗收條件並修正過時狀態。此階段只整理證據，不改候選素材或核准狀態。詳見 [DF-QA-01 稽核矩陣](../docs/art/audit/df-qa-01.md)。
+
+## 任務與完成條件
+
+- [x] 區分 45 張舊素材 viewport／DPR 矩陣與單一 1280×720 DPR1 pixel32 候選 runtime 截圖。
+- [x] 記錄同一 MapScene 的方向動畫、農務、存檔與 production isolation 測試覆蓋。
+- [x] 列明未覆蓋的 viewport／DPR、固定 12×10 場景、持續移動、碰撞／遮擋、完整素材與實機證據。
+- [x] 更新 DF-UX-01 已合併的 CI 驗收紀錄及候選方向決策措辭。
+- [ ] 跑專案檢查，commit、push、PR；Required Checks 通過後依 AIPS 發佈流程合併。
+- [ ] 下一階段在素材人眼審查與 Gate 1 目標下補齊 pixel32 候選覆蓋；每個確切素材版本仍待使用者個別核准，實機項目維持 `DEVICE_PENDING`。
 
 ---
 
