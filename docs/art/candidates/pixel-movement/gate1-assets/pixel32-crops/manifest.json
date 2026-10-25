@@ -8,7 +8,7 @@
   "source": {
     "method": "以 generator 中原創整數像素圖元手工繪製；參考圖只供甜蘿蔔紅色塊根與綠葉特徵，不取樣、不縮放、不複製其像素。",
     "generator": "tools/art/generate_gate1_crops.mjs",
-    "generatorSha256": "3d4c85a28cbd86c48ced55d73b358f6367621d3c0186c8e250d3278d796776e6",
+    "generatorSha256": "608958d3b347d3c948d5845c5eb0581a51e8669ba70f8e7a008397ebaf147741",
     "reference": {
       "file": "public/assets/crops/sweet-radish-2x.png",
       "sha256": "e7cb6a3631de28f28cda03e9ced2725a1bf30c6f8634975e0a53964f47e8fbe7",
@@ -29,7 +29,7 @@
     "width": 96,
     "height": 32,
     "colorType": "RGBA8888",
-    "sha256": "55ca6cb689d1ef7e5167c26e44c9d59ddb3e5b9a973f326e6194615d81daff41"
+    "sha256": "6fa85cde285fa70538f932f4ebeabcdcdb709ae2e65b43298ce232fcdb78ba40"
   },
   "palette": {
     "rootOutline": "#702b3c",

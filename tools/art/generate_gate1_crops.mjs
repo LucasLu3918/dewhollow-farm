@@ -4,7 +4,6 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { deflateSync } from 'node:zlib';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const DEFAULT_OUT = join(ROOT, 'docs/art/candidates/pixel-movement/gate1-assets/pixel32-crops');
@@ -44,8 +43,35 @@ function encodePng(width, height, rgba) {
   header[8] = 8; header[9] = 6; header[10] = 0; header[11] = 0; header[12] = 0;
   return Buffer.concat([
     Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', header),
-    chunk('IDAT', deflateSync(raw, { level: 9 })), chunk('IEND', Buffer.alloc(0)),
+    chunk('IDAT', deflateStored(raw)), chunk('IEND', Buffer.alloc(0)),
   ]);
+}
+
+/** Use RFC 1950/1951 stored blocks so PNG bytes do not depend on zlib versions. */
+function deflateStored(input) {
+  const blocks = [Buffer.from([0x78, 0x01])];
+  let offset = 0;
+  do {
+    const length = Math.min(0xffff, input.length - offset);
+    const final = offset + length === input.length;
+    const block = Buffer.alloc(5 + length);
+    block[0] = final ? 1 : 0;
+    block.writeUInt16LE(length, 1);
+    block.writeUInt16LE(~length & 0xffff, 3);
+    input.copy(block, 5, offset, offset + length);
+    blocks.push(block);
+    offset += length;
+  } while (offset < input.length);
+
+  let s1 = 1; let s2 = 0;
+  for (const byte of input) {
+    s1 = (s1 + byte) % 65521;
+    s2 = (s2 + s1) % 65521;
+  }
+  const adler = Buffer.alloc(4);
+  adler.writeUInt32BE(((s2 << 16) | s1) >>> 0);
+  blocks.push(adler);
+  return Buffer.concat(blocks);
 }
 
 function canvas() {
