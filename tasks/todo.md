@@ -59,5 +59,8 @@
 - [x] PR #34 Required Checks 通過並合併至 `main`；merge commit `99f76bab2cc5a7637dd4c649a3da2236d15cb7b0`。
 - [x] 下一階段初步場景證據：pixel32 候選地面／玩家與作物 fallback、cat follow、森林樹木前後深度排序；專項 E2E 1/1、`npm run check`、完整 E2E 229/229 通過。詳見 [場景覆蓋證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-scene-coverage.zh-TW.md)。
 - [x] 隔離接入 pixel32 tree canopy／house front-back 候選層，完成固定 12×10 圖層樣張與深度驗證；不得改正式素材或碰撞，實機維持 `DEVICE_PENDING`。詳見 [圖層候選報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-scene.zh-TW.md)。
+- [x] 新增 DEV-only Chromium 候選差分證據：固定玩家位於房屋／樹冠前後，量測顯示／隱藏玩家的 snapshot 差分像素數，並保存四張截圖、座標、數據與 SHA-256。詳見 [遮擋候選報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-occlusion.zh-TW.md)。
+- [x] 專項遮擋 E2E 1/1、`npm run check` 與完整 Playwright E2E 230/230（4 workers）通過。
+- [ ] 人工審查確切 pixel32 地圖與角色素材、原生裝置行為，並依 Gate 1 完整條件決定是否核准；本次自動化證據不取代該驗收。
 
 詳見 [pixel32 候選連續移動與碰撞證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-motion-evidence.zh-TW.md)。

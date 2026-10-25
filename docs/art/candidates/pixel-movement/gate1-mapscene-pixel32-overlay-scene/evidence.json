@@ -65,7 +65,7 @@
   },
   "limitations": [
     "Chromium browser evidence only.",
-    "Depth ordering is measured; pixel-level actor occlusion quality is not validated.",
-    "Exact art approval remains pending human review."
+    "This phase records shown-versus-hidden snapshot differences at fixed positions; it is not an exact player mask or occluded-area measurement.",
+    "Artistic quality, native-device rendering, exact art approval and Gate 1 sign-off remain pending human review."
   ]
 }
