@@ -19,7 +19,7 @@
 | pixel32 候選接入正式 farm MapScene 的 QA runtime | 部分 | [`gate1-mapscene-pixel32-runtime.spec.ts`](../../../tests/e2e/gate1-mapscene-pixel32-runtime.spec.ts) 驗證 DEV-only opt-in、候選地圖與玩家四向動畫、方向切換、農務命令、存檔重新載入及 production 不載入。只有 1280×720、DPR 1 候選 runtime 截圖。 |
 | 固定 12×10 完整場景與 legacy／pixel16／pixel32 同 runtime 比較 | 缺證據 | 現有 12×10 是候選靜態展示組合定義；新 runtime 只接 pixel32 部分覆蓋，沒有 pixel16 同 runtime，也沒有完整組合場景截圖矩陣。 |
 | 完整素材與角色行為 | 缺證據 | 新 pixel32 runtime 的建築、樹、土壤、作物、NPC、夥伴、工具及陰影仍用既有素材；尚無完整作物品種辨識、工具表演及寵物跟隨候選驗收。 |
-| 移動、碰撞、遮擋與動畫穩定性 | 部分／缺證據 | 舊素材影片 [`movement-and-farming.json`](../candidates/pixel-movement/gate1-runtime-evidence/videos/movement-and-farming.json) 記錄格狀移動、轉向、農務及黑貓跟隨；新 pixel32 runtime 驗證四方向狀態，但沒有每方向連續 5 秒、碰撞不穿越、候選樹／建築遮擋、候選夥伴跟隨或 60/120 fps frame-time 證據。 |
+| 移動、碰撞、遮擋與動畫穩定性 | 部分／缺證據 | pixel32 候選已有每方向 1.25 秒移動與牆碰撞證據、固定位置遮擋差分，以及 [`overlay 移動深度證據`](../candidates/pixel-movement/gate1-mapscene-pixel32-overlay-motion-stability.zh-TW.md)：14 次單格移動期間三層穩定，且角色穿過房屋／樹冠腳底錨點時深度前後翻轉。仍缺候選夥伴跟隨與 60/120 fps frame-time 證據；自動化深度訊號不代表像素遮擋品質核准。 |
 | 候選 viewport／DPR、100% 可讀性、接縫與腳錨人工評分 | 部分 | 地面／玩家 pixel32 MapScene 與 house／tree overlay 各有 5 種 viewport × DPR 1／2／3 的 15 張 Chromium CSS-scale 截圖。overlay 畫面與輸入 SHA 已記錄於 [`overlay runtime 矩陣`](../candidates/pixel-movement/gate1-mapscene-pixel32-overlay-runtime-matrix.zh-TW.md)；尚無完整候選素材組合、10 情境辨識評分、接縫／閃爍與腳底錨點審查，也不是原生 DPR raster。 |
 | 原生 iOS／Android 裝置 | 待實機 | 未驗證原生安全區、觸控命中率、像素穩定性與效能，維持 `DEVICE_PENDING`。 |
 | 候選狀態與正式素材隔離 | 通過（隔離檢查） | 候選 manifest 維持 `status: candidate`、`approved: false`；MapScene 僅 DEV 且精確 opt-in 載入候選，production 不請求該 atlas。隔離通過不代表 Gate 1 或美術核准。 |
@@ -31,6 +31,7 @@
 - 舊素材 A/B：[`gate1-mapscene-ab-evidence.zh-TW.md`](../candidates/pixel-movement/gate1-mapscene-ab-evidence.zh-TW.md)。截圖保留供比較；它不是新 pixel32 animation runtime 的驗收。
 - PR #31（DF-UX-01）已合併，Required Checks 通過；這只驗證手機控制／版面變更，不會補足 Gate 1 美術證據。DF-UX-01 的裝置實測仍為 `DEVICE_PENDING`。
 - 使用者已選擇 B／pixel32／16-bit，並同意候選進入下一階段。依 [素材審核流程](../asset-review.md)，此決定不構成對特定素材 SHA 的核准；候選進入 `approved` 或正式資產目錄前，仍需逐版本明確核准。
+- [`overlay 移動深度證據`](../candidates/pixel-movement/gate1-mapscene-pixel32-overlay-motion-stability.zh-TW.md) 為 DEV-only Chromium 測試；候選狀態維持未核准，不替代完整場景或實機審查。
 
 ## Gate 1 尚需完成
 

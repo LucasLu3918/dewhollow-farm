@@ -1,0 +1,1020 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tests/e2e/gate1-mapscene-pixel32-overlay-motion-stability.spec.ts",
+  "candidate": {
+    "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1OverlayPreview=pixel32-overlay-12x10",
+    "map": {
+      "status": "candidate",
+      "approved": false
+    },
+    "animation": {
+      "status": "candidate",
+      "approved": false
+    },
+    "inputs": {
+      "mapManifestSha256": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+      "mapAtlasSha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+      "animationManifestSha256": "ebeb2be797d5e6b16d643aeb8a2e7d8b090fc427099d892957b94f2f626692f8",
+      "animationAtlasSha256": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3"
+    }
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 900,
+    "dpr": 1,
+    "screenshotScale": "css"
+  },
+  "routes": {
+    "tree-behind": {
+      "tile": {
+        "x": 8,
+        "y": 5,
+        "facing": "down"
+      },
+      "depths": [
+        1,
+        15.001999999999999,
+        15.001999999999999
+      ]
+    },
+    "tree-sides": {
+      "tile": {
+        "x": 8,
+        "y": 5,
+        "facing": "right"
+      },
+      "depths": [
+        1,
+        15.001999999999999,
+        15.001999999999999
+      ]
+    },
+    "house-approach": {
+      "tile": {
+        "x": 5,
+        "y": 3,
+        "facing": "up"
+      },
+      "depths": [
+        1,
+        15.001999999999999,
+        15.001999999999999
+      ]
+    },
+    "house-return": {
+      "tile": {
+        "x": 8,
+        "y": 5,
+        "facing": "right"
+      },
+      "depths": [
+        1,
+        15.001999999999999,
+        15.001999999999999
+      ]
+    }
+  },
+  "measurements": [
+    {
+      "name": "tree-start",
+      "tile": {
+        "x": 8,
+        "y": 5,
+        "facing": "down"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 8,
+          "y": 5,
+          "facing": "down"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "down-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "tree-behind-north-01",
+      "tile": {
+        "x": 8,
+        "y": 4,
+        "facing": "up"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 8,
+          "y": 4,
+          "facing": "up"
+        }
+      },
+      "player": {
+        "footY": 320,
+        "depth": 15.001,
+        "frame": "up-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "tree-behind-south-02",
+      "tile": {
+        "x": 8,
+        "y": 5,
+        "facing": "down"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 8,
+          "y": 5,
+          "facing": "down"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "down-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "tree-sides-west-03",
+      "tile": {
+        "x": 7,
+        "y": 5,
+        "facing": "left"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 7,
+          "y": 5,
+          "facing": "left"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "left-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "tree-sides-east-04",
+      "tile": {
+        "x": 8,
+        "y": 5,
+        "facing": "right"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 8,
+          "y": 5,
+          "facing": "right"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "right-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-approach-west-05",
+      "tile": {
+        "x": 7,
+        "y": 5,
+        "facing": "left"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 7,
+          "y": 5,
+          "facing": "left"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "left-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-approach-west-06",
+      "tile": {
+        "x": 6,
+        "y": 5,
+        "facing": "left"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 6,
+          "y": 5,
+          "facing": "left"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "left-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-approach-west-07",
+      "tile": {
+        "x": 5,
+        "y": 5,
+        "facing": "left"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 5,
+          "y": 5,
+          "facing": "left"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "left-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-approach-north-08",
+      "tile": {
+        "x": 5,
+        "y": 4,
+        "facing": "up"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 5,
+          "y": 4,
+          "facing": "up"
+        }
+      },
+      "player": {
+        "footY": 320,
+        "depth": 15.001,
+        "frame": "up-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-approach-north-09",
+      "tile": {
+        "x": 5,
+        "y": 3,
+        "facing": "up"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 5,
+          "y": 3,
+          "facing": "up"
+        }
+      },
+      "player": {
+        "footY": 256,
+        "depth": 14.001,
+        "frame": "up-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-return-south-10",
+      "tile": {
+        "x": 5,
+        "y": 4,
+        "facing": "down"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 5,
+          "y": 4,
+          "facing": "down"
+        }
+      },
+      "player": {
+        "footY": 320,
+        "depth": 15.001,
+        "frame": "down-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-return-south-11",
+      "tile": {
+        "x": 5,
+        "y": 5,
+        "facing": "down"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 5,
+          "y": 5,
+          "facing": "down"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "down-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-return-east-12",
+      "tile": {
+        "x": 6,
+        "y": 5,
+        "facing": "right"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 6,
+          "y": 5,
+          "facing": "right"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "right-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-return-east-13",
+      "tile": {
+        "x": 7,
+        "y": 5,
+        "facing": "right"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 7,
+          "y": 5,
+          "facing": "right"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "right-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "house-return-east-14",
+      "tile": {
+        "x": 8,
+        "y": 5,
+        "facing": "right"
+      },
+      "movement": {
+        "heldDirection": null,
+        "blockedDirection": null,
+        "moving": false,
+        "pending": false,
+        "queuedTaps": 0,
+        "tile": {
+          "x": 8,
+          "y": 5,
+          "facing": "right"
+        }
+      },
+      "player": {
+        "footY": 384,
+        "depth": 16.001,
+        "frame": "right-idle"
+      },
+      "overlays": {
+        "enabled": true,
+        "overlays": [
+          {
+            "id": "house-back",
+            "frame": "house-back",
+            "layer": "back",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 1,
+            "displayList": "world",
+            "visible": true
+          },
+          {
+            "id": "tree-canopy",
+            "frame": "tree-canopy",
+            "layer": "front",
+            "tileX": 8,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          },
+          {
+            "id": "house-front",
+            "frame": "house-front",
+            "layer": "front",
+            "tileX": 3,
+            "tileY": 3,
+            "depth": 15.001999999999999,
+            "displayList": "scene",
+            "visible": true
+          }
+        ]
+      }
+    }
+  ],
+  "screenshots": {
+    "tree-behind": {
+      "file": "screenshots/tree-behind.png",
+      "sha256": "c5c5df1eb390e2b6922a3ca463010d267dd04de67fcbdad981448647f32d2a16"
+    },
+    "tree-sides": {
+      "file": "screenshots/tree-sides.png",
+      "sha256": "62ccdd35acf5c7dea8066680c3f4ddacfd3882e5a2b24682fba53663ef9381b4"
+    },
+    "house-approach": {
+      "file": "screenshots/house-approach.png",
+      "sha256": "2ec485047642234e56f58014d5d441d2d211035b3b37adea0129ef32e9277427"
+    },
+    "house-return": {
+      "file": "screenshots/house-return.png",
+      "sha256": "62ccdd35acf5c7dea8066680c3f4ddacfd3882e5a2b24682fba53663ef9381b4"
+    }
+  },
+  "assetRequests": [
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png"
+  ],
+  "assetFailures": [],
+  "assetHttpFailures": [],
+  "pageErrors": [],
+  "isolation": {
+    "exactDevOnlyQuery": true,
+    "productionAssetsModified": false,
+    "mapCollisionSaveSchemaOrGameplayModified": false
+  },
+  "limitations": [
+    "Chromium emulation only; no native iOS or Android evidence.",
+    "This records movement state and layer/depth stability, not pixel-perfect occlusion quality or artistic approval.",
+    "The complete 12x10 game scene, exact candidate approval, and Gate 1 sign-off remain pending."
+  ]
+}
