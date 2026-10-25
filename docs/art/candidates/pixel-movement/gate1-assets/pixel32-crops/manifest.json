@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "id": "gate1-pixel32-sweet-radish-growth-stages",
+  "title": "甜蘿蔔 Pixel32 三階作物候選",
+  "assetKey": "crop.sweet-radish",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "以 generator 中原創整數像素圖元手工繪製；參考圖只供甜蘿蔔紅色塊根與綠葉特徵，不取樣、不縮放、不複製其像素。",
+    "generator": "tools/art/generate_gate1_crops.mjs",
+    "generatorSha256": "608958d3b347d3c948d5845c5eb0581a51e8669ba70f8e7a008397ebaf147741",
+    "reference": {
+      "file": "public/assets/crops/sweet-radish-2x.png",
+      "sha256": "e7cb6a3631de28f28cda03e9ced2725a1bf30c6f8634975e0a53964f47e8fbe7",
+      "role": "feature-reference-only; source pixels are not reused"
+    }
+  },
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "anchorConvention": "integer-pixel-index"
+  },
+  "atlas": {
+    "file": "sweet-radish-stages.png",
+    "width": 96,
+    "height": 32,
+    "colorType": "RGBA8888",
+    "sha256": "6fa85cde285fa70538f932f4ebeabcdcdb709ae2e65b43298ce232fcdb78ba40"
+  },
+  "palette": {
+    "rootOutline": "#702b3c",
+    "rootShadow": "#ac3449",
+    "rootMid": "#d94752",
+    "rootLight": "#f16a68",
+    "rootGlint": "#ff9a83",
+    "leafDeep": "#285b3e",
+    "leafShadow": "#347346",
+    "leafMid": "#4d9657",
+    "leafLight": "#79bd67",
+    "leafGlint": "#b3dc78",
+    "seedLight": "#f3bd83",
+    "seedShade": "#8a4a45"
+  },
+  "frames": {
+    "seed": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "seed",
+      "tags": [
+        "crop",
+        "sweet-radish",
+        "seed",
+        "candidate"
+      ],
+      "sha256": "ec1d77968ae959c1249d65b7880a0a9587f8991b03655ba6012b6eb342cffe5e"
+    },
+    "sprout": {
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "sprout",
+      "tags": [
+        "crop",
+        "sweet-radish",
+        "sprout",
+        "candidate"
+      ],
+      "sha256": "80180381dda78aeb99b901d173398cbc436d0e665a79cda75a2461ea2910ea18"
+    },
+    "mature": {
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "mature",
+      "tags": [
+        "crop",
+        "sweet-radish",
+        "mature",
+        "candidate"
+      ],
+      "sha256": "cad4faea12942ef8fbdefb2089f989731c5154b2e28e8baeabc8faca1df32734"
+    }
+  },
+  "limitations": [
+    "Candidate only: this exact version is not reviewed, approved, integrated, or registered in production assets.",
+    "The existing sweet-radish PNG is a feature reference only; candidate pixels are hand-authored in the bound generator.",
+    "The checker verifies structure and reproducibility, not visual quality, in-game readability, device display, or Gate 1 acceptance."
+  ]
+}

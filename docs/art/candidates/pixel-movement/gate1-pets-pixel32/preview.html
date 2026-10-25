@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pixel32 黑貓與矮袋鼠候選預覽</title>
+  <link rel="stylesheet" href="preview.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">GATE 1 · PIXEL32 PET CANDIDATES</p>
+      <h1>寵物方向與跳步候選</h1>
+      <p class="intro">原創黑貓與 quokka 四方向候選。已核准靜態圖只提供物種參考；本圖集仍未核准，也未接入遊戲。</p>
+    </header>
+    <section class="panel" aria-label="候選畫面控制">
+      <label>物種<select id="species"><option value="cat">黑貓</option><option value="quokka">矮袋鼠</option></select></label>
+      <label>朝向<select id="direction"><option value="down">面向前</option><option value="up">背向</option><option value="left">面向左</option><option value="right">面向右</option></select></label>
+      <label>姿勢<select id="pose"><option value="idle">站立</option><option value="hop-a">跳步 A</option><option value="hop-b">跳步 B</option><option value="land">落地</option></select></label>
+      <button id="play" type="button" aria-pressed="false">播放跳步</button>
+    </section>
+    <section class="preview-card" aria-label="像素寵物候選">
+      <div class="canvas-wrap"><canvas id="sprite" width="32" height="32" role="img" aria-label="寵物像素候選預覽"></canvas></div>
+      <div class="caption"><span class="badge">CANDIDATE · 未核准</span><p id="readout" aria-live="polite">讀取候選圖集…</p></div>
+    </section>
+    <details>
+      <summary>檢視兩隻寵物完整圖集</summary>
+      <img class="atlas" src="pets-pixel32.png" alt="黑貓與矮袋鼠四方向、四姿勢完整圖集">
+      <p>圖集原生 256×128 px；黑貓佔前四欄，矮袋鼠佔後四欄；每一列依序為下、上、左、右方向。畫格大小 32×32 px。</p>
+    </details>
+    <footer>最近鄰 2× 顯示 · 足錨／pivot (16,28) · 不接入正式 runtime · 無繼承核准</footer>
+  </main>
+  <script type="module" src="preview.js"></script>
+</body>
+</html>

@@ -1,0 +1,853 @@
+{
+  "schemaVersion": 2,
+  "title": "Dewhollow pixel32 black cat and quokka candidate animation atlas",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "hand-authored integer pixel primitives; approved static assets used only as species references",
+    "generator": "tools/art/generate_gate1_pets_pixel32.mjs",
+    "generatorSha256": "f1bc412078115d44811ce71f3bbac85f6f0eac68b5503a650049d7377f66952c"
+  },
+  "pixelContract": {
+    "frameWidth": 32,
+    "frameHeight": 32,
+    "columns": 8,
+    "rows": 4,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "displayScale": 2
+  },
+  "atlas": {
+    "file": "pets-pixel32.png",
+    "width": 256,
+    "height": 128,
+    "sha256": "720411831a56879143ff3f6dd6877b0f2138744c1e81e9aff9c669c259e442f3"
+  },
+  "species": [
+    "cat",
+    "quokka"
+  ],
+  "directions": [
+    "down",
+    "up",
+    "left",
+    "right"
+  ],
+  "poses": [
+    "idle",
+    "hop-a",
+    "hop-b",
+    "land"
+  ],
+  "frames": {
+    "cat-down-idle": {
+      "species": "cat",
+      "direction": "down",
+      "pose": "idle",
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "3ef717d9c2e1c78d20bfcd6f64c626bfc7f19de6a3d38a3eed1cc70e10e85d08"
+    },
+    "cat-down-hop-a": {
+      "species": "cat",
+      "direction": "down",
+      "pose": "hop-a",
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "9c5b47d97e9d1fac9b5ff2ebac06a4136bc2c21280e9b7b38278bc99a5231159"
+    },
+    "cat-down-hop-b": {
+      "species": "cat",
+      "direction": "down",
+      "pose": "hop-b",
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "ac8425dbf7e51ca0bafc69547063fc4a8e3eb04fb98a8b913b6afce145927dde"
+    },
+    "cat-down-land": {
+      "species": "cat",
+      "direction": "down",
+      "pose": "land",
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "1f44e5172d529c5b597ac2d134ff0928c0413b12cf5bf19db9e334b63b2eac77"
+    },
+    "quokka-down-idle": {
+      "species": "quokka",
+      "direction": "down",
+      "pose": "idle",
+      "x": 128,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "12d75669e228e4f24e1fc03a8c2cc3436894f3912bf0d2fe80f7c24145f7e138"
+    },
+    "quokka-down-hop-a": {
+      "species": "quokka",
+      "direction": "down",
+      "pose": "hop-a",
+      "x": 160,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "63871a75c001ff88853e19c9e25cf382e9b58b194df3c03570c3bd59efa19674"
+    },
+    "quokka-down-hop-b": {
+      "species": "quokka",
+      "direction": "down",
+      "pose": "hop-b",
+      "x": 192,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "e74b35e56d22bf179dfde56ba171119954f23679adfa4073cd219bd326ff4bdf"
+    },
+    "quokka-down-land": {
+      "species": "quokka",
+      "direction": "down",
+      "pose": "land",
+      "x": 224,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "4163e8ec050313c1907678bf3da307d011b1d795d510d18b17d3b775375a43b6"
+    },
+    "cat-up-idle": {
+      "species": "cat",
+      "direction": "up",
+      "pose": "idle",
+      "x": 0,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "db4caacd6aa8305cb9cf5c40936b7510127ed8bee0df6ce110c7d4223de89a7b"
+    },
+    "cat-up-hop-a": {
+      "species": "cat",
+      "direction": "up",
+      "pose": "hop-a",
+      "x": 32,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "ed1ba3064b43d6a50283a0f8ccb807bd8c4311fef4a0b925c721bd9b4a464a23"
+    },
+    "cat-up-hop-b": {
+      "species": "cat",
+      "direction": "up",
+      "pose": "hop-b",
+      "x": 64,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "cf2b2a922941c8245fb069dd989f4fbe417e6c16fe368563e1700ba12c72d436"
+    },
+    "cat-up-land": {
+      "species": "cat",
+      "direction": "up",
+      "pose": "land",
+      "x": 96,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "f172e5c63cd64976afb5235ace9f4c9879459320777b1017d10880e4e5fd3377"
+    },
+    "quokka-up-idle": {
+      "species": "quokka",
+      "direction": "up",
+      "pose": "idle",
+      "x": 128,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "84b14257f9ae44d745aa96284d2109122fa8d36dbd06abd89b87d7b714e1255e"
+    },
+    "quokka-up-hop-a": {
+      "species": "quokka",
+      "direction": "up",
+      "pose": "hop-a",
+      "x": 160,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "64a6ce9e83e9fe29c358b7af1f087c6ece5828236327cb98f49d524234346eb8"
+    },
+    "quokka-up-hop-b": {
+      "species": "quokka",
+      "direction": "up",
+      "pose": "hop-b",
+      "x": 192,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "b11a19870e923a7cda03fa30ecbaf98df95e363d7ba6d6e0e5229d9cfe4b5a41"
+    },
+    "quokka-up-land": {
+      "species": "quokka",
+      "direction": "up",
+      "pose": "land",
+      "x": 224,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "5f5773f89502a072db1b9665fd9ac0a8bdcf1b288dde8462a23d327d1187d91c"
+    },
+    "cat-left-idle": {
+      "species": "cat",
+      "direction": "left",
+      "pose": "idle",
+      "x": 0,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "40b1f262135a4caa988999c3b1f6706ab079439df79057512e882c158492cd95"
+    },
+    "cat-left-hop-a": {
+      "species": "cat",
+      "direction": "left",
+      "pose": "hop-a",
+      "x": 32,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "29c2d6ed4f1b7bf4f78ad19f238028c5a93971560d3ab03ed96d8c5a94e13f28"
+    },
+    "cat-left-hop-b": {
+      "species": "cat",
+      "direction": "left",
+      "pose": "hop-b",
+      "x": 64,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "595a4fda2d7d997d58117ee046fc21a6b4ff4ea04872c9dc9734e61d943a5763"
+    },
+    "cat-left-land": {
+      "species": "cat",
+      "direction": "left",
+      "pose": "land",
+      "x": 96,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "9cd80c9530f0fccc2629e6b51d4acffde345910f3eefe3a9b0695ee5a2e32efc"
+    },
+    "quokka-left-idle": {
+      "species": "quokka",
+      "direction": "left",
+      "pose": "idle",
+      "x": 128,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "1cf868c859f656315382419bf81b6af27cde5984656ccb550533ceba9e19d8f7"
+    },
+    "quokka-left-hop-a": {
+      "species": "quokka",
+      "direction": "left",
+      "pose": "hop-a",
+      "x": 160,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "352608b6b31cb5f42b9a8b1d76736ae6f9288a2121f7b217cf9586ea4923c8b3"
+    },
+    "quokka-left-hop-b": {
+      "species": "quokka",
+      "direction": "left",
+      "pose": "hop-b",
+      "x": 192,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "879968384cdf4f0d9596f69937c396f63c24d64d8e87f7c354d219dc49d8a17a"
+    },
+    "quokka-left-land": {
+      "species": "quokka",
+      "direction": "left",
+      "pose": "land",
+      "x": 224,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "ec459dd5afc16670d2a647c6570df3949473678c91fd2e57a690ac2f1b5034ac"
+    },
+    "cat-right-idle": {
+      "species": "cat",
+      "direction": "right",
+      "pose": "idle",
+      "x": 0,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "8fd1680c7d418a99aa885f712d21b8da2a827c935c081b240080acfed5c6a30e"
+    },
+    "cat-right-hop-a": {
+      "species": "cat",
+      "direction": "right",
+      "pose": "hop-a",
+      "x": 32,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "a04f5ae38c14b83ac16ff5cb3c10f4173d2064977493f3d6c5ce5a2f484138af"
+    },
+    "cat-right-hop-b": {
+      "species": "cat",
+      "direction": "right",
+      "pose": "hop-b",
+      "x": 64,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "56943e5781298596391a24d61feb787295f30e6c4e5d11d130a1cfb870c0e941"
+    },
+    "cat-right-land": {
+      "species": "cat",
+      "direction": "right",
+      "pose": "land",
+      "x": 96,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "161fab74dce65feee83f0aa8c79297b2bdec98388f1a9b52c0721b6c3f795c93"
+    },
+    "quokka-right-idle": {
+      "species": "quokka",
+      "direction": "right",
+      "pose": "idle",
+      "x": 128,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "f78253ea3d58a95d8aa8334794ae511452748e821c59177581a1c5d31fe2bfc5"
+    },
+    "quokka-right-hop-a": {
+      "species": "quokka",
+      "direction": "right",
+      "pose": "hop-a",
+      "x": 160,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "4e0085404fbc12594275caa8e5607e9158ec21c6c4e2a46dafae81481f45bc29"
+    },
+    "quokka-right-hop-b": {
+      "species": "quokka",
+      "direction": "right",
+      "pose": "hop-b",
+      "x": 192,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "b2681c13a6ff02c092a6437ecf60cd77b4d8a7b93b664bb16844695fed26478d"
+    },
+    "quokka-right-land": {
+      "species": "quokka",
+      "direction": "right",
+      "pose": "land",
+      "x": 224,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 28
+      },
+      "pivot": {
+        "x": 16,
+        "y": 28
+      },
+      "sha256": "d1eb8c2e67c3fc0fd43854bf517d55e3246d58517a3755741417a52bebe8cd64"
+    }
+  },
+  "animations": {
+    "cat": {
+      "down": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "cat-down-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "cat-down-hop-a",
+            "cat-down-hop-b",
+            "cat-down-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "up": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "cat-up-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "cat-up-hop-a",
+            "cat-up-hop-b",
+            "cat-up-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "left": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "cat-left-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "cat-left-hop-a",
+            "cat-left-hop-b",
+            "cat-left-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "right": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "cat-right-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "cat-right-hop-a",
+            "cat-right-hop-b",
+            "cat-right-land"
+          ],
+          "returnTo": "idle"
+        }
+      }
+    },
+    "quokka": {
+      "down": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "quokka-down-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "quokka-down-hop-a",
+            "quokka-down-hop-b",
+            "quokka-down-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "up": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "quokka-up-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "quokka-up-hop-a",
+            "quokka-up-hop-b",
+            "quokka-up-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "left": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "quokka-left-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "quokka-left-hop-a",
+            "quokka-left-hop-b",
+            "quokka-left-land"
+          ],
+          "returnTo": "idle"
+        }
+      },
+      "right": {
+        "idle": {
+          "loop": true,
+          "frames": [
+            "quokka-right-idle"
+          ]
+        },
+        "hop": {
+          "loop": false,
+          "frameDurationMs": 130,
+          "frames": [
+            "quokka-right-hop-a",
+            "quokka-right-hop-b",
+            "quokka-right-land"
+          ],
+          "returnTo": "idle"
+        }
+      }
+    }
+  },
+  "referenceAssets": {
+    "cat": {
+      "file": "public/assets/characters/cat-2x.png",
+      "purpose": "species traits only; new directions and animation are not approved",
+      "sha256": "e128d8295d4d1fc8cf3ff52dc70d176b3b0ea8b6087a6f350b6feeef4c8468e5"
+    },
+    "quokka": {
+      "file": "public/assets/characters/marsupial-2x.png",
+      "purpose": "species traits only; new directions and animation are not approved",
+      "sha256": "614fc13c48dab042962c7dc39f2353890d5f038e04076205a99cad27aed822d7"
+    }
+  },
+  "limitations": [
+    "Candidate-only original pixel art; not approved or registered as production assets.",
+    "Approved static reference images inform species traits only; no approval transfers to these frames, directions, poses, or atlas.",
+    "Generated poses are mechanical review samples and require human identity, anatomy, foot-anchor, and rendered-size review.",
+    "This isolated preview has no game runtime or companion-follow integration."
+  ]
+}

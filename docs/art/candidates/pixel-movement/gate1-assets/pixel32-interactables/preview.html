@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Pixel32 互動物件候選預覽</title>
+    <link rel="stylesheet" href="preview.css" />
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <p class="eyebrow">GATE 1 · CANDIDATE ONLY</p>
+        <h1>農具、門與船運箱</h1>
+        <p>32 × 32 原生像素候選，最近鄰放大。畫面只供美術檢視，不會改變遊戲規則或正式素材。</p>
+        <div class="status"><span aria-hidden="true"></span> candidate · approved=false</div>
+      </header>
+      <section class="controls" aria-label="預覽選項">
+        <label><input id="show-anchor" type="checkbox" checked /> 顯示錨點</label>
+        <label><input id="show-grip" type="checkbox" checked /> 顯示工具握點</label>
+        <p>工具握點標記只作位置參考；這不是揮動動畫，也不代表工具已整合。</p>
+      </section>
+      <section id="candidate-grid" class="candidate-grid" aria-live="polite" aria-busy="true">
+        <p class="loading">載入候選圖集…</p>
+      </section>
+      <footer>
+        <p>工具以正式原創工具圖作視覺參考；門與船運箱分別展示開／關狀態。候選圖像與正式地圖、碰撞、運輸、背包、存檔及工具動畫完全分離。</p>
+        <p id="integrity" class="integrity"></p>
+      </footer>
+    </main>
+    <script type="module" src="preview.js"></script>
+  </body>
+</html>
