@@ -46,3 +46,17 @@
 - [x] 2. 新增 DEV-only opt-in，在同一 MapScene 使用 pixel32 地圖與玩家四向候選動畫；缺少覆蓋時回退正式素材。
 - [x] 3. 新增 E2E 驗證 farm MapScene 地圖／移動／農務行為、候選素材狀態與 production 隔離。
 - [x] Checkpoint：`npm run check`、完整 `npm run test:e2e`、瀏覽器截圖目視與 AIPS Impact reconciliation 均通過，再 commit、PR、merge。
+
+---
+
+# DF-G1-MOTION-EVIDENCE pixel32 候選連續移動與碰撞證據
+
+- [x] 驗證西側牆碰撞與停留穩定性。
+- [x] 驗證四向各至少 1.25 秒持續輸入及方向動畫幀，總按住時間至少 5 秒。
+- [x] 保存四向按住影格、牆前／收尾截圖、量測和 hash，並完成目視檢視。
+- [x] 專項 E2E 通過；完整 Playwright E2E 228/228 通過。
+- [x] 資產檢查、TypeScript、單元測試（1,614 passed／1 skipped）、build 與 8 MB 預算通過；單元測試採 4 workers。
+- [ ] Impact reconciliation、commit、push、PR、Required Checks 和 merge。
+- [ ] 下一切片完成 Gate 1 的 runtime 場景覆蓋與遮擋／作物／夥伴驗證；未核准素材不得正式整合，實機維持 `DEVICE_PENDING`。
+
+詳見 [pixel32 候選連續移動與碰撞證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-motion-evidence.zh-TW.md)。
