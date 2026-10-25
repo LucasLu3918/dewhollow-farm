@@ -1,0 +1,2998 @@
+{
+  "scope": "Chromium candidate comparison only; partial asset coverage, not a complete art A/B or Gate 1 approval",
+  "viewport": {
+    "width": 1280,
+    "height": 900,
+    "deviceScaleFactor": 1
+  },
+  "fixture": {
+    "schemaVersion": 13,
+    "mapId": "farm",
+    "player": {
+      "x": 5,
+      "y": 5
+    },
+    "savedAt": "2026-10-26T00:00:00.000Z"
+  },
+  "fixtureSha256": "a9e55671b137357a4bb65717cc6c95a39c797856864baaf8084c2da4f7b5c8a2",
+  "captures": [
+    {
+      "profile": "pixel16",
+      "candidate": "8bit",
+      "diagnostics": {
+        "mapId": "farm",
+        "candidateArt": {
+          "profile": "pixel16",
+          "candidate": "8bit",
+          "candidateAssetIds": [
+            "tile.grass",
+            "tile.field",
+            "tile.path",
+            "tile.wall",
+            "crop.sweet-radish",
+            "tile.tree",
+            "tile.fence"
+          ],
+          "fallbackAssetIds": [
+            "tile.bed",
+            "tile.shipbox",
+            "tile.door",
+            "tile.soil",
+            "crop.moon-bean",
+            "crop.star-pepper",
+            "crop.golden-rice",
+            "crop.bell-pumpkin",
+            "crop.maple-berry",
+            "crop.snow-radish",
+            "crop.frost-mushroom",
+            "crop.ember-onion",
+            "player.up",
+            "player.down",
+            "player.left",
+            "player.right",
+            "npc.maomao",
+            "npc.rong-bo",
+            "npc.a-gan",
+            "npc.shi-shifu",
+            "npc.zhi-lan",
+            "npc.xiao-sui",
+            "crop.dew-grass",
+            "crop.dusk-potato",
+            "crop.silver-wheat",
+            "pet.cat",
+            "pet.marsupial",
+            "tool.hoe",
+            "tool.can",
+            "tool.seedbag",
+            "tile.water",
+            "tile.floor",
+            "tile.furniture",
+            "tile.cave",
+            "tile.rock",
+            "tool.axe",
+            "tile.shop",
+            "tile.forage",
+            "tool.pick",
+            "tile.ore",
+            "tile.stairs",
+            "tool.rod",
+            "tile.trough",
+            "tile.kitchen",
+            "tile.workshop",
+            "tile.workbench",
+            "tile.tuft",
+            "tool.sickle",
+            "animal.cow",
+            "item.milk",
+            "item.cheese",
+            "item.butter",
+            "animal.sheep",
+            "item.wool",
+            "item.cloth",
+            "pwa.icon-192",
+            "pwa.icon-512",
+            "pwa.icon-maskable-512"
+          ],
+          "registeredFrames": [
+            "grass",
+            "tilled",
+            "road",
+            "tree",
+            "cropSeed",
+            "cropSprout",
+            "cropMature",
+            "houseEdge",
+            "fence",
+            "playerIdle",
+            "playerWalk",
+            "cat",
+            "quokka",
+            "tool",
+            "shadow"
+          ]
+        },
+        "pixel32Runtime": {
+          "enabled": false,
+          "mapFrames": [],
+          "animationFrames": [],
+          "playerFrame": null,
+          "playerVisible": false
+        },
+        "overlays": {
+          "enabled": false,
+          "overlays": []
+        },
+        "viewport": {
+          "profile": "pixel16",
+          "worldTilesVisible": {
+            "width": 17,
+            "height": 13
+          },
+          "renderResolution": {
+            "width": 272,
+            "height": 208
+          },
+          "cssScale": 2.965519831730769,
+          "devicePixelScale": 2.965519831730769,
+          "actualWorldTilesVisible": {
+            "width": 17,
+            "height": 13
+          },
+          "actualCanvasResolution": {
+            "width": 272,
+            "height": 208
+          },
+          "cameraZoom": 0.25
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "width": 1088,
+          "height": 832,
+          "zoom": 0.25,
+          "bounds": {
+            "type": 5,
+            "x": 0,
+            "y": 0,
+            "width": 2560,
+            "height": 1920
+          }
+        },
+        "canvasCss": {
+          "width": 820.4375,
+          "height": 614.828125
+        },
+        "spriteSources": [
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "cropMature",
+            "source": "candidate",
+            "count": 1
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "cropSeed",
+            "source": "candidate",
+            "count": 1
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "cropSprout",
+            "source": "candidate",
+            "count": 1
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "fence",
+            "source": "candidate",
+            "count": 21
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "grass",
+            "source": "candidate",
+            "count": 953
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "houseEdge",
+            "source": "candidate",
+            "count": 154
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "road",
+            "source": "candidate",
+            "count": 19
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "tilled",
+            "source": "candidate",
+            "count": 74
+          },
+          {
+            "key": "pet.cat",
+            "frame": null,
+            "source": "existing",
+            "count": 1
+          },
+          {
+            "key": "player.down",
+            "frame": null,
+            "source": "existing",
+            "count": 1
+          },
+          {
+            "key": "tile.door",
+            "frame": "__BASE",
+            "source": "existing",
+            "count": 7
+          },
+          {
+            "key": "tile.shipbox",
+            "frame": "__BASE",
+            "source": "existing",
+            "count": 1
+          },
+          {
+            "key": "tile.soil",
+            "frame": "__BASE",
+            "source": "existing",
+            "count": 3
+          }
+        ],
+        "candidateSprites": [
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "houseEdge",
+            "source": "candidate",
+            "count": 154
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "grass",
+            "source": "candidate",
+            "count": 953
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "tilled",
+            "source": "candidate",
+            "count": 74
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "road",
+            "source": "candidate",
+            "count": 19
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "fence",
+            "source": "candidate",
+            "count": 21
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "cropSeed",
+            "source": "candidate",
+            "count": 1
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "cropSprout",
+            "source": "candidate",
+            "count": 1
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "cropMature",
+            "source": "candidate",
+            "count": 1
+          }
+        ],
+        "cropFrames": [
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "cropSeed"
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "cropSprout"
+          },
+          {
+            "key": "gate1-candidate-atlas",
+            "frame": "cropMature"
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/8bit.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/manifest.json"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshotPath": "docs/art/candidates/pixel-movement/gate1-mapscene-pixel16-pixel32-scene-comparison/screenshots/pixel16-game.png",
+      "screenshotSha256": "c30e01bd0c4eb566cfb21ecf073ce7e2b9a243d759700043e79888228b5a6697"
+    },
+    {
+      "profile": "pixel32",
+      "candidate": "16bit",
+      "diagnostics": {
+        "mapId": "farm",
+        "candidateArt": {
+          "profile": "pixel32",
+          "candidate": null,
+          "candidateAssetIds": [],
+          "fallbackAssetIds": [
+            "tile.grass",
+            "tile.field",
+            "tile.path",
+            "tile.wall",
+            "tile.bed",
+            "tile.shipbox",
+            "tile.door",
+            "tile.soil",
+            "crop.sweet-radish",
+            "crop.moon-bean",
+            "crop.star-pepper",
+            "crop.golden-rice",
+            "crop.bell-pumpkin",
+            "crop.maple-berry",
+            "crop.snow-radish",
+            "crop.frost-mushroom",
+            "crop.ember-onion",
+            "player.up",
+            "player.down",
+            "player.left",
+            "player.right",
+            "npc.maomao",
+            "npc.rong-bo",
+            "npc.a-gan",
+            "npc.shi-shifu",
+            "npc.zhi-lan",
+            "npc.xiao-sui",
+            "crop.dew-grass",
+            "crop.dusk-potato",
+            "crop.silver-wheat",
+            "pet.cat",
+            "pet.marsupial",
+            "tool.hoe",
+            "tool.can",
+            "tool.seedbag",
+            "tile.tree",
+            "tile.water",
+            "tile.floor",
+            "tile.furniture",
+            "tile.cave",
+            "tile.rock",
+            "tool.axe",
+            "tile.shop",
+            "tile.forage",
+            "tool.pick",
+            "tile.ore",
+            "tile.stairs",
+            "tool.rod",
+            "tile.trough",
+            "tile.kitchen",
+            "tile.workshop",
+            "tile.workbench",
+            "tile.tuft",
+            "tool.sickle",
+            "tile.fence",
+            "animal.cow",
+            "item.milk",
+            "item.cheese",
+            "item.butter",
+            "animal.sheep",
+            "item.wool",
+            "item.cloth",
+            "pwa.icon-192",
+            "pwa.icon-512",
+            "pwa.icon-maskable-512"
+          ],
+          "registeredFrames": []
+        },
+        "pixel32Runtime": {
+          "enabled": true,
+          "mapFrames": [
+            "spring-grass",
+            "spring-field",
+            "spring-path",
+            "spring-water",
+            "spring-field-edge-0",
+            "spring-field-edge-1",
+            "spring-field-edge-2",
+            "spring-field-edge-3",
+            "spring-field-edge-4",
+            "spring-field-edge-5",
+            "spring-field-edge-6",
+            "spring-field-edge-7",
+            "spring-field-edge-8",
+            "spring-field-edge-9",
+            "spring-field-edge-a",
+            "spring-field-edge-b",
+            "spring-field-edge-c",
+            "spring-field-edge-d",
+            "spring-field-edge-e",
+            "spring-field-edge-f",
+            "summer-grass",
+            "summer-field",
+            "summer-path",
+            "summer-water",
+            "summer-field-edge-0",
+            "summer-field-edge-1",
+            "summer-field-edge-2",
+            "summer-field-edge-3",
+            "summer-field-edge-4",
+            "summer-field-edge-5",
+            "summer-field-edge-6",
+            "summer-field-edge-7",
+            "summer-field-edge-8",
+            "summer-field-edge-9",
+            "summer-field-edge-a",
+            "summer-field-edge-b",
+            "summer-field-edge-c",
+            "summer-field-edge-d",
+            "summer-field-edge-e",
+            "summer-field-edge-f",
+            "autumn-grass",
+            "autumn-field",
+            "autumn-path",
+            "autumn-water",
+            "autumn-field-edge-0",
+            "autumn-field-edge-1",
+            "autumn-field-edge-2",
+            "autumn-field-edge-3",
+            "autumn-field-edge-4",
+            "autumn-field-edge-5",
+            "autumn-field-edge-6",
+            "autumn-field-edge-7",
+            "autumn-field-edge-8",
+            "autumn-field-edge-9",
+            "autumn-field-edge-a",
+            "autumn-field-edge-b",
+            "autumn-field-edge-c",
+            "autumn-field-edge-d",
+            "autumn-field-edge-e",
+            "autumn-field-edge-f",
+            "winter-grass",
+            "winter-field",
+            "winter-path",
+            "winter-water",
+            "winter-field-edge-0",
+            "winter-field-edge-1",
+            "winter-field-edge-2",
+            "winter-field-edge-3",
+            "winter-field-edge-4",
+            "winter-field-edge-5",
+            "winter-field-edge-6",
+            "winter-field-edge-7",
+            "winter-field-edge-8",
+            "winter-field-edge-9",
+            "winter-field-edge-a",
+            "winter-field-edge-b",
+            "winter-field-edge-c",
+            "winter-field-edge-d",
+            "winter-field-edge-e",
+            "winter-field-edge-f",
+            "house-back",
+            "house-front",
+            "tree-canopy"
+          ],
+          "animationFrames": [
+            "down-idle",
+            "down-contact-a",
+            "down-passing",
+            "down-contact-b",
+            "up-idle",
+            "up-contact-a",
+            "up-passing",
+            "up-contact-b",
+            "left-idle",
+            "left-contact-a",
+            "left-passing",
+            "left-contact-b",
+            "right-idle",
+            "right-contact-a",
+            "right-passing",
+            "right-contact-b"
+          ],
+          "playerFrame": "down-idle",
+          "playerVisible": true
+        },
+        "overlays": {
+          "enabled": true,
+          "overlays": [
+            {
+              "id": "house-back",
+              "frame": "house-back",
+              "layer": "back",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 1,
+              "displayList": "world",
+              "visible": true
+            },
+            {
+              "id": "tree-canopy",
+              "frame": "tree-canopy",
+              "layer": "front",
+              "tileX": 8,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            },
+            {
+              "id": "house-front",
+              "frame": "house-front",
+              "layer": "front",
+              "tileX": 3,
+              "tileY": 3,
+              "depth": 15.001999999999999,
+              "displayList": "scene",
+              "visible": true
+            }
+          ]
+        },
+        "viewport": {
+          "profile": "pixel32",
+          "worldTilesVisible": {
+            "width": 17,
+            "height": 13
+          },
+          "renderResolution": {
+            "width": 544,
+            "height": 416
+          },
+          "cssScale": 1.4827599158653846,
+          "devicePixelScale": 1.4827599158653846,
+          "actualWorldTilesVisible": {
+            "width": 17,
+            "height": 13
+          },
+          "actualCanvasResolution": {
+            "width": 544,
+            "height": 416
+          },
+          "cameraZoom": 0.5
+        },
+        "camera": {
+          "x": 0,
+          "y": 0,
+          "width": 1088,
+          "height": 832,
+          "zoom": 0.5,
+          "bounds": {
+            "type": 5,
+            "x": 0,
+            "y": 0,
+            "width": 2560,
+            "height": 1920
+          }
+        },
+        "canvasCss": {
+          "width": 820.4375,
+          "height": 614.828125
+        },
+        "spriteSources": [
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "house-back",
+            "source": "candidate",
+            "count": 1
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-0",
+            "source": "candidate",
+            "count": 17
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-1",
+            "source": "candidate",
+            "count": 14
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-2",
+            "source": "candidate",
+            "count": 5
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-3",
+            "source": "candidate",
+            "count": 5
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-4",
+            "source": "candidate",
+            "count": 15
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-6",
+            "source": "candidate",
+            "count": 4
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-8",
+            "source": "candidate",
+            "count": 5
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-9",
+            "source": "candidate",
+            "count": 5
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-c",
+            "source": "candidate",
+            "count": 4
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-grass",
+            "source": "candidate",
+            "count": 953
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-path",
+            "source": "candidate",
+            "count": 19
+          },
+          {
+            "key": "crop.sweet-radish",
+            "frame": "__BASE",
+            "source": "existing",
+            "count": 3
+          },
+          {
+            "key": "pet.cat",
+            "frame": null,
+            "source": "existing",
+            "count": 1
+          },
+          {
+            "key": "player.down",
+            "frame": null,
+            "source": "existing",
+            "count": 1
+          },
+          {
+            "key": "tile.door",
+            "frame": "__BASE",
+            "source": "existing",
+            "count": 7
+          },
+          {
+            "key": "tile.fence",
+            "frame": "__BASE",
+            "source": "existing",
+            "count": 21
+          },
+          {
+            "key": "tile.shipbox",
+            "frame": "__BASE",
+            "source": "existing",
+            "count": 1
+          },
+          {
+            "key": "tile.soil",
+            "frame": "__BASE",
+            "source": "existing",
+            "count": 3
+          },
+          {
+            "key": "tile.wall",
+            "frame": "__BASE",
+            "source": "existing",
+            "count": 154
+          }
+        ],
+        "candidateSprites": [
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-grass",
+            "source": "candidate",
+            "count": 953
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-9",
+            "source": "candidate",
+            "count": 5
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-1",
+            "source": "candidate",
+            "count": 14
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-3",
+            "source": "candidate",
+            "count": 5
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-8",
+            "source": "candidate",
+            "count": 5
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-0",
+            "source": "candidate",
+            "count": 17
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-2",
+            "source": "candidate",
+            "count": 5
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-c",
+            "source": "candidate",
+            "count": 4
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-4",
+            "source": "candidate",
+            "count": 15
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-field-edge-6",
+            "source": "candidate",
+            "count": 4
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "spring-path",
+            "source": "candidate",
+            "count": 19
+          },
+          {
+            "key": "gate1-pixel32-map-atlas",
+            "frame": "house-back",
+            "source": "candidate",
+            "count": 1
+          }
+        ],
+        "cropFrames": [
+          {
+            "key": "crop.sweet-radish",
+            "frame": "__BASE"
+          },
+          {
+            "key": "crop.sweet-radish",
+            "frame": "__BASE"
+          },
+          {
+            "key": "crop.sweet-radish",
+            "frame": "__BASE"
+          }
+        ]
+      },
+      "candidateRequests": [
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+        "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png"
+      ],
+      "candidateFailures": [],
+      "candidateHttpFailures": [],
+      "pageErrors": [],
+      "screenshotPath": "docs/art/candidates/pixel-movement/gate1-mapscene-pixel16-pixel32-scene-comparison/screenshots/pixel32-game.png",
+      "screenshotSha256": "6d10da28aca1cc1078a3b96e9abe23457db23de0cd41ca60761d8b2686b453e4"
+    }
+  ],
+  "inputSha256": {
+    "docs/art/candidates/pixel-movement/gate1-assets/manifest.json": "f6482218bc83d3de53e0c75d3877824fc04b04e666bd731cc9db43cbdc3f32b7",
+    "docs/art/candidates/pixel-movement/gate1-assets/8bit.png": "c577db439d5b485af70cf1c5e6bd18d9507b3e8ac378bcedd5971b578ae89975",
+    "docs/art/candidates/pixel-movement/gate1-assets/16bit.png": "26999d1a77433112b5f2e6993ce69ac774aef9a41cb6f7c90cadf17bca9d584b",
+    "docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+    "docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+    "docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json": "ebeb2be797d5e6b16d643aeb8a2e7d8b090fc427099d892957b94f2f626692f8",
+    "docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3"
+  },
+  "candidateStatus": {
+    "profileAtlas": {
+      "status": "candidate",
+      "approved": false,
+      "candidates": [
+        {
+          "id": "8bit",
+          "status": "candidate",
+          "approved": false
+        },
+        {
+          "id": "16bit",
+          "status": "candidate",
+          "approved": false
+        }
+      ]
+    },
+    "pixel32Map": {
+      "schemaVersion": 1,
+      "title": "Dewhollow pixel32 map and tileset candidate",
+      "status": "candidate",
+      "approved": false,
+      "source": {
+        "method": "hand-authored integer pixel primitives; fixed stored-DEFLATE PNG encoding",
+        "generator": "tools/art/generate_gate1_map.mjs",
+        "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+      },
+      "pixelContract": {
+        "nativeTileSize": 32,
+        "worldTileSize": 64,
+        "displayScale": 2,
+        "sampling": "nearest-neighbor",
+        "origin": "top-left",
+        "rectConvention": "half-open",
+        "anchorConvention": "integer-pixel-index"
+      },
+      "atlas": {
+        "file": "map-atlas.png",
+        "width": 512,
+        "height": 512,
+        "sha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184"
+      },
+      "seasons": [
+        "spring",
+        "summer",
+        "autumn",
+        "winter"
+      ],
+      "autotile": {
+        "surface": "field",
+        "edgeSurface": "grass",
+        "maskBits": {
+          "north": 1,
+          "east": 2,
+          "south": 4,
+          "west": 8
+        },
+        "variantsPerSeason": 16
+      },
+      "frames": {
+        "spring-grass": {
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field": {
+          "x": 32,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-path": {
+          "x": 64,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-water": {
+          "x": 96,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-0": {
+          "x": 128,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-1": {
+          "x": 160,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-2": {
+          "x": 192,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-3": {
+          "x": 224,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-4": {
+          "x": 256,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-5": {
+          "x": 288,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-6": {
+          "x": 320,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-7": {
+          "x": 352,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-8": {
+          "x": 384,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-9": {
+          "x": 416,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-a": {
+          "x": 448,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-b": {
+          "x": 480,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-c": {
+          "x": 0,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-d": {
+          "x": 32,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-e": {
+          "x": 64,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-f": {
+          "x": 96,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-grass": {
+          "x": 128,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field": {
+          "x": 160,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-path": {
+          "x": 192,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-water": {
+          "x": 224,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-0": {
+          "x": 256,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-1": {
+          "x": 288,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-2": {
+          "x": 320,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-3": {
+          "x": 352,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-4": {
+          "x": 384,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-5": {
+          "x": 416,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-6": {
+          "x": 448,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-7": {
+          "x": 480,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-8": {
+          "x": 0,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-9": {
+          "x": 32,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-a": {
+          "x": 64,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-b": {
+          "x": 96,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-c": {
+          "x": 128,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-d": {
+          "x": 160,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-e": {
+          "x": 192,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-f": {
+          "x": 224,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-grass": {
+          "x": 256,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field": {
+          "x": 288,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-path": {
+          "x": 320,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-water": {
+          "x": 352,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-0": {
+          "x": 384,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-1": {
+          "x": 416,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-2": {
+          "x": 448,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-3": {
+          "x": 480,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-4": {
+          "x": 0,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-5": {
+          "x": 32,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-6": {
+          "x": 64,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-7": {
+          "x": 96,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-8": {
+          "x": 128,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-9": {
+          "x": 160,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-a": {
+          "x": 192,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-b": {
+          "x": 224,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-c": {
+          "x": 256,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-d": {
+          "x": 288,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-e": {
+          "x": 320,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-f": {
+          "x": 352,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-grass": {
+          "x": 384,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field": {
+          "x": 416,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-path": {
+          "x": 448,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-water": {
+          "x": 480,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-0": {
+          "x": 0,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-1": {
+          "x": 32,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-2": {
+          "x": 64,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-3": {
+          "x": 96,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-4": {
+          "x": 128,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-5": {
+          "x": 160,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-6": {
+          "x": 192,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-7": {
+          "x": 224,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-8": {
+          "x": 256,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-9": {
+          "x": 288,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-a": {
+          "x": 320,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-b": {
+          "x": 352,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-c": {
+          "x": 384,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-d": {
+          "x": 416,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-e": {
+          "x": 448,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-f": {
+          "x": 480,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "house-back": {
+          "x": 0,
+          "y": 192,
+          "width": 96,
+          "height": 64,
+          "nativeWidth": 96,
+          "nativeHeight": 64,
+          "kind": "building",
+          "widthTiles": 3,
+          "heightTiles": 2,
+          "footAnchor": {
+            "x": 48,
+            "y": 64
+          },
+          "pivot": {
+            "x": 48,
+            "y": 64
+          },
+          "layer": "back",
+          "approved": false
+        },
+        "house-front": {
+          "x": 0,
+          "y": 256,
+          "width": 96,
+          "height": 64,
+          "nativeWidth": 96,
+          "nativeHeight": 64,
+          "kind": "occlusion",
+          "widthTiles": 3,
+          "heightTiles": 2,
+          "footAnchor": {
+            "x": 48,
+            "y": 64
+          },
+          "pivot": {
+            "x": 48,
+            "y": 64
+          },
+          "layer": "front",
+          "approved": false
+        },
+        "tree-canopy": {
+          "x": 96,
+          "y": 192,
+          "width": 64,
+          "height": 64,
+          "nativeWidth": 64,
+          "nativeHeight": 64,
+          "kind": "occlusion",
+          "widthTiles": 2,
+          "heightTiles": 2,
+          "footAnchor": {
+            "x": 32,
+            "y": 64
+          },
+          "pivot": {
+            "x": 32,
+            "y": 64
+          },
+          "layer": "front",
+          "approved": false
+        }
+      },
+      "limitations": [
+        "Candidate preview only; not approved or registered as production assets.",
+        "Seasonal variants and autotile masks are hand-authored visual studies, not production game map rules.",
+        "Building and canopy demonstrate layer ordering and do not alter collision or map data.",
+        "Final colors, tile readability, seamless edges, building silhouette, and mobile readability require Gate 1 human review."
+      ]
+    },
+    "pixel32Animation": {
+      "schemaVersion": 1,
+      "title": "Dewhollow pixel32 four-direction animation candidate",
+      "status": "candidate",
+      "approved": false,
+      "source": {
+        "method": "hand-authored integer pixel primitives",
+        "generator": "tools/art/generate_gate1_animation.mjs",
+        "generatorSha256": "782937ffe90056e891a6cf7b4bd9492b86fda385603689dca91e7c9adb4c6fa6"
+      },
+      "pixelContract": {
+        "frameWidth": 32,
+        "frameHeight": 48,
+        "columns": 4,
+        "rows": 4,
+        "sampling": "nearest-neighbor",
+        "origin": "top-left",
+        "rectConvention": "half-open"
+      },
+      "atlas": {
+        "file": "player-4dir.png",
+        "width": 128,
+        "height": 192,
+        "sha256": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3"
+      },
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "frames": {
+        "down-idle": {
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "idle",
+          "sha256": "9827757cf610a6bc51abcf9bf5550160b604af51ec9c4b1d240c9988f2760877"
+        },
+        "down-contact-a": {
+          "x": 32,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "contact-a",
+          "sha256": "fa28309b2cdc0895d12f9ebedcbac6773ed7550554a0bdd7d5698982997f727b"
+        },
+        "down-passing": {
+          "x": 64,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "passing",
+          "sha256": "dcda77bc1ffb96e3e58bd7d0efb1d89a88570cd46e2fd32ac8eea9fcc0e85b77"
+        },
+        "down-contact-b": {
+          "x": 96,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "contact-b",
+          "sha256": "a7a3ed6773bcc782b6333d0e044244d5ea2f134e1c44f454763e5137ecddab38"
+        },
+        "up-idle": {
+          "x": 0,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "idle",
+          "sha256": "53941b3a686e237e2439dd518eacaca7e6d58db0bd7d33c7213af3dd3d9dd366"
+        },
+        "up-contact-a": {
+          "x": 32,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "contact-a",
+          "sha256": "9bec4cf731ce6bb13c2b570312825e0a0ace64115f1b10941393404cb44e121c"
+        },
+        "up-passing": {
+          "x": 64,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "passing",
+          "sha256": "442b4244e5103a3a981777ce5e4fe0c4d9face517998147f6deb6e991f6b6a18"
+        },
+        "up-contact-b": {
+          "x": 96,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "contact-b",
+          "sha256": "6689c4c2da9b83508c137d71dcef2ebd0cc6a3fcb38025765168442ee19bd5de"
+        },
+        "left-idle": {
+          "x": 0,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "idle",
+          "sha256": "9236bb6be4ab78f8bab864755980b6a9ef818c5b45f1a777c38c2df6cec5aa4d"
+        },
+        "left-contact-a": {
+          "x": 32,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "contact-a",
+          "sha256": "e20fdb180ce4174ec55ebf4535b207872592b61230b228f7d1d4c21491d68e2d"
+        },
+        "left-passing": {
+          "x": 64,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "passing",
+          "sha256": "aba31192c949e059dda6aa75cecec7d4080e0776248783c89a334c652040d976"
+        },
+        "left-contact-b": {
+          "x": 96,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "contact-b",
+          "sha256": "2f1d9f2ab7706b05a8bd02d7a1982038247c43d6f609c0c7cc3f6db3318c848f"
+        },
+        "right-idle": {
+          "x": 0,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "idle",
+          "sha256": "c753e0b6fc8200e7b17df6bf1a205628160dbca274ad179d861eade81048e660"
+        },
+        "right-contact-a": {
+          "x": 32,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "contact-a",
+          "sha256": "9aa91b23fcce109124b1d8355b854b837a08932d9ad4b4f86e0a312202a74be1"
+        },
+        "right-passing": {
+          "x": 64,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "passing",
+          "sha256": "5969984fc5ba554e860cb4e7638fafd7b532a731c83624ff84638f188053bfa7"
+        },
+        "right-contact-b": {
+          "x": 96,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "contact-b",
+          "sha256": "6594f8a9be48ec36156c63c30bd5f6ef6ec3056e71eeaefe34ac7bc62d73f5a9"
+        }
+      },
+      "clips": {
+        "idle": {
+          "frames": [
+            "down-idle",
+            "up-idle",
+            "left-idle",
+            "right-idle"
+          ],
+          "loop": true
+        },
+        "walk": {
+          "frameDurationMs": 55,
+          "frames": [
+            "down-contact-a",
+            "down-passing",
+            "down-contact-b",
+            "down-passing",
+            "up-contact-a",
+            "up-passing",
+            "up-contact-b",
+            "up-passing",
+            "left-contact-a",
+            "left-passing",
+            "left-contact-b",
+            "left-passing",
+            "right-contact-a",
+            "right-passing",
+            "right-contact-b",
+            "right-passing"
+          ],
+          "loop": true
+        }
+      },
+      "toolFeedback": {
+        "frameSource": "../16bit.png#tool",
+        "impactAt": 0.55,
+        "reducedMotionScale": 0.4,
+        "status": "candidate-preview-only"
+      },
+      "limitations": [
+        "Candidate art and motion only; not approved or registered as production assets.",
+        "Right-facing frames mirror left-facing poses; Gate 1 visual review must confirm silhouette and foot contact.",
+        "The preview tool overlay demonstrates timing only and does not change farming rules."
+      ]
+    }
+  },
+  "limitations": [
+    "Pixel16 candidate uses the 8-bit atlas scaled to the shared 64 px world tile; pixel32 uses its dedicated seasonal map and animation atlases.",
+    "Pixel32-only house/tree overlays and full four-direction player animation do not have equivalent pixel16 candidate frames.",
+    "Actual sprite sources are grouped by texture and frame; generic candidateArt resolver IDs do not by themselves represent the pixel32 runtime override coverage.",
+    "Chromium CSS-scale screenshots do not establish native device appearance, art quality approval or Gate 1 completion."
+  ]
+}
