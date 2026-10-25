@@ -1,4 +1,4 @@
-import { candidateFrameAt, candidateToolFeedback, candidateToolImpactCrossed } from '../../../../../../src/presentation/candidate-sprite-animator.ts';
+import { candidateFrameAt, candidateToolFeedback, candidateToolImpactCrossed, nonNegativeElapsedMs } from '../../../../../../src/presentation/candidate-sprite-animator.ts';
 
 const SHEET_URL = './player-4dir.png';
 const TOOL_ATLAS_URL = '../16bit.png';
@@ -59,7 +59,7 @@ function draw(time) {
   }
   context.fillStyle = '#647e5e'; context.fillRect(126, 187, 4, 4);
 
-  const elapsed = time - motionStartedAt;
+  const elapsed = nonNegativeElapsedMs(motionStartedAt, time);
   const moving = state.motion === 'walk' || state.motion === 'tool';
   const walkMotion = moving && !(state.reducedMotion && state.motion === 'walk');
   const frame = candidateFrameAt(state.direction, walkMotion ? 'walk' : 'idle', walkMotion ? elapsed % CYCLE_MS : 0);
@@ -72,7 +72,7 @@ function draw(time) {
 
   let progress = null;
   if (state.motion === 'tool' && state.actionStartedAt !== null) {
-    progress = Math.min(1, (time - state.actionStartedAt) / TOOL_DURATION_MS);
+    progress = Math.min(1, nonNegativeElapsedMs(state.actionStartedAt, time) / TOOL_DURATION_MS);
     const feedback = candidateToolFeedback(progress, state.direction, state.reducedMotion);
     if (candidateToolImpactCrossed(state.previousProgress, progress)) {
       state.impactSeen = true;

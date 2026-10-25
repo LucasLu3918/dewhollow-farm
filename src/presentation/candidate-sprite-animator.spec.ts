@@ -3,12 +3,21 @@ import {
   candidateFrameAt,
   candidateToolImpactCrossed,
   candidateToolFeedback,
+  nonNegativeElapsedMs,
   type CandidateDirection,
 } from './candidate-sprite-animator';
 
 const DIRECTIONS: CandidateDirection[] = ['down', 'up', 'left', 'right'];
 
 describe('pixel32 候選動畫器', () => {
+  it('把早於動畫起點的繪製時間夾到零', () => {
+    expect(nonNegativeElapsedMs(100, 97.3)).toBe(0);
+  });
+
+  it('保留動畫起點之後的經過時間', () => {
+    expect(nonNegativeElapsedMs(100, 145)).toBe(45);
+  });
+
   it('四個方向的 idle 都選到該方向的基準影格', () => {
     for (const direction of DIRECTIONS) {
       expect(candidateFrameAt(direction, 'idle', 0)).toEqual({
