@@ -28,6 +28,16 @@
 - [x] 報告每季各地表實際只有一種基礎圖塊、沒有 pixel32 soil。
 - [x] 逐季記錄來源 frame 與顯示格數：基礎地表各 1／9、field-edge 16／16、混合邊界 7／9；E2E 斷言並輸出彙總數。
 - [ ] 人工無縫評分、素材 SHA 核准與實機檢查仍待審。
+- [x] closeout：`npm run check`、完整 E2E 242/242、Impact reconciliation、commit `bc39311`、PR #52 Required Checks 與 merge；merge SHA `94eb59814c4faa11ff9a681fb187020592cf323d`。
+
+## DF-G1-MOTION-REVERSAL-STRESS
+
+- [x] 隔離 DEV-only pixel32 farm 路線完成 10 次相鄰提交，承載 50 次反向及 50 次直角轉向意圖；queue 最大深度 1。
+- [x] 記錄方向動畫影格、RAF 腳底錨點、瀏覽器端提交觀測延遲與牆前停止狀態；保存原始 JSON、截圖與 SHA-256。
+- [x] 專項 E2E 1/1 通過；不改 runtime、正式素材、地圖、玩法、存檔或素材核准。
+- [x] `npm run check` 與完整 Chromium E2E（243/243，4 workers）通過。
+- [ ] Impact reconciliation、commit、PR、Required Checks 與 merge 待完成。
+- [ ] 真機／FPS／美術／Gate 1 審查仍待各自驗收。
 
 詳見 [DF-QA-01 稽核矩陣](../docs/art/audit/df-qa-01.md)。
 

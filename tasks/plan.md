@@ -344,3 +344,22 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 更新 DF-QA-01、任務紀錄與繁中候選報告；不把缺少的土壤或隨機變體包裝成通過。
 - [ ] 收集人工接縫／紋理評分；候選仍未核准。
 - [ ] 本次 closeout：`npm run check` 已通過、完整 `npm run test:e2e` 已通過 242／242；Impact reconciliation、commit、PR Required Checks 與 merge 待完成。
+
+---
+
+# DF-G1-MOTION-REVERSAL-STRESS pixel32 候選反向與直角轉向壓力證據
+
+## 範圍與結果
+
+在隔離 DEV-only pixel32 farm MapScene 內，固定執行十次成功相鄰格位提交；每步注入 10 次同步方向意圖，總計 50 次反向與 50 次直角轉向。記錄格位、候選 player frame、tap queue、腳底錨點、瀏覽器端輸入至格位提交觀測延遲與放鍵／碰撞後停止狀態。不改 movement runtime、正式素材、地圖、玩法、存檔或候選核准狀態。資料與限制見 [反向與直角轉向壓力證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-motion-reversal-stress.zh-TW.md)。
+
+## 驗收
+
+- [x] 固定路線 `(7,9) → (1,9) → (1,5)` 完成 10 次相鄰提交；最後左移被牆拒絕且不多走。
+- [x] 每步 10 個方向意圖，合計 50 次相反方向及 50 次垂直方向轉換；latest-tap queue 最大深度 1。
+- [x] 記錄 left／up 候選走路影格、135 個腳底錨點 RAF 樣本與 9 筆輸入至格位提交觀測延遲（136.6／152.2／154.5 ms，min／median／max）。
+- [x] 停止後 19 筆 RAF 樣本跨越 299.9 ms，tile、腳底錨點及 frame 穩定，movement input、pending 與 queue 清空。
+- [x] 專項 E2E 1/1 通過；截圖、完整事件／逐幀 JSON 及 manifest／atlas／test／screenshot SHA-256 已保存。
+- [x] `npm run check` 通過；完整 Chromium E2E 243／243（4 workers）通過。
+- [ ] Impact reconciliation、commit、PR Required Checks 與 merge 待完成。
+- [ ] 60／120 FPS、實機輸入延遲、人工動作／美術審查及 Gate 1 核准仍未完成；此候選證據不代表通過。
