@@ -75,6 +75,7 @@ import { gateAction, type ActionGateAction } from '../action-gate';
 import { cameraViewportFor } from '../responsive/layout';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
 import { ToolSeedSelector } from '../tool-seed-selector';
+import { Hotbar } from '../hotbar';
 import { ContinuousFarmActions, farmActionTarget } from '../continuous-farm-actions';
 import { calculatePixelViewportPolicy } from '../pixel-viewport/policy';
 import { renderProfileFor } from '../pixel-viewport/profiles';
@@ -456,6 +457,7 @@ export class MapScene extends Phaser.Scene {
   private lastContinuousCancelReason = 'not-cancelled';
   private unsubscribeContinuousSetting: (() => void) | null = null;
   private toolSeedSelector!: ToolSeedSelector;
+  private hotbar!: Hotbar;
   /** 夜釣星星進行中的計時器與甩竿的時刻（一圈的時限，見 star-fishing.ts）。 */
   private starTimer: Phaser.Time.TimerEvent | null = null;
   private starStartedAt = 0;
@@ -543,8 +545,12 @@ export class MapScene extends Phaser.Scene {
     }, (source, direction) => this.setMovementInput(source, direction));
     this.toolSeedSelector = new ToolSeedSelector(document, deps.index, (command) => {
       // Direct selectors use distinct gate actions and preserve the selected ID in the command.
-      void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command);
+      if (command.type === 'assignHotbarSlot') void this.run(command);
+      else void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command);
     });
+    this.hotbar = new Hotbar(document, deps.index, () => deps.session.state,
+      (command) => { void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command); },
+      (slot, state) => this.openHotbarAssignment(slot, state));
     deps.hud.bindToolSeedSelectors(
       (wheel, pointer) => this.openToolSeedSelector('tool', wheel, pointer),
       (wheel, pointer) => this.openToolSeedSelector('seed', wheel, pointer),
@@ -1026,6 +1032,13 @@ export class MapScene extends Phaser.Scene {
     if (this.hasTouchInputBlocker()) return;
     this.touchControls.cancelAll();
     this.toolSeedSelector.open(mode, wheel, this.deps.session.state, pointer);
+  }
+
+  private openHotbarAssignment(slot: number, state: GameState): void {
+    if (this.hasTouchInputBlocker()) return;
+    this.cancelMovementInput();
+    this.touchControls.cancelAll();
+    this.toolSeedSelector.openAssignment(slot, state);
   }
 
   /** Resolve the latest held keyboard/touch direction into one presentation scheduler. */
@@ -1615,6 +1628,7 @@ export class MapScene extends Phaser.Scene {
   /** 依目前狀態重畫。地圖切換時整張重建，其餘情況只更新田地、方向與玩家位置。 */
   private refresh(): void {
     const state = this.deps.session.state;
+    this.hotbar.refresh(state);
     const map = this.deps.index.map(state.mapId);
     this.deps.hud.update(state, this.deps.pack);
     const interaction = resolveInteraction(state, this.deps.index);

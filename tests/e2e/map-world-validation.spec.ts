@@ -153,8 +153,17 @@ async function pauseScene(page: Page): Promise<void> {
   });
 }
 
+async function hideQuickbarToggleForSceneSnapshot(page: Page): Promise<void> {
+  // Playwright's canvas element screenshot composites positioned sibling HUD controls.
+  // Keep this visual baseline limited to the world renderer, not the DOM quickbar toggle.
+  await page.locator('#quickbar-toggle').evaluate((button) => {
+    (button as HTMLElement).style.visibility = 'hidden';
+  });
+}
+
 async function capture(page: Page, name: string): Promise<void> {
   await pauseScene(page);
+  await hideQuickbarToggleForSceneSnapshot(page);
   await expect(page.locator('#game canvas')).toHaveScreenshot(name, { animations: 'disabled' });
 }
 
@@ -417,5 +426,6 @@ test('a forest tree covers the player when they overlap from behind', async ({ p
   expect(evidence.opaqueOverlapSamples, JSON.stringify(evidence)).toBeGreaterThan(8);
   expect(evidence.changedPercent, JSON.stringify(evidence)).toBeLessThanOrEqual(2);
   expect(evidence.meanRgbDelta, JSON.stringify(evidence)).toBeLessThan(10);
+  await hideQuickbarToggleForSceneSnapshot(page);
   await expect(page.locator('#game canvas')).toHaveScreenshot('forest-tree-occlusion.png', { animations: 'disabled' });
 });

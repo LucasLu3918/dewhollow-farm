@@ -102,6 +102,14 @@ async function pauseScene(page: Page): Promise<void> {
   });
 }
 
+async function hideQuickbarToggleForSceneSnapshot(page: Page): Promise<void> {
+  // Playwright's canvas element screenshot composites positioned sibling HUD controls.
+  // Keep companion baselines limited to the world renderer, not the DOM quickbar toggle.
+  await page.locator('#quickbar-toggle').evaluate((button) => {
+    (button as HTMLElement).style.visibility = 'hidden';
+  });
+}
+
 async function expectPetBaselineCanvas(page: Page): Promise<void> {
   const size = await page.locator('#game canvas').evaluate((canvas) => {
     const { width, height } = canvas.getBoundingClientRect();
@@ -191,6 +199,7 @@ test('the approved cat artwork matches the farm visual baseline', async ({ page 
   await expect.poll(async () => (await actor(page, 'cat'))?.pose).toEqual(REST);
   await expect.poll(async () => (await actor(page, 'player'))?.pose).toEqual(REST);
   await pauseScene(page);
+  await hideQuickbarToggleForSceneSnapshot(page);
   await expect(page.locator('#game canvas')).toHaveScreenshot('pet-cat-farm.png', {
     animations: 'disabled',
   });
@@ -207,6 +216,7 @@ test('the approved cat and quokka artwork match the village visual baseline', as
   await expect.poll(async () => (await actor(page, 'player'))?.pose).toEqual(REST);
   await pauseScene(page);
   expect(await page.evaluate(() => window.__dewhollow?.cameraScroll())).toEqual(settledCamera);
+  await hideQuickbarToggleForSceneSnapshot(page);
   await expect(page.locator('#game canvas')).toHaveScreenshot('pet-companions-village.png', {
     animations: 'disabled',
   });

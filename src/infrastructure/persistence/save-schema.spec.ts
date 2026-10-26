@@ -54,7 +54,14 @@ function record(state: unknown) {
 describe('save schema', () => {
   it('accepts a new game state and returns it unchanged', () => {
     const state = createNewGame(pack, 1);
+    expect(state.hotbar).toEqual([null, null, null, null]);
     expect(parseSaveRecord(record(state), context).state).toEqual(state);
+  });
+
+  it('requires exactly four valid tool-or-seed quickbar descriptors', () => {
+    const state = createNewGame(pack, 1);
+    expect(() => parseSaveRecord(record({ ...state, hotbar: [null, null, null] }), context)).toThrow('hotbar');
+    expect(() => parseSaveRecord(record({ ...state, hotbar: [{ kind: 'tool', tool: 'bow' }, null, null, null] }), context)).toThrow('hotbar');
   });
 
   it('rejects an unknown tool with the field path', () => {
@@ -137,7 +144,7 @@ describe('save schema with an old save', () => {
 
   it('loads a v1 save as a current-version state', () => {
     const { state } = parseSaveRecord(record(v1), context);
-    expect(state.schemaVersion).toBe(23);
+    expect(state.schemaVersion).toBe(24);
     expect(state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
     expect(state.playtimeSeconds).toBe(0);
     expect(state.calendar.day).toBe(2);

@@ -35,7 +35,17 @@
           <span id="hud-version" class="version"></span>
         </span>
       </header>
-      <div id="game" class="stage" role="region" aria-label="晨露農場遊戲畫面。用方向鍵移動，按問號鍵看操作說明"><p class="loading" role="status">農場載入中…</p></div>
+      <div id="game" class="stage" role="region" aria-label="晨露農場遊戲畫面。用方向鍵移動，按問號鍵看操作說明">
+        <p class="loading" role="status">農場載入中…</p>
+        <button id="quickbar-toggle" class="quickbar-toggle" type="button" aria-expanded="false" aria-controls="quickbar">快捷欄</button>
+        <nav id="quickbar" class="quickbar" aria-label="四格工具與種子快捷欄">
+          <button data-hotbar-use="0" type="button" disabled>1 空格</button>
+          <button data-hotbar-use="1" type="button" disabled>2 空格</button>
+          <button data-hotbar-use="2" type="button" disabled>3 空格</button>
+          <button data-hotbar-use="3" type="button" disabled>4 空格</button>
+          <button data-hotbar-edit-mode type="button" aria-pressed="false">編輯</button>
+        </nav>
+      </div>
       <div id="touch-controls" class="touch-controls" hidden></div>
       <section id="inventory-panel" class="inventory-panel" aria-labelledby="inventory-title" role="dialog" aria-modal="true" hidden>
         <header class="inventory-header">

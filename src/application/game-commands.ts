@@ -5,7 +5,7 @@ import { readyHeartEvent, type HeartEmote } from '../domain/heart-events';
 import { currentPeriod, residentAt } from './residents';
 import { trySpend, restore } from '../domain/energy';
 import { growCrops, harvestPlot, isRipe, plantCrop, plotKey, tillPlot, waterAllPlots, waterPlot, type PlotMap } from '../domain/farm';
-import { TOOL_ORDER, type GameState, type ToolId } from '../domain/game-state';
+import { TOOL_IDS, TOOL_ORDER, type GameState, type HotbarItem, type ToolId } from '../domain/game-state';
 import { addItem, countOf, removeItem, takeMatching, type Inventory } from '../domain/inventory';
 import { cropItemId, seedItemId } from '../domain/items';
 import { fail, ok, type Result } from '../domain/result';
@@ -56,6 +56,8 @@ export type Command =
   | { type: 'cycleSeed' }
   /** 直接選擇一種持有中的種子，並同步切換至種子袋。 */
   | { type: 'selectSeed'; cropId: string }
+  /** 將玩家持有的工具或種子指派至存檔中的四格快捷欄；null 清空該格。 */
+  | { type: 'assignHotbarSlot'; slot: number; item: HotbarItem }
   /** 直接取出斧頭（不進 Z 的循環）。 */
   | { type: 'takeTool'; tool: ToolId }
   /** 收線：hit 表示有沒有在時限內按下（時機由畫面判斷）。只有魚上鉤後才有效。 */
@@ -156,6 +158,8 @@ const FAILURE_MESSAGES: Record<string, string> = {
   NO_CROP: '這裡沒有作物',
   NOT_RIPE: '作物還沒成熟',
   NO_SEED: '種子袋裡沒有這種種子',
+  INVALID_HOTBAR_SLOT: '快捷欄位置無效',
+  INVALID_HOTBAR_ITEM: '只有工具或持有中的種子可以放入快捷欄',
   INVALID_SEED: '找不到這種種子',
   BAG_FULL: '背包已滿',
   NEED_AXE: '要先切到斧頭才能砍樹',
@@ -265,6 +269,29 @@ function reply(state: GameState, messages: string[] = [], events: GameEvent[] = 
   return { state, messages, events };
 }
 
+function assignHotbarSlot(state: GameState, slot: number, item: HotbarItem, index: ContentIndex): CommandOutcome {
+  if (!Number.isInteger(slot) || slot < 0 || slot >= state.hotbar.length) {
+    return reply(state, [messageFor('INVALID_HOTBAR_SLOT')], [refused('INVALID_HOTBAR_SLOT')]);
+  }
+  if (item?.kind === 'tool' && !TOOL_IDS.includes(item.tool)) {
+    return reply(state, [messageFor('INVALID_HOTBAR_ITEM')], [refused('INVALID_HOTBAR_ITEM')]);
+  }
+  if (item?.kind === 'seed') {
+    if (!index.cropIds().includes(item.cropId)) {
+      return reply(state, [messageFor('INVALID_HOTBAR_ITEM')], [refused('INVALID_HOTBAR_ITEM')]);
+    }
+    if (countOf(state.inventory, seedItemId(item.cropId)) <= 0) {
+      return reply(state, [messageFor('NO_SEED')], [refused('NO_SEED')]);
+    }
+  }
+  if (item !== null && item.kind !== 'tool' && item.kind !== 'seed') {
+    return reply(state, [messageFor('INVALID_HOTBAR_ITEM')], [refused('INVALID_HOTBAR_ITEM')]);
+  }
+  const hotbar = [...state.hotbar] as GameState['hotbar'];
+  hotbar[slot] = item;
+  return reply({ ...state, hotbar });
+}
+
 /**
  * 執行一個指令，然後檢查委託：目標已達到（好感、收成、出貨…）的委託在這裡自動完成，並把完成的訊息接在後面。
  * 最後觀察圖鑑與成就（發現條目、推進計數、發獎勵，見 application/collection.ts）。
@@ -344,6 +371,8 @@ function executeCore(current: GameState, command: Command, index: ContentIndex):
       }
       return reply({ ...state, selectedSeed: command.cropId, tool: 'seedbag' });
     }
+    case 'assignHotbarSlot':
+      return assignHotbarSlot(state, command.slot, command.item, index);
     case 'chooseTalent':
       return chooseTalent(state, command.talentId, index);
     case 'acceptQuest':

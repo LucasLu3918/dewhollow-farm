@@ -47,6 +47,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   20: migrateV20ToV21,
   21: migrateV21ToV22,
   22: migrateV22ToV23,
+  23: migrateV23ToV24,
 };
 
 /**
@@ -246,6 +247,19 @@ function migrateV22ToV23(raw: unknown, context: MigrationContext): unknown {
     resetBonus: 0,
     playerName: context.playerName,
     generation: 1,
+  };
+}
+
+/** v23 → v24：每一份存檔新增四格快捷欄，舊玩家從空欄開始。 */
+function migrateV23ToV24(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(23) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v23 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  return {
+    ...(raw as Record<string, unknown>),
+    schemaVersion: 24,
+    hotbar: [null, null, null, null],
   };
 }
 
