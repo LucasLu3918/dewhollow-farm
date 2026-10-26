@@ -17,10 +17,10 @@
 | 方向意圖 | 100 |
 | 反向／直角轉向 | 50／50 |
 | 觀測到的最大 tap queue | 1；每一批的 10 次輸入皆實際入列 |
-| 瀏覽器端輸入至下一格提交觀測延遲 | 9 筆；最小 136.6 ms、中位數 152.2 ms、最大 154.5 ms |
+| 瀏覽器端輸入至下一格提交觀測延遲 | 9 筆；最小 146.9 ms、中位數 148.1 ms、最大 148.1 ms |
 | 角色候選影格 | left 與 up 走路影格皆被 RAF 取樣；最終 `left-idle` |
-| 腳底錨點 | 135 筆取樣；範圍 x=96–480、y=384–640；停止於 `(96,384)` |
-| 停止狀態 | tile `(1,5)`、`heldDirection=null`、`moving=false`、`pending=false`、queue=0；停止後 19 筆 RAF 樣本跨越 299.9 ms，格位、錨點、frame 與 busy 狀態穩定 |
+| 腳底錨點 | 133 筆取樣；範圍 x=96–480、y=384–640；停止於 `(96,384)` |
+| 停止狀態 | tile `(1,5)`、`heldDirection=null`、`moving=false`、`pending=false`、queue=0；停止後 19 筆 RAF 樣本觀測 299.9 ms，格位、錨點、frame 與 busy 狀態穩定 |
 
 延遲起點是每批最後一個合成 keydown，終點是第一個 RAF 取樣觀察到下一個 committed tile。數值只代表同一瀏覽器頁面內的 queue-response 觀測，不是完成畫面轉向的時間，也不是產品延遲 SLA。
 
@@ -28,8 +28,8 @@
 
 | 時點 | 截圖 | SHA-256 |
 |---|---|---|
-| 起始 | [motion-start-390x844.png](gate1-mapscene-pixel32-motion-reversal-stress/screenshots/motion-start-390x844.png) | `cc5a70ce3c8fb672a3064d26356c40c48f411f6e15aab895bc83f577b7a7c6f8` |
-| 停止 | [motion-stopped-390x844.png](gate1-mapscene-pixel32-motion-reversal-stress/screenshots/motion-stopped-390x844.png) | `ca202603dee2b4bc511cd41e34c924cf1a840f61b77ae34e417fc6331b822680` |
+| 起始 | [motion-start-390x844.png](gate1-mapscene-pixel32-motion-reversal-stress/screenshots/motion-start-390x844.png) | `ab43c44058945d77b388c1f3ddc89c5ec76ec04c46d974e6d1d24a1a67810f4b` |
+| 停止 | [motion-stopped-390x844.png](gate1-mapscene-pixel32-motion-reversal-stress/screenshots/motion-stopped-390x844.png) | `3d0284804139a01f6d1ecebfe7877a000b57113bba5b841bd376e72d7d6159cd` |
 
 完整輸入事件、方向分類、格位轉換、RAF frame／腳底樣本、停止狀態及來源 SHA 收錄在 [evidence.json](gate1-mapscene-pixel32-motion-reversal-stress/evidence.json)。角色動畫 manifest 保持候選狀態；atlas SHA 與 manifest 宣告值一致。
 
