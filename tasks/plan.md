@@ -98,9 +98,28 @@
 - [x] 保存四份方向 JSON、八張截圖與繁中報告；候選維持 `candidate`／`approved: false`，沒有改 runtime、地圖、存檔、正式素材或核准狀態。
 - [ ] 人工美術／盲測與 iOS／Android 實機驗收維持待完成，不由本自動化任務代替。
 - [x] `npm run check` 通過（162 個測試檔，1,643 passed／1 skipped；build 2.808 MB）；完整 Chromium E2E 248/248（4 workers）通過。
-- [ ] Impact reconciliation、commit、PR Required Checks 與 merge 待完成。
+- [x] Impact reconciliation、commit、PR #55 Required Checks 通過並 squash merge 至 `main`（merge SHA `f2e6c4cb9e37e0c65c06ca49c98a47e079d53a81`）。
 
 詳見 [四方向連續 10 格移動證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-continuous-10-tile.zh-TW.md)。
+
+---
+
+# DF-G1-INPUT-CANCEL-TRANSITION-EVIDENCE 輸入取消與場景轉換證據
+
+## 範圍
+
+以 DEV-only Chromium 觸控輸入覆核三個中斷情境：持續方向輸入穿越 farm south exit 切至 village、方向按住期間重新載入已存檔狀態、方向按住期間開啟 settings modal。每案檢查 held direction、移動、pending request 與 tap queue，並於 300 ms 安靜窗確認地圖／座標穩定。逐案狀態 JSON 由 Playwright 附件保存。
+
+只新增 E2E 與證據文件；不改 input／movement runtime、地圖、玩法、存檔 schema、正式素材或候選核准。合成 Chromium PointerEvent 不代表原生 iOS／Android、實際 frame rate、輸入延遲或美術驗收。
+
+## 任務與驗收
+
+- [x] 三種中斷情境均確認 held direction 為空、moving／pending 為 false、queue 為 0，安靜窗中位置不變。
+- [x] `npm run check` 通過（162 個測試檔、1,643 passed／1 skipped；build 2.808 MB）；專項 Chromium E2E 3/3、完整 Chromium E2E 251/251（4 workers）通過。
+- [x] AIPS Impact reconciliation 與 commit `6966b264e39e822eaae749260492396e0357faba` 完成；PR、Required Checks 與 merge 待完成。
+- [ ] 人工美術／盲測與原生 iOS／Android 驗收 gate 保持待完成。
+
+詳見 [輸入取消與場景轉換證據](../docs/art/candidates/pixel-movement/gate1-input-cancel-transition.zh-TW.md)。
 
 ---
 
@@ -257,7 +276,7 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 保存候選 manifest／atlas 輸入 SHA-256、JSON 測量、兩張 Chromium 場景圖及限制說明；維持候選狀態且不變更正式素材／runtime／地圖／碰撞／存檔／玩法。
 - [x] 專項 Chromium E2E 通過，`npm run build` 通過。
 - [x] `npm run check` 通過（1,616 passed／1 skipped）；完整 Chromium E2E 233/233 通過（4 workers）。
-- [ ] Impact reconciliation、commit、PR Required Checks 與合併。
+- [x] Impact reconciliation、commit、PR #40 Required Checks 與合併（merge commit `e1c02ba9e11892e0634b022416d339ded7f70cfe`）。
 
 詳見 [DF-G1 overlay 移動幀與深度交錯證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-walkframe-depth.zh-TW.md)。
 
@@ -280,7 +299,7 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 
 - [x] 專項 Chromium E2E 1/1 及畫面檢視。
 - [x] `npm run check`；完整 Chromium E2E 234/234（4 workers）。
-- [ ] AIPS Impact reconciliation、commit、PR、Required Checks 通過後合併。
+- [x] AIPS Impact reconciliation、commit、PR #41、Required Checks 通過並合併至 `main`。
 
 # DF-G1-PIXEL-PROFILE-COMPARISON pixel16／pixel32 同場景局部覆蓋比較
 
@@ -356,7 +375,7 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] E2E 驗證四季、地表、遮罩、混合邊界假設、候選狀態、素材請求、錯誤和證據完整性；`npm run check` 全通過；完整 Chromium E2E 242/242（4 workers）。
 - [x] 更新 DF-QA-01、任務紀錄與繁中候選報告；不把缺少的土壤或隨機變體包裝成通過。
 - [ ] 收集人工接縫／紋理評分；候選仍未核准。
-- [ ] 本次 closeout：`npm run check` 已通過、完整 `npm run test:e2e` 已通過 242／242；Impact reconciliation、commit、PR Required Checks 與 merge 待完成。
+- [x] Closeout：`npm run check` 與完整 E2E 242/242 通過；PR #52 Required Checks 通過並合併至 `main`（merge SHA `94eb59814c4faa11ff9a681fb187020592cf323d`）。
 
 ---
 
@@ -391,5 +410,5 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 100 個循環回到起始 `(7,9)`，並驗證輸入佇列及移動狀態清空。
 - [x] 西側牆碰撞拒絕額外移動；保存逐次事件 JSON、開始／停止截圖與 SHA-256。
 - [x] 專項 E2E 1/1 通過；`npm run check` 通過（1,643 passed／1 skipped；build 2.808 MB）；完整 Chromium E2E 244/244（4 workers）通過。
-- [ ] 最終 AIPS reconciliation、commit、PR Required Checks 與 merge 待完成。
+- [x] AIPS reconciliation、commit、PR #54 Required Checks 通過並合併至 `main`。
 - [ ] 真機／FPS／人工美術審查與 Gate 1 核准仍未完成。
