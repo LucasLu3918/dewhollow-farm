@@ -558,7 +558,7 @@ a:focus-visible {
 .inventory-content {
   display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
+  flex-flow: row wrap;
   align-items: stretch;
   gap: var(--ui-space-md);
   min-height: 12rem;
@@ -573,6 +573,7 @@ a:focus-visible {
 .inventory-toolbar {
   display: flex;
   flex: 0 0 auto;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
   gap: var(--ui-space-md);
@@ -634,11 +635,85 @@ a:focus-visible {
 
 .inventory-grid {
   display: grid;
-  flex: 1 0 auto;
+  flex: 1 1 28rem;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.5rem;
   align-content: start;
   min-height: 12rem;
+}
+
+.inventory-detail {
+  flex: 0 1 15rem;
+  align-self: stretch;
+  min-width: min(100%, 13rem);
+  padding: var(--ui-space-md);
+  border: 1px solid var(--ui-frame-line);
+  border-radius: var(--ui-frame-radius);
+  background: var(--ui-paper-raised);
+  color: var(--ui-ink);
+}
+
+.inventory-detail-heading,
+.inventory-detail-name,
+.inventory-detail h5 {
+  margin: 0 0 0.5rem;
+  color: var(--ui-ink);
+}
+
+.inventory-detail-empty,
+.inventory-detail-category,
+.inventory-detail-count,
+.inventory-detail-price {
+  margin: 0.35rem 0;
+  color: var(--ui-muted-ink);
+}
+
+.inventory-detail-icon {
+  display: grid;
+  place-items: center;
+  min-height: 5rem;
+  margin-bottom: var(--ui-space-sm);
+  color: var(--ui-muted-ink);
+  font-size: 3.5rem;
+}
+
+.inventory-detail-icon img {
+  display: block;
+  width: min(100%, 5rem);
+  height: 5rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.inventory-detail-quality {
+  display: inline-block;
+  margin: 0.35rem 0;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  color: #413118;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.inventory-detail-uses {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.inventory-slot--item {
+  font: inherit;
+  cursor: pointer;
+}
+
+.inventory-slot--item:hover,
+.inventory-slot--selected {
+  border-color: var(--ui-selection);
+  box-shadow: inset 0 0 0 2px var(--ui-selection), 0 0 0 2px rgba(44, 89, 57, 0.2);
+}
+
+.inventory-slot--item:focus-visible {
+  outline: 3px solid var(--ui-selection);
+  outline-offset: 2px;
 }
 
 .inventory-slot {
@@ -748,6 +823,11 @@ a:focus-visible {
   .inventory-content {
     min-height: 8rem;
     padding: var(--ui-space-md);
+  }
+
+  .inventory-grid,
+  .inventory-detail {
+    flex-basis: 100%;
   }
 
   .inventory-toolbar {

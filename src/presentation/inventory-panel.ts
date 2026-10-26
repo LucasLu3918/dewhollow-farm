@@ -61,22 +61,32 @@ export class InventoryPanel {
   private readonly trigger: HTMLButtonElement;
   private readonly root: HTMLElement;
   private readonly closeButton: HTMLButtonElement;
+  private readonly content: HTMLElement;
   private readonly grid: HTMLElement;
+  private readonly detail: HTMLElement;
   private readonly capacityLabel: HTMLElement;
   private readonly fullLabel: HTMLElement;
   private readonly emptyLabel: HTMLElement;
   private readonly dialog: PanelDialog;
   private category: InventoryCategory = 'all';
+  private selectedKey: string | null = null;
   private dataProvider: (() => InventoryPanelData) | null = null;
 
   constructor(doc: Document) {
     this.trigger = required<HTMLButtonElement>(doc, '#hud-inventory');
     this.root = required(doc, '#inventory-panel');
     this.closeButton = required<HTMLButtonElement>(doc, '#inventory-close');
+    this.content = required(doc, '#inventory-content');
     this.grid = required(doc, '#inventory-grid');
     this.capacityLabel = required(doc, '#inventory-capacity');
     this.fullLabel = required(doc, '#inventory-full');
     this.emptyLabel = required(doc, '#inventory-empty');
+    this.detail = doc.createElement('aside');
+    this.detail.id = 'inventory-detail';
+    this.detail.className = 'inventory-detail';
+    this.detail.setAttribute('aria-label', '物品詳情');
+    this.detail.setAttribute('aria-live', 'polite');
+    this.content.append(this.detail);
     applyGameUiTokens(this.root);
     this.dialog = new PanelDialog(this.root);
 
@@ -114,6 +124,8 @@ export class InventoryPanel {
     if (!data) return;
 
     const visibleEntries = filterInventoryEntries(data.entries, this.category);
+    const selectedEntry = visibleEntries.find((entry) => inventoryEntryKey(entry) === this.selectedKey) ?? null;
+    if (!selectedEntry) this.selectedKey = null;
     const slots = inventorySlotCount(data.capacity);
     const full = isInventoryFull(data.entries.length, slots);
     this.capacityLabel.textContent = `${data.entries.length} / ${slots}`;
@@ -123,13 +135,15 @@ export class InventoryPanel {
     this.emptyLabel.hidden = visibleEntries.length > 0;
     this.syncFilters();
 
-    const fragment = this.root.ownerDocument.createDocumentFragment();
-    for (let slot = 0; slot < slots; slot += 1) {
-      const entry = visibleEntries[slot];
-      fragment.append(entry ? this.itemSlot(entry, data) : this.emptySlot());
-    }
-    this.grid.replaceChildren(fragment);
-    this.dialog.restoreFocusIfLost();
+    this.dialog.redraw(() => {
+      const fragment = this.root.ownerDocument.createDocumentFragment();
+      for (let slot = 0; slot < slots; slot += 1) {
+        const entry = visibleEntries[slot];
+        fragment.append(entry ? this.itemSlot(entry, data) : this.emptySlot());
+      }
+      this.grid.replaceChildren(fragment);
+      this.renderDetail(selectedEntry, data);
+    });
   }
 
   private syncFilters(): void {
@@ -139,14 +153,25 @@ export class InventoryPanel {
     }
   }
 
-  private itemSlot(entry: InventoryDisplayEntry, data: InventoryPanelData): HTMLElement {
+  private itemSlot(entry: InventoryDisplayEntry, data: InventoryPanelData): HTMLButtonElement {
     const doc = this.root.ownerDocument;
-    const slot = doc.createElement('div');
+    const slot = doc.createElement('button');
+    slot.type = 'button';
     slot.className = 'inventory-slot inventory-slot--item';
     slot.dataset.slotState = 'item';
     slot.dataset.itemId = entry.itemId;
+    slot.dataset.quality = entry.quality;
+    slot.dataset.count = String(entry.count);
+    const key = inventoryEntryKey(entry);
+    slot.dataset.focusKey = `inventory-entry:${key}`;
     slot.setAttribute('role', 'gridcell');
     slot.setAttribute('aria-label', `${entry.name}，${entry.qualityLabel}，${entry.count} 個`);
+    slot.setAttribute('aria-selected', String(key === this.selectedKey));
+    if (key === this.selectedKey) slot.classList.add('inventory-slot--selected');
+    slot.addEventListener('click', () => {
+      this.selectedKey = key;
+      this.render();
+    });
 
     const icon = doc.createElement('span');
     icon.className = 'inventory-slot-icon';
@@ -189,6 +214,94 @@ export class InventoryPanel {
     return slot;
   }
 
+  private renderDetail(entry: InventoryDisplayEntry | null, data: InventoryPanelData): void {
+    const doc = this.root.ownerDocument;
+    this.detail.replaceChildren();
+    this.detail.dataset.state = entry ? 'selected' : 'empty';
+    delete this.detail.dataset.itemId;
+    delete this.detail.dataset.quality;
+    delete this.detail.dataset.count;
+
+    const heading = doc.createElement('h3');
+    heading.className = 'inventory-detail-heading';
+    heading.textContent = '物品詳情';
+    this.detail.append(heading);
+
+    if (!entry) {
+      const empty = doc.createElement('p');
+      empty.className = 'inventory-detail-empty';
+      empty.textContent = '選擇一件物品查看詳情。';
+      this.detail.append(empty);
+      return;
+    }
+
+    this.detail.dataset.itemId = entry.itemId;
+    this.detail.dataset.quality = entry.quality;
+    this.detail.dataset.count = String(entry.count);
+
+    const icon = doc.createElement('span');
+    icon.className = 'inventory-detail-icon';
+    const iconView = createItemIconView(
+      { id: entry.itemId, label: entry.name, quantity: entry.count },
+      data.resolveIcon(entry.itemId),
+    );
+    if (iconView.fallback) {
+      icon.dataset.iconState = 'fallback';
+      icon.dataset.diagnostic = iconView.diagnostic;
+      icon.textContent = iconView.diagnostic === 'unknown-item' ? '？' : '✧';
+      icon.setAttribute('aria-label', `圖示備援：${iconView.diagnostic}`);
+    } else {
+      icon.dataset.iconState = 'available';
+      const image = doc.createElement('img');
+      image.src = iconView.src;
+      image.alt = '';
+      image.loading = 'lazy';
+      image.addEventListener('error', () => {
+        icon.dataset.iconState = 'fallback';
+        icon.dataset.diagnostic = 'icon-load-error';
+        image.remove();
+        icon.textContent = '✧';
+        icon.setAttribute('aria-label', '圖示備援：icon-load-error');
+      });
+      icon.append(image);
+    }
+
+    const name = doc.createElement('h4');
+    name.className = 'inventory-detail-name';
+    name.textContent = entry.name;
+    const category = doc.createElement('p');
+    category.className = 'inventory-detail-category';
+    category.textContent = entry.category;
+    const quality = doc.createElement('p');
+    quality.className = `inventory-detail-quality inventory-quality--${entry.quality}`;
+    quality.textContent = entry.qualityLabel;
+    const count = doc.createElement('p');
+    count.className = 'inventory-detail-count';
+    count.textContent = `數量：${entry.count}`;
+
+    this.detail.append(icon, name, category, quality, count);
+
+    if (entry.sellPrice !== undefined) {
+      const price = doc.createElement('p');
+      price.className = 'inventory-detail-price';
+      price.textContent = `售價：${entry.sellPrice} 銅幣／個`;
+      this.detail.append(price);
+    }
+
+    if (entry.uses.length > 0) {
+      const usesHeading = doc.createElement('h5');
+      usesHeading.textContent = '用途';
+      const uses = doc.createElement('ul');
+      uses.className = 'inventory-detail-uses';
+      for (const use of entry.uses) {
+        const item = doc.createElement('li');
+        item.textContent = use;
+        uses.append(item);
+      }
+      this.detail.append(usesHeading, uses);
+    }
+  }
+
   private emptySlot(): HTMLElement {
     const slot = this.root.ownerDocument.createElement('div');
     slot.className = 'inventory-slot inventory-slot--empty';
@@ -197,6 +310,10 @@ export class InventoryPanel {
     slot.setAttribute('aria-label', '空格');
     return slot;
   }
+}
+
+function inventoryEntryKey(entry: InventoryDisplayEntry): string {
+  return JSON.stringify([entry.itemId, entry.quality, entry.count]);
 }
 
 function required<T extends HTMLElement = HTMLElement>(doc: Document, selector: string): T {
