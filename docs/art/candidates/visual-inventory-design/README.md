@@ -24,6 +24,21 @@
 - **B｜繪本手繪候選**：`item-icons-storybook.png`，1536×1024 六格 atlas，物件順序與 A 相同；紙感底色、鉛筆紋理及自然手繪輪廓，與像素版本形成明確風格差異。
 - **公平比較條件**：六物件採相同 3×2 次序與等尺寸格框；桌機詳情及 390×844、844×390 詳情展示同一甜蘿蔔、同一名稱／品質／數量／價格。手機板在小寬度切成單欄。比較板只是靜態候選，沒有遊戲互動或實際資料連線。
 
+## 繪本風單件候選（VF-02C）
+
+使用者已選擇 **B｜繪本手繪** 作為圖示美術方向；此決定不等於核准任何正式素材。以下六個獨立 PNG 都是 `candidate`，須由使用者逐項核准確切檔案與 SHA-256 後，才可進入最終化、`public/assets` 或 `content/assets.json`。
+
+| 素材 | 候選檔 | 尺寸／格式 | SHA-256 |
+|---|---|---:|---|
+| 甜蘿蔔 | `items/sweet-turnip.png` | 1254×1254 RGBA | `1a490dd850b97cb5bcfb85568cad20ccca6e60dff7c81bbb0fffbc561aeeead4` |
+| 種子袋 | `items/seed-bag.png` | 1254×1254 RGBA | `2ab355b18d6a9d3779b78087d1318e7e32acd018f0d436e13eacdc04b25e8884` |
+| 木材 | `items/wood.png` | 1254×1254 RGBA | `a9938778931d349da37b3e15d521f003d2a9de04b1c7d18e8360a5091de21517` |
+| 礦石 | `items/ore.png` | 1254×1254 RGBA | `d4df6f786b76863832ef711f9b917d867b57a7dc3ae9a5e8e5887ba8e7668a74` |
+| 魚 | `items/fish.png` | 1254×1254 RGBA | `027fa69938e6a2aa456992641bbfbf6aa8bcf10bdc3a5cdb0927afcf5c6e216a` |
+| 燉菜 | `items/stew.png` | 1254×1254 RGBA | `8b1d9c211b552049f8d1326b9a3b71f17f751532119abbcac87c9ce2b98df3c3` |
+
+來源：Codex 內建 imagegen，六個物品分別生成一張透明背景原創圖示；共同提示重點為繪本水彩與色鉛筆材質、置中單一物件、無文字／外框／場景，且在 64 px 顯示尺寸仍可辨識。工具未提供可查證的模型名稱或授權條款，因此本批維持候選狀態，發布前需完成來源與授權審核。比較板使用棋盤格呈現透明背景；未做縮放、去背或像素量化。
+
 甜蘿蔔資料：`seedPrice = 25`、`growthDays = 3`，基礎售價 `round(25 × 3 × 1.3) = 98`；優良品質倍率 125%，出貨價 `round(98 × 1.25) = 123`。內容來源 `content/crops.json`，規則來源 `src/domain/pricing.ts`。其他物品格子數量僅供版面示意。
 
 ## 限制與審核狀態

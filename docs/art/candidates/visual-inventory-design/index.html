@@ -147,8 +147,17 @@
     .candidate-label { color: #edc17e; font: 11px ui-monospace, monospace; text-transform: uppercase; }
     .story-col-1 { background-position-x: -128px !important; }
     .story-col-2 { background-position-x: -256px !important; }
+    .selected-icon-candidates { margin: 28px 0 42px; padding: 22px; color: #382e24; background: #eadfb8; border: 2px solid #57402b; }
+    .selected-icon-candidates > p { max-width: 850px; }
+    .item-candidate-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .item-candidate { min-width: 0; margin: 0; padding: 10px; border: 1px solid #8a764e; background: #f3e8c8; }
+    .item-candidate img { display: block; width: min(100%, 300px); aspect-ratio: 1; margin: 0 auto; object-fit: contain; background: repeating-conic-gradient(#eadfb8 0 25%, #d8c99f 0 50%) 0 / 16px 16px; }
+    .item-candidate figcaption { padding-top: 8px; font-weight: 700; }
+    .item-candidate figcaption small { display: block; color: #68563d; font: 11px ui-monospace, monospace; }
     @media (max-width: 760px) {
       .icon-directions { padding: 14px; }
+      .selected-icon-candidates { padding: 14px; }
+      .item-candidate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .direction-grid { grid-template-columns: 1fr; }
       .direction-card { padding: 11px; }
       .direction-detail { grid-template-columns: minmax(96px, 112px) minmax(0, 1fr); gap: 9px; }
@@ -158,7 +167,7 @@
       .story-col-1 { background-position-x: -112px !important; }
       .story-col-2 { background-position-x: -224px !important; }
     }
-    @media (max-width: 420px) { .direction-mobile { grid-template-columns: 1fr; } .direction-detail { grid-template-columns: 96px minmax(0, 1fr); } .direction-art { width: 96px; height: 96px; } .direction-art svg { width: 96px; height: 96px; } .direction-art.story { background-size: 288px 192px; } .story-col-1 { background-position-x: -96px !important; } .story-col-2 { background-position-x: -192px !important; } }
+    @media (max-width: 420px) { .item-candidate-grid { grid-template-columns: 1fr; } .direction-mobile { grid-template-columns: 1fr; } .direction-detail { grid-template-columns: 96px minmax(0, 1fr); } .direction-art { width: 96px; height: 96px; } .direction-art svg { width: 96px; height: 96px; } .direction-art.story { background-size: 288px 192px; } .story-col-1 { background-position-x: -96px !important; } .story-col-2 { background-position-x: -192px !important; } }
     @media (max-width: 760px) { main { padding: 22px 14px 44px; } .candidate { padding: 14px; } .candidate-head { display: block; } .tag { display: inline-block; margin-top: 10px; } .desktop-bag { grid-template-columns: 1fr; } .list { border-right: 0; border-bottom: 2px solid var(--line); } .grid { grid-template-columns: repeat(6, minmax(36px, 1fr)); gap: 4px; } .slot { min-width: 0; } .mobile-row { grid-template-columns: 1fr; } .phone.landscape { min-height: 190px; aspect-ratio: 844 / 390; } .landscape .screen { min-height: 168px; } }
     @media (max-width: 900px) { .mobile-row { grid-template-columns: 1fr; } .phone.landscape { max-width: 100%; } }
     @media (max-width: 620px) { .map-pair { grid-template-columns: 1fr; } .controlled-study { padding: 14px; } }
@@ -168,8 +177,8 @@
 <main>
   <h1>背包與場景視覺候選</h1>
   <p class="intro">Dewhollow Farm · 同一組 24 格容量與甜蘿蔔詳情，供比較兩種視覺精修方向。場景圖為概念稿；本頁介面是靜態提案，未連接遊戲狀態、操作或正式素材。</p>
-  <div class="gate">場景方向 B 已由使用者選定 · 場景圖與六款物品圖示仍是候選，尚未核准整合 · 靜態示意，按鈕不可操作</div>
-  <p class="intro">物品圖示有兩組待比較候選，六款物件使用一致的名稱與順序；請先檢視 VF-02B 風格比較，再閱讀下方既有背包版面提案。</p>
+  <div class="gate">場景方向 B、物品圖示美術方向 B 已由使用者選定 · 個別場景與物品素材仍是候選，尚未核准整合 · 靜態示意，按鈕不可操作</div>
+  <p class="intro">VF-02B 記錄像素與繪本風格比較；你已選繪本方向。VF-02C 下方展示六張分開生成的透明圖示，各檔案仍須依確切雜湊核准，再閱讀背包版面提案。</p>
 
   <section class="icon-directions" aria-labelledby="icon-directions-title">
     <h2 id="icon-directions-title">VF-02B｜物品圖示風格對照</h2>
@@ -193,6 +202,18 @@
       </article>
     </div>
     <p class="caption">物件順序（左至右、上至下）：甜蘿蔔、種子袋、木材、礦石、魚、料理。圖像與排版均未核准、未整合。</p>
+  </section>
+  <section class="selected-icon-candidates" aria-labelledby="selected-icons-title">
+    <h2 id="selected-icons-title">VF-02C｜繪本手繪圖示候選</h2>
+    <p>你已選擇 B 繪本手繪方向。以下六張是獨立透明 PNG 候選，背景棋盤格只用來顯示 alpha；每件素材仍待你依確切檔案與 SHA-256 核准，尚未進入正式素材清單。</p>
+    <div class="item-candidate-grid">
+      <figure class="item-candidate"><img src="items/sweet-turnip.png" alt="繪本手繪甜蘿蔔候選，透明背景"><figcaption>甜蘿蔔<small>candidate · 1254×1254 RGBA</small></figcaption></figure>
+      <figure class="item-candidate"><img src="items/seed-bag.png" alt="繪本手繪種子袋候選，透明背景"><figcaption>種子袋<small>candidate · 1254×1254 RGBA</small></figcaption></figure>
+      <figure class="item-candidate"><img src="items/wood.png" alt="繪本手繪木材候選，透明背景"><figcaption>木材<small>candidate · 1254×1254 RGBA</small></figcaption></figure>
+      <figure class="item-candidate"><img src="items/ore.png" alt="繪本手繪礦石候選，透明背景"><figcaption>礦石<small>candidate · 1254×1254 RGBA</small></figcaption></figure>
+      <figure class="item-candidate"><img src="items/fish.png" alt="繪本手繪魚候選，透明背景"><figcaption>魚<small>candidate · 1254×1254 RGBA</small></figcaption></figure>
+      <figure class="item-candidate"><img src="items/stew.png" alt="繪本手繪燉菜候選，透明背景"><figcaption>燉菜<small>candidate · 1254×1254 RGBA</small></figcaption></figure>
+    </div>
   </section>
   <section class="controlled-study" aria-labelledby="controlled-title">
     <h2 id="controlled-title">受控場景對照｜共用地圖幾何與鏡頭</h2>
