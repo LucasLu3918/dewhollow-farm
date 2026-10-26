@@ -45,8 +45,21 @@
           </div>
           <button id="inventory-close" class="inventory-close" type="button">關閉</button>
         </header>
-        <div id="inventory-content" class="inventory-content" aria-live="polite">
-          <p class="inventory-empty">物品會收在這裡，稍後就能查看與整理。</p>
+        <div id="inventory-content" class="inventory-content">
+          <div class="inventory-toolbar">
+            <nav class="inventory-filters" aria-label="背包物品分類">
+              <button id="inventory-filter-all" type="button" aria-pressed="true">全部</button>
+              <button id="inventory-filter-farming" type="button" aria-pressed="false">農耕</button>
+              <button id="inventory-filter-materials" type="button" aria-pressed="false">材料</button>
+              <button id="inventory-filter-food" type="button" aria-pressed="false">食物</button>
+              <button id="inventory-filter-wearables" type="button" aria-pressed="false">服飾</button>
+              <button id="inventory-filter-other" type="button" aria-pressed="false">其他</button>
+            </nav>
+            <p id="inventory-capacity" class="inventory-capacity" aria-live="polite">0 / 24</p>
+          </div>
+          <p id="inventory-full" class="inventory-full" role="status" hidden>背包已滿</p>
+          <p id="inventory-empty" class="inventory-empty" hidden>這個分類目前沒有物品。</p>
+          <div id="inventory-grid" class="inventory-grid" role="grid" aria-label="背包格子"></div>
         </div>
       </section>
       <section id="tool-seed-panel" class="shop-panel tool-seed-panel" aria-labelledby="tool-seed-title" role="dialog" aria-modal="true" hidden>

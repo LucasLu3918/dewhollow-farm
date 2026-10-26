@@ -52,6 +52,7 @@ import farm from '../content/maps/farm.json';
 import village from '../content/maps/village.json';
 import plaza from '../content/maps/plaza.json';
 import { createContentIndex } from './application/content-index';
+import { inventoryDisplay } from './application/inventory-display';
 import { NO_LEGACY } from './domain/legacy';
 import { GameSession } from './application/game-session';
 import type { SaveRepository } from './application/ports';
@@ -66,6 +67,7 @@ import { parseChangelog, parseHelpContent } from './infrastructure/content/info-
 import { MemorySaveRepository } from './infrastructure/persistence/memory-save-repository';
 import { IndexedDbSaveRepository, hasIndexedDb } from './infrastructure/persistence/indexeddb-save-repository';
 import { parseSaveRecord } from './infrastructure/persistence/save-schema';
+import { resolveItemIcon } from './infrastructure/assets/asset-manifest';
 import type { MigrationContext } from './infrastructure/persistence/save-migrations';
 import { Hud } from './presentation/hud';
 import { InventoryPanel } from './presentation/inventory-panel';
@@ -192,6 +194,15 @@ async function bootstrap(): Promise<void> {
     return;
   }
   const started: GameSession = session;
+  inventory.setDataProvider(() => {
+    const currentInventory = started.state.inventory;
+    const knownItemIds = new Set(currentInventory.stacks.map((stack) => stack.itemId));
+    return {
+      capacity: currentInventory.capacity,
+      entries: inventoryDisplay(currentInventory, index),
+      resolveIcon: (itemId) => resolveItemIcon(loaded.assets, itemId, knownItemIds),
+    };
+  });
 
   const game = new Phaser.Game({
     type: Phaser.AUTO,
