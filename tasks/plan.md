@@ -116,7 +116,7 @@
 
 - [x] 三種中斷情境均確認 held direction 為空、moving／pending 為 false、queue 為 0，安靜窗中位置不變。
 - [x] `npm run check` 通過（162 個測試檔、1,643 passed／1 skipped；build 2.808 MB）；專項 Chromium E2E 3/3、完整 Chromium E2E 251/251（4 workers）通過。
-- [x] AIPS Impact reconciliation 與 commit `6966b264e39e822eaae749260492396e0357faba` 完成；PR、Required Checks 與 merge 待完成。
+- [x] AIPS Impact reconciliation、commit `19261fe17c6466758bb556003b476c6afa43deca`、PR #56 Required Checks（GitHub Actions run `40293927563`）通過並 squash merge 至 `main`（merge SHA `d78d249d5d4dd5c4d4583b7e7a0c6268bde55552`）。
 - [ ] 人工美術／盲測與原生 iOS／Android 驗收 gate 保持待完成。
 
 詳見 [輸入取消與場景轉換證據](../docs/art/candidates/pixel-movement/gate1-input-cancel-transition.zh-TW.md)。
