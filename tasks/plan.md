@@ -326,3 +326,21 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 確認候選圖仍未核准、靜態候選門未被宣稱為可互動，並更新 DF-QA-01 與任務紀錄。
 - [x] 專項 E2E、`npm run check`、完整 Chromium E2E（241/241，4 workers）、Impact reconciliation、commit、PR Required Checks 與 merge。
 - [ ] 收集至少三位獨立觀察者作答；每位至少答對 9／10 才達 §11.1 可讀性門檻。實機驗收仍為 `DEVICE_PENDING`。
+- [x] PR #50 已 squash merge 至 `main`；merge commit `46bdbf3072957801b1f773b41e9481a711b874e8`。
+
+# DF-G1-TILING-CONTINUITY pixel32 候選地表重複與接縫證據
+
+## 範圍與限制
+
+只用現有未核准 pixel32 map manifest／atlas 建立候選 QA 預覽與確定性畫素邊界量測。覆蓋四季的 grass、field、path、water 3×3 重複樣本及 64 個 field edge mask；記錄鄰接像素差、輸入／輸出 SHA-256、錯誤與變體數量。每季目前只有各一張 grass／field／path／water 基礎圖塊；field 有 16 個遮罩，沒有 pixel32 soil，也沒有多款隨機地表變體。
+
+不新增或修改候選素材、manifest、generator、正式 runtime／素材／地圖／玩法／存檔；自動化邊界數值不等同人眼判斷無縫或藝術核准。人眼接縫評分與確切素材核准仍待後續處理。
+
+## 任務與驗收
+
+- [x] 新增隔離候選預覽：四季 3×3 重複地表、草地／田地 3×3 鄰接示意（圖格外視為草地，依 north/east/south/west bits 選 mask frame），呈現所有 64 個 field edge mask；此示意不是透明疊圖或正式遊戲地圖規則。
+- [ ] 計算且保存每個季節／表面的 tile frame 數、邊界樣本數、精確相等像素數、平均／最大 RGB 差；保留完整來源與截圖 hash。
+- [x] E2E 驗證四季、地表、遮罩、混合邊界假設、候選狀態、素材請求、錯誤和證據完整性；`npm run check` 全通過；完整 Chromium E2E 242/242（4 workers）。
+- [x] 更新 DF-QA-01、任務紀錄與繁中候選報告；不把缺少的土壤或隨機變體包裝成通過。
+- [ ] 收集人工接縫／紋理評分；候選仍未核准。
+- [ ] `npm run check`、完整 `npm run test:e2e`、Impact reconciliation、commit、PR Required Checks 與 merge。

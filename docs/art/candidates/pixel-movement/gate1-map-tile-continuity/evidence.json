@@ -1,0 +1,458 @@
+{
+  "schemaVersion": 1,
+  "candidateStatus": "candidate",
+  "approved": false,
+  "sourceHashes": {
+    "manifestSha256": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+    "atlasSha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+    "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+  },
+  "atlasDimensions": {
+    "width": 512,
+    "height": 512
+  },
+  "seasons": [
+    {
+      "season": "spring",
+      "screenshot": "docs/art/candidates/pixel-movement/gate1-map-tile-continuity/screenshots/spring.png",
+      "screenshotSha256": "9256197a2a850ff8255c3aaf0f908e8f7a28e71396cbceec492f8198ae8db3aa",
+      "screenshotDimensions": {
+        "width": 1280,
+        "height": 1641
+      },
+      "loadedFrameIds": [
+        "spring-field",
+        "spring-field-edge-0",
+        "spring-field-edge-1",
+        "spring-field-edge-2",
+        "spring-field-edge-3",
+        "spring-field-edge-4",
+        "spring-field-edge-5",
+        "spring-field-edge-6",
+        "spring-field-edge-7",
+        "spring-field-edge-8",
+        "spring-field-edge-9",
+        "spring-field-edge-a",
+        "spring-field-edge-b",
+        "spring-field-edge-c",
+        "spring-field-edge-d",
+        "spring-field-edge-e",
+        "spring-field-edge-f",
+        "spring-grass",
+        "spring-path",
+        "spring-water"
+      ],
+      "maskIds": [
+        "spring-field-edge-0",
+        "spring-field-edge-1",
+        "spring-field-edge-2",
+        "spring-field-edge-3",
+        "spring-field-edge-4",
+        "spring-field-edge-5",
+        "spring-field-edge-6",
+        "spring-field-edge-7",
+        "spring-field-edge-8",
+        "spring-field-edge-9",
+        "spring-field-edge-a",
+        "spring-field-edge-b",
+        "spring-field-edge-c",
+        "spring-field-edge-d",
+        "spring-field-edge-e",
+        "spring-field-edge-f"
+      ],
+      "metrics": [
+        {
+          "surface": "grass",
+          "label": "草地",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "field",
+          "label": "田地",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "path",
+          "label": "道路",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "water",
+          "label": "水面",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        }
+      ],
+      "mixedCellFrames": [
+        "spring-grass",
+        "spring-grass",
+        "spring-grass",
+        "spring-field-edge-9",
+        "spring-field-edge-1",
+        "spring-field-edge-3",
+        "spring-field-edge-c",
+        "spring-field-edge-4",
+        "spring-field-edge-6"
+      ],
+      "mixedMaskIds": [
+        "spring-field-edge-9",
+        "spring-field-edge-1",
+        "spring-field-edge-3",
+        "spring-field-edge-c",
+        "spring-field-edge-4",
+        "spring-field-edge-6"
+      ],
+      "mixedBoundaryAssumption": "out-of-grid=grass; bits north=1,east=2,south=4,west=8",
+      "hashes": {
+        "manifestSha256": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+        "atlasSha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+        "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+      }
+    },
+    {
+      "season": "summer",
+      "screenshot": "docs/art/candidates/pixel-movement/gate1-map-tile-continuity/screenshots/summer.png",
+      "screenshotSha256": "fef3653e6f5c97e979d5cf80036db927e98d7e661f56ebee97ed13988615a216",
+      "screenshotDimensions": {
+        "width": 1280,
+        "height": 1639
+      },
+      "loadedFrameIds": [
+        "summer-field",
+        "summer-field-edge-0",
+        "summer-field-edge-1",
+        "summer-field-edge-2",
+        "summer-field-edge-3",
+        "summer-field-edge-4",
+        "summer-field-edge-5",
+        "summer-field-edge-6",
+        "summer-field-edge-7",
+        "summer-field-edge-8",
+        "summer-field-edge-9",
+        "summer-field-edge-a",
+        "summer-field-edge-b",
+        "summer-field-edge-c",
+        "summer-field-edge-d",
+        "summer-field-edge-e",
+        "summer-field-edge-f",
+        "summer-grass",
+        "summer-path",
+        "summer-water"
+      ],
+      "maskIds": [
+        "summer-field-edge-0",
+        "summer-field-edge-1",
+        "summer-field-edge-2",
+        "summer-field-edge-3",
+        "summer-field-edge-4",
+        "summer-field-edge-5",
+        "summer-field-edge-6",
+        "summer-field-edge-7",
+        "summer-field-edge-8",
+        "summer-field-edge-9",
+        "summer-field-edge-a",
+        "summer-field-edge-b",
+        "summer-field-edge-c",
+        "summer-field-edge-d",
+        "summer-field-edge-e",
+        "summer-field-edge-f"
+      ],
+      "metrics": [
+        {
+          "surface": "grass",
+          "label": "草地",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "field",
+          "label": "田地",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "path",
+          "label": "道路",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "water",
+          "label": "水面",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        }
+      ],
+      "mixedCellFrames": [
+        "summer-grass",
+        "summer-grass",
+        "summer-grass",
+        "summer-field-edge-9",
+        "summer-field-edge-1",
+        "summer-field-edge-3",
+        "summer-field-edge-c",
+        "summer-field-edge-4",
+        "summer-field-edge-6"
+      ],
+      "mixedMaskIds": [
+        "summer-field-edge-9",
+        "summer-field-edge-1",
+        "summer-field-edge-3",
+        "summer-field-edge-c",
+        "summer-field-edge-4",
+        "summer-field-edge-6"
+      ],
+      "mixedBoundaryAssumption": "out-of-grid=grass; bits north=1,east=2,south=4,west=8",
+      "hashes": {
+        "manifestSha256": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+        "atlasSha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+        "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+      }
+    },
+    {
+      "season": "autumn",
+      "screenshot": "docs/art/candidates/pixel-movement/gate1-map-tile-continuity/screenshots/autumn.png",
+      "screenshotSha256": "23cb0534bce7e1c0efb8dcf40e6dd2dd96cf57cc38cba5f3a1b9ed9fa835da24",
+      "screenshotDimensions": {
+        "width": 1280,
+        "height": 1639
+      },
+      "loadedFrameIds": [
+        "autumn-field",
+        "autumn-field-edge-0",
+        "autumn-field-edge-1",
+        "autumn-field-edge-2",
+        "autumn-field-edge-3",
+        "autumn-field-edge-4",
+        "autumn-field-edge-5",
+        "autumn-field-edge-6",
+        "autumn-field-edge-7",
+        "autumn-field-edge-8",
+        "autumn-field-edge-9",
+        "autumn-field-edge-a",
+        "autumn-field-edge-b",
+        "autumn-field-edge-c",
+        "autumn-field-edge-d",
+        "autumn-field-edge-e",
+        "autumn-field-edge-f",
+        "autumn-grass",
+        "autumn-path",
+        "autumn-water"
+      ],
+      "maskIds": [
+        "autumn-field-edge-0",
+        "autumn-field-edge-1",
+        "autumn-field-edge-2",
+        "autumn-field-edge-3",
+        "autumn-field-edge-4",
+        "autumn-field-edge-5",
+        "autumn-field-edge-6",
+        "autumn-field-edge-7",
+        "autumn-field-edge-8",
+        "autumn-field-edge-9",
+        "autumn-field-edge-a",
+        "autumn-field-edge-b",
+        "autumn-field-edge-c",
+        "autumn-field-edge-d",
+        "autumn-field-edge-e",
+        "autumn-field-edge-f"
+      ],
+      "metrics": [
+        {
+          "surface": "grass",
+          "label": "草地",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "field",
+          "label": "田地",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "path",
+          "label": "道路",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "water",
+          "label": "水面",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        }
+      ],
+      "mixedCellFrames": [
+        "autumn-grass",
+        "autumn-grass",
+        "autumn-grass",
+        "autumn-field-edge-9",
+        "autumn-field-edge-1",
+        "autumn-field-edge-3",
+        "autumn-field-edge-c",
+        "autumn-field-edge-4",
+        "autumn-field-edge-6"
+      ],
+      "mixedMaskIds": [
+        "autumn-field-edge-9",
+        "autumn-field-edge-1",
+        "autumn-field-edge-3",
+        "autumn-field-edge-c",
+        "autumn-field-edge-4",
+        "autumn-field-edge-6"
+      ],
+      "mixedBoundaryAssumption": "out-of-grid=grass; bits north=1,east=2,south=4,west=8",
+      "hashes": {
+        "manifestSha256": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+        "atlasSha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+        "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+      }
+    },
+    {
+      "season": "winter",
+      "screenshot": "docs/art/candidates/pixel-movement/gate1-map-tile-continuity/screenshots/winter.png",
+      "screenshotSha256": "5a0dda426145aabc5782904a7dccaff0d73228300fe80985b9710159b1447e9a",
+      "screenshotDimensions": {
+        "width": 1280,
+        "height": 1639
+      },
+      "loadedFrameIds": [
+        "winter-field",
+        "winter-field-edge-0",
+        "winter-field-edge-1",
+        "winter-field-edge-2",
+        "winter-field-edge-3",
+        "winter-field-edge-4",
+        "winter-field-edge-5",
+        "winter-field-edge-6",
+        "winter-field-edge-7",
+        "winter-field-edge-8",
+        "winter-field-edge-9",
+        "winter-field-edge-a",
+        "winter-field-edge-b",
+        "winter-field-edge-c",
+        "winter-field-edge-d",
+        "winter-field-edge-e",
+        "winter-field-edge-f",
+        "winter-grass",
+        "winter-path",
+        "winter-water"
+      ],
+      "maskIds": [
+        "winter-field-edge-0",
+        "winter-field-edge-1",
+        "winter-field-edge-2",
+        "winter-field-edge-3",
+        "winter-field-edge-4",
+        "winter-field-edge-5",
+        "winter-field-edge-6",
+        "winter-field-edge-7",
+        "winter-field-edge-8",
+        "winter-field-edge-9",
+        "winter-field-edge-a",
+        "winter-field-edge-b",
+        "winter-field-edge-c",
+        "winter-field-edge-d",
+        "winter-field-edge-e",
+        "winter-field-edge-f"
+      ],
+      "metrics": [
+        {
+          "surface": "grass",
+          "label": "草地",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "field",
+          "label": "田地",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "path",
+          "label": "道路",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        },
+        {
+          "surface": "water",
+          "label": "水面",
+          "exactMatchCount": 64,
+          "meanRgbDelta": 0,
+          "maxRgbDelta": 0,
+          "sampleCount": 64
+        }
+      ],
+      "mixedCellFrames": [
+        "winter-grass",
+        "winter-grass",
+        "winter-grass",
+        "winter-field-edge-9",
+        "winter-field-edge-1",
+        "winter-field-edge-3",
+        "winter-field-edge-c",
+        "winter-field-edge-4",
+        "winter-field-edge-6"
+      ],
+      "mixedMaskIds": [
+        "winter-field-edge-9",
+        "winter-field-edge-1",
+        "winter-field-edge-3",
+        "winter-field-edge-c",
+        "winter-field-edge-4",
+        "winter-field-edge-6"
+      ],
+      "mixedBoundaryAssumption": "out-of-grid=grass; bits north=1,east=2,south=4,west=8",
+      "hashes": {
+        "manifestSha256": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+        "atlasSha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+        "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+      }
+    }
+  ],
+  "metricMethod": "For each repeated 3x3 surface sample, compare RGB values of corresponding pixels across each tile left/right and top/bottom edge; 64 comparisons per surface. Alpha is not included. Measurements are observations, not a seamlessness quality gate.",
+  "limitations": [
+    "Automated edge RGB measurements do not establish human-perceived seamlessness.",
+    "RGB measurements do not compare alpha-channel continuity.",
+    "Mixed-boundary preview treats out-of-grid neighbors as grass and is not a production map-rule test.",
+    "Candidate frames remain unapproved; no production assets or runtime were changed."
+  ],
+  "pageErrors": [],
+  "requestFailures": [],
+  "badResponses": []
+}

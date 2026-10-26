@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>圖塊接縫觀察｜Dewhollow Farm</title>
+    <link rel="stylesheet" href="./continuity.css">
+    <script type="module" src="./continuity.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <p class="eyebrow">GATE 1 · 候選素材 QA</p>
+        <h1>四季圖塊接縫觀察</h1>
+        <p class="intro">以 3×3 重複圖塊觀察草地、田地、道路與水面；下方列出每季全部 16 種田地邊緣遮罩。像素差是量測資料，不代表主觀無縫評分。</p>
+      </header>
+      <section class="controls" aria-label="季節選擇">
+        <fieldset>
+          <legend>候選季節</legend>
+          <div class="season-buttons">
+            <button type="button" data-season="spring" aria-pressed="true">春</button>
+            <button type="button" data-season="summer" aria-pressed="false">夏</button>
+            <button type="button" data-season="autumn" aria-pressed="false">秋</button>
+            <button type="button" data-season="winter" aria-pressed="false">冬</button>
+          </div>
+        </fieldset>
+        <span class="candidate-tag">candidate · approved=false</span>
+      </section>
+      <section class="card" aria-labelledby="repeat-title">
+        <div class="card-heading"><h2 id="repeat-title">3×3 重複樣本</h2><span>同一 frame 重複 · 最近鄰顯示</span></div>
+        <canvas id="repeat-preview" width="800" height="184" role="img" aria-label="四種地表的 3×3 重複圖塊樣本"></canvas>
+        <div class="surface-labels" aria-hidden="true"><span>草地</span><span>田地</span><span>道路</span><span>水面</span></div>
+      </section>
+      <section class="card" aria-labelledby="mask-title">
+        <div class="card-heading"><h2 id="mask-title">田地邊緣遮罩 0–15</h2><span>16 種 frame · 當季全數顯示</span></div>
+        <canvas id="mask-preview" width="800" height="176" role="img" aria-label="田地邊緣遮罩 0 到 15 全部 16 種候選圖塊"></canvas>
+        <ol id="mask-labels" class="mask-labels" aria-label="顯示中的遮罩編號"></ol>
+      </section>
+      <section class="card" aria-labelledby="mixed-title">
+        <div class="card-heading"><h2 id="mixed-title">草地與田地混合邊界示意</h2><span>依相鄰地表選用 mask frame · 非透明度疊圖</span></div>
+        <p class="mixed-note">方向假設：遮罩 bit 1／2／4／8 分別代表北／東／南／西側鄰格不是田地；3×3 範圍外也視為草地。田地格依此鄰接關係選取候選 edge frame。</p>
+        <canvas id="mixed-preview" width="800" height="184" role="img" aria-label="草地與田地相鄰的 3×3 候選邊界示意"></canvas>
+        <p id="mixed-frame-list" class="mixed-frames"></p>
+      </section>
+      <section class="metrics card" aria-labelledby="metrics-title">
+        <div class="card-heading"><h2 id="metrics-title">相鄰像素觀測</h2><span>只記錄數值，不設通過門檻</span></div>
+        <p class="metric-note">每個 3×3 樣本計算水平與垂直接縫兩側對應像素的 RGB 絕對差；色彩與紋理觀感仍需人工檢視。</p>
+        <div id="metrics" class="metric-grid" aria-live="polite"></div>
+      </section>
+      <footer>
+        <p id="readout" aria-live="polite">載入候選圖集…</p>
+        <p id="source-hashes" class="hashes"></p>
+        <p>候選 QA 頁 · 不改正式遊戲素材或地圖規則</p>
+      </footer>
+    </main>
+  </body>
+</html>
