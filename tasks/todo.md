@@ -17,6 +17,11 @@
 - [ ] 執行完整檢查、Impact reconciliation、commit、push、PR、Required Checks 和 merge。
 - [ ] 下一階段補齊 pixel32 候選覆蓋並提供確切版本供人眼審查；未核准素材不得正式整合，實機維持 `DEVICE_PENDING`。
 
+## DF-G1-READABILITY-10SCENARIOS
+
+- [x] 建立十情境 100% 尺寸盲測證據包，涵蓋作物成熟／未成熟、乾／濕土、玩家／居民／貓，以及既有可進入門；自動化包已完成，人工評分仍待收集。
+- [ ] 收集獨立人工評分並保留候選素材逐 SHA 核准及實機驗收 gate。
+
 詳見 [DF-QA-01 稽核矩陣](../docs/art/audit/df-qa-01.md)。
 
 ---
