@@ -4,23 +4,40 @@ import { playActionEffect } from './effects';
 
 interface FakeParticle {
   destroyed: boolean;
+  destroyCount: number;
   setDepth(): FakeParticle;
   setScale(): FakeParticle;
   destroy(): void;
 }
 
+interface FakeTweenConfig {
+  targets: FakeParticle;
+  onComplete?: () => void;
+  onStop?: () => void;
+}
+
 function fakeScene() {
   const particles: FakeParticle[] = [];
   const completions: (() => void)[] = [];
+  const stops: (() => void)[] = [];
+  const tweenConfigs: FakeTweenConfig[] = [];
   const create = (): FakeParticle => {
     const particle: FakeParticle = {
       destroyed: false,
+      destroyCount: 0,
       setDepth: () => particle,
       setScale: () => particle,
-      destroy: () => { particle.destroyed = true; },
+      destroy: () => {
+        particle.destroyed = true;
+        particle.destroyCount += 1;
+      },
     };
     particles.push(particle);
     return particle;
+  };
+  const stopMatching = (targets: FakeParticle | FakeParticle[]) => {
+    const selected = Array.isArray(targets) ? targets : [targets];
+    tweenConfigs.filter((config) => selected.includes(config.targets)).forEach((config) => config.onStop?.());
   };
   const scene = {
     add: {
@@ -30,12 +47,16 @@ function fakeScene() {
       text: vi.fn(create),
     },
     tweens: {
-      add: vi.fn((config: { onComplete?: () => void }) => {
+      add: vi.fn((config: FakeTweenConfig) => {
+        tweenConfigs.push(config);
         if (config.onComplete) completions.push(config.onComplete);
+        if (config.onStop) stops.push(config.onStop);
       }),
+      killTweensOf: vi.fn(stopMatching),
+      killAll: vi.fn(() => tweenConfigs.forEach((config) => config.onStop?.())),
     },
   } as unknown as Phaser.Scene;
-  return { scene, particles, completions };
+  return { scene, particles, completions, stops };
 }
 
 describe('action particle feedback', () => {
@@ -60,6 +81,26 @@ describe('action particle feedback', () => {
     completions.forEach((complete) => complete());
     playActionEffect(scene, 'fish', 4, 5);
     expect(particles).toHaveLength(70);
+    expect(particles.filter((particle) => !particle.destroyed)).toHaveLength(6);
+  });
+
+  it('destroys and releases particles when tweens are stopped or killed', () => {
+    const { scene, particles, completions, stops } = fakeScene();
+    playActionEffect(scene, 'fish', 4, 5);
+    playActionEffect(scene, 'fish', 4, 5);
+
+    scene.tweens.killTweensOf(particles.slice(0, 2));
+    expect(particles.slice(0, 2).every((particle) => particle.destroyed)).toBe(true);
+    expect(stops).toHaveLength(12);
+    playActionEffect(scene, 'fish', 4, 5);
+    expect(particles).toHaveLength(18);
+
+    scene.tweens.killAll();
+    completions.forEach((complete) => complete());
+    expect(particles.every((particle) => particle.destroyCount === 1)).toBe(true);
+
+    playActionEffect(scene, 'fish', 4, 5);
+    expect(particles).toHaveLength(24);
     expect(particles.filter((particle) => !particle.destroyed)).toHaveLength(6);
   });
 
