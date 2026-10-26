@@ -478,5 +478,13 @@
       "file": "assets/icons/icon-maskable-512.png",
       "source": "程式產生：tools/pwa/make-icons.mjs 以 64×64 邏輯畫布繪製像素風草地、太陽與幼苗，再以最近鄰放大輸出 RGBA8888；無外部素材。"
     }
-  ]
+  ],
+  "itemIcons": {
+    "crop.sweet-radish": "assets/items/sweet-turnip.png",
+    "seed.sweet-radish": "assets/items/seed-bag.png",
+    "wood": "assets/items/wood.png",
+    "copper-ore": "assets/items/ore.png",
+    "fish.carp": "assets/items/fish.png",
+    "dish.creek-stew": "assets/items/stew.png"
+  }
 }

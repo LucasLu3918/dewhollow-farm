@@ -75,7 +75,12 @@ describe('素材與 public/ 的登錄', () => {
   });
 
   it('public/ 裡每個檔案都登錄在 assets.json（或在允許清單中）', () => {
-    const registered = new Set(assets.assets.flatMap((a) => ('file' in a && a.file ? [`${a.file}`] : [])));
+    const itemIconFiles = Object.values(assets.itemIcons ?? {});
+    const registered = new Set([
+      ...assets.assets.flatMap((a) => ('file' in a && a.file ? [`${a.file}`] : [])),
+      ...itemIconFiles,
+      ...itemIconFiles.map((file) => `${file}.provenance.json`),
+    ]);
     const unregistered = publicFiles.filter((file) => !registered.has(file) && !UNREGISTERED_ALLOWED.has(file));
     expect(unregistered).toEqual([]);
   });

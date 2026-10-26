@@ -107,8 +107,19 @@ describe('loadContent with shipped content', () => {
     expect(loadedAssets.itemIcons).toEqual({ 'item.sweet-radish': iconPath });
   });
 
-  it('keeps shipped content valid when item icon metadata is absent', () => {
-    expect(loadContent(shipped()).assets.itemIcons).toBeUndefined();
+  it('loads shipped item icon metadata for canonical inventory IDs', () => {
+    expect(loadContent(shipped()).assets.itemIcons).toEqual({
+      'crop.sweet-radish': 'assets/items/sweet-turnip.png',
+      'seed.sweet-radish': 'assets/items/seed-bag.png',
+      wood: 'assets/items/wood.png',
+      'copper-ore': 'assets/items/ore.png',
+      'fish.carp': 'assets/items/fish.png',
+      'dish.creek-stew': 'assets/items/stew.png',
+    });
+  });
+
+  it('keeps shipped content valid when optional item icon metadata is absent', () => {
+    expect(loadContent(shipped({ assets: { version: assets.version, assets: assets.assets } })).assets.itemIcons).toBeUndefined();
   });
 
   it('loads the deep mine rules, and every ore they name is a real item', () => {

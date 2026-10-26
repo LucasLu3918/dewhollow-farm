@@ -281,6 +281,21 @@ describe('shipped assets', () => {
     expect(assetProblems(manifest)).toEqual([]);
   });
 
+  it('resolves every shipped icon to a public PNG for its canonical inventory ID', () => {
+    const knownItemIds = new Set([
+      ...items.items.map(({ id }) => id),
+      ...fish.fish.map(({ id }) => `fish.${id}`),
+      ...Object.keys(manifest.itemIcons ?? {}),
+    ]);
+    for (const [itemId, file] of Object.entries(manifest.itemIcons ?? {})) {
+      expect(onDisk, itemId).toContain(file);
+      expect(resolveItemIcon(manifest, itemId, knownItemIds), itemId).toEqual({
+        status: 'available',
+        src: `/${file}`,
+      });
+    }
+  });
+
   it('gives the player a front, back and side image, and mirrors the side for facing right', () => {
     const byId = new Map(manifest.assets.map((a) => [a.id, a]));
     expect(byId.get('player.down')).toMatchObject({ file: 'assets/characters/xiaohan-2x.png', density: 2 });

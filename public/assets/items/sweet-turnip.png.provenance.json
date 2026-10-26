@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "5c7a408b8083ce8d9d07bdecc0cec782991c7b32bfcbd7f20982315d321bd5d2",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "crop.sweet-radish",
+  "candidate_filename": "sweet-turnip.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T13:53:28Z",
+  "integrated_filename": "sweet-turnip.png",
+  "schema_version": 1,
+  "sha256": "1a490dd850b97cb5bcfb85568cad20ccca6e60dff7c81bbb0fffbc561aeeead4"
+}

@@ -1,6 +1,6 @@
 # VF-02 背包與場景 A/B 候選
 
-狀態：使用者已選定場景方向 **B**（`candidate-b-scenes.png`）；A 不採用。場景圖與六款新物品圖示仍是候選，尚未逐項核准，禁止整合至正式遊戲。日期：2026-10-26。
+狀態：使用者已選定場景方向 **B**（`candidate-b-scenes.png`）；A 不採用。六款繪本風物品圖示已於 2026-10-26 逐一核准並整合（詳見 [`docs/art/asset-review.md`](../../asset-review.md)）；場景 B 圖仍是候選素材，尚未核准整合。日期：2026-10-26。
 
 開啟 [`index.html`](index.html) 檢視受控農場／村莊 A/B 場景、桌機背包與選中道具詳情、390×844 直式和 844×390 橫式。候選 PNG 只作氛圍靈感，不參與幾何／zoom 對照。
 
@@ -39,9 +39,9 @@
 
 ## 繪本風單件候選（VF-02C）
 
-使用者已選擇 **B｜繪本手繪** 作為圖示美術方向；此決定不等於核准任何正式素材。以下六個獨立 PNG 都是 `candidate`，須由使用者逐項核准確切檔案與 SHA-256 後，才可進入最終化、`public/assets` 或 `content/assets.json`。
+使用者已選擇 **B｜繪本手繪** 作為圖示美術方向。方向選擇後，使用者再於 2026-10-26 逐項核准以下六個獨立 PNG 與確切 SHA-256；六個原始 PNG 已通過素材核准 gate，並整合至 `public/assets/items/`，由 `content/assets.json` 的 `itemIcons` 對應實際 inventory ID。完整核准與 provenance 紀錄見 [`docs/art/asset-review.md`](../../asset-review.md)。
 
-| 素材 | 候選檔 | 尺寸／格式 | SHA-256 |
+| 素材 | 原候選檔 | 尺寸／格式 | 核准／整合 SHA-256 |
 |---|---|---:|---|
 | 甜蘿蔔 | `items/sweet-turnip.png` | 1254×1254 RGBA | `1a490dd850b97cb5bcfb85568cad20ccca6e60dff7c81bbb0fffbc561aeeead4` |
 | 種子袋 | `items/seed-bag.png` | 1254×1254 RGBA | `2ab355b18d6a9d3779b78087d1318e7e32acd018f0d436e13eacdc04b25e8884` |
@@ -50,7 +50,7 @@
 | 魚 | `items/fish.png` | 1254×1254 RGBA | `027fa69938e6a2aa456992641bbfbf6aa8bcf10bdc3a5cdb0927afcf5c6e216a` |
 | 燉菜 | `items/stew.png` | 1254×1254 RGBA | `8b1d9c211b552049f8d1326b9a3b71f17f751532119abbcac87c9ce2b98df3c3` |
 
-來源：Codex 內建 imagegen，六個物品分別生成一張透明背景原創圖示；共同提示重點為繪本水彩與色鉛筆材質、置中單一物件、無文字／外框／場景，且在 64 px 顯示尺寸仍可辨識。工具未提供可查證的模型名稱或授權條款，因此本批維持候選狀態，發布前需完成來源與授權審核。比較板使用棋盤格呈現透明背景；未做縮放、去背或像素量化。
+來源：Codex 內建 imagegen，六個物品分別生成一張透明背景原創圖示；共同提示重點為繪本水彩與色鉛筆材質、置中單一物件、無文字／外框／場景，且在 64 px 顯示尺寸仍可辨識。工具未提供可查證的模型名稱或授權條款，因此本紀錄不推定模型名稱或授權。正式 PNG 保留核准候選的原始位元組；64 px 縮圖僅供檢查，沒有寫入正式素材。比較板使用棋盤格呈現透明背景。
 
 甜蘿蔔資料：`seedPrice = 25`、`growthDays = 3`，基礎售價 `round(25 × 3 × 1.3) = 98`；優良品質倍率 125%，出貨價 `round(98 × 1.25) = 123`。內容來源 `content/crops.json`，規則來源 `src/domain/pricing.ts`。其他物品格子數量僅供版面示意。
 
@@ -58,7 +58,7 @@
 
 - `candidate-a-scenes.png` 與 `candidate-b-scenes.png` 由本機影像模型生成；Golden Reference `docs/art/style-sheet.png` 僅作像素群與深棕輪廓的質感參照。兩 PNG 是氛圍概念圖，不是同地圖受控比較；原圖仍帶較柔筆觸，正式素材需像素清理與實際倍率檢視。
 - UI 與 VF-02B 圖示板皆為靜態提案，未連接 domain state、命令、鍵盤／觸控、focus restore、modal input lock、安全區或真機 hit target。按鈕只展示建議文案，不可操作。
-- 沒有新增到 `public/assets` 或 `content/assets.json`；沒有把場景／圖示標為 `reviewed`、`approved` 或 `integrated`。
+- 六款圖示已整合至 `public/assets/items/` 並登錄 `content/assets.json`；場景素材仍是候選，尚未標記為核准或整合。
 - VF-02 曾以 Chrome 檢查舊版 390×844 與 844×390 版面；VF-02B 新增比較板尚未完成瀏覽器實際渲染：`file://` 預覽遭瀏覽器安全策略拒絕，且本任務未使用其他瀏覽器路徑。新版目前只完成 XML、HTML 引用、CSS 斷點及固定 viewport 的靜態檢查；沒有可報告的新 viewport 截圖或實際排版觀察。
 
 ## 檔案校驗

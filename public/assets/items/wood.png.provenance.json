@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "e99ceb4c3e529e10e55830783da6b1b6cd34b7ee5f991423f8c102900559101d",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "wood",
+  "candidate_filename": "wood.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T13:53:28Z",
+  "integrated_filename": "wood.png",
+  "schema_version": 1,
+  "sha256": "a9938778931d349da37b3e15d521f003d2a9de04b1c7d18e8360a5091de21517"
+}
