@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="184" height="146" viewBox="0 0 184 146" shape-rendering="crispEdges">
+<defs>
+<symbol id="icon-radish" viewBox="0 0 32 32">
+      <path fill="#3c2b22" d="M8 11h4V8h3V5h3v3h3v3h4v4h-3v5h-3v4h-3v4h-3v-4h-3v-4H9v-5H8z"/>
+      <path fill="#4f8745" d="M11 10V6h3V3h3v5h2V5h3v4h-3v3h-3v-2z"/>
+      <path fill="#8ebb5a" d="M12 8h2v3h-2zm6-2h2v3h-2z"/>
+      <path fill="#d94f48" d="M10 12h12v4h-2v5h-3v4h-2v3h-2v-4h-2v-4h-1v-5h-2z"/>
+      <path fill="#f18466" d="M12 14h3v2h-2v5h2v3h-2v-3h-2v-5h1z"/>
+      <path fill="#ffbf7a" d="M12 15h2v3h-2z"/>
+    </symbol>
+<symbol id="icon-seed" viewBox="0 0 32 32">
+      <path fill="#3c2b22" d="M8 7h16v3h3v17H5V10h3z"/>
+      <path fill="#ead49a" d="M10 9h12v3h3v13H7V12h3z"/>
+      <path fill="#b98b4c" d="M10 12h12v2H10zm-1 3h14v2H9z"/>
+      <path fill="#765037" d="M11 20h3v-3h3v3h-2v3h-3v-2h-2zm8-1h3v3h-3z"/>
+      <path fill="#d8ad65" d="M12 19h2v2h-2zm7 3h2v2h-2z"/>
+      <path fill="#3c2b22" d="M13 4h6v2h-6z"/><path fill="#3c2b22" d="M14 3h4v2h-4z"/>
+    </symbol>
+<symbol id="icon-wood" viewBox="0 0 32 32">
+      <path fill="#3c2b22" d="M5 9h5V6h15v3h3v8h-4v3H9v-3H5zm3 11h5v-3h14v3h2v7H13v-2H8z"/>
+      <path fill="#9e653b" d="M10 8h14v3h2v5h-3v2H10V15H7v-4h3z"/>
+      <path fill="#bf8450" d="M11 10h12v2h-3v3h-9z"/>
+      <path fill="#e0b274" d="M12 10h5v2h-5z"/>
+      <path fill="#8b5735" d="M13 20h13v2h-3v3H13v-2h-3v-2h3z"/>
+      <path fill="#d2a06a" d="M15 21h7v2h-7z"/>
+      <path fill="#4e3428" d="M23 10h2v5h-2zm-9 11h2v3h-2z"/>
+    </symbol>
+<symbol id="icon-ore" viewBox="0 0 32 32">
+      <path fill="#3c2b22" d="M5 15h4V9h4V5h7v3h5v5h3v9h-4v4H11v-3H7v-4H5z"/>
+      <path fill="#7b8990" d="M8 16h4v-5h4V8h3v5h4v4h3v6h-4v3H12v-3H9v-4H7z"/>
+      <path fill="#bbc8c2" d="M13 12h3v4h-3zm6 3h4v3h-4zm-6 7h4v3h-4z"/>
+      <path fill="#586971" d="M9 18h3v4h3v3h-3v-2h-3zm11-8h3v4h-3z"/>
+      <path fill="#e2c77b" d="M17 10h2v3h-2z"/>
+    </symbol>
+<symbol id="icon-fish" viewBox="0 0 32 32">
+      <path fill="#3c2b22" d="M4 14h5v-4h5V7h8v3h4v4h4v8h-4v4h-5v3h-8v-3H9v-4H4z"/>
+      <path fill="#4c91a0" d="M6 15h5v-3h4V9h6v3h4v4h3v6h-4v3h-5v2h-5v-3h-4v-4H6z"/>
+      <path fill="#77c2bf" d="M12 13h5v3h-5zm6 6h5v3h-5z"/>
+      <path fill="#2e6878" d="M7 17h4v4H7zm9 8h4v2h-4z"/>
+      <path fill="#f2d18a" d="M23 16h2v2h-2z"/><path fill="#3c2b22" d="M24 16h1v1h-1z"/>
+      <path fill="#3c2b22" d="M11 12V9h3v3zm8 12h4v2h-4z"/>
+    </symbol>
+<symbol id="icon-dish" viewBox="0 0 32 32">
+      <path fill="#3c2b22" d="M5 17h22v4h-2v4h-3v3H10v-3H7v-4H5z"/>
+      <path fill="#a84f3b" d="M8 17h16v4h-2v3h-3v2h-7v-2h-2v-3H8z"/>
+      <path fill="#efb765" d="M8 15h16v3H8z"/>
+      <path fill="#f7dc95" d="M10 16h4v2h-4zm8 0h4v2h-4z"/>
+      <path fill="#79a759" d="M13 13h3v3h-3zm6 1h3v2h-3z"/>
+      <path fill="#e78b69" d="M9 20h3v3H9zm10 0h3v3h-3z"/>
+      <path fill="#3c2b22" d="M11 8h2v4h-2zm8-3h2v5h-2z"/>
+      <path fill="#b9d080" d="M12 7h2v3h-2zm8-2h2v3h-2z"/>
+      <path fill="#755039" d="M13 28h6v2h-6z"/>
+    </symbol>
+</defs>
+<rect width="184" height="146" fill="#1d352b"/>
+<rect x="8" y="8" width="48" height="48" fill="#d9d0a6" stroke="#66513a" stroke-width="2"/>
+<use href="#icon-radish" x="16" y="16" width="32" height="32"/>
+<text x="32" y="68" text-anchor="middle" fill="#edf4d7" font-family="sans-serif" font-size="10">甜蘿蔔</text>
+<rect x="68" y="8" width="48" height="48" fill="#d9d0a6" stroke="#66513a" stroke-width="2"/>
+<use href="#icon-seed" x="76" y="16" width="32" height="32"/>
+<text x="92" y="68" text-anchor="middle" fill="#edf4d7" font-family="sans-serif" font-size="10">種子</text>
+<rect x="128" y="8" width="48" height="48" fill="#d9d0a6" stroke="#66513a" stroke-width="2"/>
+<use href="#icon-wood" x="136" y="16" width="32" height="32"/>
+<text x="152" y="68" text-anchor="middle" fill="#edf4d7" font-family="sans-serif" font-size="10">木材</text>
+<rect x="8" y="68" width="48" height="48" fill="#d9d0a6" stroke="#66513a" stroke-width="2"/>
+<use href="#icon-ore" x="16" y="76" width="32" height="32"/>
+<text x="32" y="128" text-anchor="middle" fill="#edf4d7" font-family="sans-serif" font-size="10">礦石</text>
+<rect x="68" y="68" width="48" height="48" fill="#d9d0a6" stroke="#66513a" stroke-width="2"/>
+<use href="#icon-fish" x="76" y="76" width="32" height="32"/>
+<text x="92" y="128" text-anchor="middle" fill="#edf4d7" font-family="sans-serif" font-size="10">魚</text>
+<rect x="128" y="68" width="48" height="48" fill="#d9d0a6" stroke="#66513a" stroke-width="2"/>
+<use href="#icon-dish" x="136" y="76" width="32" height="32"/>
+<text x="152" y="128" text-anchor="middle" fill="#edf4d7" font-family="sans-serif" font-size="10">料理</text>
+</svg>
