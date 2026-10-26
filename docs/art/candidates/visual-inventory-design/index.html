@@ -121,6 +121,44 @@
     .map-b { --ground: #355f42; --grass: #57814e; --grass-detail: #85a75a; --path: #cfad68; --soil: #684330; --bed: #855236; --leaf: #2e5b3d; --leaf-light: #8eaf5d; --wood: #795032; --roof: #335e62; --stone: #bab084; --water: #65b9b5; --flower: #eb8ba8; --outline: #33291f; --detail-line: #e6ca81; --edge-width: 4px; --detail-width: 3px; --depth-effect: drop-shadow(0 5px 0 rgba(35, 39, 26, .42)); }
     .map-pair .caption { margin: 7px 0 0; }
     .svg-library { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+    .icon-directions { margin: 34px 0 42px; padding: 24px; border: 1px solid #8a764e; background: #22342b; }
+    .direction-intro { max-width: 820px; color: #c9d5bd; }
+    .direction-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+    .direction-card { min-width: 0; padding: 16px; border: 1px solid #6d795f; background: #2d4034; }
+    .direction-card h3 { display: flex; justify-content: space-between; gap: 8px; }
+    .direction-card h3 small { color: #c9d5bd; font: 11px ui-monospace, monospace; }
+    .direction-board { display: block; width: min(100%, 768px); height: auto; border: 2px solid #55432f; background: #d7c796; image-rendering: pixelated; }
+    .storybook-board { display: block; width: min(100%, 768px); height: auto; border: 2px solid #55432f; background: #d7c796; }
+    .direction-detail { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px; border: 1px solid #8c7954; background: #eadfb8; color: #352d26; }
+    .direction-art { width: 128px; height: 128px; overflow: hidden; display: grid; place-items: center; border: 2px solid #4a3829; background: #eadfb8; }
+    .direction-art svg { width: 128px; height: 128px; image-rendering: pixelated; shape-rendering: crispEdges; }
+    .direction-art.story { display: block; background-image: url('item-icons-storybook.png'); background-repeat: no-repeat; background-size: 384px 256px; }
+    .direction-meta { font-size: 13px; }
+    .direction-meta strong { display: block; font-size: 18px; }
+    .direction-meta p { margin: 5px 0; }
+    .direction-mobile { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+    .direction-mobile section { min-width: 0; padding: 8px; border: 1px solid #52634e; background: #172b23; }
+    .direction-mobile h4 { margin: 0 0 6px; color: #dbe5ca; font-size: 11px; }
+    .mobile-detail-sample { display: flex; align-items: center; gap: 8px; min-height: 92px; padding: 7px; color: #352d26; background: #eadfb8; border: 2px solid #59402c; }
+    .mobile-detail-sample .direction-art { width: 72px; height: 72px; flex: none; }
+    .mobile-detail-sample .direction-art svg { width: 72px; height: 72px; }
+    .mobile-detail-sample .direction-art.story { background-size: 216px 144px; }
+    .candidate-label { color: #edc17e; font: 11px ui-monospace, monospace; text-transform: uppercase; }
+    .story-col-1 { background-position-x: -128px !important; }
+    .story-col-2 { background-position-x: -256px !important; }
+    @media (max-width: 760px) {
+      .icon-directions { padding: 14px; }
+      .direction-grid { grid-template-columns: 1fr; }
+      .direction-card { padding: 11px; }
+      .direction-detail { grid-template-columns: minmax(96px, 112px) minmax(0, 1fr); gap: 9px; }
+      .direction-art { width: 112px; height: 112px; }
+      .direction-art svg { width: 112px; height: 112px; }
+      .direction-art.story { background-size: 336px 224px; }
+      .story-col-1 { background-position-x: -112px !important; }
+      .story-col-2 { background-position-x: -224px !important; }
+    }
+    @media (max-width: 420px) { .direction-mobile { grid-template-columns: 1fr; } .direction-detail { grid-template-columns: 96px minmax(0, 1fr); } .direction-art { width: 96px; height: 96px; } .direction-art svg { width: 96px; height: 96px; } .direction-art.story { background-size: 288px 192px; } .story-col-1 { background-position-x: -96px !important; } .story-col-2 { background-position-x: -192px !important; } }
     @media (max-width: 760px) { main { padding: 22px 14px 44px; } .candidate { padding: 14px; } .candidate-head { display: block; } .tag { display: inline-block; margin-top: 10px; } .desktop-bag { grid-template-columns: 1fr; } .list { border-right: 0; border-bottom: 2px solid var(--line); } .grid { grid-template-columns: repeat(6, minmax(36px, 1fr)); gap: 4px; } .slot { min-width: 0; } .mobile-row { grid-template-columns: 1fr; } .phone.landscape { min-height: 190px; aspect-ratio: 844 / 390; } .landscape .screen { min-height: 168px; } }
     @media (max-width: 900px) { .mobile-row { grid-template-columns: 1fr; } .phone.landscape { max-width: 100%; } }
     @media (max-width: 620px) { .map-pair { grid-template-columns: 1fr; } .controlled-study { padding: 14px; } }
@@ -131,9 +169,31 @@
   <h1>背包與場景視覺候選</h1>
   <p class="intro">Dewhollow Farm · 同一組 24 格容量與甜蘿蔔詳情，供比較兩種視覺精修方向。場景圖為概念稿；本頁介面是靜態提案，未連接遊戲狀態、操作或正式素材。</p>
   <div class="gate">場景方向 B 已由使用者選定 · 場景圖與六款物品圖示仍是候選，尚未核准整合 · 靜態示意，按鈕不可操作</div>
-  <p class="intro">六款原創 32×32 像素圖示候選：甜蘿蔔、種子袋、木材、礦石、魚、料理。詳情圖以相同 32×32 圖形 nearest-neighbor 放大，桌機與直式 128 px、橫式 96 px 的像素放大預覽。</p>
-  <img class="icon-atlas" src="item-icons.svg" alt="六款原創像素物品圖示候選圖集">
+  <p class="intro">物品圖示有兩組待比較候選，六款物件使用一致的名稱與順序；請先檢視 VF-02B 風格比較，再閱讀下方既有背包版面提案。</p>
 
+  <section class="icon-directions" aria-labelledby="icon-directions-title">
+    <h2 id="icon-directions-title">VF-02B｜物品圖示風格對照</h2>
+    <p class="direction-intro">相同六種物件、相同 3×2 版位、相同暖紙底與深棕框。A 使用較大畫布與清楚的像素明暗簇；B 使用原創繪本手繪筆觸。下方桌機與手機詳情均為靜態候選板，並排比較同一筆甜蘿蔔資料，沒有連接遊戲互動。稍後的 VF-02 場景／背包提案保留原先 superseded 圖示，風格審閱請以本比較板為準。</p>
+    <div class="direction-grid">
+      <article class="direction-card" aria-label="A 精緻像素方向候選">
+        <h3><span>A｜精緻像素</span><small>候選 · 64×64 symbol</small></h3>
+        <svg class="direction-board" viewBox="0 0 768 512" role="img" aria-label="甜蘿蔔、種子袋、木材、礦石、魚與料理像素圖示候選"><use href="item-icons-pixel.svg#atlas"></use></svg>
+        <p class="caption">較大的輪廓、陰影與局部亮面簇；用 pixelated nearest-neighbor 呈現。</p>
+        <h4>桌機選中詳情｜候選</h4>
+        <div class="direction-detail"><div class="direction-art"><svg viewBox="0 0 64 64" role="img" aria-label="像素甜蘿蔔"><use href="item-icons-pixel.svg#pix-radish"></use></svg></div><div class="direction-meta"><strong>甜蘿蔔</strong><p>作物 · 優良品質 · 持有 2 個</p><p>基礎售價 98 金<br>出貨價 123 金</p></div></div>
+        <div class="direction-mobile"><section><h4>手機直式｜390×844 詳情候選</h4><div class="mobile-detail-sample"><div class="direction-art"><svg viewBox="0 0 64 64" role="img" aria-label="像素甜蘿蔔"><use href="item-icons-pixel.svg#pix-radish"></use></svg></div><div class="direction-meta"><strong>甜蘿蔔 · 優良</strong>持有 2 個<br>98 → 123 金</div></div></section><section><h4>手機橫式｜844×390 詳情候選</h4><div class="mobile-detail-sample"><div class="direction-art"><svg viewBox="0 0 64 64" role="img" aria-label="像素甜蘿蔔"><use href="item-icons-pixel.svg#pix-radish"></use></svg></div><div class="direction-meta"><strong>甜蘿蔔 · 優良</strong>持有 2 個<br>98 → 123 金</div></div></section></div>
+      </article>
+      <article class="direction-card" aria-label="B 繪本手繪方向候選">
+        <h3><span>B｜繪本手繪</span><small>候選 · 生成 atlas</small></h3>
+        <img class="storybook-board" src="item-icons-storybook.png" alt="與 A 相同六種物件的原創繪本手繪圖示候選">
+        <p class="caption">紙感底色、柔和色鉛筆輪廓與手繪材質；保留相同物件順序和格子。</p>
+        <h4>桌機選中詳情｜候選</h4>
+        <div class="direction-detail"><div class="direction-art story" role="img" aria-label="繪本手繪甜蘿蔔"></div><div class="direction-meta"><strong>甜蘿蔔</strong><p>作物 · 優良品質 · 持有 2 個</p><p>基礎售價 98 金<br>出貨價 123 金</p></div></div>
+        <div class="direction-mobile"><section><h4>手機直式｜390×844 詳情候選</h4><div class="mobile-detail-sample"><div class="direction-art story" role="img" aria-label="繪本手繪甜蘿蔔"></div><div class="direction-meta"><strong>甜蘿蔔 · 優良</strong>持有 2 個<br>98 → 123 金</div></div></section><section><h4>手機橫式｜844×390 詳情候選</h4><div class="mobile-detail-sample"><div class="direction-art story" role="img" aria-label="繪本手繪甜蘿蔔"></div><div class="direction-meta"><strong>甜蘿蔔 · 優良</strong>持有 2 個<br>98 → 123 金</div></div></section></div>
+      </article>
+    </div>
+    <p class="caption">物件順序（左至右、上至下）：甜蘿蔔、種子袋、木材、礦石、魚、料理。圖像與排版均未核准、未整合。</p>
+  </section>
   <section class="controlled-study" aria-labelledby="controlled-title">
     <h2 id="controlled-title">受控場景對照｜共用地圖幾何與鏡頭</h2>
     <p>下列 A/B 使用相同 SVG 地標、座標與 <code>viewBox="0 0 640 360"</code>；每張以相同 16:9 畫框顯示，沒有各自的 SVG transform、縮放或平移。變更只在 CSS 外觀 tokens、輪廓粗細與同一物件群的陰影。這是鎖定幾何／zoom 的向量視覺研究，不是遊戲 renderer 截圖，也不代表 tile、角色或真實相機已實作。</p>
