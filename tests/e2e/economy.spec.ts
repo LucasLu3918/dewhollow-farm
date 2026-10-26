@@ -68,6 +68,29 @@ test('an axe chops a tree in the forest: wood comes, and the tree is gone', asyn
   await expect(page.locator('#hud-log')).toContainText('這裡沒有可以互動的東西');
 });
 
+test('neighboring forest trees keep independent collision and chopping after forest art integration', async ({ page }) => {
+  await waitForGame(page);
+  await toForest(page);
+  // Reach the walkable tile west of the adjacent tree blockers at (7,9) and (8,9).
+  await walk(page, 'ArrowDown', 2);
+  await walk(page, 'ArrowRight', 4);
+  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 6, y: 9 });
+  await page.keyboard.press('a');
+  await expect(page.locator('#hud-tool')).toHaveText('斧頭');
+
+  await page.keyboard.press('x');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().worldChanges['forest,7,9'])).toBe('chopped');
+  await walk(page, 'ArrowRight', 1);
+  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 7, y: 9 });
+
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 7, y: 9 });
+  await page.keyboard.press('x');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().worldChanges['forest,8,9'])).toBe('chopped');
+  await walk(page, 'ArrowRight', 1);
+  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 8, y: 9 });
+});
+
 test('wild mint can be picked once a day, and the spot is named when it is empty', async ({ page }) => {
   await waitForGame(page);
   await toForest(page);

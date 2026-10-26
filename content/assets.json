@@ -359,6 +359,46 @@
       "density": 2
     },
     {
+      "id": "scene.forest.grass",
+      "kind": "tile",
+      "color": "#547447",
+      "file": "assets/forest/ground-grass.png",
+      "density": 2,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 839c2cfd2de5c063a8b12933beffa42f27647381a8b765d90e90ce6c25f1b1c5; model name and license terms unavailable; exact-byte integration, forest-only runtime use."
+    },
+    {
+      "id": "scene.forest.path",
+      "kind": "tile",
+      "color": "#8f7654",
+      "file": "assets/forest/ground-path.png",
+      "density": 2,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 d697f250602cbb1f4f1b2755cce6e58876e451ef977864dbdef47badff09e00e; model name and license terms unavailable; exact-byte integration, forest-only runtime use."
+    },
+    {
+      "id": "scene.forest.moss",
+      "kind": "tile",
+      "color": "#3d6246",
+      "file": "assets/forest/ground-moss.png",
+      "density": 2,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 eb2d1e1037ee2d67b4122f05a1845a36c9f9904ede10d72f875698a2b06516f7; model name and license terms unavailable; exact-byte integration, forest-only runtime use."
+    },
+    {
+      "id": "scene.forest.tree",
+      "kind": "overlay",
+      "color": "#35613b",
+      "file": "assets/forest/tree.png",
+      "density": 4,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 d9a43c1d9a6fa1948dc30e25fb6a164b6578ef207186cf727c0bb22d8f24e10c; model name and license terms unavailable; exact-byte integration, forest-only runtime use at one existing blocked tile per tree."
+    },
+    {
+      "id": "scene.forest.rock",
+      "kind": "overlay",
+      "color": "#78736c",
+      "file": "assets/forest/rock.png",
+      "density": 2,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 5928ba117c42b5f1b334f93771cf079724452def76f19a9dd8b8295df9363171; model name and license terms unavailable; exact-byte integration, forest-only runtime use at one existing blocked tile per rock."
+    },
+    {
       "id": "tile.water",
       "kind": "tile",
       "color": "#3f7fb5",

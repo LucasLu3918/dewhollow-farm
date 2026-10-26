@@ -4,6 +4,7 @@ import { plotKey, type PlotMap, type PlotState } from '../../domain/farm';
 import { tileAt } from '../../domain/world';
 import { groundLayerFor, isGroundLayer } from '../map-layers';
 import { sceneOverlaysFor } from '../scene-overlays';
+import { forestSceneAssetFor } from '../forest-scene-art';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import { resolveInteraction, type InteractionLabelKey } from '../../application/interaction';
@@ -1857,9 +1858,9 @@ export class MapScene extends Phaser.Scene {
     for (const sprite of this.tileSprites) {
       const kind = effectiveKind(sprite.base, changeAt(state.worldChanges, state.mapId, sprite.x, sprite.y));
       const ground = isGroundLayer(kind) ? kind : sprite.ground;
-      const groundKey = `tile.${ground}`;
+      const groundKey = forestSceneAssetFor(state.mapId, ground, sprite.x, sprite.y) ?? `tile.${ground}`;
       if (sprite.groundImage.texture.key !== groundKey) this.applyAsset(sprite.groundImage, groundKey);
-      if (ground === 'grass' && this.shownSeason && sprite.groundImage.texture.key !== PIXEL32_MAP_ATLAS_KEY) {
+      if (ground === 'grass' && groundKey === 'tile.grass' && this.shownSeason && sprite.groundImage.texture.key !== PIXEL32_MAP_ATLAS_KEY) {
         sprite.groundImage.setTint(seasonGrassTint(this.shownSeason));
       }
       else sprite.groundImage.clearTint();
@@ -1867,7 +1868,7 @@ export class MapScene extends Phaser.Scene {
       if (isGroundLayer(kind)) {
         sprite.objectImage?.setVisible(false);
       } else {
-        const objectKey = `tile.${kind}`;
+        const objectKey = forestSceneAssetFor(state.mapId, kind, sprite.x, sprite.y) ?? `tile.${kind}`;
         if (!sprite.objectImage) {
           sprite.objectImage = this.image(objectKey, sprite.x, sprite.y, 1);
         } else {
@@ -1905,8 +1906,10 @@ export class MapScene extends Phaser.Scene {
         const tile = tileAt(map, x, y);
         if (!tile) continue;
         const ground = groundLayerFor(map, x, y);
-        const groundImage = this.image(`tile.${ground}`, x, y, 0);
-        const objectImage = isGroundLayer(tile.kind) ? undefined : this.image(`tile.${tile.kind}`, x, y, 1);
+        const groundKey = forestSceneAssetFor(mapId, ground, x, y) ?? `tile.${ground}`;
+        const groundImage = this.image(groundKey, x, y, 0);
+        const objectKey = forestSceneAssetFor(mapId, tile.kind, x, y) ?? `tile.${tile.kind}`;
+        const objectImage = isGroundLayer(tile.kind) ? undefined : this.image(objectKey, x, y, 1);
         this.tileSprites.push({ x, y, base: tile.kind, ground, groundImage, objectImage });
         this.world.add(groundImage);
         if (objectImage) this.placeObjectImage(objectImage, tile.kind, y);

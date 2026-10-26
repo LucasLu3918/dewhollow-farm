@@ -6,7 +6,7 @@
 
 ## 一、素材（content/assets.json）
 
-共 69 筆：有檔案 50 筆（其中本機模型生成 0、程式產生 3）、水平翻轉 1 筆（不另存檔）、占位（程式繪製的色塊，無檔案）18 筆。
+共 74 筆：有檔案 55 筆（其中本機模型生成 0、程式產生 3）、水平翻轉 1 筆（不另存檔）、占位（程式繪製的色塊，無檔案）18 筆。
 
 ### 1.1 本機影像模型生成
 
@@ -54,6 +54,11 @@
 | `tool.can` | object | `assets/tools/can-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
 | `tool.seedbag` | object | `assets/tools/seedbag-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
 | `tile.tree` | overlay | `assets/tiles/tree-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `scene.forest.grass` | tile | `assets/forest/ground-grass.png` | OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 839c2cfd2de5c063a8b12933beffa42f27647381a8b765d90e90ce6c25f1b1c5; model name and license terms unavailable; exact-byte integration, forest-only runtime use. |
+| `scene.forest.path` | tile | `assets/forest/ground-path.png` | OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 d697f250602cbb1f4f1b2755cce6e58876e451ef977864dbdef47badff09e00e; model name and license terms unavailable; exact-byte integration, forest-only runtime use. |
+| `scene.forest.moss` | tile | `assets/forest/ground-moss.png` | OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 eb2d1e1037ee2d67b4122f05a1845a36c9f9904ede10d72f875698a2b06516f7; model name and license terms unavailable; exact-byte integration, forest-only runtime use. |
+| `scene.forest.tree` | overlay | `assets/forest/tree.png` | OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 d9a43c1d9a6fa1948dc30e25fb6a164b6578ef207186cf727c0bb22d8f24e10c; model name and license terms unavailable; exact-byte integration, forest-only runtime use at one existing blocked tile per tree. |
+| `scene.forest.rock` | overlay | `assets/forest/rock.png` | OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 5928ba117c42b5f1b334f93771cf079724452def76f19a9dd8b8295df9363171; model name and license terms unavailable; exact-byte integration, forest-only runtime use at one existing blocked tile per rock. |
 | `tile.water` | tile | `assets/tiles/water-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
 | `tile.floor` | tile | `assets/tiles/floor-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
 | `tile.furniture` | overlay | `assets/tiles/furniture-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
