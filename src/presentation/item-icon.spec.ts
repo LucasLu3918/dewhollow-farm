@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { createItemIconLoadError, createItemIconView, type ItemIconItem } from './item-icon';
 
-const item: ItemIconItem = { id: 'item.sweet-radish', label: '甜蘿蔔', quantity: 7 };
+const item: ItemIconItem = { id: 'crop.sweet-radish', label: '甜蘿蔔', quantity: 7 };
+const itemWithoutDedicatedIcon: ItemIconItem = { id: 'mint', label: '野薄荷', quantity: 2 };
 
 describe('item icon presentation', () => {
   it('shows a known icon with the original item identity and quantity', () => {
@@ -15,13 +16,22 @@ describe('item icon presentation', () => {
   });
 
   it('shows a diagnostic fallback when the icon is missing', () => {
-    expect(createItemIconView(item, { status: 'missing', diagnostic: 'missing-icon' })).toEqual({
-      id: item.id,
-      label: item.label,
-      quantity: item.quantity,
+    expect(createItemIconView(itemWithoutDedicatedIcon, { status: 'missing', diagnostic: 'missing-icon' })).toEqual({
+      id: itemWithoutDedicatedIcon.id,
+      label: itemWithoutDedicatedIcon.label,
+      quantity: itemWithoutDedicatedIcon.quantity,
       fallback: true,
       diagnostic: 'missing-icon',
+      fallbackKind: 'forage',
     });
+  });
+
+  it('keeps unknown item IDs distinct from explicit category fallbacks', () => {
+    expect(createItemIconView({ ...item, id: 'item.unknown' }, { status: 'missing', diagnostic: 'unknown-item' })).toMatchObject({
+      fallback: true,
+      diagnostic: 'unknown-item',
+    });
+    expect(createItemIconView({ ...item, id: 'item.unknown' }, { status: 'missing', diagnostic: 'unknown-item' })).not.toHaveProperty('fallbackKind');
   });
 
   it('shows a distinct diagnostic fallback for an unknown item ID', () => {

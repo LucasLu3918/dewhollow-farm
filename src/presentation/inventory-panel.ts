@@ -2,6 +2,7 @@ import type { InventoryDisplayEntry } from '../application/inventory-display';
 import type { Command, CommandOutcome } from '../application/game-commands';
 import type { ItemIconResolution } from '../infrastructure/assets/asset-manifest';
 import { createItemIconView } from './item-icon';
+import { ITEM_ICON_FALLBACK_PRESENTATION } from './item-icon-fallbacks';
 import { applyGameUiTokens } from './game-ui-tokens';
 import { PanelDialog } from './panel-dialog';
 
@@ -240,8 +241,12 @@ export class InventoryPanel {
     if (iconView.fallback) {
       icon.dataset.iconState = 'fallback';
       icon.dataset.diagnostic = iconView.diagnostic;
-      icon.textContent = iconView.diagnostic === 'unknown-item' ? '？' : '✧';
-      icon.setAttribute('aria-label', `圖示備援：${iconView.diagnostic}`);
+      const fallbackPresentation = iconView.fallbackKind === undefined
+        ? undefined
+        : ITEM_ICON_FALLBACK_PRESENTATION[iconView.fallbackKind];
+      if (iconView.fallbackKind !== undefined) icon.dataset.fallbackKind = iconView.fallbackKind;
+      icon.textContent = fallbackPresentation?.symbol ?? (iconView.diagnostic === 'unknown-item' ? '？' : '✧');
+      icon.setAttribute('aria-label', fallbackPresentation ? `圖示備援：${fallbackPresentation.label}` : `圖示備援：${iconView.diagnostic}`);
     } else {
       icon.dataset.iconState = 'available';
       const image = doc.createElement('img');

@@ -174,6 +174,22 @@ function panelFixture(): { panel: InventoryPanel; trigger: FakeElement; root: Fa
 }
 
 describe('InventoryPanel', () => {
+  it('shows the assigned category symbol and kind for an item without dedicated artwork', () => {
+    const { panel, grid } = panelFixture();
+    panel.setDataProvider(() => ({
+      capacity: 1,
+      entries: [{ itemId: 'mint', name: '野薄荷', category: '採集', count: 2, quality: 'normal', qualityLabel: '普通', uses: [] }],
+      resolveIcon: () => ({ status: 'missing', diagnostic: 'missing-icon' }),
+    }));
+
+    panel.open();
+
+    const icon = grid.children[0]!.querySelector('.inventory-slot-icon')!;
+    expect(icon.dataset).toMatchObject({ iconState: 'fallback', diagnostic: 'missing-icon', fallbackKind: 'forage' });
+    expect(icon.textContent).toBe('❀');
+    expect(icon.getAttribute('aria-label')).toBe('圖示備援：採集物');
+  });
+
   it('opens from the HUD entry through its modal dialog', () => {
     const { panel, trigger, root } = panelFixture();
 
