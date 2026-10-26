@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dewhollow Farm｜背包與視覺候選 A/B</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #edf4d7; background: #162a24; line-height: 1.45; }
+    main { max-width: 1440px; margin: 0 auto; padding: 36px 28px 72px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(28px, 4vw, 46px); line-height: 1.08; letter-spacing: -.035em; margin-bottom: 10px; }
+    h2 { font-size: 27px; letter-spacing: -.02em; margin-bottom: 8px; }
+    h3 { font-size: 16px; margin-bottom: 12px; }
+    .intro { max-width: 840px; color: #bfd0ae; margin-bottom: 30px; }
+    .gate { display: inline-block; padding: 7px 11px; border: 1px solid #df9c65; color: #f0bd82; font-size: 12px; letter-spacing: .04em; margin-bottom: 24px; }
+    .candidate { --ink: #352d26; --line: #77684c; --paper: #e9dfb6; --paper2: #d8c995; --muted: #61704c; --accent: #81b96b; --select: #f2d470; --edge: #664b34; --shadow: #1a3025; border: 1px solid #47624d; background: #1d352b; padding: 24px; margin: 26px 0 42px; }
+    .candidate.b { --ink: #252a23; --line: #98784b; --paper: #ede0ae; --paper2: #d5ba7d; --muted: #52624a; --accent: #73aa68; --select: #f4c95c; --edge: #59402c; --shadow: #17281f; border-color: #846d49; background: #29372c; }
+    .candidate-head { display: flex; align-items: start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+    .candidate-head p { color: #c1cead; max-width: 790px; margin: 0; }
+    .tag { flex: none; border: 1px solid #718166; color: #d6e5ba; padding: 5px 9px; font: 12px ui-monospace, monospace; }
+    .tokens { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 20px; }
+    .token { display: flex; align-items: center; gap: 7px; color: #d8e1c8; font-size: 12px; }
+    .swatch { width: 17px; height: 17px; border: 1px solid #a6b49a; }
+    .scenes { width: 100%; display: block; height: auto; border: 2px solid var(--line); image-rendering: pixelated; }
+    .caption { font-size: 12px; color: #c6d1ba; margin: 7px 0 20px; }
+    .mockup { color: var(--ink); background: var(--paper); border: 3px solid var(--edge); box-shadow: 7px 7px 0 var(--shadow); }
+    .candidate.b .mockup { border-width: 4px; box-shadow: 9px 9px 0 var(--shadow), inset 0 0 0 2px #f3e7b9; }
+    .bag-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--line); padding: 12px 16px; background: var(--paper2); }
+    .bag-title { font-weight: 850; font-size: 20px; letter-spacing: .01em; }
+    .capacity { font: 700 13px ui-monospace, monospace; background: #344a33; color: #f5efce; padding: 5px 9px; border: 1px solid var(--edge); }
+    .desktop-bag { display: grid; grid-template-columns: minmax(0, 1.32fr) minmax(280px, .78fr); }
+    .list { padding: 12px 16px 16px; border-right: 2px solid var(--line); }
+    .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .filter { padding: 5px 9px; border: 1px solid #9c8b5e; color: #4d4934; font-size: 12px; }
+    .filter.active { background: #425c3d; border-color: #344a33; color: #fff3c3; }
+    .grid { display: grid; grid-template-columns: repeat(6, minmax(50px, 1fr)); gap: 7px; }
+    .slot { position: relative; aspect-ratio: 1; display: grid; place-items: center; border: 2px solid #96875f; background: #d9d0a6; }
+    .slot.empty { background: #ded7b7; border-style: dotted; }
+    .slot.selected { outline: 3px solid var(--select); outline-offset: 1px; background: #f5e6a6; }
+    .qty { position: absolute; bottom: 2px; right: 4px; font: 700 11px ui-monospace, monospace; color: #262a20; }
+    .quality { position: absolute; top: 3px; right: 4px; color: #b87b27; font-size: 12px; line-height: 1; }
+    .pixel { width: 38px; height: 38px; image-rendering: pixelated; }
+    .detail { padding: 16px; }
+    .detail-top { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: 14px; }
+    .item-art { width: 112px; height: 112px; border: 2px solid var(--line); background: #c6cf8e; display: grid; place-items: center; }
+    .item-art svg { width: 72px; height: 72px; image-rendering: pixelated; }
+    .item-name { font-size: 22px; font-weight: 850; margin-bottom: 4px; }
+    .item-kind { color: #59634a; font-size: 12px; }
+    .quality-line { color: #8a5816; font-weight: 800; margin-top: 8px; }
+    dl { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; font-size: 13px; margin: 15px 0; padding-top: 12px; border-top: 1px solid #9f9162; }
+    dt { color: #58634b; } dd { font-weight: 750; margin: 0; }
+    .hint { font-size: 12px; color: #5e674d; margin: 0 0 13px; }
+    .actions { display: flex; gap: 8px; }
+    .button { min-height: 40px; padding: 9px 13px; border: 2px solid #43543a; background: #506d42; color: #fff4ce; font-family: inherit; font-size: 13px; font-weight: 700; }
+    .button.secondary { background: transparent; color: #3f4c36; }
+    .mobile-row { display: grid; grid-template-columns: 1fr 1.15fr; gap: 20px; margin-top: 24px; }
+    .phone { width: min(100%, 370px); margin: 0 auto; padding: 11px; border: 4px solid #354233; border-radius: 22px; background: #0e201b; box-shadow: 0 10px 20px #0d1714; }
+    .phone.landscape { width: 100%; max-width: 620px; aspect-ratio: 844 / 390; border-radius: 18px; }
+    .screen { height: 620px; min-height: 0; overflow: hidden; background: #263b2e; position: relative; border-radius: 12px; }
+    .landscape .screen { height: 100%; }
+    .game-backdrop { position: absolute; inset: 0; background: linear-gradient(130deg, #5d8d4a, #b3bb70 62%, #5b8560); }
+    .game-backdrop::before { content: "農場遊戲畫面"; position: absolute; top: 24px; left: 15px; color: #f4edca; font-size: 11px; text-shadow: 1px 2px #233b2d; }
+    .portrait .game-backdrop { inset: 0 0 38%; }
+    .drawer { position: absolute; left: 0; right: 0; bottom: 0; height: 66%; background: var(--paper); color: var(--ink); border: 3px solid var(--edge); border-bottom: 0; padding: 10px; }
+    .portrait .drawer { height: 72%; border-radius: 16px 16px 0 0; }
+    .drawer-title { font-weight: 850; font-size: 14px; display: flex; align-items: center; justify-content: space-between; padding: 4px 3px 9px; border-bottom: 1px solid var(--line); }
+    .mobile-filters { display: flex; gap: 5px; overflow: hidden; padding: 7px 0; }
+    .mobile-filters span { white-space: nowrap; font-size: 10px; padding: 4px 6px; border: 1px solid #9c8b5e; }
+    .mobile-filters .active { color: #fff4cf; background: #425c3d; }
+    .mobile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .mobile-grid .slot { min-width: 0; border-width: 1px; }
+    .mobile-grid .pixel { width: 28px; height: 28px; }
+    .mobile-grid .qty { font-size: 9px; bottom: 1px; right: 2px; }
+    .mobile-detail { display: flex; align-items: center; gap: 9px; border-top: 1px solid #9f9162; margin-top: 8px; padding-top: 7px; font-size: 11px; }
+    .mobile-detail .item-art { width: 54px; height: 54px; flex: none; }
+    .mobile-detail .item-art svg { width: 42px; height: 42px; }
+    .mobile-detail .button { min-height: 36px; margin-left: auto; padding: 6px; font-size: 10px; }
+    .landscape .drawer { left: 0; right: 0; top: 0; bottom: 0; height: 100%; border: 3px solid var(--edge); display: grid; grid-template-columns: 1fr .85fr; gap: 9px; padding: 9px; }
+    .landscape .drawer-list { min-width: 0; }
+    .landscape .drawer-title { font-size: 12px; }
+    .landscape .mobile-filters span { font-size: 9px; padding: 3px 5px; }
+    .landscape .mobile-grid .slot { aspect-ratio: 1.05; }
+    .landscape .drawer-detail { border-left: 1px solid #9f9162; padding-left: 8px; }
+    .landscape .mobile-detail { display: block; border: 0; margin: 0; padding: 0; font-size: 10px; }
+    .landscape .mobile-detail .item-art { width: 58px; height: 58px; margin-bottom: 4px; }
+    .landscape .mobile-detail .button { margin: 6px 4px 0 0; }
+    .landscape .phone-close { position: absolute; z-index: 4; right: 5px; top: 4px; color: white; font-size: 10px; }
+    .notes { margin: 18px 0 0; padding: 12px 14px; color: #c8d4b9; border-left: 3px solid #a7b783; background: #21382d; font-size: 13px; }
+    .small { font-size: 11px; color: #b5c5a8; }
+    @media (max-width: 760px) { main { padding: 22px 14px 44px; } .candidate { padding: 14px; } .candidate-head { display: block; } .tag { display: inline-block; margin-top: 10px; } .desktop-bag { grid-template-columns: 1fr; } .list { border-right: 0; border-bottom: 2px solid var(--line); } .grid { grid-template-columns: repeat(6, minmax(36px, 1fr)); gap: 4px; } .slot { min-width: 0; } .mobile-row { grid-template-columns: 1fr; } .phone.landscape { min-height: 190px; aspect-ratio: 844 / 390; } .landscape .screen { min-height: 168px; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>背包與場景視覺候選</h1>
+  <p class="intro">Dewhollow Farm · 同一組 24 格容量與甜蘿蔔詳情，供比較兩種視覺精修方向。場景圖為概念稿；本頁介面是靜態提案，未連接遊戲狀態、操作或正式素材。</p>
+  <div class="gate">候選審閱用 · 尚未核准 · 禁止整合至正式遊戲</div>
+
+  <section class="candidate a">
+    <div class="candidate-head"><div><h2>A｜保守高精修</h2><p>保留低層級場景與像素密度，先降低草地重複感、清楚分出田地／道路，再把村莊視線收在中央水槽。背包框線與留白較輕，讓物品格成為主焦點。</p></div><span class="tag">推薦先審 · 低風險</span></div>
+    <div class="tokens"><span class="token"><i class="swatch" style="background:#386044"></i>松針綠</span><span class="token"><i class="swatch" style="background:#91b86d"></i>嫩葉</span><span class="token"><i class="swatch" style="background:#e9dfb6"></i>稻草紙</span><span class="token"><i class="swatch" style="background:#66513a"></i>深棕線</span><span class="token">標題：粗圓角黑體 · 數值：等寬</span></div>
+    <img class="scenes" src="candidate-a-scenes.png" alt="A 方向原創農場和村莊像素場景候選，左農場右村莊">
+    <p class="caption">概念場景：左為 3×3 農地與棚屋，右為中央水槽與分岔道路。此圖不是既有地圖的逐像素重繪，也未驗證相機 zoom。</p>
+    <h3>桌機｜背包列表與選中詳情</h3>
+    <div class="mockup">
+      <div class="bag-head"><span class="bag-title">我的背包</span><span class="capacity">9 / 24 格</span></div>
+      <div class="desktop-bag"><section class="list"><div class="filters"><span class="filter active">全部</span><span class="filter">農作／種子</span><span class="filter">材料／礦物</span><span class="filter">食物／魚產</span><span class="filter">裝飾／服飾</span><span class="filter">其他</span></div><div class="grid" aria-label="六欄背包格">
+        <div class="slot selected"><svg class="pixel radish" viewBox="0 0 32 32"><path fill="#43723c" d="M13 9 8 4l2-1 5 5 2-6 2 1-1 7 7-3 1 2-8 5z"/><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/><path fill="#f28b63" d="M11 13h3v6h-3z"/><path fill="#4e3428" d="M9 10h14v2H9z"/></svg><span class="quality">◆</span><span class="qty">×2</span></div>
+        <div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#346a45" d="M6 18q4-9 10-5 6-6 10 2-2 9-10 10Q7 25 6 18"/><path fill="#a2c564" d="M14 15h3v7h-3z"/></svg><span class="quality">◆</span><span class="qty">×5</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#ba8b4f" d="m8 11 4-5 8 1 4 5-2 12-5 4-7-5z"/><path fill="#e1b96b" d="m12 12 7-2 3 4-3 9-6 1-3-6z"/></svg><span class="qty">×8</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#768b56" d="m7 13 7-7 10 4 2 10-8 7-9-3z"/><path fill="#b7c87d" d="m12 14 5-4 5 3-1 6-6 3-4-4z"/></svg><span class="qty">×1</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#df9f38" d="M10 8h12v5l-2 2v13h-8V15l-2-2z"/><path fill="#f2d276" d="M12 10h8v3h-8z"/></svg><span class="qty">×3</span></div><div class="slot empty"></div>
+        <div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#6f8751" d="M6 12h20v15H6z"/><path fill="#a7bf79" d="M8 9h16v5H8z"/><path fill="#4d653e" d="M11 16h10v3H11z"/></svg><span class="qty">×3</span></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div>
+        <div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div>
+        <div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div>
+      </div></section><aside class="detail"><div class="detail-top"><div class="item-art"><svg viewBox="0 0 32 32"><path fill="#43723c" d="M13 9 8 4l2-1 5 5 2-6 2 1-1 7 7-3 1 2-8 5z"/><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/><path fill="#f28b63" d="M11 13h3v6h-3z"/><path fill="#4e3428" d="M9 10h14v2H9z"/></svg></div><div><div class="item-name">甜蘿蔔</div><div class="item-kind">作物 · 品質可分堆</div><div class="quality-line">◆ 優良品質</div></div></div><dl><dt>持有數量</dt><dd>2 個</dd><dt>基礎售價</dt><dd>98 金</dd><dt>優良品質出貨價</dt><dd>123 金</dd></dl><p class="hint">出貨價依作物成長天數與品質倍率計算。可出貨；此畫面不會直接替你出售。</p><div class="actions"><button class="button">查看用途</button><button class="button secondary">關閉詳情</button></div></aside></div>
+    </div>
+    <div class="mobile-row"><section><h3>手機直式｜390 × 844</h3><div class="phone portrait"><div class="screen"><div class="game-backdrop"></div><div class="drawer"><div class="drawer-title"><span>我的背包　9 / 24</span><span>關閉 ×</span></div><div class="mobile-filters"><span class="active">全部</span><span>農作</span><span>材料</span><span>食物</span><span>服飾</span></div><div class="mobile-grid">
+      <div class="slot selected"><svg class="pixel" viewBox="0 0 32 32"><path fill="#43723c" d="M13 9 8 4l2-1 5 5 2-6 2 1-1 7 7-3 1 2-8 5z"/><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/></svg><span class="quality">◆</span><span class="qty">×2</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#346a45" d="M6 18q4-9 10-5 6-6 10 2-2 9-10 10Q7 25 6 18"/></svg><span class="qty">×5</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#ba8b4f" d="m8 11 4-5 8 1 4 5-2 12-5 4-7-5z"/></svg><span class="qty">×8</span></div><div class="slot empty"></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#df9f38" d="M10 8h12v5l-2 2v13h-8V15l-2-2z"/></svg><span class="qty">×3</span></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div></div><div class="mobile-detail"><div class="item-art"><svg viewBox="0 0 32 32"><path fill="#43723c" d="M13 9 8 4l2-1 5 5 2-6 2 1-1 7 7-3 1 2-8 5z"/><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/></svg></div><div><b>甜蘿蔔 · 優良</b><br>持有 2　出貨 123 金</div><button class="button">查看詳情</button></div></div></div></div></section>
+    <section><h3>手機橫式｜844 × 390</h3><div class="phone landscape"><div class="screen"><div class="game-backdrop"></div><span class="phone-close">關閉 ×</span><div class="drawer"><div class="drawer-list"><div class="drawer-title"><span>我的背包</span><span>9 / 24</span></div><div class="mobile-filters"><span class="active">全部</span><span>農作</span><span>材料</span><span>食物</span></div><div class="mobile-grid"><div class="slot selected"><svg class="pixel" viewBox="0 0 32 32"><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/><path fill="#43723c" d="M13 9 8 4l2-1 5 5 3-6 2 1-2 7z"/></svg><span class="qty">×2</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#ba8b4f" d="m8 11 4-5 8 1 4 5-2 12-5 4-7-5z"/></svg><span class="qty">×8</span></div><div class="slot empty"></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#346a45" d="M6 18q4-9 10-5 6-6 10 2-2 9-10 10Q7 25 6 18"/></svg><span class="qty">×5</span></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div></div></div><div class="drawer-detail"><div class="drawer-title">道具詳情</div><div class="mobile-detail"><div class="item-art"><svg viewBox="0 0 32 32"><path fill="#43723c" d="M13 9 8 4l2-1 5 5 3-6 2 1-2 7z"/><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/></svg></div><b>甜蘿蔔<br>作物 · 優良<br>持有 2<br>出貨 123 金</b><button class="button">用途</button></div></div></div></div></div></section></div>
+    <p class="notes">互動狀態提案：鍵盤方向鍵移動格子、Enter 選取、Tab 操作、Esc 關閉；手機單次點按即可選取，直式可由詳情返回格子，橫式左右並列。真實觸控命中、安全區與 game-input modal lock 尚未測試。</p>
+  </section>
+
+  <section class="candidate b">
+    <div class="candidate-head"><div><h2>B｜層次更強／細節更密</h2><p>以更明確的近景樹冠、圍籬、石砌高差和建築簷影建立距離；仍留出明確道路與可互動物件輪廓。背包採較厚的木框和內層亮邊，讓選取詳情更像置於場景中的工作台。</p></div><span class="tag">較大美術成本 · 對照稿</span></div>
+    <div class="tokens"><span class="token"><i class="swatch" style="background:#2e5541"></i>深苔綠</span><span class="token"><i class="swatch" style="background:#769b5d"></i>樹影</span><span class="token"><i class="swatch" style="background:#ede0ae"></i>暖紙</span><span class="token"><i class="swatch" style="background:#59402c"></i>木框棕</span><span class="token">標題：粗圓角黑體 · 數值：等寬</span></div>
+    <img class="scenes" src="candidate-b-scenes.png" alt="B 方向原創農場和村莊像素場景候選，左農場右村莊">
+    <p class="caption">概念場景：同樣的農田、棚屋、中心水槽和分岔路題材，以前景物件與石砌邊界增加層次。實際鏡頭、世界座標與同地圖逐像素差異尚無證據。</p>
+    <h3>桌機｜背包列表與選中詳情</h3>
+    <div class="mockup"><div class="bag-head"><span class="bag-title">我的背包</span><span class="capacity">9 / 24 格</span></div><div class="desktop-bag"><section class="list"><div class="filters"><span class="filter active">全部</span><span class="filter">農作／種子</span><span class="filter">材料／礦物</span><span class="filter">食物／魚產</span><span class="filter">裝飾／服飾</span><span class="filter">其他</span></div><div class="grid">
+      <div class="slot selected"><svg class="pixel" viewBox="0 0 32 32"><path fill="#43723c" d="M13 9 8 4l2-1 5 5 2-6 2 1-1 7 7-3 1 2-8 5z"/><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/></svg><span class="quality">◆</span><span class="qty">×2</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#346a45" d="M6 18q4-9 10-5 6-6 10 2-2 9-10 10Q7 25 6 18"/></svg><span class="qty">×5</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#ba8b4f" d="m8 11 4-5 8 1 4 5-2 12-5 4-7-5z"/></svg><span class="qty">×8</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#768b56" d="m7 13 7-7 10 4 2 10-8 7-9-3z"/></svg><span class="qty">×1</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#df9f38" d="M10 8h12v5l-2 2v13h-8V15l-2-2z"/></svg><span class="qty">×3</span></div><div class="slot empty"></div>
+      <div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#6f8751" d="M6 12h20v15H6z"/><path fill="#a7bf79" d="M8 9h16v5H8z"/></svg><span class="qty">×3</span></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div>
+      <div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div>
+    </div></section><aside class="detail"><div class="detail-top"><div class="item-art"><svg viewBox="0 0 32 32"><path fill="#43723c" d="M13 9 8 4l2-1 5 5 2-6 2 1-1 7 7-3 1 2-8 5z"/><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/><path fill="#f28b63" d="M11 13h3v6h-3z"/></svg></div><div><div class="item-name">甜蘿蔔</div><div class="item-kind">作物 · 品質可分堆</div><div class="quality-line">◆ 優良品質</div></div></div><dl><dt>持有數量</dt><dd>2 個</dd><dt>基礎售價</dt><dd>98 金</dd><dt>優良品質出貨價</dt><dd>123 金</dd></dl><p class="hint">出貨價依作物成長天數與品質倍率計算。可出貨；此畫面不會直接替你出售。</p><div class="actions"><button class="button">查看用途</button><button class="button secondary">關閉詳情</button></div></aside></div></div>
+    <div class="mobile-row"><section><h3>手機直式｜390 × 844</h3><div class="phone portrait"><div class="screen"><div class="game-backdrop"></div><div class="drawer"><div class="drawer-title"><span>我的背包　9 / 24</span><span>關閉 ×</span></div><div class="mobile-filters"><span class="active">全部</span><span>農作</span><span>材料</span><span>食物</span><span>服飾</span></div><div class="mobile-grid"><div class="slot selected"><svg class="pixel" viewBox="0 0 32 32"><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/><path fill="#43723c" d="M13 9 8 4l2-1 5 5 3-6 2 1-2 7z"/></svg><span class="quality">◆</span><span class="qty">×2</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#346a45" d="M6 18q4-9 10-5 6-6 10 2-2 9-10 10Q7 25 6 18"/></svg><span class="qty">×5</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#ba8b4f" d="m8 11 4-5 8 1 4 5-2 12-5 4-7-5z"/></svg><span class="qty">×8</span></div><div class="slot empty"></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#df9f38" d="M10 8h12v5l-2 2v13h-8V15l-2-2z"/></svg><span class="qty">×3</span></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div></div><div class="mobile-detail"><div class="item-art"><svg viewBox="0 0 32 32"><path fill="#43723c" d="M13 9 8 4l2-1 5 5 3-6 2 1-2 7z"/><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/></svg></div><div><b>甜蘿蔔 · 優良</b><br>持有 2　出貨 123 金</div><button class="button">查看詳情</button></div></div></div></div></section>
+    <section><h3>手機橫式｜844 × 390</h3><div class="phone landscape"><div class="screen"><div class="game-backdrop"></div><span class="phone-close">關閉 ×</span><div class="drawer"><div class="drawer-list"><div class="drawer-title"><span>我的背包</span><span>9 / 24</span></div><div class="mobile-filters"><span class="active">全部</span><span>農作</span><span>材料</span><span>食物</span></div><div class="mobile-grid"><div class="slot selected"><svg class="pixel" viewBox="0 0 32 32"><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/><path fill="#43723c" d="M13 9 8 4l2-1 5 5 3-6 2 1-2 7z"/></svg><span class="qty">×2</span></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#ba8b4f" d="m8 11 4-5 8 1 4 5-2 12-5 4-7-5z"/></svg><span class="qty">×8</span></div><div class="slot empty"></div><div class="slot"><svg class="pixel" viewBox="0 0 32 32"><path fill="#346a45" d="M6 18q4-9 10-5 6-6 10 2-2 9-10 10Q7 25 6 18"/></svg><span class="qty">×5</span></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div><div class="slot empty"></div></div></div><div class="drawer-detail"><div class="drawer-title">道具詳情</div><div class="mobile-detail"><div class="item-art"><svg viewBox="0 0 32 32"><path fill="#43723c" d="M13 9 8 4l2-1 5 5 3-6 2 1-2 7z"/><path fill="#c94f45" d="M9 11h14l-2 10-5 8-5-8z"/></svg></div><b>甜蘿蔔<br>作物 · 優良<br>持有 2<br>出貨 123 金</b><button class="button">用途</button></div></div></div></div></div></section></div>
+    <p class="notes">互動狀態提案與 A 相同；B 的厚框、重陰影會更突出 modal，但也增加手機畫面被 UI 覆蓋的重量。真實觸控命中、安全區、modal lock、鍵盤流程尚未驗證。</p>
+  </section>
+  <p class="small">資料示例：甜蘿蔔 seedPrice 25、growthDays 3，base sell price = 98；優良品質倍率 125%，sell price = 123。詳情只列已知資料，沒有虛構戰鬥或成長屬性。</p>
+  <p class="small">原創聲明：場景及像素小圖由本機影像模型生成／手繪 SVG 概念，沒有引用或重畫可辨識既有遊戲 IP。A/B 圖檔 SHA 與限制見同目錄 README。</p>
+</main>
+</body>
+</html>
