@@ -49,6 +49,23 @@
   --radius-md: 8px;
   --radius-lg: 10px;
   --radius-pill: 99px;
+
+  /* B 方向共用介面 tokens：深森林作背景，暖紙面與木框承載背包內容。 */
+  --ui-frame-edge: #59402c;
+  --ui-frame-line: #98784b;
+  --ui-paper: #ede0ae;
+  --ui-paper-raised: #d5ba7d;
+  --ui-ink: #252a23;
+  --ui-muted-ink: #52624a;
+  --ui-leaf-accent: #73aa68;
+  --ui-selection: #f4c95c;
+  --ui-forest: #29372c;
+  --ui-forest-shadow: #17281f;
+  --ui-space-sm: 0.5rem;
+  --ui-space-md: 0.75rem;
+  --ui-space-lg: 1rem;
+  --ui-frame-radius: 0.25rem;
+  --ui-panel-max-width: 56rem;
 }
 
 * {
@@ -107,9 +124,10 @@ a:focus-visible {
   align-items: center;
   font-size: calc(14px * var(--font-scale));
   padding: 10px 12px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  background: var(--ui-forest);
+  border: 1px solid var(--ui-frame-line);
+  border-radius: var(--ui-frame-radius);
+  box-shadow: inset 0 0 0 1px rgba(237, 224, 174, 0.07);
 }
 
 .status #hud-clock,
@@ -134,6 +152,18 @@ a:focus-visible {
 .status .hud-action:disabled {
   opacity: 0.65;
   cursor: default;
+}
+
+.status-actions .inventory-open {
+  border: 2px solid var(--ui-frame-edge);
+  background: var(--ui-paper-raised);
+  color: var(--ui-ink);
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px rgba(255, 244, 206, 0.45);
+}
+
+.status-actions .inventory-open:hover {
+  background: var(--ui-selection);
 }
 
 /* 技能列是按鈕（點了打開技能與天賦面板），看起來仍然是一行文字。 */
@@ -452,6 +482,114 @@ a:focus-visible {
 
 .shop-panel[hidden] {
   display: none;
+}
+
+/* 背包先提供場景 B 的暖紙面／木框外殼；內容格與物品資料由後續 VF 任務填入。 */
+.inventory-panel {
+  position: fixed;
+  inset: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--ui-panel-max-width), 100%);
+  max-height: min(88vh, 52rem);
+  max-height: min(88dvh, 52rem);
+  margin: auto;
+  padding: 5px;
+  overflow: hidden;
+  border: 3px solid var(--ui-frame-edge);
+  border-radius: var(--ui-frame-radius);
+  outline: 1px solid var(--ui-frame-line);
+  outline-offset: -7px;
+  background: var(--ui-forest-shadow);
+  color: var(--ui-ink);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(244, 201, 92, 0.2);
+}
+
+.inventory-panel[hidden] {
+  display: none;
+}
+
+.inventory-header {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--ui-space-md);
+  padding: var(--ui-space-md) var(--ui-space-lg);
+  border: 1px solid var(--ui-frame-line);
+  border-bottom: 2px solid var(--ui-frame-edge);
+  background: var(--ui-paper-raised);
+}
+
+.inventory-eyebrow {
+  margin: 0 0 2px;
+  color: var(--ui-muted-ink);
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.inventory-header h2 {
+  margin: 0;
+  color: var(--ui-ink);
+  font-size: 1.25em;
+  line-height: 1.25;
+}
+
+.inventory-close {
+  min-width: 3rem;
+  min-height: 2.75rem;
+  padding: 0 var(--ui-space-md);
+  border: 2px solid var(--ui-frame-edge);
+  border-radius: var(--ui-frame-radius);
+  background: var(--ui-forest);
+  color: var(--ui-paper);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inventory-close:hover {
+  background: var(--ui-leaf-accent);
+  color: var(--ui-ink);
+}
+
+.inventory-content {
+  display: grid;
+  flex: 1 1 auto;
+  place-items: center;
+  min-height: 12rem;
+  margin: 0;
+  padding: var(--ui-space-lg);
+  overflow: auto;
+  border: 1px solid var(--ui-frame-line);
+  border-top: 0;
+  background: var(--ui-paper);
+}
+
+.inventory-empty {
+  max-width: 24rem;
+  margin: 0;
+  padding: var(--ui-space-lg);
+  border: 1px dashed var(--ui-frame-line);
+  color: var(--ui-muted-ink);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .status-actions {
+    justify-content: flex-start;
+  }
+
+  .inventory-panel {
+    max-height: min(92vh, 52rem);
+    max-height: min(92dvh, 52rem);
+  }
+
+  .inventory-content {
+    min-height: 8rem;
+  }
 }
 
 .shop-panel > button[id$='-close'] {

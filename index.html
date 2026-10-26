@@ -27,6 +27,7 @@
         <span id="hud-mine" aria-label="礦坑狀態"></span>
         <span class="status-actions">
           <button id="hud-action" class="status-button hud-action" type="button" aria-label="主要動作：沒有可互動的目標" disabled>沒有可互動的目標</button>
+          <button id="hud-inventory" class="status-button inventory-open" type="button" aria-label="開啟背包">背包</button>
           <button id="hud-saves" class="status-button" type="button" aria-label="存檔槽，可讀取、新遊戲、刪除、匯出與匯入（或按 L）">存檔</button>
           <button id="hud-settings" class="status-button" type="button" aria-label="設定：按鍵、字級、色盲模式、閃光與震動、觸控（或按 O）">設定</button>
           <button id="hud-help" class="status-button" type="button" aria-label="說明、操作按鍵、更新日誌與隱私說明（或按 ?）">說明</button>
@@ -36,6 +37,18 @@
       </header>
       <div id="game" class="stage" role="region" aria-label="晨露農場遊戲畫面。用方向鍵移動，按問號鍵看操作說明"><p class="loading" role="status">農場載入中…</p></div>
       <div id="touch-controls" class="touch-controls" hidden></div>
+      <section id="inventory-panel" class="inventory-panel" aria-labelledby="inventory-title" role="dialog" aria-modal="true" hidden>
+        <header class="inventory-header">
+          <div>
+            <p class="inventory-eyebrow">晨露農場 · 隨身收納</p>
+            <h2 id="inventory-title">我的背包</h2>
+          </div>
+          <button id="inventory-close" class="inventory-close" type="button">關閉</button>
+        </header>
+        <div id="inventory-content" class="inventory-content" aria-live="polite">
+          <p class="inventory-empty">物品會收在這裡，稍後就能查看與整理。</p>
+        </div>
+      </section>
       <section id="tool-seed-panel" class="shop-panel tool-seed-panel" aria-labelledby="tool-seed-title" role="dialog" aria-modal="true" hidden>
         <header><h2 id="tool-seed-title">選擇工具</h2></header>
         <p id="tool-seed-note" class="tool-seed-note" hidden></p>

@@ -68,6 +68,7 @@ import { IndexedDbSaveRepository, hasIndexedDb } from './infrastructure/persiste
 import { parseSaveRecord } from './infrastructure/persistence/save-schema';
 import type { MigrationContext } from './infrastructure/persistence/save-migrations';
 import { Hud } from './presentation/hud';
+import { InventoryPanel } from './presentation/inventory-panel';
 import { HelpPanel } from './presentation/help-panel';
 import { SavePanel } from './presentation/save-panel';
 import { GAME_VERSION } from './version';
@@ -103,6 +104,7 @@ function markStageReady(): void {
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
+  new InventoryPanel(document);
   const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, merchant, decor, rating, legacy, maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
   // 操作說明的文字（狀態列提示、設定面板的動作名稱、虛擬按鍵）來自 content/controls.json，缺漏會在這裡報錯。
   const controls = parseControlsContent(controlsContent);
