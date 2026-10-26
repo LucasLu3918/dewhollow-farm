@@ -1,8 +1,9 @@
-import Phaser from 'phaser';
+import type Phaser from 'phaser';
 import type { ActionFeedback } from '../application/game-commands';
 import { TILE_SIZE, UNIT } from './constants';
 import { pickupPoint } from './pickup-arc';
 import { lidAngle, SHIP_FLIGHT_MS, SHIP_LID_TOTAL_MS, shipIconDelay } from './ship-animation';
+import { reserveSceneParticle } from './particle-budget';
 
 /**
  * 動作效果：只負責視覺回饋（粒子、飄字、閃爍），不影響任何規則。
@@ -56,8 +57,8 @@ export function playActionEffect(scene: Phaser.Scene, action: ActionFeedback, x:
       if (particles) puff(scene, cx, cy, 0x9a9aa6, 6);
       break;
     case 'fish':
-      // 水波：投竿落水的那一圈。
-      if (particles) puff(scene, cx, cy, 0x6fb6ff, 6);
+      // 水波：兩圈擴散搭配小水滴，和一般採集煙塵明確區分。
+      if (particles) waterRipple(scene, cx, cy);
       break;
   }
 }
@@ -218,6 +219,8 @@ export function sleepEffect(scene: Phaser.Scene, x: number, y: number, screenFad
 
 function puff(scene: Phaser.Scene, cx: number, cy: number, color: number, count: number, alpha = 0.8): void {
   for (let i = 0; i < count; i += 1) {
+    const release = reserveSceneParticle(scene);
+    if (!release) break;
     const angle = (Math.PI * 2 * i) / count;
     const dot = scene.add.circle(cx, cy, px(3), color, alpha).setDepth(20);
     scene.tweens.add({
@@ -228,13 +231,18 @@ function puff(scene: Phaser.Scene, cx: number, cy: number, color: number, count:
       scale: 0.4,
       duration: 380,
       ease: 'Quad.easeOut',
-      onComplete: () => dot.destroy(),
+      onComplete: () => {
+        dot.destroy();
+        release();
+      },
     });
   }
 }
 
 function droplets(scene: Phaser.Scene, cx: number, cy: number): void {
   for (let i = 0; i < 5; i += 1) {
+    const release = reserveSceneParticle(scene);
+    if (!release) break;
     const startX = cx - px(10) + i * px(5);
     const drop = scene.add.circle(startX, cy - px(14), px(2), 0x6fb6ff, 0.95).setDepth(20);
     scene.tweens.add({
@@ -244,12 +252,17 @@ function droplets(scene: Phaser.Scene, cx: number, cy: number): void {
       duration: 420,
       delay: i * 40,
       ease: 'Quad.easeIn',
-      onComplete: () => drop.destroy(),
+      onComplete: () => {
+        drop.destroy();
+        release();
+      },
     });
   }
 }
 
 function sprout(scene: Phaser.Scene, cx: number, cy: number): void {
+  const release = reserveSceneParticle(scene);
+  if (!release) return;
   const leaf = scene.add.ellipse(cx, cy, px(10), px(14), 0x7fcf6b).setDepth(20).setScale(0.2);
   scene.tweens.add({
     targets: leaf,
@@ -258,12 +271,17 @@ function sprout(scene: Phaser.Scene, cx: number, cy: number): void {
     ease: 'Back.easeOut',
     yoyo: true,
     hold: 200,
-    onComplete: () => leaf.destroy(),
+    onComplete: () => {
+      leaf.destroy();
+      release();
+    },
   });
 }
 
 function sparkle(scene: Phaser.Scene, cx: number, cy: number): void {
   for (let i = 0; i < 4; i += 1) {
+    const release = reserveSceneParticle(scene);
+    if (!release) break;
     const angle = (Math.PI / 2) * i + Math.PI / 4;
     const star = scene.add.star(cx, cy, 4, px(2), px(5), 0xffe08a).setDepth(20);
     scene.tweens.add({
@@ -274,7 +292,50 @@ function sparkle(scene: Phaser.Scene, cx: number, cy: number): void {
       scale: 0.3,
       duration: 480,
       ease: 'Cubic.easeOut',
-      onComplete: () => star.destroy(),
+      onComplete: () => {
+        star.destroy();
+        release();
+      },
+    });
+  }
+}
+
+function waterRipple(scene: Phaser.Scene, cx: number, cy: number): void {
+  for (let ring = 0; ring < 2; ring += 1) {
+    const release = reserveSceneParticle(scene);
+    if (!release) return;
+    const ripple = scene.add.ellipse(cx, cy, px(8), px(3), 0x6fb6ff, 0.8).setDepth(20).setScale(0.35, 0.6);
+    scene.tweens.add({
+      targets: ripple,
+      scaleX: 2.8,
+      scaleY: 1.4,
+      alpha: 0,
+      duration: 420,
+      delay: ring * 100,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        ripple.destroy();
+        release();
+      },
+    });
+  }
+  for (let i = 0; i < 4; i += 1) {
+    const release = reserveSceneParticle(scene);
+    if (!release) return;
+    const angle = (Math.PI * 2 * i) / 4;
+    const drop = scene.add.circle(cx, cy, px(2), 0xb7e7ff, 0.9).setDepth(20);
+    scene.tweens.add({
+      targets: drop,
+      x: cx + Math.cos(angle) * px(12),
+      y: cy + Math.sin(angle) * px(7) - px(2),
+      alpha: 0,
+      scale: 0.35,
+      duration: 360,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        drop.destroy();
+        release();
+      },
     });
   }
 }
