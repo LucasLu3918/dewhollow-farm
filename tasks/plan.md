@@ -361,5 +361,22 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 停止後 19 筆 RAF 樣本跨越 300 ms，tile、腳底錨點及 frame 穩定，movement input、pending 與 queue 清空。
 - [x] 專項 E2E 10 次重複與 1 次證據擷取皆通過；截圖、完整事件／逐幀 JSON 及 manifest／atlas／test／screenshot SHA-256 已保存。
 - [x] 最新首步 kickoff 修正後 `npm run check` 通過；完整 Chromium E2E 243／243（4 workers）通過。
-- [ ] AIPS reconciliation、最終 commit、PR #53 Required Checks 與 merge 待完成；CI trace 曾證實首步 kickoff 在等待格位後已 idle，已改為 kickoff 與第一批輸入同一頁面任務派送。
+- [x] AIPS reconciliation 已驗證；commit `a4bd3c0`、PR #53 Required Checks 通過並 squash merge 至 `main`（merge commit `3c37a865e7fc62f7d8df9038fa1f2aadbe75ab2e`）。CI trace 曾證實首步 kickoff 在等待格位後已 idle，已改為 kickoff 與第一批輸入同一頁面任務派送。
 - [ ] 60／120 FPS、實機輸入延遲、人工動作／美術審查及 Gate 1 核准仍未完成；此候選證據不代表通過。
+
+---
+
+# DF-G1-SHORT-PRESS-100 pixel32 候選四向短按證據
+
+## 範圍與限制
+
+在隔離 DEV-only pixel32 farm `MapScene` 上以 R→D→L→U 四格循環完成 100 圈，測試四方向各 100 次短按。逐次記錄座標、候選 idle frame、pending、held input 與 queue，驗證每次移動恰好一個正交格位。另驗證到達西牆鄰格 `(1,9)` 後左移遭拒且座標不變。只新增 E2E、證據、報告與 QA／任務文件，不修改 runtime、正式素材、地圖、玩法、存檔或核准狀態。詳細限制見 [四向短按證據報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-short-press-100.zh-TW.md)。
+
+## 驗收
+
+- [x] 四向各 100 次短按、共 400 次；每次恰好移動一格，面向與 idle frame 一致。
+- [x] 100 個循環回到起始 `(7,9)`，並驗證輸入佇列及移動狀態清空。
+- [x] 西側牆碰撞拒絕額外移動；保存逐次事件 JSON、開始／停止截圖與 SHA-256。
+- [x] 專項 E2E 1/1 通過；`npm run check` 通過（1,643 passed／1 skipped；build 2.808 MB）；完整 Chromium E2E 244/244（4 workers）通過。
+- [ ] 最終 AIPS reconciliation、commit、PR Required Checks 與 merge 待完成。
+- [ ] 真機／FPS／人工美術審查與 Gate 1 核准仍未完成。

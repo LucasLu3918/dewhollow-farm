@@ -36,10 +36,22 @@
 - [x] 記錄方向動畫影格、RAF 腳底錨點、瀏覽器端提交觀測延遲與牆前停止狀態；保存原始 JSON、截圖與 SHA-256。
 - [x] 專項 E2E 1/1 通過；不改 runtime、正式素材、地圖、玩法、存檔或素材核准。
 - [x] 最新首步 kickoff 修正後 `npm run check` 與完整 Chromium E2E（243/243，4 workers）通過；測試以 kickoff 與首批輸入原子派送修復 CI 排程競態。
-- [ ] 更新 AIPS Impact reconciliation、提交並更新 PR #53；Required Checks 與 merge 待完成。
+- [x] Impact reconciliation 已驗證；commit `a4bd3c0`、PR #53 Required Checks 通過並 squash merge 至 `main`（merge commit `3c37a865e7fc62f7d8df9038fa1f2aadbe75ab2e`）。
 - [ ] 真機／FPS／美術／Gate 1 審查仍待各自驗收。
 
 詳見 [DF-QA-01 稽核矩陣](../docs/art/audit/df-qa-01.md)。
+
+## DF-G1-SHORT-PRESS-100
+
+- [x] pixel32 候選 farm 上以 R→D→L→U 小迴圈執行 100 圈、400 次短按；四方向各 100 次，每次恰好移動一格且方向 idle frame 正確。
+- [x] 100 圈皆回到 `(7,9)`；每次檢查時 held input、pending 與 queue 清空。
+- [x] 往西抵達 `(1,9)` 後驗證 `x=0` 牆拒絕移動、座標不變與放鍵後靜止；保存逐次 JSON、兩張截圖與 SHA-256。
+- [x] 專項 Chromium E2E 1/1 通過；此項目前未改 runtime／正式素材／玩法。
+- [x] `npm run check` 通過（1,643 passed／1 skipped；build 2.808 MB）；完整 Chromium E2E 244/244（4 workers）通過。
+- [ ] 最終 Impact reconciliation、commit、PR Required Checks 與 merge 待完成。
+- [ ] 真機／FPS／人工美術審查與 Gate 1 核准仍未完成。
+
+詳見 [DF-G1-SHORT-PRESS-100 報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-short-press-100.zh-TW.md)。
 
 ---
 
