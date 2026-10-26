@@ -79,8 +79,8 @@ export function assetProblems(manifest: AssetManifest): string[] {
     }
   }
   for (const [itemId, file] of Object.entries(manifest.itemIcons ?? {})) {
-    if (!itemId.startsWith('item.') || itemId.length <= 'item.'.length) {
-      problems.push(`物品圖示 id 必須是完整的 item.* id：${itemId}`);
+    if (!isValidInventoryItemId(itemId)) {
+      problems.push(`物品圖示 id 格式無效：${itemId}`);
     }
     if (!isSafeItemIconFile(file)) {
       problems.push(`物品 ${itemId} 的圖示路徑必須在 assets/ 底下：${file}`);
@@ -105,6 +105,10 @@ export function resolveItemIcon(
 
 function isSafeItemIconFile(file: string): boolean {
   return /^assets\/items\/(?:[a-z0-9_-]+\/)*[a-z0-9_-]+\.png$/i.test(file);
+}
+
+function isValidInventoryItemId(itemId: string): boolean {
+  return /^(?:(?:item|building|recipe|fish|crop|seed|animal|dish|decor)\.)?[a-z0-9]+(?:-[a-z0-9]+)*$/.test(itemId);
 }
 
 function mirrorProblems(entry: AssetEntry, byId: ReadonlyMap<string, AssetEntry>): string[] {

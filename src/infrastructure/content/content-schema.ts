@@ -821,7 +821,7 @@ export const assetsFileSchema = z.object({
   version: z.literal(1),
   assets: z.array(assetSchema),
   itemIcons: z.record(
-    z.string().regex(/^item\.[a-z0-9-]+$/),
+    z.string().regex(/^(?:(?:item|building|recipe|fish|crop|seed|animal|dish|decor)\.)?[a-z0-9]+(?:-[a-z0-9]+)*$/),
     z.string().regex(/^assets\/items\/(?:[a-z0-9_-]+\/)*[a-z0-9_-]+\.png$/i),
   ).optional(),
 });

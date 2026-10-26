@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import assets from '../../../content/assets.json';
+import fish from '../../../content/fish.json';
+import items from '../../../content/items.json';
 import { assetsFileSchema } from '../content/content-schema';
 import {
   assetProblems,
@@ -62,6 +64,27 @@ describe('assetsFileSchema itemIcons', () => {
       assets: [],
       itemIcons: { 'tile.grass': 'assets/items/sweet-radish.png' },
     }).success).toBe(false);
+  });
+
+  it('accepts canonical IDs from shipped inventory content, including dotted IDs', () => {
+    const itemIcons = Object.fromEntries([
+      ...items.items.map(({ id }) => [id, 'assets/items/example.png']),
+      ...fish.fish.map(({ id }) => [`fish.${id}`, 'assets/items/example.png']),
+      ['crop.sweet-radish', 'assets/items/example.png'],
+      ['seed.sweet-radish', 'assets/items/example.png'],
+    ]);
+
+    expect(assetsFileSchema.safeParse({ version: 1, assets: [], itemIcons }).success).toBe(true);
+  });
+
+  it('rejects malformed canonical IDs and path-like keys', () => {
+    for (const itemId of ['item.', '.wood', 'fish..carp', 'fish/carp', '../wood', ' wood', 'tile.grass']) {
+      expect(assetsFileSchema.safeParse({
+        version: 1,
+        assets: [],
+        itemIcons: { [itemId]: 'assets/items/example.png' },
+      }).success, itemId).toBe(false);
+    }
   });
 
   it('rejects paths outside the local item icon directory', () => {
@@ -218,9 +241,29 @@ describe('itemIcons', () => {
     });
   });
 
+  it('validates and resolves canonical content IDs without rewriting them', () => {
+    const itemIds = ['wood', 'fish.carp', 'recipe.sun-hat'];
+    const itemIcons = Object.fromEntries(itemIds.map((id) => [id, `assets/items/${id.replaceAll('.', '-')}.png`]));
+    const manifest = iconManifest(itemIcons);
+
+    expect(assetProblems(manifest)).toEqual([]);
+    for (const id of itemIds) {
+      expect(resolveItemIcon(manifest, id, new Set(itemIds))).toEqual({
+        status: 'available',
+        src: `/${itemIcons[id]}`,
+      });
+    }
+  });
+
   it('reports item icon entries with unsafe file paths', () => {
     expect(assetProblems(iconManifest({ 'item.sweet-radish': '../private.png' }))).toContain(
       '物品 item.sweet-radish 的圖示路徑必須在 assets/ 底下：../private.png',
+    );
+  });
+
+  it('rejects malformed inventory IDs even when the manifest bypasses content schema parsing', () => {
+    expect(assetProblems(iconManifest({ '../wood': 'assets/items/wood.png' }))).toContain(
+      '物品圖示 id 格式無效：../wood',
     );
   });
 });
