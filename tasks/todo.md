@@ -158,7 +158,7 @@
 - [x] DEV-only Chromium E2E 覆核觸控方向按住時穿越農場出口、重新載入已存檔狀態，以及開啟設定面板三種中斷情境。
 - [x] 每個情境確認 held direction、moving、pending 與 queue 清空，並在 300 ms 安靜窗確認地圖／座標不再變動；逐案 JSON 附件隨 Playwright 測試結果保存。
 - [x] `npm run check` 通過（162 個測試檔、1,643 passed／1 skipped；build 2.808 MB）；專項 E2E 3/3、完整 Chromium E2E 251/251 通過（4 workers）。
-- [x] AIPS Impact reconciliation 與 commit `6966b264e39e822eaae749260492396e0357faba` 完成；PR、Required Checks 與 merge 待完成。
+- [x] AIPS Impact reconciliation、commit `19261fe17c6466758bb556003b476c6afa43deca`、PR #56 Required Checks（GitHub Actions run `40293927563`）通過並 squash merge 至 `main`（merge SHA `d78d249d5d4dd5c4d4583b7e7a0c6268bde55552`）。
 - [ ] 合成 Chromium 觸控不代表實機輸入／效能驗收；人工美術、可讀性與原生 iOS／Android gate 仍待完成。
 
 詳見 [輸入取消與場景轉換證據](../docs/art/candidates/pixel-movement/gate1-input-cancel-transition.zh-TW.md)。
