@@ -317,4 +317,12 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 五種 viewport × DPR 1／2／3 共 15 組 context 載入四個候選 frame，記錄請求／錯誤與尺寸量測。
 - [x] 保存 15 張截圖、manifest／atlas／frame 輸入 hash 與截圖 SHA-256；抽查手機直式及桌面全高清。
 - [x] `npm run check` 通過（162 個測試檔，1,643 passed／1 skipped；production build 2.808 MB）；完整 Chromium E2E 240/240 通過（9 workers）。
-- [ ] AIPS Impact Graph reconciliation、commit、PR Required Checks 通過並合併。
+- [x] AIPS Impact Graph reconciliation、commit `80c01aef`、PR #49 Required Checks 通過並合併至 `main`（merge commit `390d61b2d9c46da3790a7d8f15de86660c80bc89`）。
+
+# DF-G1-READABILITY-10SCENARIOS 100% 尺寸盲測證據包
+
+- [x] 以固定 DEV-only candidate route 與隔離 farm save 擷取十種 1280×900、DPR 1 CSS-scale 情境；測試作物成熟／未成熟、乾／濕土、玩家／居民／貓與既有可進入溫室門。
+- [x] 提供打亂編號刺激圖、分離答案鍵、盲測作答表、評分規則與 SHA-256 證據；觀察者成績先保持 `PENDING`。
+- [x] 確認候選圖仍未核准、靜態候選門未被宣稱為可互動，並更新 DF-QA-01 與任務紀錄。
+- [x] 專項 E2E、`npm run check`、完整 Chromium E2E（241/241，4 workers）、Impact reconciliation、commit、PR Required Checks 與 merge。
+- [ ] 收集至少三位獨立觀察者作答；每位至少答對 9／10 才達 §11.1 可讀性門檻。實機驗收仍為 `DEVICE_PENDING`。

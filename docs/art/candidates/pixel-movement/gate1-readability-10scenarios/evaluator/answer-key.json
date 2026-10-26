@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "warning": "Keep sealed until all observers submit their answer forms.",
+  "answers": {
+    "10": {
+      "scenarioId": "player-near-crop",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates",
+      "fixture": {
+        "mapId": "farm",
+        "player": {
+          "x": 4,
+          "y": 5,
+          "facing": "right"
+        },
+        "plots": {
+          "5,6": {
+            "watered": true,
+            "dryDays": 0,
+            "crop": {
+              "cropId": "sweet-radish",
+              "growthDays": 3
+            }
+          }
+        },
+        "flags": {}
+      }
+    },
+    "01": {
+      "scenarioId": "player-with-cat",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates&gate1CandidatePetFollow=pixel32-cat-follow",
+      "fixture": {
+        "mapId": "farm",
+        "player": {
+          "x": 5,
+          "y": 5,
+          "facing": "up"
+        },
+        "plots": {},
+        "flags": {}
+      }
+    },
+    "02": {
+      "scenarioId": "dry-ripe",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates",
+      "fixture": {
+        "mapId": "farm",
+        "player": {
+          "x": 5,
+          "y": 5,
+          "facing": "down"
+        },
+        "plots": {
+          "5,6": {
+            "watered": false,
+            "dryDays": 0,
+            "crop": {
+              "cropId": "sweet-radish",
+              "growthDays": 3
+            }
+          }
+        },
+        "flags": {}
+      }
+    },
+    "03": {
+      "scenarioId": "greenhouse-interior",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation",
+      "fixture": {
+        "mapId": "farm",
+        "player": {
+          "x": 30,
+          "y": 19,
+          "facing": "down"
+        },
+        "plots": {},
+        "flags": {
+          "greenhouse": true
+        }
+      }
+    },
+    "04": {
+      "scenarioId": "wet-unripe",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates",
+      "fixture": {
+        "mapId": "farm",
+        "player": {
+          "x": 5,
+          "y": 5,
+          "facing": "down"
+        },
+        "plots": {
+          "5,6": {
+            "watered": true,
+            "dryDays": 0,
+            "crop": {
+              "cropId": "sweet-radish",
+              "growthDays": 1
+            }
+          }
+        },
+        "flags": {}
+      }
+    },
+    "05": {
+      "scenarioId": "player-with-resident",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation",
+      "fixture": {
+        "mapId": "village",
+        "player": {
+          "x": 7,
+          "y": 9,
+          "facing": "down"
+        },
+        "plots": {},
+        "flags": {}
+      }
+    },
+    "06": {
+      "scenarioId": "player-farm",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates",
+      "fixture": {
+        "mapId": "farm",
+        "player": {
+          "x": 5,
+          "y": 5,
+          "facing": "down"
+        },
+        "plots": {},
+        "flags": {}
+      }
+    },
+    "07": {
+      "scenarioId": "dry-unripe",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates",
+      "fixture": {
+        "mapId": "farm",
+        "player": {
+          "x": 5,
+          "y": 5,
+          "facing": "down"
+        },
+        "plots": {
+          "5,6": {
+            "watered": false,
+            "dryDays": 0,
+            "crop": {
+              "cropId": "sweet-radish",
+              "growthDays": 1
+            }
+          }
+        },
+        "flags": {}
+      }
+    },
+    "08": {
+      "scenarioId": "greenhouse-door",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation",
+      "fixture": {
+        "mapId": "farm",
+        "player": {
+          "x": 30,
+          "y": 19,
+          "facing": "down"
+        },
+        "plots": {},
+        "flags": {
+          "greenhouse": true
+        }
+      }
+    },
+    "09": {
+      "scenarioId": "wet-ripe",
+      "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates",
+      "fixture": {
+        "mapId": "farm",
+        "player": {
+          "x": 5,
+          "y": 5,
+          "facing": "down"
+        },
+        "plots": {
+          "5,6": {
+            "watered": true,
+            "dryDays": 0,
+            "crop": {
+              "cropId": "sweet-radish",
+              "growthDays": 3
+            }
+          }
+        },
+        "flags": {}
+      }
+    }
+  }
+}

@@ -1,0 +1,3339 @@
+{
+  "schemaVersion": 1,
+  "status": "candidate-assessment-pending",
+  "generatedBy": "tests/e2e/gate1-readability-10scenarios.spec.ts",
+  "capturedAt": "2026-10-26T00:04:48.292Z",
+  "captureProvider": "Playwright Chromium, 1280x900 viewport, DPR 1; exact canvas CSS content box using clientLeft/clientTop border insets",
+  "baseRevision": "390d61b2d9c46da3790a7d8f15de86660c80bc89",
+  "testSource": {
+    "path": "tests/e2e/gate1-readability-10scenarios.spec.ts",
+    "sha256": "f01a509e7f06daeecac80f6484b1b2254f2f48a25d2a3a3ef73f23a9bc46a7b3"
+  },
+  "stimuli": [
+    {
+      "number": "01",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "dfc7d33beaee589f1a89d7bd2607ef52b6d2c7aabb39ee5e62522d57d12e390f",
+      "bytes": 50862
+    },
+    {
+      "number": "02",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "c15eb93a1937c1a0768a6a7f0235103ada88fd6a0ca00f87f7a48e6fc1197619",
+      "bytes": 53539
+    },
+    {
+      "number": "03",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "71c76e393dc32b6e420a96da5941a2d4d05801167845df00d4d6c4320046ab4c",
+      "bytes": 19382
+    },
+    {
+      "number": "04",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "7ee66ba932f21ffcb577174c568fcaca11b16c22ea5b75e5535c96262663d01c",
+      "bytes": 53387
+    },
+    {
+      "number": "05",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "b2d82cf801d8e994bf89950733ca9fa8425cbce7040a30f84c9663090045ba3a",
+      "bytes": 75645
+    },
+    {
+      "number": "06",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "216003a4301ec43c2d5f38bfe37eae09a77a59e065c9c0986062eb8c48530454",
+      "bytes": 51220
+    },
+    {
+      "number": "07",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "25a5dc7ea4e969a6bd6d1e3e48e292ea336570d6fa6bd3fb33225035ed9b6aa3",
+      "bytes": 53671
+    },
+    {
+      "number": "08",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "d2ce9f658182359e4c586b3df1c33bea69013ec4bf28a0d78a0505f5af0e55f7",
+      "bytes": 19408
+    },
+    {
+      "number": "09",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "e0f8d3989b6d5d635c4989f9ab40f2824fc746ce16f3657fb52ca6fe141a8a72",
+      "bytes": 53301
+    },
+    {
+      "number": "10",
+      "width": 820,
+      "height": 615,
+      "contentBox": {
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "sha256": "81a8fa03c09106c6896aa9597d7b6e8a38b37ea91b04373d48c9c3c186e53b1a",
+      "bytes": 53978
+    }
+  ],
+  "inputHashes": [
+    {
+      "path": "docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+      "sha256": "ebeb2be797d5e6b16d643aeb8a2e7d8b090fc427099d892957b94f2f626692f8",
+      "bytes": 8456
+    },
+    {
+      "path": "docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+      "sha256": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3",
+      "bytes": 98569
+    },
+    {
+      "path": "docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+      "sha256": "3a179659310f657b70bfd5a929e671d8fbce340e241fe16fbb90bb5d5b27c9ea",
+      "bytes": 34408
+    },
+    {
+      "path": "docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+      "sha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184",
+      "bytes": 1049428
+    },
+    {
+      "path": "docs/art/candidates/pixel-movement/gate1-assets/pixel32-crops/manifest.json",
+      "sha256": "6e7b3c847eb026c2980dfd22da2cfcd43dc6288781a89bfc2b9ff480a10d00dd",
+      "bytes": 3510
+    },
+    {
+      "path": "docs/art/candidates/pixel-movement/gate1-assets/pixel32-crops/sweet-radish-stages.png",
+      "sha256": "6fa85cde285fa70538f932f4ebeabcdcdb709ae2e65b43298ce232fcdb78ba40",
+      "bytes": 12388
+    },
+    {
+      "path": "docs/art/candidates/pixel-movement/gate1-pets-pixel32/manifest.json",
+      "sha256": "bc1cbc0d39091702d58867513fd029168b57bc348e3e21a80a50c90745de86ea",
+      "bytes": 18974
+    },
+    {
+      "path": "docs/art/candidates/pixel-movement/gate1-pets-pixel32/pets-pixel32.png",
+      "sha256": "720411831a56879143ff3f6dd6877b0f2138744c1e81e9aff9c669c259e442f3",
+      "bytes": 131278
+    }
+  ],
+  "candidateStatus": {
+    "animation": {
+      "schemaVersion": 1,
+      "title": "Dewhollow pixel32 four-direction animation candidate",
+      "status": "candidate",
+      "approved": false,
+      "source": {
+        "method": "hand-authored integer pixel primitives",
+        "generator": "tools/art/generate_gate1_animation.mjs",
+        "generatorSha256": "782937ffe90056e891a6cf7b4bd9492b86fda385603689dca91e7c9adb4c6fa6"
+      },
+      "pixelContract": {
+        "frameWidth": 32,
+        "frameHeight": 48,
+        "columns": 4,
+        "rows": 4,
+        "sampling": "nearest-neighbor",
+        "origin": "top-left",
+        "rectConvention": "half-open"
+      },
+      "atlas": {
+        "file": "player-4dir.png",
+        "width": 128,
+        "height": 192,
+        "sha256": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3"
+      },
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "frames": {
+        "down-idle": {
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "idle",
+          "sha256": "9827757cf610a6bc51abcf9bf5550160b604af51ec9c4b1d240c9988f2760877"
+        },
+        "down-contact-a": {
+          "x": 32,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "contact-a",
+          "sha256": "fa28309b2cdc0895d12f9ebedcbac6773ed7550554a0bdd7d5698982997f727b"
+        },
+        "down-passing": {
+          "x": 64,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "passing",
+          "sha256": "dcda77bc1ffb96e3e58bd7d0efb1d89a88570cd46e2fd32ac8eea9fcc0e85b77"
+        },
+        "down-contact-b": {
+          "x": 96,
+          "y": 0,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "down",
+          "pose": "contact-b",
+          "sha256": "a7a3ed6773bcc782b6333d0e044244d5ea2f134e1c44f454763e5137ecddab38"
+        },
+        "up-idle": {
+          "x": 0,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "idle",
+          "sha256": "53941b3a686e237e2439dd518eacaca7e6d58db0bd7d33c7213af3dd3d9dd366"
+        },
+        "up-contact-a": {
+          "x": 32,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "contact-a",
+          "sha256": "9bec4cf731ce6bb13c2b570312825e0a0ace64115f1b10941393404cb44e121c"
+        },
+        "up-passing": {
+          "x": 64,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "passing",
+          "sha256": "442b4244e5103a3a981777ce5e4fe0c4d9face517998147f6deb6e991f6b6a18"
+        },
+        "up-contact-b": {
+          "x": 96,
+          "y": 48,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "up",
+          "pose": "contact-b",
+          "sha256": "6689c4c2da9b83508c137d71dcef2ebd0cc6a3fcb38025765168442ee19bd5de"
+        },
+        "left-idle": {
+          "x": 0,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "idle",
+          "sha256": "9236bb6be4ab78f8bab864755980b6a9ef818c5b45f1a777c38c2df6cec5aa4d"
+        },
+        "left-contact-a": {
+          "x": 32,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "contact-a",
+          "sha256": "e20fdb180ce4174ec55ebf4535b207872592b61230b228f7d1d4c21491d68e2d"
+        },
+        "left-passing": {
+          "x": 64,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "passing",
+          "sha256": "aba31192c949e059dda6aa75cecec7d4080e0776248783c89a334c652040d976"
+        },
+        "left-contact-b": {
+          "x": 96,
+          "y": 96,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "left",
+          "pose": "contact-b",
+          "sha256": "2f1d9f2ab7706b05a8bd02d7a1982038247c43d6f609c0c7cc3f6db3318c848f"
+        },
+        "right-idle": {
+          "x": 0,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "idle",
+          "sha256": "c753e0b6fc8200e7b17df6bf1a205628160dbca274ad179d861eade81048e660"
+        },
+        "right-contact-a": {
+          "x": 32,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "contact-a",
+          "sha256": "9aa91b23fcce109124b1d8355b854b837a08932d9ad4b4f86e0a312202a74be1"
+        },
+        "right-passing": {
+          "x": 64,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "passing",
+          "sha256": "5969984fc5ba554e860cb4e7638fafd7b532a731c83624ff84638f188053bfa7"
+        },
+        "right-contact-b": {
+          "x": 96,
+          "y": 144,
+          "width": 32,
+          "height": 48,
+          "nativeWidth": 32,
+          "nativeHeight": 48,
+          "footAnchor": {
+            "x": 16,
+            "y": 47
+          },
+          "pivot": {
+            "x": 16,
+            "y": 47
+          },
+          "direction": "right",
+          "pose": "contact-b",
+          "sha256": "6594f8a9be48ec36156c63c30bd5f6ef6ec3056e71eeaefe34ac7bc62d73f5a9"
+        }
+      },
+      "clips": {
+        "idle": {
+          "frames": [
+            "down-idle",
+            "up-idle",
+            "left-idle",
+            "right-idle"
+          ],
+          "loop": true
+        },
+        "walk": {
+          "frameDurationMs": 55,
+          "frames": [
+            "down-contact-a",
+            "down-passing",
+            "down-contact-b",
+            "down-passing",
+            "up-contact-a",
+            "up-passing",
+            "up-contact-b",
+            "up-passing",
+            "left-contact-a",
+            "left-passing",
+            "left-contact-b",
+            "left-passing",
+            "right-contact-a",
+            "right-passing",
+            "right-contact-b",
+            "right-passing"
+          ],
+          "loop": true
+        }
+      },
+      "toolFeedback": {
+        "frameSource": "../16bit.png#tool",
+        "impactAt": 0.55,
+        "reducedMotionScale": 0.4,
+        "status": "candidate-preview-only"
+      },
+      "limitations": [
+        "Candidate art and motion only; not approved or registered as production assets.",
+        "Right-facing frames mirror left-facing poses; Gate 1 visual review must confirm silhouette and foot contact.",
+        "The preview tool overlay demonstrates timing only and does not change farming rules."
+      ]
+    },
+    "map": {
+      "schemaVersion": 1,
+      "title": "Dewhollow pixel32 map and tileset candidate",
+      "status": "candidate",
+      "approved": false,
+      "source": {
+        "method": "hand-authored integer pixel primitives; fixed stored-DEFLATE PNG encoding",
+        "generator": "tools/art/generate_gate1_map.mjs",
+        "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+      },
+      "pixelContract": {
+        "nativeTileSize": 32,
+        "worldTileSize": 64,
+        "displayScale": 2,
+        "sampling": "nearest-neighbor",
+        "origin": "top-left",
+        "rectConvention": "half-open",
+        "anchorConvention": "integer-pixel-index"
+      },
+      "atlas": {
+        "file": "map-atlas.png",
+        "width": 512,
+        "height": 512,
+        "sha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184"
+      },
+      "seasons": [
+        "spring",
+        "summer",
+        "autumn",
+        "winter"
+      ],
+      "autotile": {
+        "surface": "field",
+        "edgeSurface": "grass",
+        "maskBits": {
+          "north": 1,
+          "east": 2,
+          "south": 4,
+          "west": 8
+        },
+        "variantsPerSeason": 16
+      },
+      "frames": {
+        "spring-grass": {
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field": {
+          "x": 32,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-path": {
+          "x": 64,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-water": {
+          "x": 96,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-0": {
+          "x": 128,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-1": {
+          "x": 160,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-2": {
+          "x": 192,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-3": {
+          "x": 224,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-4": {
+          "x": 256,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-5": {
+          "x": 288,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-6": {
+          "x": 320,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-7": {
+          "x": 352,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-8": {
+          "x": 384,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-9": {
+          "x": 416,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-a": {
+          "x": 448,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-b": {
+          "x": 480,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-c": {
+          "x": 0,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-d": {
+          "x": 32,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-e": {
+          "x": 64,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "spring-field-edge-f": {
+          "x": 96,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "spring",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-grass": {
+          "x": 128,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field": {
+          "x": 160,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-path": {
+          "x": 192,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-water": {
+          "x": 224,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-0": {
+          "x": 256,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-1": {
+          "x": 288,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-2": {
+          "x": 320,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-3": {
+          "x": 352,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-4": {
+          "x": 384,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-5": {
+          "x": 416,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-6": {
+          "x": 448,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-7": {
+          "x": 480,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-8": {
+          "x": 0,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-9": {
+          "x": 32,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-a": {
+          "x": 64,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-b": {
+          "x": 96,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-c": {
+          "x": 128,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-d": {
+          "x": 160,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-e": {
+          "x": 192,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "summer-field-edge-f": {
+          "x": 224,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "summer",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-grass": {
+          "x": 256,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field": {
+          "x": 288,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-path": {
+          "x": 320,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-water": {
+          "x": 352,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-0": {
+          "x": 384,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-1": {
+          "x": 416,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-2": {
+          "x": 448,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-3": {
+          "x": 480,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-4": {
+          "x": 0,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-5": {
+          "x": 32,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-6": {
+          "x": 64,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-7": {
+          "x": 96,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-8": {
+          "x": 128,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-9": {
+          "x": 160,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-a": {
+          "x": 192,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-b": {
+          "x": 224,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-c": {
+          "x": 256,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-d": {
+          "x": 288,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-e": {
+          "x": 320,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "autumn-field-edge-f": {
+          "x": 352,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "autumn",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-grass": {
+          "x": 384,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "grass",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field": {
+          "x": 416,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-path": {
+          "x": 448,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "path",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-water": {
+          "x": 480,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "water",
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-0": {
+          "x": 0,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 0,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-1": {
+          "x": 32,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 1,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-2": {
+          "x": 64,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 2,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-3": {
+          "x": 96,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 3,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-4": {
+          "x": 128,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 4,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-5": {
+          "x": 160,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 5,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-6": {
+          "x": 192,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 6,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-7": {
+          "x": 224,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 7,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-8": {
+          "x": 256,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 8,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-9": {
+          "x": 288,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 9,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-a": {
+          "x": 320,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 10,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-b": {
+          "x": 352,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 11,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-c": {
+          "x": 384,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 12,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-d": {
+          "x": 416,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 13,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-e": {
+          "x": 448,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 14,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "winter-field-edge-f": {
+          "x": 480,
+          "y": 128,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "kind": "tile",
+          "season": "winter",
+          "surface": "field",
+          "autotileMask": 15,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "approved": false
+        },
+        "house-back": {
+          "x": 0,
+          "y": 192,
+          "width": 96,
+          "height": 64,
+          "nativeWidth": 96,
+          "nativeHeight": 64,
+          "kind": "building",
+          "widthTiles": 3,
+          "heightTiles": 2,
+          "footAnchor": {
+            "x": 48,
+            "y": 64
+          },
+          "pivot": {
+            "x": 48,
+            "y": 64
+          },
+          "layer": "back",
+          "approved": false
+        },
+        "house-front": {
+          "x": 0,
+          "y": 256,
+          "width": 96,
+          "height": 64,
+          "nativeWidth": 96,
+          "nativeHeight": 64,
+          "kind": "occlusion",
+          "widthTiles": 3,
+          "heightTiles": 2,
+          "footAnchor": {
+            "x": 48,
+            "y": 64
+          },
+          "pivot": {
+            "x": 48,
+            "y": 64
+          },
+          "layer": "front",
+          "approved": false
+        },
+        "tree-canopy": {
+          "x": 96,
+          "y": 192,
+          "width": 64,
+          "height": 64,
+          "nativeWidth": 64,
+          "nativeHeight": 64,
+          "kind": "occlusion",
+          "widthTiles": 2,
+          "heightTiles": 2,
+          "footAnchor": {
+            "x": 32,
+            "y": 64
+          },
+          "pivot": {
+            "x": 32,
+            "y": 64
+          },
+          "layer": "front",
+          "approved": false
+        }
+      },
+      "limitations": [
+        "Candidate preview only; not approved or registered as production assets.",
+        "Seasonal variants and autotile masks are hand-authored visual studies, not production game map rules.",
+        "Building and canopy demonstrate layer ordering and do not alter collision or map data.",
+        "Final colors, tile readability, seamless edges, building silhouette, and mobile readability require Gate 1 human review."
+      ]
+    },
+    "crops": {
+      "schemaVersion": 1,
+      "id": "gate1-pixel32-sweet-radish-growth-stages",
+      "title": "甜蘿蔔 Pixel32 三階作物候選",
+      "assetKey": "crop.sweet-radish",
+      "status": "candidate",
+      "approved": false,
+      "source": {
+        "method": "以 generator 中原創整數像素圖元手工繪製；參考圖只供甜蘿蔔紅色塊根與綠葉特徵，不取樣、不縮放、不複製其像素。",
+        "generator": "tools/art/generate_gate1_crops.mjs",
+        "generatorSha256": "608958d3b347d3c948d5845c5eb0581a51e8669ba70f8e7a008397ebaf147741",
+        "reference": {
+          "file": "public/assets/crops/sweet-radish-2x.png",
+          "sha256": "e7cb6a3631de28f28cda03e9ced2725a1bf30c6f8634975e0a53964f47e8fbe7",
+          "role": "feature-reference-only; source pixels are not reused"
+        }
+      },
+      "pixelContract": {
+        "nativeTileSize": 32,
+        "worldTileSize": 64,
+        "displayScale": 2,
+        "sampling": "nearest-neighbor",
+        "origin": "top-left",
+        "rectConvention": "half-open",
+        "anchorConvention": "integer-pixel-index"
+      },
+      "atlas": {
+        "file": "sweet-radish-stages.png",
+        "width": 96,
+        "height": 32,
+        "colorType": "RGBA8888",
+        "sha256": "6fa85cde285fa70538f932f4ebeabcdcdb709ae2e65b43298ce232fcdb78ba40"
+      },
+      "palette": {
+        "rootOutline": "#702b3c",
+        "rootShadow": "#ac3449",
+        "rootMid": "#d94752",
+        "rootLight": "#f16a68",
+        "rootGlint": "#ff9a83",
+        "leafDeep": "#285b3e",
+        "leafShadow": "#347346",
+        "leafMid": "#4d9657",
+        "leafLight": "#79bd67",
+        "leafGlint": "#b3dc78",
+        "seedLight": "#f3bd83",
+        "seedShade": "#8a4a45"
+      },
+      "frames": {
+        "seed": {
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "kind": "cropOverlay",
+          "stage": "seed",
+          "tags": [
+            "crop",
+            "sweet-radish",
+            "seed",
+            "candidate"
+          ],
+          "sha256": "ec1d77968ae959c1249d65b7880a0a9587f8991b03655ba6012b6eb342cffe5e"
+        },
+        "sprout": {
+          "x": 32,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "kind": "cropOverlay",
+          "stage": "sprout",
+          "tags": [
+            "crop",
+            "sweet-radish",
+            "sprout",
+            "candidate"
+          ],
+          "sha256": "80180381dda78aeb99b901d173398cbc436d0e665a79cda75a2461ea2910ea18"
+        },
+        "mature": {
+          "x": 64,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 31
+          },
+          "pivot": {
+            "x": 16,
+            "y": 31
+          },
+          "kind": "cropOverlay",
+          "stage": "mature",
+          "tags": [
+            "crop",
+            "sweet-radish",
+            "mature",
+            "candidate"
+          ],
+          "sha256": "cad4faea12942ef8fbdefb2089f989731c5154b2e28e8baeabc8faca1df32734"
+        }
+      },
+      "limitations": [
+        "Candidate only: this exact version is not reviewed, approved, integrated, or registered in production assets.",
+        "The existing sweet-radish PNG is a feature reference only; candidate pixels are hand-authored in the bound generator.",
+        "The checker verifies structure and reproducibility, not visual quality, in-game readability, device display, or Gate 1 acceptance."
+      ]
+    },
+    "pets": {
+      "schemaVersion": 2,
+      "title": "Dewhollow pixel32 black cat and quokka candidate animation atlas",
+      "status": "candidate",
+      "approved": false,
+      "source": {
+        "method": "hand-authored integer pixel primitives; approved static assets used only as species references",
+        "generator": "tools/art/generate_gate1_pets_pixel32.mjs",
+        "generatorSha256": "f1bc412078115d44811ce71f3bbac85f6f0eac68b5503a650049d7377f66952c"
+      },
+      "pixelContract": {
+        "frameWidth": 32,
+        "frameHeight": 32,
+        "columns": 8,
+        "rows": 4,
+        "sampling": "nearest-neighbor",
+        "origin": "top-left",
+        "rectConvention": "half-open",
+        "displayScale": 2
+      },
+      "atlas": {
+        "file": "pets-pixel32.png",
+        "width": 256,
+        "height": 128,
+        "sha256": "720411831a56879143ff3f6dd6877b0f2138744c1e81e9aff9c669c259e442f3"
+      },
+      "species": [
+        "cat",
+        "quokka"
+      ],
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "poses": [
+        "idle",
+        "hop-a",
+        "hop-b",
+        "land"
+      ],
+      "frames": {
+        "cat-down-idle": {
+          "species": "cat",
+          "direction": "down",
+          "pose": "idle",
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "3ef717d9c2e1c78d20bfcd6f64c626bfc7f19de6a3d38a3eed1cc70e10e85d08"
+        },
+        "cat-down-hop-a": {
+          "species": "cat",
+          "direction": "down",
+          "pose": "hop-a",
+          "x": 32,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "9c5b47d97e9d1fac9b5ff2ebac06a4136bc2c21280e9b7b38278bc99a5231159"
+        },
+        "cat-down-hop-b": {
+          "species": "cat",
+          "direction": "down",
+          "pose": "hop-b",
+          "x": 64,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "ac8425dbf7e51ca0bafc69547063fc4a8e3eb04fb98a8b913b6afce145927dde"
+        },
+        "cat-down-land": {
+          "species": "cat",
+          "direction": "down",
+          "pose": "land",
+          "x": 96,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "1f44e5172d529c5b597ac2d134ff0928c0413b12cf5bf19db9e334b63b2eac77"
+        },
+        "quokka-down-idle": {
+          "species": "quokka",
+          "direction": "down",
+          "pose": "idle",
+          "x": 128,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "12d75669e228e4f24e1fc03a8c2cc3436894f3912bf0d2fe80f7c24145f7e138"
+        },
+        "quokka-down-hop-a": {
+          "species": "quokka",
+          "direction": "down",
+          "pose": "hop-a",
+          "x": 160,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "63871a75c001ff88853e19c9e25cf382e9b58b194df3c03570c3bd59efa19674"
+        },
+        "quokka-down-hop-b": {
+          "species": "quokka",
+          "direction": "down",
+          "pose": "hop-b",
+          "x": 192,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "e74b35e56d22bf179dfde56ba171119954f23679adfa4073cd219bd326ff4bdf"
+        },
+        "quokka-down-land": {
+          "species": "quokka",
+          "direction": "down",
+          "pose": "land",
+          "x": 224,
+          "y": 0,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "4163e8ec050313c1907678bf3da307d011b1d795d510d18b17d3b775375a43b6"
+        },
+        "cat-up-idle": {
+          "species": "cat",
+          "direction": "up",
+          "pose": "idle",
+          "x": 0,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "db4caacd6aa8305cb9cf5c40936b7510127ed8bee0df6ce110c7d4223de89a7b"
+        },
+        "cat-up-hop-a": {
+          "species": "cat",
+          "direction": "up",
+          "pose": "hop-a",
+          "x": 32,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "ed1ba3064b43d6a50283a0f8ccb807bd8c4311fef4a0b925c721bd9b4a464a23"
+        },
+        "cat-up-hop-b": {
+          "species": "cat",
+          "direction": "up",
+          "pose": "hop-b",
+          "x": 64,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "cf2b2a922941c8245fb069dd989f4fbe417e6c16fe368563e1700ba12c72d436"
+        },
+        "cat-up-land": {
+          "species": "cat",
+          "direction": "up",
+          "pose": "land",
+          "x": 96,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "f172e5c63cd64976afb5235ace9f4c9879459320777b1017d10880e4e5fd3377"
+        },
+        "quokka-up-idle": {
+          "species": "quokka",
+          "direction": "up",
+          "pose": "idle",
+          "x": 128,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "84b14257f9ae44d745aa96284d2109122fa8d36dbd06abd89b87d7b714e1255e"
+        },
+        "quokka-up-hop-a": {
+          "species": "quokka",
+          "direction": "up",
+          "pose": "hop-a",
+          "x": 160,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "64a6ce9e83e9fe29c358b7af1f087c6ece5828236327cb98f49d524234346eb8"
+        },
+        "quokka-up-hop-b": {
+          "species": "quokka",
+          "direction": "up",
+          "pose": "hop-b",
+          "x": 192,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "b11a19870e923a7cda03fa30ecbaf98df95e363d7ba6d6e0e5229d9cfe4b5a41"
+        },
+        "quokka-up-land": {
+          "species": "quokka",
+          "direction": "up",
+          "pose": "land",
+          "x": 224,
+          "y": 32,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "5f5773f89502a072db1b9665fd9ac0a8bdcf1b288dde8462a23d327d1187d91c"
+        },
+        "cat-left-idle": {
+          "species": "cat",
+          "direction": "left",
+          "pose": "idle",
+          "x": 0,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "40b1f262135a4caa988999c3b1f6706ab079439df79057512e882c158492cd95"
+        },
+        "cat-left-hop-a": {
+          "species": "cat",
+          "direction": "left",
+          "pose": "hop-a",
+          "x": 32,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "29c2d6ed4f1b7bf4f78ad19f238028c5a93971560d3ab03ed96d8c5a94e13f28"
+        },
+        "cat-left-hop-b": {
+          "species": "cat",
+          "direction": "left",
+          "pose": "hop-b",
+          "x": 64,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "595a4fda2d7d997d58117ee046fc21a6b4ff4ea04872c9dc9734e61d943a5763"
+        },
+        "cat-left-land": {
+          "species": "cat",
+          "direction": "left",
+          "pose": "land",
+          "x": 96,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "9cd80c9530f0fccc2629e6b51d4acffde345910f3eefe3a9b0695ee5a2e32efc"
+        },
+        "quokka-left-idle": {
+          "species": "quokka",
+          "direction": "left",
+          "pose": "idle",
+          "x": 128,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "1cf868c859f656315382419bf81b6af27cde5984656ccb550533ceba9e19d8f7"
+        },
+        "quokka-left-hop-a": {
+          "species": "quokka",
+          "direction": "left",
+          "pose": "hop-a",
+          "x": 160,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "352608b6b31cb5f42b9a8b1d76736ae6f9288a2121f7b217cf9586ea4923c8b3"
+        },
+        "quokka-left-hop-b": {
+          "species": "quokka",
+          "direction": "left",
+          "pose": "hop-b",
+          "x": 192,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "879968384cdf4f0d9596f69937c396f63c24d64d8e87f7c354d219dc49d8a17a"
+        },
+        "quokka-left-land": {
+          "species": "quokka",
+          "direction": "left",
+          "pose": "land",
+          "x": 224,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "ec459dd5afc16670d2a647c6570df3949473678c91fd2e57a690ac2f1b5034ac"
+        },
+        "cat-right-idle": {
+          "species": "cat",
+          "direction": "right",
+          "pose": "idle",
+          "x": 0,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "8fd1680c7d418a99aa885f712d21b8da2a827c935c081b240080acfed5c6a30e"
+        },
+        "cat-right-hop-a": {
+          "species": "cat",
+          "direction": "right",
+          "pose": "hop-a",
+          "x": 32,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "a04f5ae38c14b83ac16ff5cb3c10f4173d2064977493f3d6c5ce5a2f484138af"
+        },
+        "cat-right-hop-b": {
+          "species": "cat",
+          "direction": "right",
+          "pose": "hop-b",
+          "x": 64,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "56943e5781298596391a24d61feb787295f30e6c4e5d11d130a1cfb870c0e941"
+        },
+        "cat-right-land": {
+          "species": "cat",
+          "direction": "right",
+          "pose": "land",
+          "x": 96,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "161fab74dce65feee83f0aa8c79297b2bdec98388f1a9b52c0721b6c3f795c93"
+        },
+        "quokka-right-idle": {
+          "species": "quokka",
+          "direction": "right",
+          "pose": "idle",
+          "x": 128,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "f78253ea3d58a95d8aa8334794ae511452748e821c59177581a1c5d31fe2bfc5"
+        },
+        "quokka-right-hop-a": {
+          "species": "quokka",
+          "direction": "right",
+          "pose": "hop-a",
+          "x": 160,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "4e0085404fbc12594275caa8e5607e9158ec21c6c4e2a46dafae81481f45bc29"
+        },
+        "quokka-right-hop-b": {
+          "species": "quokka",
+          "direction": "right",
+          "pose": "hop-b",
+          "x": 192,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "b2681c13a6ff02c092a6437ecf60cd77b4d8a7b93b664bb16844695fed26478d"
+        },
+        "quokka-right-land": {
+          "species": "quokka",
+          "direction": "right",
+          "pose": "land",
+          "x": 224,
+          "y": 96,
+          "width": 32,
+          "height": 32,
+          "nativeWidth": 32,
+          "nativeHeight": 32,
+          "footAnchor": {
+            "x": 16,
+            "y": 28
+          },
+          "pivot": {
+            "x": 16,
+            "y": 28
+          },
+          "sha256": "d1eb8c2e67c3fc0fd43854bf517d55e3246d58517a3755741417a52bebe8cd64"
+        }
+      },
+      "animations": {
+        "cat": {
+          "down": {
+            "idle": {
+              "loop": true,
+              "frames": [
+                "cat-down-idle"
+              ]
+            },
+            "hop": {
+              "loop": false,
+              "frameDurationMs": 130,
+              "frames": [
+                "cat-down-hop-a",
+                "cat-down-hop-b",
+                "cat-down-land"
+              ],
+              "returnTo": "idle"
+            }
+          },
+          "up": {
+            "idle": {
+              "loop": true,
+              "frames": [
+                "cat-up-idle"
+              ]
+            },
+            "hop": {
+              "loop": false,
+              "frameDurationMs": 130,
+              "frames": [
+                "cat-up-hop-a",
+                "cat-up-hop-b",
+                "cat-up-land"
+              ],
+              "returnTo": "idle"
+            }
+          },
+          "left": {
+            "idle": {
+              "loop": true,
+              "frames": [
+                "cat-left-idle"
+              ]
+            },
+            "hop": {
+              "loop": false,
+              "frameDurationMs": 130,
+              "frames": [
+                "cat-left-hop-a",
+                "cat-left-hop-b",
+                "cat-left-land"
+              ],
+              "returnTo": "idle"
+            }
+          },
+          "right": {
+            "idle": {
+              "loop": true,
+              "frames": [
+                "cat-right-idle"
+              ]
+            },
+            "hop": {
+              "loop": false,
+              "frameDurationMs": 130,
+              "frames": [
+                "cat-right-hop-a",
+                "cat-right-hop-b",
+                "cat-right-land"
+              ],
+              "returnTo": "idle"
+            }
+          }
+        },
+        "quokka": {
+          "down": {
+            "idle": {
+              "loop": true,
+              "frames": [
+                "quokka-down-idle"
+              ]
+            },
+            "hop": {
+              "loop": false,
+              "frameDurationMs": 130,
+              "frames": [
+                "quokka-down-hop-a",
+                "quokka-down-hop-b",
+                "quokka-down-land"
+              ],
+              "returnTo": "idle"
+            }
+          },
+          "up": {
+            "idle": {
+              "loop": true,
+              "frames": [
+                "quokka-up-idle"
+              ]
+            },
+            "hop": {
+              "loop": false,
+              "frameDurationMs": 130,
+              "frames": [
+                "quokka-up-hop-a",
+                "quokka-up-hop-b",
+                "quokka-up-land"
+              ],
+              "returnTo": "idle"
+            }
+          },
+          "left": {
+            "idle": {
+              "loop": true,
+              "frames": [
+                "quokka-left-idle"
+              ]
+            },
+            "hop": {
+              "loop": false,
+              "frameDurationMs": 130,
+              "frames": [
+                "quokka-left-hop-a",
+                "quokka-left-hop-b",
+                "quokka-left-land"
+              ],
+              "returnTo": "idle"
+            }
+          },
+          "right": {
+            "idle": {
+              "loop": true,
+              "frames": [
+                "quokka-right-idle"
+              ]
+            },
+            "hop": {
+              "loop": false,
+              "frameDurationMs": 130,
+              "frames": [
+                "quokka-right-hop-a",
+                "quokka-right-hop-b",
+                "quokka-right-land"
+              ],
+              "returnTo": "idle"
+            }
+          }
+        }
+      },
+      "referenceAssets": {
+        "cat": {
+          "file": "public/assets/characters/cat-2x.png",
+          "purpose": "species traits only; new directions and animation are not approved",
+          "sha256": "e128d8295d4d1fc8cf3ff52dc70d176b3b0ea8b6087a6f350b6feeef4c8468e5"
+        },
+        "quokka": {
+          "file": "public/assets/characters/marsupial-2x.png",
+          "purpose": "species traits only; new directions and animation are not approved",
+          "sha256": "614fc13c48dab042962c7dc39f2353890d5f038e04076205a99cad27aed822d7"
+        }
+      },
+      "limitations": [
+        "Candidate-only original pixel art; not approved or registered as production assets.",
+        "Approved static reference images inform species traits only; no approval transfers to these frames, directions, poses, or atlas.",
+        "Generated poses are mechanical review samples and require human identity, anatomy, foot-anchor, and rendered-size review.",
+        "This isolated preview has no game runtime or companion-follow integration."
+      ]
+    }
+  },
+  "requests": [
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-animation/player-4dir.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-crops/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-crops/sweet-radish-stages.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/interactables-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-interactables/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/map-atlas.png",
+    "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/manifest.json",
+    "/docs/art/candidates/pixel-movement/gate1-pets-pixel32/pets-pixel32.png"
+  ],
+  "candidateFailures": [],
+  "pageErrors": [],
+  "humanResults": {
+    "observers": 0,
+    "correct": null,
+    "total": 10,
+    "accuracy": null,
+    "threshold": 0.9,
+    "status": "PENDING"
+  },
+  "limitations": [
+    "This evidence is Chromium CSS-scale output, not native-device or native-DPR evidence.",
+    "The greenhouse door screenshot shows the existing playable transition, not the separate static pixel32 door candidate preview.",
+    "No human answers are included; machine capture success does not satisfy the 90% readability threshold.",
+    "Candidate asset hashes remain unapproved and formal integration remains pending."
+  ]
+}
