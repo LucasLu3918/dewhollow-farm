@@ -99,6 +99,18 @@ describe('loadContent with shipped content', () => {
     expect(pack.start.mapId).toBe('farm');
   });
 
+  it('preserves optional item icon metadata from JSON into the loaded manifest', () => {
+    const iconPath = 'assets/items/sweet-radish.png';
+    const { assets: loadedAssets } = loadContent(shipped({
+      assets: { ...assets, itemIcons: { 'item.sweet-radish': iconPath } },
+    }));
+    expect(loadedAssets.itemIcons).toEqual({ 'item.sweet-radish': iconPath });
+  });
+
+  it('keeps shipped content valid when item icon metadata is absent', () => {
+    expect(loadContent(shipped()).assets.itemIcons).toBeUndefined();
+  });
+
   it('loads the deep mine rules, and every ore they name is a real item', () => {
     const { pack } = loadContent(shipped());
     expect(pack.mine.ores.map((o) => o.item)).toEqual(['copper-ore', 'silver-ore', 'gold-ore']);

@@ -6,6 +6,7 @@ import {
   displayScale,
   missingFiles,
   resolveAsset,
+  resolveItemIcon,
   type AssetEntry,
   type AssetManifest,
 } from './asset-manifest';
@@ -42,6 +43,33 @@ describe('assetsFileSchema density', () => {
 
   it('rejects zero, fractions and absurd values', () => {
     for (const density of [0, 1.5, 5, -2, '2']) expect(parse(density).success).toBe(false);
+  });
+});
+
+describe('assetsFileSchema itemIcons', () => {
+  it('accepts an optional item-id to asset-path map', () => {
+    expect(assetsFileSchema.safeParse({
+      version: 1,
+      assets: [],
+      itemIcons: { 'item.sweet-radish': 'assets/items/sweet-radish.png' },
+    }).success).toBe(true);
+    expect(assetsFileSchema.safeParse({ version: 1, assets: [] }).success).toBe(true);
+  });
+
+  it('rejects map keys that are not item ids', () => {
+    expect(assetsFileSchema.safeParse({
+      version: 1,
+      assets: [],
+      itemIcons: { 'tile.grass': 'assets/items/sweet-radish.png' },
+    }).success).toBe(false);
+  });
+
+  it('rejects paths outside the local item icon directory', () => {
+    expect(assetsFileSchema.safeParse({
+      version: 1,
+      assets: [],
+      itemIcons: { 'item.sweet-radish': '../private.png' },
+    }).success).toBe(false);
   });
 });
 
@@ -160,6 +188,40 @@ describe('missingFiles', () => {
 
   it('ignores placeholders', () => {
     expect(missingFiles(manifestOf({ id: 'tile.grass', kind: 'tile', source: '占位（程式產生）' }), new Set())).toEqual([]);
+  });
+});
+
+describe('itemIcons', () => {
+  const iconManifest = (itemIcons?: Record<string, string>): AssetManifest => ({
+    version: 1,
+    assets: [],
+    ...(itemIcons === undefined ? {} : { itemIcons }),
+  });
+
+  it('is optional for existing manifests', () => {
+    expect(assetProblems(iconManifest())).toEqual([]);
+    expect(resolveItemIcon(iconManifest(), 'item.sweet-radish', new Set(['item.sweet-radish']))).toEqual({
+      status: 'missing',
+      diagnostic: 'missing-icon',
+    });
+  });
+
+  it('resolves a declared item icon only for a known item ID', () => {
+    const manifest = iconManifest({ 'item.sweet-radish': 'assets/items/sweet-radish.png' });
+    expect(resolveItemIcon(manifest, 'item.sweet-radish', new Set(['item.sweet-radish']))).toEqual({
+      status: 'available',
+      src: '/assets/items/sweet-radish.png',
+    });
+    expect(resolveItemIcon(manifest, 'item.unknown', new Set(['item.sweet-radish']))).toEqual({
+      status: 'missing',
+      diagnostic: 'unknown-item',
+    });
+  });
+
+  it('reports item icon entries with unsafe file paths', () => {
+    expect(assetProblems(iconManifest({ 'item.sweet-radish': '../private.png' }))).toContain(
+      '物品 item.sweet-radish 的圖示路徑必須在 assets/ 底下：../private.png',
+    );
   });
 });
 
