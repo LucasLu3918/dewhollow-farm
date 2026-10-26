@@ -48,7 +48,7 @@
 - [x] 往西抵達 `(1,9)` 後驗證 `x=0` 牆拒絕移動、座標不變與放鍵後靜止；保存逐次 JSON、兩張截圖與 SHA-256。
 - [x] 專項 Chromium E2E 1/1 通過；此項目前未改 runtime／正式素材／玩法。
 - [x] `npm run check` 通過（1,643 passed／1 skipped；build 2.808 MB）；完整 Chromium E2E 244/244（4 workers）通過。
-- [ ] 最終 Impact reconciliation、commit、PR Required Checks 與 merge 待完成。
+- [x] Impact reconciliation、commit、PR #54 Required Checks 與 merge 完成。
 - [ ] 真機／FPS／人工美術審查與 Gate 1 核准仍未完成。
 
 詳見 [DF-G1-SHORT-PRESS-100 報告](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-short-press-100.zh-TW.md)。
@@ -146,10 +146,22 @@
 - [x] 保存每方向 keydown／keyup、10 個 tile commit、候選 frame／pose／腳錨時間線，以及第 5 格與放開停止後畫面。
 - [x] 更新 DF-QA-01 狀態與繁中證據報告；候選仍未核准，沒有改 runtime、地圖、存檔或正式素材。
 - [x] `npm run check` 通過（162 個測試檔，1,643 passed／1 skipped；build 2.808 MB）；完整 Chromium E2E 248/248（4 workers）通過。
-- [ ] 完成 Impact reconciliation、commit、PR、Required Checks 與 merge。
+- [x] Impact reconciliation、commit、PR #55 Required Checks 與 squash merge 至 `main`（merge SHA `f2e6c4cb9e37e0c65c06ca49c98a47e079d53a81`）。
 - [ ] 人工盲測／美術驗收與原生 iOS／Android 實機驗證仍待完成。
 
 詳見 [四方向連續 10 格移動證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-continuous-10-tile.zh-TW.md)。
+
+---
+
+# DF-G1-INPUT-CANCEL-TRANSITION-EVIDENCE 輸入取消與場景轉換證據
+
+- [x] DEV-only Chromium E2E 覆核觸控方向按住時穿越農場出口、重新載入已存檔狀態，以及開啟設定面板三種中斷情境。
+- [x] 每個情境確認 held direction、moving、pending 與 queue 清空，並在 300 ms 安靜窗確認地圖／座標不再變動；逐案 JSON 附件隨 Playwright 測試結果保存。
+- [x] `npm run check` 通過（162 個測試檔、1,643 passed／1 skipped；build 2.808 MB）；專項 E2E 3/3、完整 Chromium E2E 251/251 通過（4 workers）。
+- [x] AIPS Impact reconciliation 與 commit `6966b264e39e822eaae749260492396e0357faba` 完成；PR、Required Checks 與 merge 待完成。
+- [ ] 合成 Chromium 觸控不代表實機輸入／效能驗收；人工美術、可讀性與原生 iOS／Android gate 仍待完成。
+
+詳見 [輸入取消與場景轉換證據](../docs/art/candidates/pixel-movement/gate1-input-cancel-transition.zh-TW.md)。
 
 
 ---
@@ -160,4 +172,4 @@
 - [x] 記錄實際 viewport／camera、候選 manifest／atlas SHA、未覆蓋素材 fallback、載入錯誤及 screenshot SHA；Chromium CSS-scale 限制清楚標示。
 - [x] 更新 DF-QA-01 報告及本任務狀態；候選維持 `candidate`／`approved: false`，不觸碰正式素材或 Gate 1 核准。
 - [x] 專項 E2E 1/1、`npm run check` 與完整 Chromium E2E 234/234（4 workers）通過。
-- [ ] Impact reconciliation、commit、PR、Required Checks 通過後 merge。
+- [x] PR #41 已合併至 `main`。
