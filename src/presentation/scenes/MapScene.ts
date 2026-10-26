@@ -130,7 +130,7 @@ export interface MapSceneDeps {
   help: HelpPanel;
   saves: SavePanel;
   /** 背包：共用 DOM modal stack，並由 MapScene 處理 Esc 和遊戲輸入阻擋。 */
-  inventory: OpenablePanel & Pick<InventoryPanel, 'setCommandHandler' | 'refresh'>;
+  inventory: OpenablePanel & Pick<InventoryPanel, 'open' | 'setCommandHandler' | 'refresh'>;
   /** 玩家偏好（按鍵、字級、閃光與震動等），不進存檔。 */
   settings: SettingsService;
   responsive: ResponsiveLayoutController;
@@ -1157,6 +1157,25 @@ export class MapScene extends Phaser.Scene {
     const { hud, sounds } = this.deps;
     if (action !== 'interact' && !isMovementAction(action)) this.continuousFarmActions.stop('non-farm-action');
     if (this.settingsPanel.isCapturing()) return null;
+    const openGroup = this.modalGroups.find((group) => group.some((panel) => panel.isOpen()));
+    if (this.hasTouchInputBlocker() && (action === 'mute' || action === 'music')) {
+      event?.preventDefault();
+      this.touchControls.cancelAll();
+      return null;
+    }
+    if (action === 'inventory') {
+      event?.preventDefault();
+      if (this.deps.inventory.isOpen()) {
+        this.cancelMovementInput();
+        this.touchControls.cancelAll();
+        this.deps.inventory.close();
+      } else if (!this.hasTouchInputBlocker()) {
+        this.cancelMovementInput();
+        this.touchControls.cancelAll();
+        this.deps.inventory.open();
+      }
+      return null;
+    }
     if (action === 'mute') {
       // 靜音是玩家的偏好，不是遊戲指令，所以不經過應用層。
       event?.preventDefault();
@@ -1171,7 +1190,6 @@ export class MapScene extends Phaser.Scene {
       hud.messages([playing ? '背景音樂開始播放（按 B 暫停）' : '背景音樂已暫停（按 B 播放）']);
       return null;
     }
-    const openGroup = this.modalGroups.find((group) => group.some((panel) => panel.isOpen()));
     if (!action) {
       // Escape 不一定綁定成遊戲動作；保留鍵盤的原生面板關閉行為。
       if (openGroup && event?.key === 'Escape') {

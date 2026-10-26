@@ -47,6 +47,7 @@ export function controlsHint(bindings: Bindings, labels: HintLabels, text: HintT
     segment(bindings, labels, ['placeDecor', 'wear', 'takeOff']),
     segment(bindings, labels, ['skills']),
     segment(bindings, labels, ['residents']),
+    segment(bindings, labels, ['inventory']),
     segment(bindings, labels, ['collection']),
     segment(bindings, labels, ['quests']),
     segment(bindings, labels, ['manualSave']),

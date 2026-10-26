@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { filterInventoryEntries, InventoryPanel, inventorySlotCount, isInventoryFull } from './inventory-panel';
+import { filterInventoryEntries, InventoryPanel, inventoryGridFocusTarget, inventorySlotCount, isInventoryFull } from './inventory-panel';
 import type { InventoryDisplayEntry } from '../application/inventory-display';
 
 vi.mock('./panel-dialog', () => ({
@@ -420,5 +420,14 @@ describe('inventory grid view helpers', () => {
     expect(filterInventoryEntries(withQualityStack, 'food').map((entry) => entry.itemId)).toEqual(['fish.carp']);
     expect(filterInventoryEntries(withQualityStack, 'wearables').map((entry) => entry.itemId)).toEqual(['decor.flower-crown']);
     expect(filterInventoryEntries(withQualityStack, 'other').map((entry) => entry.itemId)).toEqual(['recipe.sun-hat']);
+  });
+
+  it('moves grid focus by visual row and column while skipping empty slots', () => {
+    const occupied = [0, 2, 5, 6, 11];
+    expect(inventoryGridFocusTarget(occupied, 0, 'ArrowRight', 4)).toBe(2);
+    expect(inventoryGridFocusTarget(occupied, 2, 'ArrowRight', 4)).toBe(2);
+    expect(inventoryGridFocusTarget(occupied, 5, 'ArrowDown', 4)).toBe(11);
+    expect(inventoryGridFocusTarget(occupied, 2, 'ArrowDown', 4)).toBe(6);
+    expect(inventoryGridFocusTarget(occupied, 0, 'ArrowLeft', 4)).toBe(0);
   });
 });

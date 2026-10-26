@@ -47,6 +47,39 @@ export function isInventoryFull(entryCount: number, capacity: number): boolean {
   return entryCount >= capacity;
 }
 
+/** Find the next occupied slot in the requested visual direction; empty cells are skipped. */
+export function inventoryGridFocusTarget(
+  occupiedSlots: readonly number[],
+  currentSlot: number,
+  direction: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight',
+  columns: number,
+): number {
+  if (occupiedSlots.length === 0 || columns < 1) return currentSlot;
+  if (!occupiedSlots.includes(currentSlot)) return occupiedSlots[0] ?? currentSlot;
+  const row = Math.floor(currentSlot / columns);
+  const column = currentSlot % columns;
+  if (direction === 'ArrowLeft' || direction === 'ArrowRight') {
+    const candidates = occupiedSlots.filter((slot) => Math.floor(slot / columns) === row
+      && (direction === 'ArrowLeft' ? slot < currentSlot : slot > currentSlot));
+    if (candidates.length === 0) return currentSlot;
+    return direction === 'ArrowLeft' ? Math.max(...candidates) : Math.min(...candidates);
+  }
+
+  const step = direction === 'ArrowUp' ? -1 : 1;
+  const maxRow = Math.max(...occupiedSlots.map((slot) => Math.floor(slot / columns)));
+  for (let targetRow = row + step; targetRow >= 0 && targetRow <= maxRow; targetRow += step) {
+    const candidates = occupiedSlots.filter((slot) => Math.floor(slot / columns) === targetRow);
+    if (candidates.length > 0) {
+      return candidates.reduce((closest, slot) => {
+        const closestDistance = Math.abs((closest % columns) - column);
+        const distance = Math.abs((slot % columns) - column);
+        return distance < closestDistance || (distance === closestDistance && slot < closest) ? slot : closest;
+      }, candidates[0]!);
+    }
+  }
+  return currentSlot;
+}
+
 /** 分類只依 inventory-display 的 ItemKind 對應標籤；未知類型會保留在「其他」。 */
 export function filterInventoryEntries(
   entries: readonly InventoryDisplayEntry[],
@@ -96,6 +129,7 @@ export class InventoryPanel {
     this.content.append(this.detail);
     applyGameUiTokens(this.root);
     this.dialog = new PanelDialog(this.root);
+    this.grid.addEventListener('keydown', (event) => this.handleGridKeydown(event));
 
     for (const filter of FILTERS) {
       const button = required<HTMLButtonElement>(doc, `#inventory-filter-${filter.id}`);
@@ -130,6 +164,9 @@ export class InventoryPanel {
   open(): void {
     this.render();
     this.dialog.open();
+    // Start keyboard users in the contents when an item exists; an empty inventory
+    // keeps the shared dialog's normal close-button initial focus.
+    this.grid.querySelector<HTMLButtonElement>('.inventory-slot--item')?.focus();
   }
 
   close(): void {
@@ -156,7 +193,9 @@ export class InventoryPanel {
       const fragment = this.root.ownerDocument.createDocumentFragment();
       for (let slot = 0; slot < slots; slot += 1) {
         const entry = visibleEntries[slot];
-        fragment.append(entry ? this.itemSlot(entry, data) : this.emptySlot());
+        const selected = entry !== undefined && inventoryEntryKey(entry) === this.selectedKey;
+        const first = entry !== undefined && this.selectedKey === null && slot === 0;
+        fragment.append(entry ? this.itemSlot(entry, data, selected || first) : this.emptySlot());
       }
       this.grid.replaceChildren(fragment);
       this.renderDetail(selectedEntry, data);
@@ -170,11 +209,12 @@ export class InventoryPanel {
     }
   }
 
-  private itemSlot(entry: InventoryDisplayEntry, data: InventoryPanelData): HTMLButtonElement {
+  private itemSlot(entry: InventoryDisplayEntry, data: InventoryPanelData, tabStop: boolean): HTMLButtonElement {
     const doc = this.root.ownerDocument;
     const slot = doc.createElement('button');
     slot.type = 'button';
     slot.className = 'inventory-slot inventory-slot--item';
+    slot.tabIndex = tabStop ? 0 : -1;
     slot.dataset.slotState = 'item';
     slot.dataset.itemId = entry.itemId;
     slot.dataset.quality = entry.quality;
@@ -230,6 +270,25 @@ export class InventoryPanel {
 
     slot.append(icon, label, quantity, quality);
     return slot;
+  }
+
+  private handleGridKeydown(event: KeyboardEvent): void {
+    if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    const active = event.target instanceof HTMLElement ? event.target.closest<HTMLButtonElement>('.inventory-slot--item') : null;
+    if (!active) return;
+    const items = Array.from(this.grid.querySelectorAll<HTMLButtonElement>('.inventory-slot--item'));
+    const current = items.indexOf(active);
+    if (current < 0) return;
+    const columns = getComputedStyle(this.grid).gridTemplateColumns.split(' ').filter(Boolean).length || 6;
+    const next = inventoryGridFocusTarget(items.map((_, index) => index), current, event.key as 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight', columns);
+    event.preventDefault();
+    if (next === current) return;
+    active.tabIndex = -1;
+    const target = items[next];
+    if (target) {
+      target.tabIndex = 0;
+      target.focus();
+    }
   }
 
   private renderDetail(entry: InventoryDisplayEntry | null, data: InventoryPanelData): void {

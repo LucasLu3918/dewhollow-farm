@@ -127,4 +127,26 @@ describe('sanitizeSettings', () => {
     const custom = { ...DEFAULT_BINDINGS, interact: 'e', wear: 'x' };
     expect(sanitizeSettings({ schemaVersion: 1, bindings: custom }).bindings).toEqual(custom);
   });
+
+  it('adds the inventory action to an existing key table without discarding its custom bindings', () => {
+    const legacyBindings = { ...DEFAULT_BINDINGS, collection: 'i', cycleSeed: 'c' } as Record<string, string>;
+    delete legacyBindings.inventory;
+    legacyBindings.interact = 'h';
+
+    expect(sanitizeSettings({ schemaVersion: 1, bindings: legacyBindings }).bindings).toEqual({
+      ...DEFAULT_BINDINGS,
+      interact: 'h',
+    });
+  });
+
+  it('preserves customized collection and seed keys while assigning a free inventory key', () => {
+    const legacyBindings = { ...DEFAULT_BINDINGS, collection: 'y', cycleSeed: 'u' } as Record<string, string>;
+    delete legacyBindings.inventory;
+
+    expect(sanitizeSettings({ schemaVersion: 1, bindings: legacyBindings }).bindings).toEqual({
+      ...DEFAULT_BINDINGS,
+      collection: 'y',
+      cycleSeed: 'u',
+    });
+  });
 });

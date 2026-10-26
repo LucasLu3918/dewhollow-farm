@@ -6,7 +6,7 @@ import { achievementContext } from '../application/collection';
 import { PanelDialog } from './panel-dialog';
 
 /**
- * 圖鑑與成就的面板（DOM，按 I 開關）：每一類的已發現條目與下一個門檻、七類的獎勵、成就與稱號。
+ * 圖鑑與成就的面板（DOM，預設按 C 開關）：每一類的已發現條目與下一個門檻、七類的獎勵、成就與稱號。
  * 進度與條件判斷由 domain（collection.ts、achievements.ts）與 application/collection.ts 決定；這裡只呈現。
  * 還沒發現的條目與還沒達成的成就只顯示「？」與條件，讓玩家知道要去找什麼。
  */
