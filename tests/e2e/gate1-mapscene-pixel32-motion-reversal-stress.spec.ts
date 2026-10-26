@@ -156,9 +156,24 @@ async function tap(page: Page, direction: Direction): Promise<number> {
   }, direction);
 }
 
-async function batch(page: Page, inputs: Direction[]): Promise<number> {
-  return page.evaluate((batchInputs) => {
+async function batch(page: Page, expectedBefore: Tile, inputs: Direction[]): Promise<{
+  beforeTile: Tile;
+  lastInputAt: number;
+  queueDepths: number[];
+} | null> {
+  return page.evaluate(({ expected, batchInputs }) => {
+    const movement = window.__dewhollow?.movement();
+    if (
+      !movement || movement.tile.x !== expected.x || movement.tile.y !== expected.y ||
+      (!movement.moving && !movement.pending)
+    ) return null;
+
+    // Recheck and dispatch in the same browser task. A movement step cannot end
+    // between this check and the first keydown, so the first tap cannot escape
+    // the queue and start an unintended tile in its own direction.
+    const beforeTile = { x: movement.tile.x, y: movement.tile.y };
     let lastInputAt = 0;
+    const queueDepths: number[] = [];
     for (const direction of batchInputs) {
       const key = ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[direction];
       const trace = (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress;
@@ -166,20 +181,32 @@ async function batch(page: Page, inputs: Direction[]): Promise<number> {
       const record: Record<string, unknown> = { at: lastInputAt, direction, key, type: 'keydown' };
       trace?.inputEvents.push(record);
       window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
-      if (trace) record['stateAfterKeydown'] = window.__dewhollow?.movement() ?? null;
+      const afterKeydown = window.__dewhollow?.movement() ?? null;
+      if (trace) record['stateAfterKeydown'] = afterKeydown;
+      queueDepths.push(afterKeydown?.queuedTaps ?? 0);
       const upAt = performance.now();
       trace?.inputEvents.push({ at: upAt, direction, key, type: 'keyup' });
       window.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }));
     }
-    return lastInputAt;
-  }, inputs);
+    return { beforeTile, lastInputAt, queueDepths };
+  }, { expected: expectedBefore, batchInputs: inputs });
 }
 
 async function waitForTile(page: Page, expected: Tile): Promise<void> {
-  await page.waitForFunction(({ x, y }) => {
-    const tile = window.__dewhollow?.movement().tile;
-    return tile?.x === x && tile.y === y;
-  }, expected, { timeout: 10_000 });
+  try {
+    await page.waitForFunction(({ x, y }) => {
+      const tile = window.__dewhollow?.movement().tile;
+      return tile?.x === x && tile.y === y;
+    }, expected, { timeout: 10_000 });
+  } catch (cause) {
+    const diagnostic = await page.evaluate(() => ({
+      movement: window.__dewhollow?.movement() ?? null,
+      player: window.__dewhollow?.actors().find((actor) => actor.id === 'player') ?? null,
+      frame: window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? null,
+      recentInputs: (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress?.inputEvents.slice(-20) ?? [],
+    }));
+    throw new Error(`等待格位 ${expected.x},${expected.y} 逾時；目前狀態：${JSON.stringify(diagnostic)}`, { cause });
+  }
 }
 
 test('pixel32 candidate survives 50 reversals and 50 cross-turns during ten committed tiles', async ({ browser }, testInfo: TestInfo) => {
@@ -216,20 +243,22 @@ test('pixel32 candidate survives 50 reversals and 50 cross-turns during ten comm
     const batchesEvidence: Array<{ index: number; expectedNext: Direction; lastInputAt: number; beforeTile: Tile; afterTile: Tile; queueDepths: number[] }> = [];
 
     for (const [index, inputBatch] of batches.entries()) {
-      await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().moving ?? false)).toBe(true);
-      const before = await currentTile(page);
-      expect(before).toEqual(route[index]);
-      const lastInputAt = await batch(page, inputBatch.inputs);
-      const depths = await page.evaluate(() => {
-        const entries = (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress?.inputEvents ?? [];
-        return entries.slice(-20).filter((entry) => entry.type === 'keydown').map((entry) => {
-          const state = entry.stateAfterKeydown as { queuedTaps?: number } | null | undefined;
-          return state?.queuedTaps ?? 0;
-        });
-      });
+      const before = route[index]!;
+      const deadline = Date.now() + 10_000;
+      let dispatched: Awaited<ReturnType<typeof batch>> = null;
+      while (!dispatched && Date.now() < deadline) {
+        await expect.poll(() => page.evaluate(({ x, y }) => {
+          const movement = window.__dewhollow?.movement();
+          return Boolean(movement && movement.tile.x === x && movement.tile.y === y && (movement.moving || movement.pending));
+        }, before), { timeout: Math.max(1, deadline - Date.now()) }).toBe(true);
+        dispatched = await batch(page, before, inputBatch.inputs);
+      }
+      if (!dispatched) throw new Error(`無法在格位 ${before.x},${before.y} 的有效移動步驟中派發輸入`);
+      expect(dispatched.beforeTile).toEqual(before);
+      const { lastInputAt, queueDepths: depths } = dispatched;
       expect(depths).toHaveLength(10);
+      expect(depths.every((depth) => depth === 1)).toBe(true);
       expect(Math.max(...depths)).toBeLessThanOrEqual(1);
-      expect(Math.max(...depths)).toBe(1);
       if (index < route.length - 1) {
         const expected = route[index + 1]!;
         await waitForTile(page, expected);
