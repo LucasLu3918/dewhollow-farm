@@ -1,7 +1,7 @@
 {
   "task": "DF-G1-MOTION-REVERSAL-STRESS",
   "status": "candidate-only browser evidence; does not pass Gate 1",
-  "capturedAt": "2026-10-26T03:44:36.021Z",
+  "capturedAt": "2026-10-26T04:30:50.771Z",
   "environment": {
     "browser": "Playwright Chromium",
     "viewport": {
@@ -757,7 +757,7 @@
     ],
     "rawEvents": [
       {
-        "at": 1029.8999999761581,
+        "at": 1063.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -775,21 +775,21 @@
         }
       },
       {
-        "at": 1030.699999988079,
+        "at": 1064.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1041.5999999642372,
+        "at": 1064.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "up",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -799,21 +799,21 @@
         }
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.699999988079,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "left",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -823,21 +823,21 @@
         }
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "up",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -847,21 +847,21 @@
         }
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "left",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -871,21 +871,21 @@
         }
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "right",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -895,21 +895,21 @@
         }
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "left",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -919,21 +919,21 @@
         }
       },
       {
-        "at": 1041.699999988079,
+        "at": 1064.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1041.800000011921,
+        "at": 1064.800000011921,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "right",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -943,21 +943,21 @@
         }
       },
       {
-        "at": 1041.800000011921,
+        "at": 1064.800000011921,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1041.8999999761581,
+        "at": 1064.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "left",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -967,21 +967,21 @@
         }
       },
       {
-        "at": 1041.8999999761581,
+        "at": 1064.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1041.8999999761581,
+        "at": 1064.800000011921,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "right",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -991,21 +991,21 @@
         }
       },
       {
-        "at": 1041.8999999761581,
+        "at": 1064.800000011921,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1041.8999999761581,
+        "at": 1064.800000011921,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
         "stateAfterKeydown": {
           "heldDirection": "left",
           "blockedDirection": null,
-          "moving": true,
-          "pending": false,
+          "moving": false,
+          "pending": true,
           "queuedTaps": 1,
           "tile": {
             "x": 6,
@@ -1015,13 +1015,13 @@
         }
       },
       {
-        "at": 1041.8999999761581,
+        "at": 1064.9000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1207.3999999761581,
+        "at": 1240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1039,13 +1039,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1063,13 +1063,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1087,13 +1087,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1111,13 +1111,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1135,13 +1135,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1159,13 +1159,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1183,13 +1183,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1207.5,
+        "at": 1240.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1207,13 +1207,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.699999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1207.5,
+        "at": 1240.699999988079,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1231,13 +1231,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.699999988079,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1207.5,
+        "at": 1240.699999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1255,13 +1255,13 @@
         }
       },
       {
-        "at": 1207.5,
+        "at": 1240.699999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1279,13 +1279,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1303,13 +1303,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1327,13 +1327,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1351,13 +1351,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1375,13 +1375,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1399,13 +1399,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1423,13 +1423,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1447,13 +1447,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1471,13 +1471,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1495,13 +1495,13 @@
         }
       },
       {
-        "at": 1374.0999999642372,
+        "at": 1408.1000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1519,13 +1519,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1543,13 +1543,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1567,13 +1567,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1591,13 +1591,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1615,13 +1615,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1639,13 +1639,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.6000000238419,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1663,13 +1663,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.699999988079,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.699999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1687,13 +1687,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.699999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.699999988079,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1711,13 +1711,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.699999988079,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.699999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1735,13 +1735,13 @@
         }
       },
       {
-        "at": 1540.699999988079,
+        "at": 1574.699999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1707.300000011921,
+        "at": 1740.4000000357628,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1759,13 +1759,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1783,13 +1783,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1807,13 +1807,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1831,13 +1831,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1855,13 +1855,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1879,13 +1879,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1903,13 +1903,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1927,13 +1927,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -1951,13 +1951,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -1975,13 +1975,13 @@
         }
       },
       {
-        "at": 1707.3999999761581,
+        "at": 1740.4000000357628,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1907.9000000357628,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -1999,13 +1999,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2023,13 +2023,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2047,13 +2047,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2071,13 +2071,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2095,13 +2095,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2119,13 +2119,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2143,13 +2143,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2167,13 +2167,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2191,13 +2191,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2215,13 +2215,13 @@
         }
       },
       {
-        "at": 1874,
+        "at": 1908,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2040.699999988079,
+        "at": 2074.199999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2239,13 +2239,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2263,13 +2263,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2287,13 +2287,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2311,13 +2311,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2335,13 +2335,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.199999988079,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2359,13 +2359,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.300000011921,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.300000011921,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2383,13 +2383,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.300000011921,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.300000011921,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2407,13 +2407,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.300000011921,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.300000011921,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2431,13 +2431,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.300000011921,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.300000011921,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2455,13 +2455,13 @@
         }
       },
       {
-        "at": 2040.800000011921,
+        "at": 2074.300000011921,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2479,13 +2479,13 @@
         }
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2503,13 +2503,13 @@
         }
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2527,13 +2527,13 @@
         }
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2551,13 +2551,13 @@
         }
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2575,13 +2575,13 @@
         }
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2599,13 +2599,13 @@
         }
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2623,13 +2623,13 @@
         }
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2647,13 +2647,13 @@
         }
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2671,13 +2671,13 @@
         }
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 2207.300000011921,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2695,13 +2695,13 @@
         }
       },
       {
-        "at": 2207.399999976158,
+        "at": 2240.5,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2373.899999976158,
+        "at": 2407.100000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2719,13 +2719,13 @@
         }
       },
       {
-        "at": 2373.899999976158,
+        "at": 2407.100000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2373.899999976158,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2743,13 +2743,13 @@
         }
       },
       {
-        "at": 2373.899999976158,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2373.899999976158,
+        "at": 2407.100000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2767,13 +2767,13 @@
         }
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2791,13 +2791,13 @@
         }
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2815,13 +2815,13 @@
         }
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2839,13 +2839,13 @@
         }
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2863,13 +2863,13 @@
         }
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2887,13 +2887,13 @@
         }
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -2911,13 +2911,13 @@
         }
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2935,13 +2935,13 @@
         }
       },
       {
-        "at": 2374,
+        "at": 2407.100000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.5,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -2959,13 +2959,13 @@
         }
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -2983,13 +2983,13 @@
         }
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -3007,13 +3007,13 @@
         }
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keydown",
@@ -3031,13 +3031,13 @@
         }
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "up",
         "key": "ArrowUp",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keydown",
@@ -3055,13 +3055,13 @@
         }
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "down",
         "key": "ArrowDown",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -3079,13 +3079,13 @@
         }
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -3103,13 +3103,13 @@
         }
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -3127,13 +3127,13 @@
         }
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keydown",
@@ -3151,13 +3151,13 @@
         }
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "right",
         "key": "ArrowRight",
         "type": "keyup"
       },
       {
-        "at": 2540.699999988079,
+        "at": 2574.600000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keydown",
@@ -3175,7 +3175,7 @@
         }
       },
       {
-        "at": 2540.800000011921,
+        "at": 2574.600000023842,
         "direction": "left",
         "key": "ArrowLeft",
         "type": "keyup"
@@ -3185,7 +3185,7 @@
   },
   "transitions": [
     {
-      "at": 1038.9,
+      "at": 1072.7,
       "from": {
         "x": 7,
         "y": 9
@@ -3195,14 +3195,14 @@
         "y": 9
       },
       "direction": "left",
-      "frame": "left-contact-b",
+      "frame": "left-passing",
       "foot": {
-        "x": 473.6099271111111,
+        "x": 473.6056888888889,
         "y": 640
       }
     },
     {
-      "at": 1188.8,
+      "at": 1222.6,
       "from": {
         "x": 6,
         "y": 9
@@ -3219,7 +3219,7 @@
       }
     },
     {
-      "at": 1355.5,
+      "at": 1389.3,
       "from": {
         "x": 5,
         "y": 9
@@ -3236,7 +3236,7 @@
       }
     },
     {
-      "at": 1522.1,
+      "at": 1555.9,
       "from": {
         "x": 4,
         "y": 9
@@ -3253,7 +3253,7 @@
       }
     },
     {
-      "at": 1688.8,
+      "at": 1722.6,
       "from": {
         "x": 3,
         "y": 9
@@ -3270,7 +3270,7 @@
       }
     },
     {
-      "at": 1855.5,
+      "at": 1889.3,
       "from": {
         "x": 2,
         "y": 9
@@ -3287,7 +3287,7 @@
       }
     },
     {
-      "at": 2022.1,
+      "at": 2056,
       "from": {
         "x": 1,
         "y": 9
@@ -3304,7 +3304,7 @@
       }
     },
     {
-      "at": 2188.8,
+      "at": 2222.6,
       "from": {
         "x": 1,
         "y": 8
@@ -3321,7 +3321,7 @@
       }
     },
     {
-      "at": 2355.4,
+      "at": 2389.2,
       "from": {
         "x": 1,
         "y": 7
@@ -3338,7 +3338,7 @@
       }
     },
     {
-      "at": 2522.1,
+      "at": 2556,
       "from": {
         "x": 1,
         "y": 6
@@ -3357,7 +3357,7 @@
   ],
   "samples": [
     {
-      "at": 1005.5,
+      "at": 1039.3,
       "tile": {
         "x": 7,
         "y": 9,
@@ -3376,7 +3376,7 @@
       "busy": false
     },
     {
-      "at": 1022.1,
+      "at": 1056,
       "tile": {
         "x": 7,
         "y": 9,
@@ -3395,26 +3395,7 @@
       "busy": false
     },
     {
-      "at": 1038.9,
-      "tile": {
-        "x": 6,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 0,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-contact-b",
-      "foot": {
-        "x": 473.6099271111111,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1055.5,
+      "at": 1072.7,
       "tile": {
         "x": 6,
         "y": 9,
@@ -3427,13 +3408,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 466.51158755555554,
+        "x": 473.6056888888889,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1072.2,
+      "at": 1089.3,
       "tile": {
         "x": 6,
         "y": 9,
@@ -3446,32 +3427,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 459.41185422222225,
+        "x": 466.50311111111114,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1088.9,
-      "tile": {
-        "x": 6,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-passing",
-      "foot": {
-        "x": 452.30927644444444,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1105.5,
+      "at": 1106,
       "tile": {
         "x": 6,
         "y": 9,
@@ -3484,13 +3446,13 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 445.20954311111115,
+        "x": 459.3976888888889,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1122.1,
+      "at": 1122.7,
       "tile": {
         "x": 6,
         "y": 9,
@@ -3503,13 +3465,13 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 438.11265422222226,
+        "x": 452.2922666666667,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1138.9,
+      "at": 1139.3,
       "tile": {
         "x": 6,
         "y": 9,
@@ -3522,13 +3484,13 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 431.0129208888889,
+        "x": 445.1868444444445,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1155.5,
+      "at": 1156,
       "tile": {
         "x": 6,
         "y": 9,
@@ -3541,13 +3503,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 423.91603200000003,
+        "x": 438.0814222222223,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1172.1,
+      "at": 1172.7,
       "tile": {
         "x": 6,
         "y": 9,
@@ -3560,13 +3522,51 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 416.8219875555556,
+        "x": 430.97600000000006,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1188.8,
+      "at": 1189.3,
+      "tile": {
+        "x": 6,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-passing",
+      "foot": {
+        "x": 423.8734222222223,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1205.9,
+      "tile": {
+        "x": 6,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-passing",
+      "foot": {
+        "x": 416.77368888888896,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1222.6,
       "tile": {
         "x": 5,
         "y": 9,
@@ -3585,7 +3585,7 @@
       "busy": true
     },
     {
-      "at": 1205.6,
+      "at": 1239.3,
       "tile": {
         "x": 5,
         "y": 9,
@@ -3596,15 +3596,15 @@
       "queuedTaps": 0,
       "heldDirection": null,
       "blockedDirection": null,
-      "frame": "left-passing",
+      "frame": "left-contact-b",
       "foot": {
-        "x": 408.9031111111111,
+        "x": 408.90026666666665,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1222.2,
+      "at": 1256,
       "tile": {
         "x": 5,
         "y": 9,
@@ -3617,51 +3617,13 @@
       "blockedDirection": null,
       "frame": "left-contact-b",
       "foot": {
-        "x": 401.80622222222223,
+        "x": 401.7976888888889,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1238.9,
-      "tile": {
-        "x": 5,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-contact-b",
-      "foot": {
-        "x": 394.70933333333335,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1255.5,
-      "tile": {
-        "x": 5,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-contact-b",
-      "foot": {
-        "x": 387.6152888888889,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1272.2,
+      "at": 1272.6,
       "tile": {
         "x": 5,
         "y": 9,
@@ -3674,13 +3636,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 380.51840000000004,
+        "x": 394.69795555555555,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1288.8,
+      "at": 1289.3,
       "tile": {
         "x": 5,
         "y": 9,
@@ -3693,13 +3655,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 373.42151111111116,
+        "x": 387.59822222222226,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1305.5,
+      "at": 1306,
       "tile": {
         "x": 5,
         "y": 9,
@@ -3712,13 +3674,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 366.3246222222223,
+        "x": 380.49564444444445,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1322.1,
+      "at": 1322.7,
       "tile": {
         "x": 5,
         "y": 9,
@@ -3731,13 +3693,13 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 359.22773333333345,
+        "x": 373.3930666666667,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1338.8,
+      "at": 1339.3,
       "tile": {
         "x": 5,
         "y": 9,
@@ -3750,13 +3712,51 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 352.1280000000001,
+        "x": 366.29333333333335,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1355.5,
+      "at": 1356,
+      "tile": {
+        "x": 5,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-contact-a",
+      "foot": {
+        "x": 359.1907555555556,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1372.6,
+      "tile": {
+        "x": 5,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-contact-a",
+      "foot": {
+        "x": 352.0881777777778,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1389.3,
       "tile": {
         "x": 4,
         "y": 9,
@@ -3775,7 +3775,7 @@
       "busy": true
     },
     {
-      "at": 1372.2,
+      "at": 1406,
       "tile": {
         "x": 4,
         "y": 9,
@@ -3786,15 +3786,15 @@
       "queuedTaps": 0,
       "heldDirection": null,
       "blockedDirection": null,
-      "frame": "left-contact-a",
+      "frame": "left-passing",
       "foot": {
-        "x": 344.90026666666665,
+        "x": 344.89742222222225,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1388.8,
+      "at": 1422.7,
       "tile": {
         "x": 4,
         "y": 9,
@@ -3807,51 +3807,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 337.80053333333336,
+        "x": 337.7948444444445,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1405.5,
-      "tile": {
-        "x": 4,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-passing",
-      "foot": {
-        "x": 330.7008,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1422.1,
-      "tile": {
-        "x": 4,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-passing",
-      "foot": {
-        "x": 323.6010666666667,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1438.8,
+      "at": 1439.4,
       "tile": {
         "x": 4,
         "y": 9,
@@ -3864,13 +3826,13 @@
       "blockedDirection": null,
       "frame": "left-contact-b",
       "foot": {
-        "x": 316.5013333333334,
+        "x": 330.6894222222223,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1455.5,
+      "at": 1455.9,
       "tile": {
         "x": 4,
         "y": 9,
@@ -3883,13 +3845,13 @@
       "blockedDirection": null,
       "frame": "left-contact-b",
       "foot": {
-        "x": 309.3987555555556,
+        "x": 323.59111111111116,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1472.2,
+      "at": 1472.6,
       "tile": {
         "x": 4,
         "y": 9,
@@ -3902,13 +3864,13 @@
       "blockedDirection": null,
       "frame": "left-contact-b",
       "foot": {
-        "x": 302.29617777777787,
+        "x": 316.49280000000005,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1488.8,
+      "at": 1489.3,
       "tile": {
         "x": 4,
         "y": 9,
@@ -3921,13 +3883,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 295.19360000000006,
+        "x": 309.39448888888893,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1505.5,
+      "at": 1505.9,
       "tile": {
         "x": 4,
         "y": 9,
@@ -3940,13 +3902,51 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 288.0910222222223,
+        "x": 302.2961777777778,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1522.1,
+      "at": 1522.6,
+      "tile": {
+        "x": 4,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-passing",
+      "foot": {
+        "x": 295.1978666666667,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1539.3,
+      "tile": {
+        "x": 4,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-passing",
+      "foot": {
+        "x": 288.0967111111112,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1555.9,
       "tile": {
         "x": 3,
         "y": 9,
@@ -3965,7 +3965,7 @@
       "busy": true
     },
     {
-      "at": 1538.9,
+      "at": 1572.6,
       "tile": {
         "x": 3,
         "y": 9,
@@ -3976,15 +3976,15 @@
       "queuedTaps": 0,
       "heldDirection": null,
       "blockedDirection": null,
-      "frame": "left-passing",
+      "frame": "left-contact-a",
       "foot": {
-        "x": 280.90026666666665,
+        "x": 280.9016888888889,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1555.5,
+      "at": 1589.3,
       "tile": {
         "x": 3,
         "y": 9,
@@ -3997,51 +3997,13 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 273.80053333333336,
+        "x": 273.80337777777777,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1572.2,
-      "tile": {
-        "x": 3,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-contact-a",
-      "foot": {
-        "x": 266.7008000000001,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1588.9,
-      "tile": {
-        "x": 3,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-contact-a",
-      "foot": {
-        "x": 259.59822222222226,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1605.5,
+      "at": 1605.9,
       "tile": {
         "x": 3,
         "y": 9,
@@ -4054,13 +4016,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 252.49848888888897,
+        "x": 266.70791111111106,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1622.1,
+      "at": 1622.6,
       "tile": {
         "x": 3,
         "y": 9,
@@ -4073,13 +4035,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 245.4016000000001,
+        "x": 259.6053333333333,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1638.9,
+      "at": 1639.3,
       "tile": {
         "x": 3,
         "y": 9,
@@ -4092,13 +4054,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 238.3047111111112,
+        "x": 252.5027555555555,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1655.5,
+      "at": 1656,
       "tile": {
         "x": 3,
         "y": 9,
@@ -4111,13 +4073,13 @@
       "blockedDirection": null,
       "frame": "left-contact-b",
       "foot": {
-        "x": 231.20782222222232,
+        "x": 245.40017777777769,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1672.1,
+      "at": 1672.7,
       "tile": {
         "x": 3,
         "y": 9,
@@ -4130,13 +4092,51 @@
       "blockedDirection": null,
       "frame": "left-contact-b",
       "foot": {
-        "x": 224.11377777777793,
+        "x": 238.29475555555547,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1688.8,
+      "at": 1689.3,
+      "tile": {
+        "x": 3,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-contact-b",
+      "foot": {
+        "x": 231.19217777777766,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1706,
+      "tile": {
+        "x": 3,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-passing",
+      "foot": {
+        "x": 224.0895999999999,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1722.6,
       "tile": {
         "x": 2,
         "y": 9,
@@ -4155,7 +4155,7 @@
       "busy": true
     },
     {
-      "at": 1705.5,
+      "at": 1739.3,
       "tile": {
         "x": 2,
         "y": 9,
@@ -4168,13 +4168,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 216.90311111111114,
+        "x": 216.89742222222222,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1722.1,
+      "at": 1755.9,
       "tile": {
         "x": 2,
         "y": 9,
@@ -4187,51 +4187,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 209.80622222222226,
+        "x": 209.7976888888889,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1738.8,
-      "tile": {
-        "x": 2,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-passing",
-      "foot": {
-        "x": 202.7093333333334,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1755.5,
-      "tile": {
-        "x": 2,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-passing",
-      "foot": {
-        "x": 195.61244444444452,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1772.1,
+      "at": 1772.6,
       "tile": {
         "x": 2,
         "y": 9,
@@ -4244,13 +4206,13 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 188.51555555555566,
+        "x": 202.69511111111112,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1788.8,
+      "at": 1789.3,
       "tile": {
         "x": 2,
         "y": 9,
@@ -4263,13 +4225,13 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 181.41582222222235,
+        "x": 195.59253333333334,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1805.5,
+      "at": 1806,
       "tile": {
         "x": 2,
         "y": 9,
@@ -4282,13 +4244,13 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 174.31608888888903,
+        "x": 188.48995555555555,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1822.2,
+      "at": 1822.6,
       "tile": {
         "x": 2,
         "y": 9,
@@ -4301,13 +4263,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 167.21351111111125,
+        "x": 181.39022222222223,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1838.8,
+      "at": 1839.3,
       "tile": {
         "x": 2,
         "y": 9,
@@ -4320,13 +4282,51 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 160.1109333333335,
+        "x": 174.2904888888889,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1855.5,
+      "at": 1856,
+      "tile": {
+        "x": 2,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-passing",
+      "foot": {
+        "x": 167.18791111111113,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1872.6,
+      "tile": {
+        "x": 2,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-contact-b",
+      "foot": {
+        "x": 160.0881777777778,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 1889.3,
       "tile": {
         "x": 1,
         "y": 9,
@@ -4345,7 +4345,7 @@
       "busy": true
     },
     {
-      "at": 1872.1,
+      "at": 1905.9,
       "tile": {
         "x": 1,
         "y": 9,
@@ -4358,13 +4358,13 @@
       "blockedDirection": null,
       "frame": "left-contact-b",
       "foot": {
-        "x": 152.90026666666668,
+        "x": 152.90026666666665,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1888.9,
+      "at": 1922.6,
       "tile": {
         "x": 1,
         "y": 9,
@@ -4383,45 +4383,7 @@
       "busy": true
     },
     {
-      "at": 1905.5,
-      "tile": {
-        "x": 1,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-contact-b",
-      "foot": {
-        "x": 138.6979555555556,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1922.1,
-      "tile": {
-        "x": 1,
-        "y": 9,
-        "facing": "left"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "left-contact-b",
-      "foot": {
-        "x": 131.60106666666672,
-        "y": 640
-      },
-      "busy": true
-    },
-    {
-      "at": 1938.8,
+      "at": 1939.3,
       "tile": {
         "x": 1,
         "y": 9,
@@ -4434,13 +4396,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 124.5013333333334,
+        "x": 138.69511111111112,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1955.5,
+      "at": 1955.9,
       "tile": {
         "x": 1,
         "y": 9,
@@ -4453,13 +4415,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 117.40160000000009,
+        "x": 131.59537777777777,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1972.2,
+      "at": 1972.6,
       "tile": {
         "x": 1,
         "y": 9,
@@ -4472,13 +4434,13 @@
       "blockedDirection": null,
       "frame": "left-passing",
       "foot": {
-        "x": 110.30186666666678,
+        "x": 124.49564444444442,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 1988.9,
+      "at": 1989.3,
       "tile": {
         "x": 1,
         "y": 9,
@@ -4491,13 +4453,13 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 103.20213333333346,
+        "x": 117.39306666666664,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 2005.5,
+      "at": 2005.9,
       "tile": {
         "x": 1,
         "y": 9,
@@ -4510,13 +4472,51 @@
       "blockedDirection": null,
       "frame": "left-contact-a",
       "foot": {
-        "x": 96.10240000000016,
+        "x": 110.2933333333333,
         "y": 640
       },
       "busy": true
     },
     {
-      "at": 2022.1,
+      "at": 2022.6,
+      "tile": {
+        "x": 1,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-contact-a",
+      "foot": {
+        "x": 103.19359999999995,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 2039.3,
+      "tile": {
+        "x": 1,
+        "y": 9,
+        "facing": "left"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "left-passing",
+      "foot": {
+        "x": 96.09102222222216,
+        "y": 640
+      },
+      "busy": true
+    },
+    {
+      "at": 2056,
       "tile": {
         "x": 1,
         "y": 8,
@@ -4535,7 +4535,7 @@
       "busy": true
     },
     {
-      "at": 2038.8,
+      "at": 2072.6,
       "tile": {
         "x": 1,
         "y": 8,
@@ -4549,12 +4549,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 632.9002666666667
+        "y": 632.8974222222222
       },
       "busy": true
     },
     {
-      "at": 2055.5,
+      "at": 2089.3,
       "tile": {
         "x": 1,
         "y": 8,
@@ -4568,50 +4568,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 625.8005333333333
+        "y": 625.7948444444444
       },
       "busy": true
     },
     {
-      "at": 2072.1,
-      "tile": {
-        "x": 1,
-        "y": 8,
-        "facing": "up"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "up-passing",
-      "foot": {
-        "x": 96,
-        "y": 618.7008000000001
-      },
-      "busy": true
-    },
-    {
-      "at": 2088.8,
-      "tile": {
-        "x": 1,
-        "y": 8,
-        "facing": "up"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "up-passing",
-      "foot": {
-        "x": 96,
-        "y": 611.5982222222223
-      },
-      "busy": true
-    },
-    {
-      "at": 2105.4,
+      "at": 2105.9,
       "tile": {
         "x": 1,
         "y": 8,
@@ -4625,12 +4587,12 @@
       "frame": "up-contact-b",
       "foot": {
         "x": 96,
-        "y": 604.4984888888889
+        "y": 618.6951111111111
       },
       "busy": true
     },
     {
-      "at": 2122.1,
+      "at": 2122.7,
       "tile": {
         "x": 1,
         "y": 8,
@@ -4644,12 +4606,12 @@
       "frame": "up-contact-b",
       "foot": {
         "x": 96,
-        "y": 597.3987555555557
+        "y": 611.5925333333333
       },
       "busy": true
     },
     {
-      "at": 2138.8,
+      "at": 2139.2,
       "tile": {
         "x": 1,
         "y": 8,
@@ -4663,12 +4625,12 @@
       "frame": "up-contact-b",
       "foot": {
         "x": 96,
-        "y": 590.2990222222223
+        "y": 604.4970666666667
       },
       "busy": true
     },
     {
-      "at": 2155.5,
+      "at": 2155.9,
       "tile": {
         "x": 1,
         "y": 8,
@@ -4682,12 +4644,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 583.199288888889
+        "y": 597.4016
       },
       "busy": true
     },
     {
-      "at": 2172.1,
+      "at": 2172.6,
       "tile": {
         "x": 1,
         "y": 8,
@@ -4701,12 +4663,50 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 576.0995555555558
+        "y": 590.3032888888889
       },
       "busy": true
     },
     {
-      "at": 2188.8,
+      "at": 2189.2,
+      "tile": {
+        "x": 1,
+        "y": 8,
+        "facing": "up"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "up-passing",
+      "foot": {
+        "x": 96,
+        "y": 583.2078222222223
+      },
+      "busy": true
+    },
+    {
+      "at": 2206,
+      "tile": {
+        "x": 1,
+        "y": 8,
+        "facing": "up"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "up-contact-a",
+      "foot": {
+        "x": 96,
+        "y": 576.1123555555556
+      },
+      "busy": true
+    },
+    {
+      "at": 2222.6,
       "tile": {
         "x": 1,
         "y": 7,
@@ -4725,7 +4725,7 @@
       "busy": true
     },
     {
-      "at": 2205.5,
+      "at": 2239.3,
       "tile": {
         "x": 1,
         "y": 7,
@@ -4739,50 +4739,12 @@
       "frame": "up-contact-a",
       "foot": {
         "x": 96,
-        "y": 568.8974222222223
+        "y": 568.9045333333333
       },
       "busy": true
     },
     {
-      "at": 2222.1,
-      "tile": {
-        "x": 1,
-        "y": 7,
-        "facing": "up"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "up-contact-a",
-      "foot": {
-        "x": 96,
-        "y": 561.7976888888888
-      },
-      "busy": true
-    },
-    {
-      "at": 2238.8,
-      "tile": {
-        "x": 1,
-        "y": 7,
-        "facing": "up"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "up-contact-a",
-      "foot": {
-        "x": 96,
-        "y": 554.6951111111111
-      },
-      "busy": true
-    },
-    {
-      "at": 2255.5,
+      "at": 2256,
       "tile": {
         "x": 1,
         "y": 7,
@@ -4796,12 +4758,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 547.5925333333334
+        "y": 561.8090666666667
       },
       "busy": true
     },
     {
-      "at": 2272.2,
+      "at": 2272.6,
       "tile": {
         "x": 1,
         "y": 7,
@@ -4815,12 +4777,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 540.4871111111112
+        "y": 554.7136
       },
       "busy": true
     },
     {
-      "at": 2288.8,
+      "at": 2289.2,
       "tile": {
         "x": 1,
         "y": 7,
@@ -4834,12 +4796,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 533.3845333333334
+        "y": 547.6209777777779
       },
       "busy": true
     },
     {
-      "at": 2305.5,
+      "at": 2306,
       "tile": {
         "x": 1,
         "y": 7,
@@ -4853,12 +4815,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 526.2819555555557
+        "y": 540.5212444444445
       },
       "busy": true
     },
     {
-      "at": 2322.1,
+      "at": 2322.6,
       "tile": {
         "x": 1,
         "y": 7,
@@ -4872,12 +4834,12 @@
       "frame": "up-contact-b",
       "foot": {
         "x": 96,
-        "y": 519.1822222222222
+        "y": 533.4243555555556
       },
       "busy": true
     },
     {
-      "at": 2338.8,
+      "at": 2339.3,
       "tile": {
         "x": 1,
         "y": 7,
@@ -4891,12 +4853,50 @@
       "frame": "up-contact-b",
       "foot": {
         "x": 96,
-        "y": 512.0796444444445
+        "y": 526.3274666666667
       },
       "busy": true
     },
     {
-      "at": 2355.4,
+      "at": 2356,
+      "tile": {
+        "x": 1,
+        "y": 7,
+        "facing": "up"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "up-contact-b",
+      "foot": {
+        "x": 96,
+        "y": 519.2277333333334
+      },
+      "busy": true
+    },
+    {
+      "at": 2372.6,
+      "tile": {
+        "x": 1,
+        "y": 7,
+        "facing": "up"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "up-passing",
+      "foot": {
+        "x": 96,
+        "y": 512.1308444444446
+      },
+      "busy": true
+    },
+    {
+      "at": 2389.2,
       "tile": {
         "x": 1,
         "y": 6,
@@ -4915,7 +4915,7 @@
       "busy": true
     },
     {
-      "at": 2372.2,
+      "at": 2405.9,
       "tile": {
         "x": 1,
         "y": 6,
@@ -4929,50 +4929,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 504.90026666666665
+        "y": 504.9031111111111
       },
       "busy": true
     },
     {
-      "at": 2388.8,
-      "tile": {
-        "x": 1,
-        "y": 6,
-        "facing": "up"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "up-passing",
-      "foot": {
-        "x": 96,
-        "y": 497.8005333333333
-      },
-      "busy": true
-    },
-    {
-      "at": 2405.4,
-      "tile": {
-        "x": 1,
-        "y": 6,
-        "facing": "up"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "up-passing",
-      "foot": {
-        "x": 96,
-        "y": 490.7036444444444
-      },
-      "busy": true
-    },
-    {
-      "at": 2422.2,
+      "at": 2422.6,
       "tile": {
         "x": 1,
         "y": 6,
@@ -4986,12 +4948,12 @@
       "frame": "up-contact-a",
       "foot": {
         "x": 96,
-        "y": 483.6067555555555
+        "y": 497.80622222222223
       },
       "busy": true
     },
     {
-      "at": 2438.8,
+      "at": 2439.3,
       "tile": {
         "x": 1,
         "y": 6,
@@ -5005,12 +4967,12 @@
       "frame": "up-contact-a",
       "foot": {
         "x": 96,
-        "y": 476.512711111111
+        "y": 490.70648888888894
       },
       "busy": true
     },
     {
-      "at": 2455.4,
+      "at": 2455.9,
       "tile": {
         "x": 1,
         "y": 6,
@@ -5024,12 +4986,12 @@
       "frame": "up-contact-a",
       "foot": {
         "x": 96,
-        "y": 469.4186666666666
+        "y": 483.60675555555565
       },
       "busy": true
     },
     {
-      "at": 2472.1,
+      "at": 2472.6,
       "tile": {
         "x": 1,
         "y": 6,
@@ -5043,12 +5005,12 @@
       "frame": "up-contact-a",
       "foot": {
         "x": 96,
-        "y": 462.3246222222221
+        "y": 476.5070222222223
       },
       "busy": true
     },
     {
-      "at": 2488.8,
+      "at": 2489.2,
       "tile": {
         "x": 1,
         "y": 6,
@@ -5062,12 +5024,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 455.22773333333316
+        "y": 469.407288888889
       },
       "busy": true
     },
     {
-      "at": 2505.5,
+      "at": 2505.9,
       "tile": {
         "x": 1,
         "y": 6,
@@ -5081,12 +5043,50 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 448.1308444444443
+        "y": 462.30755555555567
       },
       "busy": true
     },
     {
-      "at": 2522.1,
+      "at": 2522.6,
+      "tile": {
+        "x": 1,
+        "y": 6,
+        "facing": "up"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "up-passing",
+      "foot": {
+        "x": 96,
+        "y": 455.2078222222224
+      },
+      "busy": true
+    },
+    {
+      "at": 2539.3,
+      "tile": {
+        "x": 1,
+        "y": 6,
+        "facing": "up"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "up-contact-b",
+      "foot": {
+        "x": 96,
+        "y": 448.10524444444457
+      },
+      "busy": true
+    },
+    {
+      "at": 2556,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5105,7 +5105,7 @@
       "busy": true
     },
     {
-      "at": 2538.8,
+      "at": 2572.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5119,50 +5119,12 @@
       "frame": "up-contact-b",
       "foot": {
         "x": 96,
-        "y": 440.9031111111111
+        "y": 440.89742222222225
       },
       "busy": true
     },
     {
-      "at": 2555.5,
-      "tile": {
-        "x": 1,
-        "y": 5,
-        "facing": "up"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "up-contact-b",
-      "foot": {
-        "x": 96,
-        "y": 433.80337777777777
-      },
-      "busy": true
-    },
-    {
-      "at": 2572.2,
-      "tile": {
-        "x": 1,
-        "y": 5,
-        "facing": "up"
-      },
-      "moving": true,
-      "pending": false,
-      "queuedTaps": 1,
-      "heldDirection": null,
-      "blockedDirection": null,
-      "frame": "up-contact-b",
-      "foot": {
-        "x": 96,
-        "y": 426.70079999999996
-      },
-      "busy": true
-    },
-    {
-      "at": 2588.8,
+      "at": 2589.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5176,12 +5138,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 419.6010666666666
+        "y": 433.7976888888889
       },
       "busy": true
     },
     {
-      "at": 2605.5,
+      "at": 2606,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5195,12 +5157,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 412.49848888888886
+        "y": 426.6979555555556
       },
       "busy": true
     },
     {
-      "at": 2622.1,
+      "at": 2622.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5214,12 +5176,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 405.39591111111105
+        "y": 419.59822222222226
       },
       "busy": true
     },
     {
-      "at": 2638.8,
+      "at": 2639.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5233,12 +5195,12 @@
       "frame": "up-passing",
       "foot": {
         "x": 96,
-        "y": 398.2933333333333
+        "y": 412.50133333333343
       },
       "busy": true
     },
     {
-      "at": 2655.4,
+      "at": 2655.9,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5252,12 +5214,12 @@
       "frame": "up-contact-a",
       "foot": {
         "x": 96,
-        "y": 391.19359999999995
+        "y": 405.4016000000001
       },
       "busy": true
     },
     {
-      "at": 2672.1,
+      "at": 2672.5,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5271,12 +5233,50 @@
       "frame": "up-contact-a",
       "foot": {
         "x": 96,
-        "y": 384.0938666666666
+        "y": 398.3047111111112
       },
       "busy": true
     },
     {
-      "at": 2688.8,
+      "at": 2689.3,
+      "tile": {
+        "x": 1,
+        "y": 5,
+        "facing": "up"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "up-contact-a",
+      "foot": {
+        "x": 96,
+        "y": 391.2078222222224
+      },
+      "busy": true
+    },
+    {
+      "at": 2705.9,
+      "tile": {
+        "x": 1,
+        "y": 5,
+        "facing": "up"
+      },
+      "moving": true,
+      "pending": false,
+      "queuedTaps": 1,
+      "heldDirection": null,
+      "blockedDirection": null,
+      "frame": "up-passing",
+      "foot": {
+        "x": 96,
+        "y": 384.11377777777795
+      },
+      "busy": true
+    },
+    {
+      "at": 2722.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5295,7 +5295,7 @@
       "busy": false
     },
     {
-      "at": 2705.4,
+      "at": 2739.3,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5314,7 +5314,7 @@
       "busy": false
     },
     {
-      "at": 2722.1,
+      "at": 2755.9,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5333,7 +5333,7 @@
       "busy": false
     },
     {
-      "at": 2738.8,
+      "at": 2772.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5352,7 +5352,7 @@
       "busy": false
     },
     {
-      "at": 2755.4,
+      "at": 2789.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5371,7 +5371,7 @@
       "busy": false
     },
     {
-      "at": 2772.2,
+      "at": 2805.9,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5390,7 +5390,7 @@
       "busy": false
     },
     {
-      "at": 2788.8,
+      "at": 2822.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5409,7 +5409,7 @@
       "busy": false
     },
     {
-      "at": 2805.5,
+      "at": 2839.3,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5428,7 +5428,7 @@
       "busy": false
     },
     {
-      "at": 2822.1,
+      "at": 2855.9,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5447,7 +5447,7 @@
       "busy": false
     },
     {
-      "at": 2838.8,
+      "at": 2872.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5466,7 +5466,7 @@
       "busy": false
     },
     {
-      "at": 2855.4,
+      "at": 2889.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5485,7 +5485,7 @@
       "busy": false
     },
     {
-      "at": 2872.1,
+      "at": 2905.9,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5504,7 +5504,7 @@
       "busy": false
     },
     {
-      "at": 2888.8,
+      "at": 2922.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5523,7 +5523,7 @@
       "busy": false
     },
     {
-      "at": 2905.5,
+      "at": 2939.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5542,7 +5542,7 @@
       "busy": false
     },
     {
-      "at": 2922.1,
+      "at": 2956,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5561,7 +5561,7 @@
       "busy": false
     },
     {
-      "at": 2938.7,
+      "at": 2972.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5580,7 +5580,7 @@
       "busy": false
     },
     {
-      "at": 2955.5,
+      "at": 2989.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5599,7 +5599,7 @@
       "busy": false
     },
     {
-      "at": 2972.1,
+      "at": 3005.9,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5618,7 +5618,7 @@
       "busy": false
     },
     {
-      "at": 2988.7,
+      "at": 3022.5,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5637,7 +5637,7 @@
       "busy": false
     },
     {
-      "at": 3005.4,
+      "at": 3039.3,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5656,7 +5656,7 @@
       "busy": false
     },
     {
-      "at": 3022.1,
+      "at": 3056,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5675,7 +5675,7 @@
       "busy": false
     },
     {
-      "at": 3038.8,
+      "at": 3072.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5694,7 +5694,7 @@
       "busy": false
     },
     {
-      "at": 3055.5,
+      "at": 3089.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5713,7 +5713,7 @@
       "busy": false
     },
     {
-      "at": 3072.1,
+      "at": 3105.9,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5732,7 +5732,7 @@
       "busy": false
     },
     {
-      "at": 3088.8,
+      "at": 3122.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5751,7 +5751,7 @@
       "busy": false
     },
     {
-      "at": 3105.5,
+      "at": 3139.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5770,7 +5770,7 @@
       "busy": false
     },
     {
-      "at": 3122.1,
+      "at": 3155.9,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5789,7 +5789,7 @@
       "busy": false
     },
     {
-      "at": 3138.8,
+      "at": 3172.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5808,7 +5808,7 @@
       "busy": false
     },
     {
-      "at": 3155.4,
+      "at": 3189.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5827,7 +5827,7 @@
       "busy": false
     },
     {
-      "at": 3172.1,
+      "at": 3205.9,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5846,7 +5846,7 @@
       "busy": false
     },
     {
-      "at": 3188.7,
+      "at": 3222.6,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5865,7 +5865,7 @@
       "busy": false
     },
     {
-      "at": 3205.4,
+      "at": 3239.2,
       "tile": {
         "x": 1,
         "y": 5,
@@ -5887,14 +5887,14 @@
   "frameEvidence": {
     "uniqueFrames": [
       "down-idle",
-      "left-contact-b",
       "left-passing",
       "left-contact-a",
       "left-idle",
+      "left-contact-b",
       "up-passing",
       "up-contact-b",
-      "up-idle",
-      "up-contact-a"
+      "up-contact-a",
+      "up-idle"
     ],
     "finalFrame": "left-idle"
   },
@@ -5912,15 +5912,15 @@
     }
   },
   "stopStability": {
-    "observedForMs": 299.9000000000001,
+    "observedForMs": 300,
     "rafSamples": 19
   },
   "latency": {
     "definition": "last synthetic keydown in each in-step batch to the first requestAnimationFrame sample observing the next committed tile; browser-side observation only",
     "samples": 9,
-    "minMs": 146.9000000238418,
-    "medianMs": 148.09999998807916,
-    "maxMs": 148.10000002384186
+    "minMs": 147.79999997615823,
+    "medianMs": 148.60000001192088,
+    "maxMs": 157.79999998807898
   },
   "stopState": {
     "heldDirection": null,
@@ -5935,18 +5935,18 @@
     }
   },
   "hashes": {
-    "test": "2771b2ac6848f750e8e568f2dae5c04591d0705ac0a3d9eb9e4048094bbc1b26",
+    "test": "f91d39bc2330127da3a6dc5dc8a88048afa1a200f7c518b6fdeca1edd8afadba",
     "animationManifest": "ebeb2be797d5e6b16d643aeb8a2e7d8b090fc427099d892957b94f2f626692f8",
     "animationAtlas": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3",
     "manifestDeclaredAtlas": "15ad5e872025c19baf5337cb3e08567d4665fdaba2ee68126bf07d8b893c00a3",
     "screenshots": {
       "start": {
-        "sha256": "ab43c44058945d77b388c1f3ddc89c5ec76ec04c46d974e6d1d24a1a67810f4b",
-        "bytes": 26862
+        "sha256": "a13bce2711bc1ebeed8c4c7d04606f60e24987917d5f9df1560d3dd1f2e1e106",
+        "bytes": 27985
       },
       "stopped": {
-        "sha256": "3d0284804139a01f6d1ecebfe7877a000b57113bba5b841bd376e72d7d6159cd",
-        "bytes": 36765
+        "sha256": "b81abafee0cac4cb6e727bd6ba97c2f7b96b6a34316b1393f06bb04a72c946da",
+        "bytes": 37882
       }
     }
   },

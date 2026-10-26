@@ -357,9 +357,9 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 
 - [x] 固定路線 `(7,9) → (1,9) → (1,5)` 完成 10 次相鄰提交；最後左移被牆拒絕且不多走。
 - [x] 每步 10 個方向意圖，合計 50 次相反方向及 50 次垂直方向轉換；latest-tap queue 最大深度 1。
-- [x] 記錄 left／up 候選走路影格、135 個腳底錨點 RAF 樣本與 9 筆輸入至格位提交觀測延遲（136.6／152.2／154.5 ms，min／median／max）。
-- [x] 停止後 19 筆 RAF 樣本跨越 299.9 ms，tile、腳底錨點及 frame 穩定，movement input、pending 與 queue 清空。
-- [x] 專項 E2E 1/1 通過；截圖、完整事件／逐幀 JSON 及 manifest／atlas／test／screenshot SHA-256 已保存。
-- [x] `npm run check` 通過；完整 Chromium E2E 243／243（4 workers）通過。
-- [ ] Impact reconciliation、commit、PR Required Checks 與 merge 待完成。
+- [x] 記錄 left／up 候選走路影格、133 個腳底錨點 RAF 樣本與 9 筆輸入至格位提交觀測延遲（147.8／148.6／157.8 ms，min／median／max）。
+- [x] 停止後 19 筆 RAF 樣本跨越 300 ms，tile、腳底錨點及 frame 穩定，movement input、pending 與 queue 清空。
+- [x] 專項 E2E 10 次重複與 1 次證據擷取皆通過；截圖、完整事件／逐幀 JSON 及 manifest／atlas／test／screenshot SHA-256 已保存。
+- [x] 最新首步 kickoff 修正後 `npm run check` 通過；完整 Chromium E2E 243／243（4 workers）通過。
+- [ ] AIPS reconciliation、最終 commit、PR #53 Required Checks 與 merge 待完成；CI trace 曾證實首步 kickoff 在等待格位後已 idle，已改為 kickoff 與第一批輸入同一頁面任務派送。
 - [ ] 60／120 FPS、實機輸入延遲、人工動作／美術審查及 Gate 1 核准仍未完成；此候選證據不代表通過。

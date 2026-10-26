@@ -35,8 +35,8 @@
 - [x] 隔離 DEV-only pixel32 farm 路線完成 10 次相鄰提交，承載 50 次反向及 50 次直角轉向意圖；queue 最大深度 1。
 - [x] 記錄方向動畫影格、RAF 腳底錨點、瀏覽器端提交觀測延遲與牆前停止狀態；保存原始 JSON、截圖與 SHA-256。
 - [x] 專項 E2E 1/1 通過；不改 runtime、正式素材、地圖、玩法、存檔或素材核准。
-- [x] `npm run check` 與完整 Chromium E2E（243/243，4 workers）通過。
-- [ ] Impact reconciliation、commit、PR、Required Checks 與 merge 待完成。
+- [x] 最新首步 kickoff 修正後 `npm run check` 與完整 Chromium E2E（243/243，4 workers）通過；測試以 kickoff 與首批輸入原子派送修復 CI 排程競態。
+- [ ] 更新 AIPS Impact reconciliation、提交並更新 PR #53；Required Checks 與 merge 待完成。
 - [ ] 真機／FPS／美術／Gate 1 審查仍待各自驗收。
 
 詳見 [DF-QA-01 稽核矩陣](../docs/art/audit/df-qa-01.md)。

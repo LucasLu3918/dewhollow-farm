@@ -140,66 +140,76 @@ async function installCollector(page: Page): Promise<void> {
   });
 }
 
-async function tap(page: Page, direction: Direction): Promise<number> {
-  return page.evaluate((inputDirection) => {
-    const key = ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[inputDirection];
-    const trace = (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress;
-    const at = performance.now();
-    const record: Record<string, unknown> = { at, direction: inputDirection, key, type: 'keydown' };
-    trace?.inputEvents.push(record);
-    window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
-    if (trace) record['stateAfterKeydown'] = window.__dewhollow?.movement() ?? null;
-    const upAt = performance.now();
-    trace?.inputEvents.push({ at: upAt, direction: inputDirection, key, type: 'keyup' });
-    window.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }));
-    return at;
-  }, direction);
-}
-
-async function batch(page: Page, expectedBefore: Tile, inputs: Direction[]): Promise<{
+async function batch(page: Page, expectedBefore: Tile, inputs: Direction[], kickoff?: Direction): Promise<{
   beforeTile: Tile;
   lastInputAt: number;
   queueDepths: number[];
 } | null> {
-  return page.evaluate(({ expected, batchInputs }) => new Promise((resolve) => {
+  return page.evaluate(({ expected, batchInputs, kickoffDirection }) => new Promise((resolve) => {
     const deadline = performance.now() + 10_000;
-    const waitForStepAndDispatch = () => {
-      const movement = window.__dewhollow?.movement();
-      if (movement && (movement.tile.x !== expected.x || movement.tile.y !== expected.y)) {
+    const dispatchBatch = (movement: { tile: Tile; moving: boolean; pending: boolean }) => {
+      if (movement.tile.x !== expected.x || movement.tile.y !== expected.y) {
         resolve(null);
         return;
       }
-      if (movement && (movement.moving || movement.pending)) {
-        // The readiness check and all key events run in this same RAF callback.
-        // A movement step cannot finish between the check and first keydown.
-        const beforeTile = { x: movement.tile.x, y: movement.tile.y };
-        let lastInputAt = 0;
-        const queueDepths: number[] = [];
-        for (const direction of batchInputs) {
-          const key = ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[direction];
-          const trace = (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress;
-          lastInputAt = performance.now();
-          const record: Record<string, unknown> = { at: lastInputAt, direction, key, type: 'keydown' };
-          trace?.inputEvents.push(record);
-          window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
-          const afterKeydown = window.__dewhollow?.movement() ?? null;
-          if (trace) record['stateAfterKeydown'] = afterKeydown;
-          queueDepths.push(afterKeydown?.queuedTaps ?? 0);
-          const upAt = performance.now();
-          trace?.inputEvents.push({ at: upAt, direction, key, type: 'keyup' });
-          window.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }));
-        }
-        resolve({ beforeTile, lastInputAt, queueDepths });
-        return;
+      if (!movement.moving && !movement.pending) return false;
+
+      // Readiness and all key events run in one browser task, so the active
+      // step cannot finish between the check and the first queued tap.
+      const beforeTile = { x: movement.tile.x, y: movement.tile.y };
+      let lastInputAt = 0;
+      const queueDepths: number[] = [];
+      for (const direction of batchInputs) {
+        const key = ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[direction];
+        const trace = (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress;
+        lastInputAt = performance.now();
+        const record: Record<string, unknown> = { at: lastInputAt, direction, key, type: 'keydown' };
+        trace?.inputEvents.push(record);
+        window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+        const afterKeydown = window.__dewhollow?.movement() ?? null;
+        if (trace) record['stateAfterKeydown'] = afterKeydown;
+        queueDepths.push(afterKeydown?.queuedTaps ?? 0);
+        const upAt = performance.now();
+        trace?.inputEvents.push({ at: upAt, direction, key, type: 'keyup' });
+        window.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }));
       }
+      resolve({ beforeTile, lastInputAt, queueDepths });
+      return true;
+    };
+
+    const sendKickoff = () => {
+      if (!kickoffDirection) return;
+      const key = ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[kickoffDirection];
+      const trace = (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress;
+      const at = performance.now();
+      const record: Record<string, unknown> = { at, direction: kickoffDirection, key, type: 'keydown' };
+      trace?.inputEvents.push(record);
+      window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+      if (trace) record['stateAfterKeydown'] = window.__dewhollow?.movement() ?? null;
+      trace?.inputEvents.push({ at: performance.now(), direction: kickoffDirection, key, type: 'keyup' });
+      window.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }));
+    };
+
+    const waitForStepAndDispatch = () => {
+      const movement = window.__dewhollow?.movement();
+      if (movement && dispatchBatch(movement) !== false) return;
       if (performance.now() >= deadline) {
         resolve(null);
         return;
       }
       requestAnimationFrame(waitForStepAndDispatch);
     };
+
+    // The first movement step has no previous tap queued to start it. Inject its
+    // kickoff and stress batch synchronously so CI scheduling cannot let that
+    // 150 ms step settle before the first batch is queued.
+    if (kickoffDirection) {
+      sendKickoff();
+      const movement = window.__dewhollow?.movement();
+      if (movement && dispatchBatch(movement) !== false) return;
+    }
     requestAnimationFrame(waitForStepAndDispatch);
-  }), { expected: expectedBefore, batchInputs: inputs });
+  }), { expected: expectedBefore, batchInputs: inputs, kickoffDirection: kickoff });
 }
 
 async function waitForTile(page: Page, expected: Tile): Promise<void> {
@@ -244,17 +254,11 @@ test('pixel32 candidate survives 50 reversals and 50 cross-turns during ten comm
     const startScreenshot = await page.screenshot({ animations: 'disabled', scale: 'css' });
     await testInfo.attach('pixel32-motion-stress-start.png', { body: startScreenshot, contentType: 'image/png' });
 
-    await tap(page, initialDirection);
-    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().moving ?? false)).toBe(true);
-    await expect.poll(() => page.evaluate(() => {
-      const tile = window.__dewhollow?.movement().tile;
-      return tile ? { x: tile.x, y: tile.y } : null;
-    })).toEqual(route[0]);
     const batchesEvidence: Array<{ index: number; expectedNext: Direction; lastInputAt: number; beforeTile: Tile; afterTile: Tile; queueDepths: number[] }> = [];
 
     for (const [index, inputBatch] of batches.entries()) {
       const before = route[index]!;
-      const dispatched = await batch(page, before, inputBatch.inputs);
+      const dispatched = await batch(page, before, inputBatch.inputs, index === 0 ? initialDirection : undefined);
       if (!dispatched) throw new Error(`無法在格位 ${before.x},${before.y} 的有效移動步驟中派發輸入`);
       expect(dispatched.beforeTile).toEqual(before);
       const { lastInputAt, queueDepths: depths } = dispatched;
