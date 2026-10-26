@@ -1,0 +1,240 @@
+{
+  "status": "candidate-only",
+  "map": {
+    "id": "forest",
+    "width": 24,
+    "height": 16,
+    "exits": {
+      "farm": {
+        "x": 0,
+        "y": 7
+      },
+      "lake": {
+        "x": 23,
+        "y": 6
+      },
+      "mine-entrance": {
+        "x": 12,
+        "y": 0
+      }
+    }
+  },
+  "tiles": {
+    "ground-grass-2x.png": {
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "horizontal_edge_jump_rgb": 26.036,
+      "horizontal_inner_jump_rgb": 26.036,
+      "vertical_edge_jump_rgb": 23.542,
+      "vertical_inner_jump_rgb": 23.542,
+      "repeat_preview": "generated in contact sheet"
+    },
+    "ground-path-v2-2x.png": {
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "horizontal_edge_jump_rgb": 10.625,
+      "horizontal_inner_jump_rgb": 10.625,
+      "vertical_edge_jump_rgb": 13.958,
+      "vertical_inner_jump_rgb": 13.958,
+      "repeat_preview": "generated in contact sheet"
+    },
+    "ground-moss-v2-2x.png": {
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "horizontal_edge_jump_rgb": 15.312,
+      "horizontal_inner_jump_rgb": 15.312,
+      "vertical_edge_jump_rgb": 15.281,
+      "vertical_inner_jump_rgb": 15.281,
+      "repeat_preview": "generated in contact sheet"
+    }
+  },
+  "assets": [
+    {
+      "path": "source/forest-grass-generated.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGB",
+      "sha256": "8f1c30010135ed4fcc211b8855d5824b0531aeb04cc145b51f97779fca3f9413",
+      "alpha_bbox": null,
+      "alpha_extrema": null
+    },
+    {
+      "path": "source/forest-moss-generated-v2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGB",
+      "sha256": "85ac8040de31bfeaef26e6e4d4a653cf79a76bd938d6e2f3cfa42152d881a2ae",
+      "alpha_bbox": null,
+      "alpha_extrema": null
+    },
+    {
+      "path": "source/forest-path-generated-v2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGB",
+      "sha256": "d81938dfa8f635f13640b4c90a632058021f4f07b07bddc543793b6eaf602606",
+      "alpha_bbox": null,
+      "alpha_extrema": null
+    },
+    {
+      "path": "source/forest-rocks-generated-v2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "sha256": "c42ed078e6bf5bd492628d5501a0fa402da89fd87e5d46fa79c9e090dfefd1cd",
+      "alpha_bbox": [
+        0,
+        23,
+        1224,
+        1230
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "source/forest-tree-generated-v2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "sha256": "bdea6918f8be15a3cb27921f6c2c8328846dd3d37a0abe1d17d415a6d677ab17",
+      "alpha_bbox": [
+        0,
+        23,
+        1243,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "tiles/forest-rocks-v2-2x.png",
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA",
+      "sha256": "5928ba117c42b5f1b334f93771cf079724452def76f19a9dd8b8295df9363171",
+      "alpha_bbox": [
+        11,
+        16,
+        110,
+        114
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "tiles/forest-tree-v2-4x.png",
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA",
+      "sha256": "d9a43c1d9a6fa1948dc30e25fb6a164b6578ef207186cf727c0bb22d8f24e10c",
+      "alpha_bbox": [
+        20,
+        24,
+        237,
+        237
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "path": "tiles/ground-grass-2x.png",
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA",
+      "sha256": "839c2cfd2de5c063a8b12933beffa42f27647381a8b765d90e90ce6c25f1b1c5",
+      "alpha_bbox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ]
+    },
+    {
+      "path": "tiles/ground-moss-v2-2x.png",
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA",
+      "sha256": "eb2d1e1037ee2d67b4122f05a1845a36c9f9904ede10d72f875698a2b06516f7",
+      "alpha_bbox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ]
+    },
+    {
+      "path": "tiles/ground-path-v2-2x.png",
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA",
+      "sha256": "d697f250602cbb1f4f1b2755cce6e58876e451ef977864dbdef47badff09e00e",
+      "alpha_bbox": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ]
+    }
+  ]
+}
