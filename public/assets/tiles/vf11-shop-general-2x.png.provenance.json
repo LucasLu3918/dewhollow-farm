@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "ba957fd707cf24f7c05fbed801fd6382da90f55941d492233cdca1981498fdbe",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "scene.village.general-shop",
+  "candidate_filename": "overlay-shop-general-4x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:54Z",
+  "integrated_filename": "vf11-shop-general-2x.png",
+  "schema_version": 1,
+  "sha256": "b4236b568a6ac5c6c05a9b4744a92c50fdfe39bc132900a883ca13c6d7aa7f33"
+}

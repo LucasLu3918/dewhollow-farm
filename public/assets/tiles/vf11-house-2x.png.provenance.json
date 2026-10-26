@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "9952b67b3a868a54731a7089658e7f433a503a8fd8d19bbe6614579afa83d615",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "scene.farm.house",
+  "candidate_filename": "overlay-house-4x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:54Z",
+  "integrated_filename": "vf11-house-2x.png",
+  "schema_version": 1,
+  "sha256": "0af23947af0fa9c7c82eb42a8fbacd52ba5f11ceca416257de5081aa52ed58ac"
+}

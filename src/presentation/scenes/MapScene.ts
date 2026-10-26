@@ -3,6 +3,7 @@ import type { ContentPack, Direction, MapDef, Point } from '../../domain/content
 import { plotKey, type PlotMap, type PlotState } from '../../domain/farm';
 import { tileAt } from '../../domain/world';
 import { groundLayerFor, isGroundLayer } from '../map-layers';
+import { sceneOverlaysFor } from '../scene-overlays';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import { resolveInteraction, type InteractionLabelKey } from '../../application/interaction';
@@ -435,6 +436,8 @@ export class MapScene extends Phaser.Scene {
     groundImage: Phaser.GameObjects.Image;
     objectImage?: Phaser.GameObjects.Image;
   }[] = [];
+  /** Map-specific static art overlays; they are render-only and carry no world or collision state. */
+  private sceneOverlaySprites: Phaser.GameObjects.Image[] = [];
   private shopPanel!: ShopPanel;
   private kitchenPanel!: KitchenPanel;
   private workshopPanel!: WorkshopPanel;
@@ -1868,6 +1871,7 @@ export class MapScene extends Phaser.Scene {
   private drawMap(mapId: string): void {
     this.clearPixel32CandidateOverlays();
     this.clearPixel32CandidateInteractables();
+    this.clearSceneOverlays();
     // Tree overlays live on the scene display list so their foot depth can sort
     // against actor roots. Destroy those roots explicitly before clearing the tile container.
     for (const sprite of this.tileSprites) {
@@ -1893,8 +1897,29 @@ export class MapScene extends Phaser.Scene {
 
     this.clearActors();
     this.createResidents(map);
+    this.drawSceneOverlays(mapId);
     this.drawPixel32CandidateOverlays(mapId);
     this.drawPixel32CandidateInteractables(mapId);
+  }
+
+  private clearSceneOverlays(): void {
+    for (const image of this.sceneOverlaySprites) image.destroy();
+    this.sceneOverlaySprites = [];
+  }
+
+  /** Render approved, map-specific large art at tile anchors without changing map or world state. */
+  private drawSceneOverlays(mapId: string): void {
+    for (const overlay of sceneOverlaysFor(mapId)) {
+      const { textureId, flipX, scale } = resolveAsset(this.deps.assets, overlay.assetId);
+      const footX = (overlay.anchorTile.x + 0.5) * TILE_SIZE;
+      const footY = (overlay.anchorTile.y + 1) * TILE_SIZE;
+      const image = this.add.image(footX, footY, textureId)
+        .setOrigin(0.5, 240 / 256)
+        .setFlipX(flipX)
+        .setScale(scale)
+        .setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
+      this.sceneOverlaySprites.push(image);
+    }
   }
 
   private clearPixel32CandidateOverlays(): void {
@@ -2247,6 +2272,7 @@ export class MapScene extends Phaser.Scene {
     const images = [
       ...this.world.getAll().filter((c): c is Phaser.GameObjects.Image => c instanceof Phaser.GameObjects.Image),
       ...tileRootImages,
+      ...this.sceneOverlaySprites,
     ];
     const others = images.map((image) => {
       const bounds = image.getBounds();

@@ -6,7 +6,7 @@
 
 ## 一、素材（content/assets.json）
 
-共 65 筆：有檔案 46 筆（其中本機模型生成 0、程式產生 3）、水平翻轉 1 筆（不另存檔）、占位（程式繪製的色塊，無檔案）18 筆。
+共 69 筆：有檔案 50 筆（其中本機模型生成 0、程式產生 3）、水平翻轉 1 筆（不另存檔）、占位（程式繪製的色塊，無檔案）18 筆。
 
 ### 1.1 本機影像模型生成
 
@@ -30,13 +30,13 @@
 
 | 素材 id | 類別 | 檔案 | 來源與授權 |
 | --- | --- | --- | --- |
-| `tile.grass` | tile | `assets/tiles/grass-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
-| `tile.field` | tile | `assets/tiles/field-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
-| `tile.path` | tile | `assets/tiles/path-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
-| `tile.wall` | tile | `assets/tiles/wall-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
+| `tile.grass` | tile | `assets/tiles/vf11-grass-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.grass, SHA-256 c392ed3eaa096ffec14b2c622f0737852146da5e290f9af021458c7c88f527df; model name and license terms unavailable; exact-byte integration with per-file provenance. |
+| `tile.field` | tile | `assets/tiles/vf11-field-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.field, SHA-256 87929b9296e120f0f565a12fedb90bd4a6103d1fca3ea6847722d156fa52011c; model name and license terms unavailable; exact-byte integration with per-file provenance. |
+| `tile.path` | tile | `assets/tiles/vf11-path-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.path, SHA-256 53f82edb07b05e74c3f5de8dbee7a667b0189d50daa0992d6f1770dbb18842e6; model name and license terms unavailable; exact-byte integration with per-file provenance. |
+| `tile.wall` | tile | `assets/tiles/vf11-wall-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.wall, SHA-256 bf8da937dfb069d284197051f8f7dba8ef2163229a2e87f1a821147982bb28b6; model name and license terms unavailable; exact-byte integration with per-file provenance. |
 | `tile.bed` | overlay | `assets/tiles/bed-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
-| `tile.shipbox` | overlay | `assets/tiles/shipbox-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
-| `tile.door` | overlay | `assets/tiles/door-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.shipbox` | overlay | `assets/tiles/vf11-shipbox-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.shipbox, SHA-256 bc1905a68908ff720e0800f9bef5745f28b44ddaef54a08156531c5d9d738035; model name and license terms unavailable; exact-byte integration with per-file provenance. |
+| `tile.door` | overlay | `assets/tiles/vf11-door-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.door, SHA-256 85f5ca05d866e4407d69fdef9e23c437d81996c27734cc35b54f8534edf7a3fd; model name and license terms unavailable; exact-byte integration with per-file provenance. |
 | `tile.soil` | tile | `assets/tiles/soil-2x.png` | OpenAI built-in image generation tool（2026-10-23），原創全彩農地土壤地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。 |
 | `crop.sweet-radish` | crop | `assets/crops/sweet-radish-2x.png` | OpenAI built-in image generation tool（2026-10-23），使用者核准之甜蘿蔔原創像素圖；保留核准 PNG 原始位元組，未重繪或重採樣。 |
 | `player.up` | character | `assets/characters/xiaohan-back-2x.png` | OpenAI built-in image generation tool（2026-10-23），依 docs/art/character-briefs.md 原創角色描述生成；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
@@ -72,7 +72,11 @@
 | `tile.workbench` | overlay | `assets/tiles/workbench-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
 | `tile.tuft` | overlay | `assets/tiles/tuft-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
 | `tool.sickle` | object | `assets/tools/sickle-2x.png` | OpenAI built-in image generation tool（2026-10-23），依原創農具設計生成透明像素圖；未使用第三方遊戲素材；tools/art/finalize.py 輸出 RGBA8888。 |
-| `tile.fence` | overlay | `assets/tiles/fence-2x.png` | OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。 |
+| `tile.fence` | overlay | `assets/tiles/vf11-fence-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.fence, SHA-256 569613d3c4be2c6ca7cf40173e753649c282012f8378f1169d1b74401046ea2c; model name and license terms unavailable; exact-byte integration with per-file provenance. |
+| `scene.village.general-shop` | overlay | `assets/tiles/vf11-shop-general-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for scene.village.general-shop, SHA-256 b4236b568a6ac5c6c05a9b4744a92c50fdfe39bc132900a883ca13c6d7aa7f33; model name and license terms unavailable; exact-byte integration with per-file provenance. |
+| `scene.village.smithy` | overlay | `assets/tiles/vf11-shop-smithy-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for scene.village.smithy, SHA-256 24d378dd0d75eb01573968b9420e81077172a9930026741cbbd2a7ee07d7d410; model name and license terms unavailable; exact-byte integration with per-file provenance. |
+| `scene.farm.tree` | overlay | `assets/tiles/vf11-tree-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for scene.farm.tree, SHA-256 3972b8de6b0aeef93ace94c2c90b5e167206392c8727607b814591477d1cb7ea; model name and license terms unavailable; exact-byte integration with per-file provenance. |
+| `scene.farm.house` | overlay | `assets/tiles/vf11-house-2x.png` | OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for scene.farm.house, SHA-256 0af23947af0fa9c7c82eb42a8fbacd52ba5f11ceca416257de5081aa52ed58ac; model name and license terms unavailable; exact-byte integration with per-file provenance. |
 
 ### 1.4 水平翻轉（不另存檔）
 
@@ -115,13 +119,13 @@
 
 | 套件 | 版本 | 授權 | 類別 | 用途 |
 | --- | --- | --- | --- | --- |
-| `dexie` | 4.4.6 | （未安裝，無法讀取） | 執行期 | IndexedDB 存檔封裝 |
-| `phaser` | 4.2.1 | （未安裝，無法讀取） | 執行期 | 遊戲引擎（場景、貼圖、輸入與鏡頭） |
-| `zod` | 4.6.7 | （未安裝，無法讀取） | 執行期 | 內容與存檔資料的格式驗證 |
-| `@playwright/test` | 1.64.1 | （未安裝，無法讀取） | 開發用 | 端到端測試（不隨遊戲發布） |
-| `typescript` | 5.9.3 | （未安裝，無法讀取） | 開發用 | 型別檢查與編譯 |
-| `vite` | 8.3.5 | （未安裝，無法讀取） | 開發用 | 開發伺服器與建置（產生 dist/） |
-| `vitest` | 5.0.5 | （未安裝，無法讀取） | 開發用 | 單元測試與模擬 |
+| `dexie` | 4.4.6 | Apache-2.0 | 執行期 | IndexedDB 存檔封裝 |
+| `phaser` | 4.2.1 | MIT | 執行期 | 遊戲引擎（場景、貼圖、輸入與鏡頭） |
+| `zod` | 4.6.7 | MIT | 執行期 | 內容與存檔資料的格式驗證 |
+| `@playwright/test` | 1.64.1 | Apache-2.0 | 開發用 | 端到端測試（不隨遊戲發布） |
+| `typescript` | 5.9.3 | Apache-2.0 | 開發用 | 型別檢查與編譯 |
+| `vite` | 8.3.5 | MIT | 開發用 | 開發伺服器與建置（產生 dist/） |
+| `vitest` | 5.0.5 | MIT | 開發用 | 單元測試與模擬 |
 
 ## 三、已安裝的全部套件（含間接依賴）
 
@@ -129,19 +133,23 @@
 
 | 授權 | 套件數 |
 | --- | --- |
-| （未安裝，無法讀取） | 41 |
-| （平台專用套件，本機未安裝，未讀取授權） | 27 |
+| MIT | 33 |
+| （平台專用套件，本機未安裝，未讀取授權） | 24 |
+| Apache-2.0 | 7 |
+| MPL-2.0 | 2 |
+| ISC | 1 |
+| BSD-3-Clause | 1 |
 
 | 套件 | 版本 | 授權 |
 | --- | --- | --- |
-| `@jridgewell/resolve-uri` | 3.1.2 | （未安裝，無法讀取） |
-| `@jridgewell/sourcemap-codec` | 1.6.0 | （未安裝，無法讀取） |
-| `@jridgewell/trace-mapping` | 0.3.31 | （未安裝，無法讀取） |
-| `@oxc-project/types` | 0.154.0 | （未安裝，無法讀取） |
-| `@playwright/test` | 1.64.1 | （未安裝，無法讀取） |
+| `@jridgewell/resolve-uri` | 3.1.2 | MIT |
+| `@jridgewell/sourcemap-codec` | 1.6.0 | MIT |
+| `@jridgewell/trace-mapping` | 0.3.31 | MIT |
+| `@oxc-project/types` | 0.154.0 | MIT |
+| `@playwright/test` | 1.64.1 | Apache-2.0 |
 | `@rolldown/binding-android-arm-eabi` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-android-arm64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
-| `@rolldown/binding-darwin-arm64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
+| `@rolldown/binding-darwin-arm64` | 1.2.14 | MIT |
 | `@rolldown/binding-darwin-x64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-freebsd-x64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-linux-arm-gnueabihf` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
@@ -154,25 +162,25 @@
 | `@rolldown/binding-openharmony-arm64` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-win32-arm64-msvc` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
 | `@rolldown/binding-win32-x64-msvc` | 1.2.14 | （平台專用套件，本機未安裝，未讀取授權） |
-| `@rolldown/pluginutils` | 1.0.1 | （未安裝，無法讀取） |
-| `@types/chai` | 5.2.3 | （未安裝，無法讀取） |
-| `@types/deep-eql` | 4.0.2 | （未安裝，無法讀取） |
-| `@types/estree` | 1.0.9 | （未安裝，無法讀取） |
-| `@vitest/mocker` | 5.0.5 | （未安裝，無法讀取） |
-| `@vitest/spy` | 5.0.5 | （未安裝，無法讀取） |
-| `assertion-error` | 2.0.1 | （未安裝，無法讀取） |
-| `chai` | 6.3.0 | （未安裝，無法讀取） |
-| `detect-libc` | 2.1.2 | （未安裝，無法讀取） |
-| `dexie` | 4.4.6 | （未安裝，無法讀取） |
-| `es-module-lexer` | 2.3.2 | （未安裝，無法讀取） |
-| `estree-walker` | 3.0.3 | （未安裝，無法讀取） |
-| `eventemitter3` | 5.0.4 | （未安裝，無法讀取） |
-| `expect-type` | 1.4.0 | （未安裝，無法讀取） |
-| `fdir` | 6.5.0 | （未安裝，無法讀取） |
-| `fsevents` | 2.3.3 | （平台專用套件，本機未安裝，未讀取授權） |
-| `lightningcss` | 1.33.0 | （未安裝，無法讀取） |
+| `@rolldown/pluginutils` | 1.0.1 | MIT |
+| `@types/chai` | 5.2.3 | MIT |
+| `@types/deep-eql` | 4.0.2 | MIT |
+| `@types/estree` | 1.0.9 | MIT |
+| `@vitest/mocker` | 5.0.5 | MIT |
+| `@vitest/spy` | 5.0.5 | MIT |
+| `assertion-error` | 2.0.1 | MIT |
+| `chai` | 6.3.0 | MIT |
+| `detect-libc` | 2.1.2 | Apache-2.0 |
+| `dexie` | 4.4.6 | Apache-2.0 |
+| `es-module-lexer` | 2.3.2 | MIT |
+| `estree-walker` | 3.0.3 | MIT |
+| `eventemitter3` | 5.0.4 | MIT |
+| `expect-type` | 1.4.0 | Apache-2.0 |
+| `fdir` | 6.5.0 | MIT |
+| `fsevents` | 2.3.3 | MIT |
+| `lightningcss` | 1.33.0 | MPL-2.0 |
 | `lightningcss-android-arm64` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
-| `lightningcss-darwin-arm64` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
+| `lightningcss-darwin-arm64` | 1.33.0 | MPL-2.0 |
 | `lightningcss-darwin-x64` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
 | `lightningcss-freebsd-x64` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
 | `lightningcss-linux-arm-gnueabihf` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
@@ -182,26 +190,26 @@
 | `lightningcss-linux-x64-musl` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
 | `lightningcss-win32-arm64-msvc` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
 | `lightningcss-win32-x64-msvc` | 1.33.0 | （平台專用套件，本機未安裝，未讀取授權） |
-| `magic-string` | 1.4.3 | （未安裝，無法讀取） |
-| `nanoid` | 3.3.20 | （未安裝，無法讀取） |
-| `obug` | 3.0.0 | （未安裝，無法讀取） |
-| `phaser` | 4.2.1 | （未安裝，無法讀取） |
-| `picocolors` | 1.1.1 | （未安裝，無法讀取） |
-| `picomatch` | 4.0.7 | （未安裝，無法讀取） |
-| `playwright` | 1.64.1 | （未安裝，無法讀取） |
-| `playwright-core` | 1.64.1 | （未安裝，無法讀取） |
-| `postcss` | 8.5.31 | （未安裝，無法讀取） |
-| `rolldown` | 1.2.14 | （未安裝，無法讀取） |
-| `source-map-js` | 1.2.2 | （未安裝，無法讀取） |
-| `std-env` | 4.3.0 | （未安裝，無法讀取） |
-| `tinybench` | 6.2.2 | （未安裝，無法讀取） |
-| `tinyexec` | 1.3.1 | （未安裝，無法讀取） |
-| `tinyglobby` | 0.2.17 | （未安裝，無法讀取） |
-| `typescript` | 5.9.3 | （未安裝，無法讀取） |
-| `vite` | 8.3.5 | （未安裝，無法讀取） |
-| `vitest` | 5.0.5 | （未安裝，無法讀取） |
-| `why-is-node-running` | 3.2.1 | （未安裝，無法讀取） |
-| `zod` | 4.6.7 | （未安裝，無法讀取） |
+| `magic-string` | 1.4.3 | MIT |
+| `nanoid` | 3.3.20 | MIT |
+| `obug` | 3.0.0 | MIT |
+| `phaser` | 4.2.1 | MIT |
+| `picocolors` | 1.1.1 | ISC |
+| `picomatch` | 4.0.7 | MIT |
+| `playwright` | 1.64.1 | Apache-2.0 |
+| `playwright-core` | 1.64.1 | Apache-2.0 |
+| `postcss` | 8.5.31 | MIT |
+| `rolldown` | 1.2.14 | MIT |
+| `source-map-js` | 1.2.2 | BSD-3-Clause |
+| `std-env` | 4.3.0 | MIT |
+| `tinybench` | 6.2.2 | MIT |
+| `tinyexec` | 1.3.1 | MIT |
+| `tinyglobby` | 0.2.17 | MIT |
+| `typescript` | 5.9.3 | Apache-2.0 |
+| `vite` | 8.3.5 | MIT |
+| `vitest` | 5.0.5 | MIT |
+| `why-is-node-running` | 3.2.1 | MIT |
+| `zod` | 4.6.7 | MIT |
 
 ## 四、字型
 

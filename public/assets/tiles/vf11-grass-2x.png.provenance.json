@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "6aeb77da97391bf00680e7b3693a8a2349a72d476f356959ebc9d2621f4dd9dc",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "tile.grass",
+  "candidate_filename": "tile-grass-2x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:53Z",
+  "integrated_filename": "vf11-grass-2x.png",
+  "schema_version": 1,
+  "sha256": "c392ed3eaa096ffec14b2c622f0737852146da5e290f9af021458c7c88f527df"
+}

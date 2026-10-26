@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "3ed565f2770d42bde7ca92e27cbd78e48f5483f46c35fab0f0ac5a98583a925f",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "tile.door",
+  "candidate_filename": "overlay-door-2x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:54Z",
+  "integrated_filename": "vf11-door-2x.png",
+  "schema_version": 1,
+  "sha256": "85f5ca05d866e4407d69fdef9e23c437d81996c27734cc35b54f8534edf7a3fd"
+}

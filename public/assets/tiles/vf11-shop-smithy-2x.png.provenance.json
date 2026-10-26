@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "4936179f21f00febe465399714e4cb771c8adf78a2f3cda2633ef5d111cad8f7",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "scene.village.smithy",
+  "candidate_filename": "overlay-shop-smithy-4x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:54Z",
+  "integrated_filename": "vf11-shop-smithy-2x.png",
+  "schema_version": 1,
+  "sha256": "24d378dd0d75eb01573968b9420e81077172a9930026741cbbd2a7ee07d7d410"
+}

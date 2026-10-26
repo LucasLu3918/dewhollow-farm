@@ -37,4 +37,26 @@
 | `integrated` | `fish.carp` | `public/assets/items/fish.png` | `027fa69938e6a2aa456992641bbfbf6aa8bcf10bdc3a5cdb0927afcf5c6e216a` | 1016660 / 555647 / 209 |
 | `integrated` | `dish.creek-stew` | `public/assets/items/stew.png` | `8b1d9c211b552049f8d1326b9a3b71f17f751532119abbcac87c9ce2b98df3c3` | 648499 / 923784 / 233 |
 
-六個候選都以 64×64 暫存縮圖檢視，主體仍可辨識；正式檔維持原始尺寸。場景 B 圖仍只代表已選定的美術方向，沒有納入本次整合或 `content/assets.json`。
+六個候選都以 64×64 暫存縮圖檢視，主體仍可辨識；正式檔維持原始尺寸。VF-12 背包圖示變更不包含場景素材；場景 B 的逐檔核准與整合紀錄見下方 VF-11。
+
+## VF-11｜格子化場景素材（2026-10-26）
+
+使用者逐檔核准下列 11 個場景候選 PNG 與確切 SHA-256，並授權正式整合。每筆簽核 JSON 位於 `docs/art/approvals/vf11/`；`tools/art/asset_review_gate.py` 對原候選逐檔驗證並以原始 bytes 安裝到新路徑，旁附 `.provenance.json`。未重繪或重採樣。來源為 OpenAI 內建 imagegen；模型名稱及授權條款無可查證資訊，因此 `content/assets.json` 不推定模型或授權。
+
+| 用途 | 候選／正式檔 | 尺寸／顯示格數 | 候選與整合 SHA-256 |
+|---|---|---:|---|
+| `tile.grass` | `tile-grass-2x-candidate-20261026.png` → `public/assets/tiles/vf11-grass-2x.png` | 128×128／1 格 | `c392ed3eaa096ffec14b2c622f0737852146da5e290f9af021458c7c88f527df` |
+| `tile.path` | `tile-path-2x-candidate-20261026.png` → `public/assets/tiles/vf11-path-2x.png` | 128×128／1 格 | `53f82edb07b05e74c3f5de8dbee7a667b0189d50daa0992d6f1770dbb18842e6` |
+| `tile.field` | `tile-field-2x-candidate-20261026.png` → `public/assets/tiles/vf11-field-2x.png` | 128×128／1 格 | `87929b9296e120f0f565a12fedb90bd4a6103d1fca3ea6847722d156fa52011c` |
+| `tile.wall` | `overlay-wall-2x-candidate-20261026.png` → `public/assets/tiles/vf11-wall-2x.png` | 128×128／1 格 | `bf8da937dfb069d284197051f8f7dba8ef2163229a2e87f1a821147982bb28b6` |
+| `tile.fence` | `overlay-fence-2x-candidate-20261026.png` → `public/assets/tiles/vf11-fence-2x.png` | 128×128／1 格 | `569613d3c4be2c6ca7cf40173e753649c282012f8378f1169d1b74401046ea2c` |
+| `tile.shipbox` | `overlay-shipbox-2x-candidate-20261026.png` → `public/assets/tiles/vf11-shipbox-2x.png` | 128×128／1 格 | `bc1905a68908ff720e0800f9bef5745f28b44ddaef54a08156531c5d9d738035` |
+| `tile.door` | `overlay-door-2x-candidate-20261026.png` → `public/assets/tiles/vf11-door-2x.png` | 128×128／1 格 | `85f5ca05d866e4407d69fdef9e23c437d81996c27734cc35b54f8534edf7a3fd` |
+| `scene.village.general-shop` | `overlay-shop-general-4x-candidate-20261026.png` → `public/assets/tiles/vf11-shop-general-2x.png` | 256×256／2×2 格 | `b4236b568a6ac5c6c05a9b4744a92c50fdfe39bc132900a883ca13c6d7aa7f33` |
+| `scene.village.smithy` | `overlay-shop-smithy-4x-candidate-20261026.png` → `public/assets/tiles/vf11-shop-smithy-2x.png` | 256×256／2×2 格 | `24d378dd0d75eb01573968b9420e81077172a9930026741cbbd2a7ee07d7d410` |
+| `scene.farm.tree` | `overlay-tree-4x-candidate-20261026.png` → `public/assets/tiles/vf11-tree-2x.png` | 256×256／2×2 格 | `3972b8de6b0aeef93ace94c2c90b5e167206392c8727607b814591477d1cb7ea` |
+| `scene.farm.house` | `overlay-house-4x-candidate-20261026.png` → `public/assets/tiles/vf11-house-2x.png` | 256×256／2×2 格 | `0af23947af0fa9c7c82eb42a8fbacd52ba5f11ceca416257de5081aa52ed58ac` |
+
+前三種地表為全不透明；牆、圍籬、出貨箱、門及四種大型物件保留透明 alpha。牆仍使用原始 `wall` map kind 並保持不可通行，但 renderer 會先繪製相鄰地表，再把透明牆圖疊上去。商店、房屋與樹只由 `src/presentation/scene-overlays.ts` 在指定地圖格錨定；不寫入地圖資料、不增加碰撞，也不改 shop、door、transition 或世界變更規則。
+
+地表的重複紋理仍可見規律感；草地和路徑的小細節在遊戲格尺寸會變成密集色點，田地橫向紋理較突出。四種大型 overlay 的窗、瓦片與葉片在 64 px 的原尺寸預覽會合併，實際場景截圖驗收見 `docs/art/audit/vf11-scenes/README.md`。此素材不構成模型條款或發布權利審查。
