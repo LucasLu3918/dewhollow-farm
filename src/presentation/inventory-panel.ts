@@ -1,35 +1,34 @@
 import { applyGameUiTokens } from './game-ui-tokens';
+import { PanelDialog } from './panel-dialog';
 
-/** Structural inventory shell only. Item data, filtering and modal input handling arrive in later tasks. */
+/** Inventory shell and modal lifecycle. Item data and filtering arrive in later tasks. */
 export class InventoryPanel {
   private readonly trigger: HTMLButtonElement;
   private readonly root: HTMLElement;
   private readonly closeButton: HTMLButtonElement;
+  private readonly dialog: PanelDialog;
 
   constructor(doc: Document) {
     this.trigger = required<HTMLButtonElement>(doc, '#hud-inventory');
     this.root = required(doc, '#inventory-panel');
     this.closeButton = required<HTMLButtonElement>(doc, '#inventory-close');
     applyGameUiTokens(this.root);
+    this.dialog = new PanelDialog(this.root);
 
     this.trigger.addEventListener('click', () => this.open());
     this.closeButton.addEventListener('click', () => this.close());
   }
 
   isOpen(): boolean {
-    return !this.root.hidden;
+    return this.dialog.isOpen();
   }
 
   open(): void {
-    if (this.isOpen()) return;
-    this.root.hidden = false;
-    this.closeButton.focus();
+    this.dialog.open();
   }
 
   close(): void {
-    if (!this.isOpen()) return;
-    this.root.hidden = true;
-    this.trigger.focus();
+    this.dialog.close();
   }
 }
 

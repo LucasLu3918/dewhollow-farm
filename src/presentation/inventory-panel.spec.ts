@@ -1,9 +1,32 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { InventoryPanel } from './inventory-panel';
+
+vi.mock('./panel-dialog', () => ({
+  PanelDialog: class {
+    private open_ = false;
+
+    constructor(private readonly root: { hidden: boolean }) {}
+
+    isOpen(): boolean {
+      return this.open_;
+    }
+
+    open(): void {
+      if (this.open_) return;
+      this.open_ = true;
+      this.root.hidden = false;
+    }
+
+    close(): void {
+      if (!this.open_) return;
+      this.open_ = false;
+      this.root.hidden = true;
+    }
+  },
+}));
 
 class FakeElement {
   hidden = false;
-  focused = false;
   readonly style = { setProperty: (_name: string, _value: string) => undefined };
   private readonly listeners = new Map<string, Array<() => void>>();
 
@@ -11,10 +34,6 @@ class FakeElement {
     const current = this.listeners.get(type) ?? [];
     current.push(listener);
     this.listeners.set(type, current);
-  }
-
-  focus(): void {
-    this.focused = true;
   }
 
   click(): void {
@@ -37,36 +56,34 @@ function panelFixture(): { panel: InventoryPanel; trigger: FakeElement; root: Fa
 }
 
 describe('InventoryPanel', () => {
-  it('opens from the HUD entry and moves focus into the panel', () => {
-    const { trigger, root, close } = panelFixture();
+  it('opens from the HUD entry through its modal dialog', () => {
+    const { panel, trigger, root } = panelFixture();
 
     trigger.click();
 
     expect(root.hidden).toBe(false);
-    expect(close.focused).toBe(true);
+    expect(panel.isOpen()).toBe(true);
   });
 
-  it('closes from the panel and returns focus to the HUD entry', () => {
-    const { trigger, root, close } = panelFixture();
+  it('closes from the panel and updates the modal state', () => {
+    const { panel, trigger, root, close } = panelFixture();
     trigger.click();
-    trigger.focused = false;
 
     close.click();
 
     expect(root.hidden).toBe(true);
-    expect(trigger.focused).toBe(true);
+    expect(panel.isOpen()).toBe(false);
   });
 
   it('is idempotent when opened or closed repeatedly', () => {
-    const { panel, trigger, root } = panelFixture();
+    const { panel, root } = panelFixture();
 
     panel.open();
     panel.open();
-    expect(root.hidden).toBe(false);
+    expect(panel.isOpen()).toBe(true);
 
     panel.close();
     panel.close();
     expect(root.hidden).toBe(true);
-    expect(trigger.focused).toBe(true);
   });
 });

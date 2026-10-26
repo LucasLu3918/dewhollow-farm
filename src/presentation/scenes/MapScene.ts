@@ -127,6 +127,8 @@ export interface MapSceneDeps {
   /** 說明頁（? 鍵）與存檔槽（L 鍵）；打開時遊戲的按鍵只用來關閉（Esc）。 */
   help: HelpPanel;
   saves: SavePanel;
+  /** 背包：共用 DOM modal stack，並由 MapScene 處理 Esc 和遊戲輸入阻擋。 */
+  inventory: OpenablePanel;
   /** 玩家偏好（按鍵、字級、閃光與震動等），不進存檔。 */
   settings: SettingsService;
   responsive: ResponsiveLayoutController;
@@ -570,6 +572,7 @@ export class MapScene extends Phaser.Scene {
         this.repairPanel,
         this.collectionPanel,
         this.legacyPanel,
+        deps.inventory,
       ],
       [deps.help, deps.saves, this.settingsPanel, this.toolSeedSelector],
     ];
