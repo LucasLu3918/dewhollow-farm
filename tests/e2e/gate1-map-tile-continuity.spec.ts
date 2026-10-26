@@ -69,7 +69,13 @@ test('captures four-season repeated tiles and all field autotile masks', async (
     screenshotDimensions: { width: number; height: number };
     loadedFrameIds: string[];
     maskIds: string[];
-    metrics: Array<{ surface: string; exactMatchCount: number; meanRgbDelta: number; maxRgbDelta: number; sampleCount: number }>;
+    frameCounts: {
+      baseSurfaces: Array<{ surface: string; sourceFrameCount: number; displayedTileCount: number }>;
+      fieldEdge: { sourceFrameCount: number; displayedTileCount: number };
+      mixedBoundary: { uniqueSourceFrameCount: number; displayedTileCount: number };
+      uniqueSourceFramesLoaded: number;
+    };
+    metrics: Array<{ surface: string; exactMatchCount: number; meanRgbDelta: number; maxRgbDelta: number; sampleCount: number; sourceFrameCount?: number; displayedTileCount?: number }>;
     hashes: typeof sourceHashes;
   }> = [];
   if (saveEvidence) await fs.mkdir(path.resolve(repoRoot, screenshotsDirectory), { recursive: true });
@@ -89,6 +95,12 @@ test('captures four-season repeated tiles and all field autotile masks', async (
       return {
         loadedFrameIds: [...new Set((element.dataset.loadedFrameIds ?? '').split(',').filter(Boolean))],
         maskIds: (element.dataset.maskIds ?? '').split(',').filter(Boolean),
+        frameCounts: JSON.parse(element.dataset.frameCounts ?? '{}') as {
+          baseSurfaces: Array<{ surface: string; sourceFrameCount: number; displayedTileCount: number }>;
+          fieldEdge: { sourceFrameCount: number; displayedTileCount: number };
+          mixedBoundary: { uniqueSourceFrameCount: number; displayedTileCount: number };
+          uniqueSourceFramesLoaded: number;
+        },
         metrics: JSON.parse(element.dataset.metrics ?? '[]') as Array<{ surface: string; exactMatchCount: number; meanRgbDelta: number; maxRgbDelta: number; sampleCount: number }>,
         mixedCellFrames: (element.dataset.mixedCellFrames ?? '').split(',').filter(Boolean),
         mixedMaskIds: (element.dataset.mixedMaskIds ?? '').split(',').filter(Boolean),
@@ -97,6 +109,12 @@ test('captures four-season repeated tiles and all field autotile masks', async (
     });
     expect(observed.loadedFrameIds.sort()).toEqual(expectedIds.filter((id) => id.startsWith(`${season}-`)).sort());
     expect(observed.maskIds).toEqual(Array.from({ length: 16 }, (_, mask) => `${season}-field-edge-${mask.toString(16)}`));
+    expect(observed.frameCounts.baseSurfaces).toEqual(['grass', 'field', 'path', 'water'].map((surface) => ({ surface, sourceFrameCount: 1, displayedTileCount: 9 })));
+    expect(observed.frameCounts.fieldEdge).toEqual({ sourceFrameCount: 16, displayedTileCount: 16 });
+    expect(observed.frameCounts.mixedBoundary.displayedTileCount).toBe(9);
+    expect(observed.frameCounts.mixedBoundary.uniqueSourceFrameCount).toBe(new Set(observed.mixedCellFrames).size);
+    expect(observed.frameCounts.uniqueSourceFramesLoaded).toBe(observed.loadedFrameIds.length);
+    expect(observed.frameCounts.uniqueSourceFramesLoaded).toBe(20);
     expect(observed.mixedCellFrames).toEqual([
       `${season}-grass`, `${season}-grass`, `${season}-grass`,
       `${season}-field-edge-9`, `${season}-field-edge-1`, `${season}-field-edge-3`,
@@ -121,6 +139,11 @@ test('captures four-season repeated tiles and all field autotile masks', async (
       expect(metric.meanRgbDelta).toBeGreaterThanOrEqual(0);
       expect(metric.maxRgbDelta).toBeGreaterThanOrEqual(metric.meanRgbDelta);
     }
+    const metrics = observed.metrics.map((metric) => ({
+      ...metric,
+      sourceFrameCount: observed.frameCounts.baseSurfaces.find((item) => item.surface === metric.surface)?.sourceFrameCount ?? 0,
+      displayedTileCount: observed.frameCounts.baseSurfaces.find((item) => item.surface === metric.surface)?.displayedTileCount ?? 0,
+    }));
 
     const image = await page.screenshot({ fullPage: true });
     const screenshotDimensions = { width: image.readUInt32BE(16), height: image.readUInt32BE(20) };
@@ -129,7 +152,7 @@ test('captures four-season repeated tiles and all field autotile masks', async (
     const filename = `${season}.png`;
     await testInfo.attach(`tiling-continuity-${filename}`, { body: image, contentType: 'image/png' });
     if (saveEvidence) await fs.writeFile(path.resolve(repoRoot, screenshotsDirectory, filename), image);
-    results.push({ season, screenshot: `${screenshotsDirectory}/${filename}`, screenshotSha256: sha256(image), screenshotDimensions, ...observed, hashes: sourceHashes });
+    results.push({ season, screenshot: `${screenshotsDirectory}/${filename}`, screenshotSha256: sha256(image), screenshotDimensions, ...observed, metrics, hashes: sourceHashes });
   }
 
   expect(pageErrors).toEqual([]);
@@ -143,6 +166,14 @@ test('captures four-season repeated tiles and all field autotile masks', async (
       sourceHashes,
       atlasDimensions: { width: manifest.atlas.width, height: manifest.atlas.height },
       seasons: results,
+      aggregateFrameCounts: {
+        seasons: results.length,
+        baseSurfaceSourceFrames: results.reduce((total, result) => total + result.frameCounts.baseSurfaces.reduce((count, item) => count + item.sourceFrameCount, 0), 0),
+        baseSurfaceDisplayedTiles: results.reduce((total, result) => total + result.frameCounts.baseSurfaces.reduce((count, item) => count + item.displayedTileCount, 0), 0),
+        fieldEdgeSourceFrames: results.reduce((total, result) => total + result.frameCounts.fieldEdge.sourceFrameCount, 0),
+        fieldEdgeDisplayedTiles: results.reduce((total, result) => total + result.frameCounts.fieldEdge.displayedTileCount, 0),
+        mixedBoundaryDisplayedTiles: results.reduce((total, result) => total + result.frameCounts.mixedBoundary.displayedTileCount, 0),
+      },
       metricMethod: 'For each repeated 3x3 surface sample, compare RGB values of corresponding pixels across each tile left/right and top/bottom edge; 64 comparisons per surface. Alpha is not included. Measurements are observations, not a seamlessness quality gate.',
       limitations: ['Automated edge RGB measurements do not establish human-perceived seamlessness.', 'RGB measurements do not compare alpha-channel continuity.', 'Mixed-boundary preview treats out-of-grid neighbors as grass and is not a production map-rule test.', 'Candidate frames remain unapproved; no production assets or runtime were changed.'],
       pageErrors,

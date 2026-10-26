@@ -4,7 +4,7 @@
 
 這是四季候選素材的瀏覽器 QA 觀察包，不是 Gate 1 通過或美術核准。manifest 維持 `status: candidate`、`approved: false`；沒有修改圖集、manifest、generator、正式 runtime、遊戲地圖或資產登錄。
 
-四季各呈現 grass、field、path、water 的 3×3 同圖重複，並檢視每季 16 種 field-edge frame（共 64 種）。混合邊界區依 manifest 的方向位元 north/east/south/west = 1/2/4/8，在上排草地、下兩排田地的 3×3 示意中選取 mask；圖格外鄰居假設為草地。這是候選 mask 選取示意，不是透明圖層疊合，也不驗證正式地圖規則。
+四季各呈現 grass、field、path、water 的 3×3 同圖重複：每季 4 張基礎來源 frame，畫面共 36 格。另檢視每季 16 張 field-edge 來源 frame（共 64 張），遮罩預覽每張顯示一次。混合邊界區在每季畫出 9 格，引用 7 張不同來源 frame。混合邊界依 manifest 的方向位元 north/east/south/west = 1/2/4/8，在上排草地、下兩排田地的 3×3 示意中選取 mask；圖格外鄰居假設為草地。這是候選 mask 選取示意，不是透明圖層疊合，也不驗證正式地圖規則。
 
 目前每季只有一張 grass、field、path、water 基礎圖塊；沒有 pixel32 soil，也沒有多款基礎重複變體。此階段不補造缺少的素材。
 
@@ -12,12 +12,14 @@
 
 每種基礎圖塊取 32 個左右邊界像素對及 32 個上下邊界像素對，共 64 組 RGB 比較。四季 × 四地表共 1,024 組比較；目前全部 RGB 差為 0，完全相等為 1,024／1,024，平均及最大 RGB 差皆為 0。量測不含 alpha 通道，也不代表人眼感知的無縫程度、重複紋理品質或正式素材核准。
 
-| 季節 | 草地／田地／道路／水面 | 完全相等 | 平均／最大 RGB 差 | 截圖 |
-|---|---|---:|---:|---|
-| 春 | 各 64／64；平均／最大皆 0／0 | 256／256 | 0／0 | [spring.png](gate1-map-tile-continuity/screenshots/spring.png) |
-| 夏 | 各 64／64；平均／最大皆 0／0 | 256／256 | 0／0 | [summer.png](gate1-map-tile-continuity/screenshots/summer.png) |
-| 秋 | 各 64／64；平均／最大皆 0／0 | 256／256 | 0／0 | [autumn.png](gate1-map-tile-continuity/screenshots/autumn.png) |
-| 冬 | 各 64／64；平均／最大皆 0／0 | 256／256 | 0／0 | [winter.png](gate1-map-tile-continuity/screenshots/winter.png) |
+| 季節 | 每種基礎地表來源／顯示格 | field-edge 來源／顯示格 | 混合區不同來源／顯示格 | RGB 完全相等 | 平均／最大 RGB 差 | 截圖 |
+|---|---:|---:|---:|---:|---:|---|
+| 春 | 各 1／9；合計 4／36 | 16／16 | 7／9 | 256／256 | 0／0 | [spring.png](gate1-map-tile-continuity/screenshots/spring.png) |
+| 夏 | 各 1／9；合計 4／36 | 16／16 | 7／9 | 256／256 | 0／0 | [summer.png](gate1-map-tile-continuity/screenshots/summer.png) |
+| 秋 | 各 1／9；合計 4／36 | 16／16 | 7／9 | 256／256 | 0／0 | [autumn.png](gate1-map-tile-continuity/screenshots/autumn.png) |
+| 冬 | 各 1／9；合計 4／36 | 16／16 | 7／9 | 256／256 | 0／0 | [winter.png](gate1-map-tile-continuity/screenshots/winter.png) |
+
+四季總計為 16 張基礎來源 frame／144 個基礎重複顯示格、64 張 field-edge frame／64 個遮罩顯示格，以及 36 個混合邊界顯示格。每季載入的不同來源 frame 共 20 張。這些數字描述來源與預覽繪製格數；重複顯示不代表額外素材變體。逐季資料見 `evidence.json` 的 `frameCounts` 和 `aggregateFrameCounts`。
 
 ## 可重現來源與證據
 

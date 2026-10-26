@@ -128,6 +128,19 @@ function render() {
   repeatCanvas.dataset.loadedFrameIds = loadedFrameIds.join(',');
   repeatCanvas.dataset.maskIds = maskIds.join(',');
   repeatCanvas.dataset.metrics = JSON.stringify(metrics);
+  repeatCanvas.dataset.frameCounts = JSON.stringify({
+    baseSurfaces: surfaces.map((surface) => ({
+      surface,
+      sourceFrameCount: Object.values(manifest.frames).filter((frame) => frame.season === season && frame.surface === surface && frame.autotileMask === undefined).length,
+      displayedTileCount: 9,
+    })),
+    fieldEdge: { sourceFrameCount: maskIds.length, displayedTileCount: maskIds.length },
+    mixedBoundary: {
+      uniqueSourceFrameCount: new Set(mixedFrames).size,
+      displayedTileCount: mixedFrames.length,
+    },
+    uniqueSourceFramesLoaded: new Set(loadedFrameIds).size,
+  });
   repeatCanvas.dataset.mixedCellFrames = mixedFrames.join(',');
   repeatCanvas.dataset.mixedMaskIds = mixedFrames.filter((id) => id.includes('-field-edge-')).join(',');
   repeatCanvas.dataset.mixedBoundaryAssumption = 'out-of-grid=grass; bits north=1,east=2,south=4,west=8';
