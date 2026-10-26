@@ -247,6 +247,148 @@ describe('InventoryPanel', () => {
     expect(detail.textContent).toContain('優良');
     expect(detail.textContent).toContain('數量：3');
   });
+
+  it('dispatches the selected seed command and presents the application refusal without changing the selected stack', async () => {
+    const { panel, grid, detail } = panelFixture();
+    const entry: InventoryDisplayEntry = {
+      itemId: 'seed.sweet-radish', name: '甜蘿蔔種子', category: '種子', count: 5,
+      quality: 'normal', qualityLabel: '普通', uses: ['播種'],
+    };
+    const messages = ['種子袋裡沒有這種種子'];
+    const commands: unknown[] = [];
+    panel.setDataProvider(() => ({
+      capacity: 3,
+      entries: [entry],
+      resolveIcon: () => ({ status: 'missing', diagnostic: 'missing-icon' }),
+    }));
+    panel.setCommandHandler(async (command) => {
+      commands.push(command);
+      return {
+        state: {} as never,
+        messages,
+        events: [{ type: 'refused', reason: 'NO_SEED' }],
+      };
+    });
+
+    panel.open();
+    grid.children[0]!.click();
+    detail.querySelector('.inventory-action')!.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(commands).toEqual([{ type: 'selectSeed', cropId: 'sweet-radish' }]);
+    expect(detail.dataset).toMatchObject({ state: 'selected', itemId: entry.itemId, count: '5' });
+    expect(detail.textContent).toContain(messages[0]);
+  });
+
+  it('offers only existing item actions and dispatches their matching GameSession commands', async () => {
+    const { panel, grid, detail } = panelFixture();
+    const commands: unknown[] = [];
+    panel.setDataProvider(() => ({
+      capacity: 4,
+      entries: [
+        { itemId: 'dish.pie', name: '蘋果派', category: '料理', count: 2, quality: 'normal', qualityLabel: '普通', uses: ['食用'] },
+        { itemId: 'decor.flower-crown', name: '花冠', category: '裝飾', count: 1, quality: 'normal', qualityLabel: '普通', uses: ['穿戴'] },
+        { itemId: 'decor.star-string', name: '星星串燈', category: '裝飾', count: 1, quality: 'normal', qualityLabel: '普通', uses: ['擺放'] },
+      ],
+      wornItemId: 'decor.flower-crown',
+      wornItemName: '花冠',
+      resolveIcon: () => ({ status: 'missing', diagnostic: 'missing-icon' }),
+    }));
+    panel.setCommandHandler(async (command) => {
+      commands.push(command);
+      return { state: {} as never, messages: ['操作完成'], events: [] };
+    });
+
+    panel.open();
+    grid.children[0]!.click();
+    expect(detail.querySelector('.inventory-action')?.textContent).toContain('食用');
+    detail.querySelector('.inventory-action')!.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    grid.children[1]!.click();
+    expect(detail.querySelector('.inventory-action')?.textContent).toContain('脫下');
+    detail.querySelector('.inventory-action')!.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    grid.children[2]!.click();
+    const placeAction = detail.children.find((child) => child.className === 'inventory-action' && child.textContent.includes('擺放'));
+    expect(placeAction?.textContent).toContain('擺放');
+    placeAction!.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(commands).toEqual([
+      { type: 'eat', itemId: 'dish.pie' },
+      { type: 'takeOff' },
+      { type: 'placeDecor', itemId: 'decor.star-string' },
+    ]);
+    expect(detail.textContent).toContain('操作完成');
+  });
+
+  it('can take off the current worn item while inspecting another inventory stack', async () => {
+    const { panel, grid, detail } = panelFixture();
+    const commands: unknown[] = [];
+    panel.setDataProvider(() => ({
+      capacity: 2,
+      entries: [
+        { itemId: 'seed.sweet-radish', name: '甜蘿蔔種子', category: '種子', count: 2, quality: 'normal', qualityLabel: '普通', uses: ['播種'] },
+      ],
+      wornItemId: 'clothes',
+      wornItemName: '衣服',
+      resolveIcon: () => ({ status: 'missing', diagnostic: 'missing-icon' }),
+    }));
+    panel.setCommandHandler(async (command) => {
+      commands.push(command);
+      return { state: {} as never, messages: ['脫下了衣服'], events: [] };
+    });
+
+    panel.open();
+    grid.children[0]!.click();
+    const takeOff = detail.children.find((child) => child.className === 'inventory-action' && child.textContent.includes('脫下'));
+    expect(takeOff?.textContent).toBe('脫下目前穿戴');
+    takeOff!.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(commands).toEqual([{ type: 'takeOff' }]);
+    expect(detail.textContent).toContain('脫下了衣服');
+  });
+
+  it('ignores a stale action button after selection changes and blocks duplicate pending clicks', () => {
+    const { panel, grid, detail } = panelFixture();
+    let calls = 0;
+    let resolveCommand!: (outcome: { state: never; messages: string[]; events: [] }) => void;
+    const pendingOutcome = new Promise<{ state: never; messages: string[]; events: [] }>((resolve) => {
+      resolveCommand = resolve;
+    });
+    panel.setDataProvider(() => ({
+      capacity: 2,
+      entries: [
+        { itemId: 'dish.pie', name: '蘋果派', category: '料理', count: 1, quality: 'normal', qualityLabel: '普通', uses: ['食用'] },
+        { itemId: 'dish.soup', name: '蔬菜湯', category: '料理', count: 1, quality: 'normal', qualityLabel: '普通', uses: ['食用'] },
+      ],
+      resolveIcon: () => ({ status: 'missing', diagnostic: 'missing-icon' }),
+    }));
+    panel.setCommandHandler(() => {
+      calls += 1;
+      return pendingOutcome;
+    });
+
+    panel.open();
+    grid.children[0]!.click();
+    const staleAction = detail.querySelector('.inventory-action')!;
+    staleAction.click();
+    staleAction.click();
+    expect(calls).toBe(1);
+
+    grid.children[1]!.click();
+    staleAction.click();
+    expect(calls).toBe(1);
+    resolveCommand({ state: {} as never, messages: ['已食用'], events: [] });
+  });
 });
 
 const entries: InventoryDisplayEntry[] = [

@@ -1,8 +1,27 @@
 import { expect, test, type Page } from '@playwright/test';
+import type { GameState } from '../../src/domain/game-state';
 
 async function start(page: Page): Promise<void> {
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
+  await expect(page.locator('#game')).toHaveAttribute('data-ready', 'true');
+}
+
+async function replaceSessionState(page: Page, update: (state: GameState) => void): Promise<void> {
+  const state = await page.evaluate(() => window.__dewhollow!.gameState());
+  update(state);
+  await page.evaluate((nextState) => new Promise<void>((resolve, reject) => {
+    const open = indexedDB.open('dewhollow-farm');
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const database = open.result;
+      const transaction = database.transaction('saves', 'readwrite');
+      transaction.objectStore('saves').put({ slot: 'slot-1', savedAt: new Date().toISOString(), state: nextState });
+      transaction.oncomplete = () => { database.close(); resolve(); };
+      transaction.onerror = () => reject(transaction.error);
+    };
+  }), state);
+  await page.reload();
   await expect(page.locator('#game')).toHaveAttribute('data-ready', 'true');
 }
 
@@ -30,6 +49,69 @@ test.describe('背包物品詳情', () => {
     await expect(detail).not.toContainText('售價');
     await expect(detail.locator('.inventory-detail-icon')).toHaveAttribute('data-icon-state', /available|fallback/);
     await expect(seed).toBeFocused();
+  });
+
+  test('selects a held seed through GameSession and refreshes the HUD', async ({ page }) => {
+    await start(page);
+    await page.locator('#hud-inventory').click();
+    await page.locator('#inventory-grid [data-item-id="seed.moon-bean"]').click();
+
+    const detail = page.locator('#inventory-detail');
+    const before = await page.evaluate(() => window.__dewhollow!.gameState());
+    await detail.getByRole('button', { name: '設為目前種子' }).click();
+
+    await expect(detail).toHaveAttribute('data-item-id', 'seed.moon-bean');
+    await expect(page.locator('#hud-seed')).toContainText('月光豆');
+    await expect(page.locator('#hud-tool')).toContainText('種子袋');
+    const after = await page.evaluate(() => window.__dewhollow!.gameState());
+    expect(after.selectedSeed).toBe('moon-bean');
+    expect(after.tool).toBe('seedbag');
+    expect(after.inventory).toEqual(before.inventory);
+  });
+
+  test('shows the real full-bag refusal and preserves the serialized GameSession state', async ({ page }) => {
+    await start(page);
+    await replaceSessionState(page, (state) => {
+      state.inventory = {
+        capacity: 2,
+        stacks: [
+          { itemId: 'sun-hat', quality: 'normal', count: 2 },
+          { itemId: 'hay', quality: 'normal', count: 1 },
+        ],
+      };
+      state.wearing = { player: 'clothes' };
+    });
+
+    await page.locator('#hud-inventory').click();
+    await page.locator('#inventory-grid [data-item-id="sun-hat"]').click();
+    const before = await page.evaluate(() => JSON.stringify(window.__dewhollow!.gameState()));
+    const detail = page.locator('#inventory-detail');
+    await detail.getByRole('button', { name: '穿上' }).click();
+
+    await expect(detail.locator('.inventory-action-feedback')).toHaveAttribute('data-state', 'error');
+    await expect(detail.locator('.inventory-action-feedback')).toContainText('背包已滿');
+    const after = await page.evaluate(() => JSON.stringify(window.__dewhollow!.gameState()));
+    expect(after).toBe(before);
+  });
+
+  test('takes off the worn item through GameSession and refreshes the inventory detail', async ({ page }) => {
+    await start(page);
+    await replaceSessionState(page, (state) => {
+      state.wearing = { player: 'clothes' };
+    });
+
+    await page.locator('#hud-inventory').click();
+    await page.locator('#inventory-grid [data-item-id="seed.sweet-radish"]').click();
+    const detail = page.locator('#inventory-detail');
+    await expect(detail).toHaveAttribute('data-item-id', 'seed.sweet-radish');
+    await detail.getByRole('button', { name: '脫下目前穿戴' }).click();
+
+    await expect(detail.locator('.inventory-action-feedback')).toHaveAttribute('data-state', 'success');
+    await expect(detail.locator('.inventory-action-feedback')).toContainText('脫下了衣服');
+    await expect(page.locator('#inventory-grid [data-item-id="clothes"]')).toBeVisible();
+    const state = await page.evaluate(() => window.__dewhollow!.gameState());
+    expect(state.wearing.player).toBeUndefined();
+    expect(state.inventory.stacks).toContainEqual({ itemId: 'clothes', quality: 'normal', count: 1 });
   });
 
   test('restores an empty detail state when the selected entry is filtered out', async ({ page }) => {

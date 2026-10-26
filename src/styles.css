@@ -700,6 +700,51 @@ a:focus-visible {
   padding-left: 1.25rem;
 }
 
+.inventory-detail-worn {
+  margin: 0.5rem 0;
+  color: var(--ui-muted-ink);
+}
+
+.inventory-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  margin: 0.5rem 0.5rem 0 0;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--ui-frame-line);
+  border-radius: var(--ui-frame-radius);
+  background: var(--ui-paper);
+  color: var(--ui-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inventory-action:hover,
+.inventory-action:focus-visible {
+  border-color: var(--ui-selection);
+  outline: 2px solid var(--ui-selection);
+  outline-offset: 2px;
+}
+
+.inventory-action-feedback {
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.35rem;
+  background: var(--ui-paper-raised);
+  color: var(--ui-ink);
+}
+
+.inventory-action-feedback[data-state="error"] {
+  border: 1px solid #9a4037;
+  color: #7a2d26;
+}
+
+.inventory-action-feedback[data-state="success"] {
+  border: 1px solid #557a3b;
+  color: #3f642c;
+}
+
 .inventory-slot--item {
   font: inherit;
   cursor: pointer;

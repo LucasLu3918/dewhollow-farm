@@ -54,6 +54,7 @@ import plaza from '../content/maps/plaza.json';
 import { createContentIndex } from './application/content-index';
 import { inventoryDisplay } from './application/inventory-display';
 import { NO_LEGACY } from './domain/legacy';
+import { PLAYER_WEARER } from './domain/decor';
 import { GameSession } from './application/game-session';
 import type { SaveRepository } from './application/ports';
 import { SaveSlotService, slotFromQuery } from './application/save-slots';
@@ -197,10 +198,13 @@ async function bootstrap(): Promise<void> {
   inventory.setDataProvider(() => {
     const currentInventory = started.state.inventory;
     const knownItemIds = new Set(currentInventory.stacks.map((stack) => stack.itemId));
+    const wornItemId = started.state.wearing[PLAYER_WEARER];
     return {
       capacity: currentInventory.capacity,
       entries: inventoryDisplay(currentInventory, index),
       resolveIcon: (itemId) => resolveItemIcon(loaded.assets, itemId, knownItemIds),
+      wornItemId,
+      wornItemName: wornItemId ? index.item(wornItemId).name : undefined,
     };
   });
 

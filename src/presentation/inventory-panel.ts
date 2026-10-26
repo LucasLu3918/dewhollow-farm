@@ -1,4 +1,5 @@
 import type { InventoryDisplayEntry } from '../application/inventory-display';
+import type { Command, CommandOutcome } from '../application/game-commands';
 import type { ItemIconResolution } from '../infrastructure/assets/asset-manifest';
 import { createItemIconView } from './item-icon';
 import { applyGameUiTokens } from './game-ui-tokens';
@@ -10,7 +11,11 @@ export interface InventoryPanelData {
   capacity: number;
   entries: readonly InventoryDisplayEntry[];
   resolveIcon: (itemId: string) => ItemIconResolution;
+  wornItemId?: string;
+  wornItemName?: string;
 }
+
+export type InventoryCommandHandler = (command: Command) => Promise<CommandOutcome | null>;
 
 interface InventoryFilter {
   id: InventoryCategory;
@@ -71,6 +76,8 @@ export class InventoryPanel {
   private category: InventoryCategory = 'all';
   private selectedKey: string | null = null;
   private dataProvider: (() => InventoryPanelData) | null = null;
+  private commandHandler: InventoryCommandHandler | null = null;
+  private actionFeedback: { message: string; refused: boolean } | null = null;
 
   constructor(doc: Document) {
     this.trigger = required<HTMLButtonElement>(doc, '#hud-inventory');
@@ -104,6 +111,16 @@ export class InventoryPanel {
   /** Source is queried on each open so the grid always reflects the latest session snapshot. */
   setDataProvider(provider: () => InventoryPanelData): void {
     this.dataProvider = provider;
+  }
+
+  /** Item actions are dispatched by MapScene through its existing GameSession route. */
+  setCommandHandler(handler: InventoryCommandHandler): void {
+    this.commandHandler = handler;
+  }
+
+  /** Refreshes details from the live provider after a command has changed session state. */
+  refresh(): void {
+    if (this.dialog.isOpen()) this.render();
   }
 
   isOpen(): boolean {
@@ -170,6 +187,7 @@ export class InventoryPanel {
     if (key === this.selectedKey) slot.classList.add('inventory-slot--selected');
     slot.addEventListener('click', () => {
       this.selectedKey = key;
+      this.actionFeedback = null;
       this.render();
     });
 
@@ -232,6 +250,7 @@ export class InventoryPanel {
       empty.className = 'inventory-detail-empty';
       empty.textContent = '選擇一件物品查看詳情。';
       this.detail.append(empty);
+      this.renderActionFeedback();
       return;
     }
 
@@ -300,6 +319,57 @@ export class InventoryPanel {
       }
       this.detail.append(usesHeading, uses);
     }
+
+    if (data.wornItemId) {
+      const worn = doc.createElement('p');
+      worn.className = 'inventory-detail-worn';
+      worn.textContent = `目前穿戴：${data.wornItemName ?? data.wornItemId}`;
+      this.detail.append(worn);
+    }
+
+    for (const action of inventoryActions(entry, data)) this.actionButton(action, entry);
+    this.renderActionFeedback();
+  }
+
+  private actionButton(action: InventoryAction, entry: InventoryDisplayEntry): void {
+    const button = this.root.ownerDocument.createElement('button');
+    button.type = 'button';
+    button.className = 'inventory-action';
+    button.textContent = action.label;
+    let pending = false;
+    button.addEventListener('click', () => {
+      const handler = this.commandHandler;
+      if (!handler || pending) return;
+      const data = this.dataProvider?.();
+      const currentEntry = data?.entries.find((candidate) => inventoryEntryKey(candidate) === this.selectedKey);
+      if (!data || !currentEntry || inventoryEntryKey(entry) !== this.selectedKey) return;
+      const currentAction = inventoryActions(currentEntry, data).find((candidate) => candidate.id === action.id);
+      if (!currentAction || currentAction.label !== action.label) return;
+
+      pending = true;
+      button.disabled = true;
+      void handler(currentAction.command).then((outcome) => {
+        if (!outcome) return;
+        const refused = outcome.events.some((event) => event.type === 'refused');
+        const message = outcome.messages.join('　');
+        this.actionFeedback = message ? { message, refused } : null;
+        this.refresh();
+      }).finally(() => {
+        pending = false;
+        button.disabled = false;
+      });
+    });
+    this.detail.append(button);
+  }
+
+  private renderActionFeedback(): void {
+    if (!this.actionFeedback) return;
+    const feedback = this.root.ownerDocument.createElement('p');
+    feedback.className = 'inventory-action-feedback';
+    feedback.dataset.state = this.actionFeedback.refused ? 'error' : 'success';
+    feedback.setAttribute('role', this.actionFeedback.refused ? 'alert' : 'status');
+    feedback.textContent = this.actionFeedback.message;
+    this.detail.append(feedback);
   }
 
   private emptySlot(): HTMLElement {
@@ -310,6 +380,33 @@ export class InventoryPanel {
     slot.setAttribute('aria-label', '空格');
     return slot;
   }
+}
+
+type InventoryActionId = 'selectSeed' | 'eat' | 'wear' | 'takeOff' | 'placeDecor';
+
+interface InventoryAction {
+  id: InventoryActionId;
+  label: string;
+  command: Command;
+}
+
+function inventoryActions(entry: InventoryDisplayEntry, data: InventoryPanelData): InventoryAction[] {
+  const actions: InventoryAction[] = [];
+  if (entry.uses.includes('播種') && entry.itemId.startsWith('seed.')) {
+    actions.push({
+      id: 'selectSeed', label: '設為目前種子',
+      command: { type: 'selectSeed', cropId: entry.itemId.slice('seed.'.length) },
+    });
+  }
+  if (entry.uses.includes('食用')) actions.push({ id: 'eat', label: '食用 1 份', command: { type: 'eat', itemId: entry.itemId } });
+  if (entry.uses.includes('穿戴') && data.wornItemId !== entry.itemId) {
+    actions.push({ id: 'wear', label: '穿上', command: { type: 'wear', itemId: entry.itemId } });
+  }
+  // Worn items are removed from the inventory, so taking one off must remain
+  // available while inspecting any held stack.
+  if (data.wornItemId) actions.push({ id: 'takeOff', label: '脫下目前穿戴', command: { type: 'takeOff' } });
+  if (entry.uses.includes('擺放')) actions.push({ id: 'placeDecor', label: '擺放', command: { type: 'placeDecor', itemId: entry.itemId } });
+  return actions;
 }
 
 function inventoryEntryKey(entry: InventoryDisplayEntry): string {

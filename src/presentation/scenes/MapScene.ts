@@ -54,6 +54,7 @@ import { gainedItems } from '../yield-feedback';
 import { footstepKind, touchesWater, type FootstepEnv } from '../footstep-surface';
 import { shipIconsFor, shippedItemIds } from '../ship-animation';
 import type { Inventory } from '../../domain/inventory';
+import type { GameState } from '../../domain/game-state';
 import type { SoundPlayer } from '../audio/sound-player';
 import type { MusicPlayer } from '../audio/music-player';
 import { ACTION_SOUND } from '../audio/sound-ids';
@@ -68,6 +69,7 @@ import { isJoystickMovementSource, TouchControls } from '../touch-controls';
 import type { TouchLabels, TouchText } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
 import type { OpenablePanel } from '../panel-dialog';
+import type { InventoryPanel } from '../inventory-panel';
 import { gateAction, type ActionGateAction } from '../action-gate';
 import { cameraViewportFor } from '../responsive/layout';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
@@ -128,7 +130,7 @@ export interface MapSceneDeps {
   help: HelpPanel;
   saves: SavePanel;
   /** 背包：共用 DOM modal stack，並由 MapScene 處理 Esc 和遊戲輸入阻擋。 */
-  inventory: OpenablePanel;
+  inventory: OpenablePanel & Pick<InventoryPanel, 'setCommandHandler' | 'refresh'>;
   /** 玩家偏好（按鍵、字級、閃光與震動等），不進存檔。 */
   settings: SettingsService;
   responsive: ResponsiveLayoutController;
@@ -294,6 +296,8 @@ declare global {
   interface Window {
     __dewhollow?: {
       cameraScroll(): { x: number; y: number };
+      /** Read-only current GameSession snapshot for local E2E assertions. */
+      gameState(): GameState;
       pixelViewport(): {
         profile: string;
         worldTilesVisible: { width: number; height: number };
@@ -555,6 +559,7 @@ export class MapScene extends Phaser.Scene {
     this.repairPanel = new RepairPanel(document, deps.index, (command) => void this.run(command));
     this.collectionPanel = new CollectionPanel(document, deps.index);
     this.legacyPanel = new LegacyPanel(document, deps.index, (command) => void this.run(command));
+    deps.inventory.setCommandHandler((command) => this.run(command));
     deps.hud.bindSkills(() => {
       this.touchControls.cancelAll();
       this.skillPanel.toggle(deps.session.state);
@@ -723,6 +728,7 @@ export class MapScene extends Phaser.Scene {
     if (import.meta.env.DEV) {
       window.__dewhollow = {
         cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
+        gameState: () => structuredClone(this.deps.session.state),
         pixelViewport: () => this.pixelViewportDebugInfo(),
         movement: () => ({
           heldDirection: this.movementScheduler?.heldDirection ?? null,
@@ -1368,6 +1374,7 @@ export class MapScene extends Phaser.Scene {
     this.collectionPanel.refresh(session.state);
     this.legacyPanel.refresh(session.state);
     this.refresh();
+    this.deps.inventory.refresh();
     if (session.state.mapId !== previousMapId || this.hasTouchInputBlocker()) this.touchControls.cancelAll();
     return commandOutcome;
   }
