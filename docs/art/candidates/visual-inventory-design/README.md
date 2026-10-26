@@ -29,6 +29,32 @@
 
 實際以 nearest-neighbor 產生並檢視 64×36 與 96×54 縮圖（只作檢視，衍生檔未入庫）：64×36 尚能分辨農場棚屋、田區、大樹、圍籬和主路；村莊可辨店屋分居兩側、中央水槽與南側樹池，但細節大多融合。96×54 的道路、田區／建物分區更易辨認；窗格、石板、花瓣及草葉等細節仍會消失或併成色塊。這是整張場景縮到 64／96 px 寬的讀性觀察，不是遊戲內 tile 64 px 或 renderer 驗收；候選保留原始 1672×941 尺寸。
 
+### 依格子模組化候選（VF11-GRID-TILE-CANDIDATES）
+
+使用者已核准以上農場／村莊母稿作為生成參考，並明確允許以 Codex 內建 imagegen 產生格子化衍生候選及對外傳送參考圖。這項授權只涵蓋下列候選；衍生檔仍為 `candidate`，母稿核准不代表衍生檔獲准正式整合。沒有變更 `public/`、`content/assets.json`、`content/maps/` 或 runtime。
+
+下列地表依專案 `tools/art/tile_finalize.py --seamless` 輸出 128×128 RGBA8888（64 px 格的 2× 母版）；四張單格 overlay 依 `--overlay` 輸出 128×128。建築／樹木為 256×256、對齊 2×2 格，縮至 224×224 內容範圍，水平置中，透明錨點基線為 y=240，以保留邊界留白。圖像皆以 nearest-neighbor 縮放，未添加遊戲碰撞、互動或地圖語意。
+
+| 類別 | 候選檔 | 尺寸／模式；alpha bbox | SHA-256 |
+|---|---|---|---|
+| 草地 | `tile-grass-2x-candidate-20261026.png` | 128×128 RGBA；全不透明 | `c392ed3eaa096ffec14b2c622f0737852146da5e290f9af021458c7c88f527df` |
+| 路徑 | `tile-path-2x-candidate-20261026.png` | 128×128 RGBA；全不透明 | `53f82edb07b05e74c3f5de8dbee7a667b0189d50daa0992d6f1770dbb18842e6` |
+| 耕地 | `tile-field-2x-candidate-20261026.png` | 128×128 RGBA；全不透明 | `87929b9296e120f0f565a12fedb90bd4a6103d1fca3ea6847722d156fa52011c` |
+| 矮石牆 | `overlay-wall-2x-candidate-20261026.png` | 128×128 RGBA；alpha bbox `(20,30,112,99)` | `bf8da937dfb069d284197051f8f7dba8ef2163229a2e87f1a821147982bb28b6` |
+| 木圍籬 | `overlay-fence-2x-candidate-20261026.png` | 128×128 RGBA；alpha bbox `(27,53,109,90)` | `569613d3c4be2c6ca7cf40173e753649c282012f8378f1169d1b74401046ea2c` |
+| 出貨箱 | `overlay-shipbox-2x-candidate-20261026.png` | 128×128 RGBA；alpha bbox `(6,7,120,122)` | `bc1905a68908ff720e0800f9bef5745f28b44ddaef54a08156531c5d9d738035` |
+| 門 | `overlay-door-2x-candidate-20261026.png` | 128×128 RGBA；alpha bbox `(4,5,114,114)` | `85f5ca05d866e4407d69fdef9e23c437d81996c27734cc35b54f8534edf7a3fd` |
+| 一般商店 | `overlay-shop-general-4x-candidate-20261026.png` | 256×256 RGBA；alpha bbox `(16,16,238,240)` | `b4236b568a6ac5c6c05a9b4744a92c50fdfe39bc132900a883ca13c6d7aa7f33` |
+| 鐵匠鋪 | `overlay-shop-smithy-4x-candidate-20261026.png` | 256×256 RGBA；alpha bbox `(16,16,237,237)` | `24d378dd0d75eb01573968b9420e81077172a9930026741cbbd2a7ee07d7d410` |
+| 樹 | `overlay-tree-4x-candidate-20261026.png` | 256×256 RGBA；alpha bbox `(16,16,240,237)` | `3972b8de6b0aeef93ace94c2c90b5e167206392c8727607b814591477d1cb7ea` |
+| 房屋 | `overlay-house-4x-candidate-20261026.png` | 256×256 RGBA；alpha bbox `(16,20,240,233)` | `0af23947af0fa9c7c82eb42a8fbacd52ba5f11ceca416257de5081aa52ed58ac` |
+
+來源與可查證範圍：全部圖像由 OpenAI 內建 imagegen 生成，參考已核准農場／村莊母稿；工具未暴露模型名稱，因此無法確認具體模型。未保存 raw prompt。地表用專案 nearest-neighbor finalizer 做接縫處理；128 px 物件用其透明 overlay 模式；四張 256 px 圖另以 nearest-neighbor 縮入透明畫布並設置上述錨點。這些記錄不構成模型條款或發布權利審查。
+
+靜態檢查：11 個檔案均由 Pillow 12.3.0 讀為指定尺寸 RGBA；地表 alpha extrema 為 `(255,255)`，物件 alpha extrema 為 `(0,255)`。地表不是逐像素相等的週期邊界：在相鄰重複格的四邊，平均 RGB 差相對於 tile 內部相鄰像素差，草地水平／垂直約 1.06／1.36、路徑約 1.08／1.15、耕地約 1.12／0.81；2×2 nearest-neighbor 重複預覽未見明顯硬接縫，但草地細碎高對比、路徑碎石密集、耕地橫向條紋仍有規律重複。這是像素差和靜態預覽結果，不是遊戲 renderer 驗收。
+
+以 nearest-neighbor 縮至 64×64 和 96×96 檢視：三種地表的用途色塊仍可辨，草地／碎石細節會融成密集噪點，耕地行紋更明顯；單格牆、圍籬、箱子、門在 64 px 仍保有輪廓，但內部紋理需 96 px 才較清楚。四種 2×2 overlay 在 64 px 整體大小時建物／樹仍可辨但細節融合；96 px 更易看出店屋正面與樹冠層次，窗格、磚瓦及小植栽仍會合併。64／96 px 圖只作候選板檢視，沒有另存為候選素材。
+
 ## 物品圖示方向比較（VF-02B）
 
 使用者回覆既有 `item-icons.svg`（SHA-256 `3cd9abb6376b741bd316adcc77045e9a97bf3894bdc070b67f5063ac59af04dd`）需要修改，先比較兩個新方向。該檔為 **superseded candidate（已被取代的候選）**，不是核准素材；它仍留在歷史 VF-02 提案中供追溯。新比較板位於 [`index.html`](index.html) 開頭的「VF-02B｜物品圖示風格對照」。

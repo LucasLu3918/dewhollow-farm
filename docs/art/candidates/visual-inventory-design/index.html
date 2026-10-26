@@ -103,6 +103,16 @@
     .scene-scale-tests { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
     .scene-scale-tests figure { margin: 0; color: #c6d1ba; font: 11px ui-monospace, monospace; }
     .scene-scale-tests img { display: block; width: auto; max-width: 96px; height: auto; margin-top: 5px; border: 1px solid #8d9b6c; image-rendering: pixelated; }
+    .tile-candidate-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+    .tile-candidate-card { min-width: 0; padding: 10px; border: 1px solid #68805d; background: #243b2e; }
+    .tile-candidate-card h3 { margin: 0 0 8px; font-size: 14px; }
+    .tile-candidate-card p { margin: 5px 0; font-size: 11px; overflow-wrap: anywhere; }
+    .tile-art-preview { min-height: 112px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px; background-color: #354537; background-image: linear-gradient(45deg,#293b30 25%,transparent 25%),linear-gradient(-45deg,#293b30 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#293b30 75%),linear-gradient(-45deg,transparent 75%,#293b30 75%); background-size: 16px 16px; background-position: 0 0,0 8px,8px -8px,-8px 0; }
+    .tile-art-preview figure { margin: 0; color: #c6d1ba; font: 10px ui-monospace, monospace; text-align: center; }
+    .tile-art-preview img { display: block; width: 64px; height: 64px; margin: 4px auto; object-fit: contain; image-rendering: pixelated; }
+    .tile-art-preview img.large-preview { width: 96px; height: 96px; }
+    @media (max-width: 720px) { .tile-candidate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 440px) { .tile-candidate-grid { grid-template-columns: 1fr; } }
     .map-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
     .map-card { min-width: 0; padding: 12px; border: 1px solid #59714f; background: #243b2e; }
     .map-card h3 { display: flex; justify-content: space-between; gap: 10px; margin: 0 0 10px; }
@@ -348,6 +358,24 @@
       <article class="scene-candidate-card"><h3>村莊 B 像素候選 <small>candidate · 1672×941 RGBA</small></h3><img class="scene-candidate-full" src="scene-candidate-village-20261026.png" alt="村莊頂視像素場景候選：中央水槽、東西店屋、十字路和南側樹池"><div class="scene-scale-tests"><figure>64×36 檢視<img src="scene-candidate-village-20261026.png" width="64" height="36" alt="村莊候選縮至64乘36像素"></figure><figure>96×54 檢視<img src="scene-candidate-village-20261026.png" width="96" height="54" alt="村莊候選縮至96乘54像素"></figure></div></article>
     </div>
     <p class="caption">模型／工具未提供可查證名稱與完整授權資訊，正式核准仍須綁定各檔案 SHA-256；詳細來源、alpha 與縮小限制見候選 README。</p>
+  </section>
+  <section class="controlled-study" aria-labelledby="grid-candidates-title">
+    <h2 id="grid-candidates-title">VF-11｜依格子拆分的場景 B 候選</h2>
+    <p>以下 11 張素材以 64 px 地圖格為基準：地表與單格物件為 128×128（2×），建築與樹為 256×256（2×2 格）。物件保留透明 alpha；四張大型 overlay 以畫布底部中央作錨點。所有素材仍為候選，沒有加入正式素材、地圖或遊戲執行流程。</p>
+    <div class="tile-candidate-grid">
+      <article class="tile-candidate-card"><h3>草地｜2× 地表</h3><div class="tile-art-preview"><figure>64 px<img src="tile-grass-2x-candidate-20261026.png" width="64" height="64" alt="草地候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="tile-grass-2x-candidate-20261026.png" width="96" height="96" alt="草地候選縮至96像素"></figure></div><p>SHA-256 <code>c392ed3eaa096ffec14b2c622f0737852146da5e290f9af021458c7c88f527df</code></p></article>
+      <article class="tile-candidate-card"><h3>路徑｜2× 地表</h3><div class="tile-art-preview"><figure>64 px<img src="tile-path-2x-candidate-20261026.png" width="64" height="64" alt="路徑候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="tile-path-2x-candidate-20261026.png" width="96" height="96" alt="路徑候選縮至96像素"></figure></div><p>SHA-256 <code>53f82edb07b05e74c3f5de8dbee7a667b0189d50daa0992d6f1770dbb18842e6</code></p></article>
+      <article class="tile-candidate-card"><h3>耕地｜2× 地表</h3><div class="tile-art-preview"><figure>64 px<img src="tile-field-2x-candidate-20261026.png" width="64" height="64" alt="耕地候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="tile-field-2x-candidate-20261026.png" width="96" height="96" alt="耕地候選縮至96像素"></figure></div><p>SHA-256 <code>87929b9296e120f0f565a12fedb90bd4a6103d1fca3ea6847722d156fa52011c</code></p></article>
+      <article class="tile-candidate-card"><h3>矮石牆｜單格 overlay</h3><div class="tile-art-preview"><figure>64 px<img src="overlay-wall-2x-candidate-20261026.png" width="64" height="64" alt="石牆候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="overlay-wall-2x-candidate-20261026.png" width="96" height="96" alt="石牆候選縮至96像素"></figure></div><p>SHA-256 <code>bf8da937dfb069d284197051f8f7dba8ef2163229a2e87f1a821147982bb28b6</code></p></article>
+      <article class="tile-candidate-card"><h3>木圍籬｜單格 overlay</h3><div class="tile-art-preview"><figure>64 px<img src="overlay-fence-2x-candidate-20261026.png" width="64" height="64" alt="圍籬候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="overlay-fence-2x-candidate-20261026.png" width="96" height="96" alt="圍籬候選縮至96像素"></figure></div><p>SHA-256 <code>569613d3c4be2c6ca7cf40173e753649c282012f8378f1169d1b74401046ea2c</code></p></article>
+      <article class="tile-candidate-card"><h3>出貨箱｜單格 overlay</h3><div class="tile-art-preview"><figure>64 px<img src="overlay-shipbox-2x-candidate-20261026.png" width="64" height="64" alt="出貨箱候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="overlay-shipbox-2x-candidate-20261026.png" width="96" height="96" alt="出貨箱候選縮至96像素"></figure></div><p>SHA-256 <code>bc1905a68908ff720e0800f9bef5745f28b44ddaef54a08156531c5d9d738035</code></p></article>
+      <article class="tile-candidate-card"><h3>門｜單格 overlay</h3><div class="tile-art-preview"><figure>64 px<img src="overlay-door-2x-candidate-20261026.png" width="64" height="64" alt="門候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="overlay-door-2x-candidate-20261026.png" width="96" height="96" alt="門候選縮至96像素"></figure></div><p>SHA-256 <code>85f5ca05d866e4407d69fdef9e23c437d81996c27734cc35b54f8534edf7a3fd</code></p></article>
+      <article class="tile-candidate-card"><h3>一般商店｜2×2 格 overlay</h3><div class="tile-art-preview"><figure>64 px<img src="overlay-shop-general-4x-candidate-20261026.png" width="64" height="64" alt="一般商店候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="overlay-shop-general-4x-candidate-20261026.png" width="96" height="96" alt="一般商店候選縮至96像素"></figure></div><p>SHA-256 <code>b4236b568a6ac5c6c05a9b4744a92c50fdfe39bc132900a883ca13c6d7aa7f33</code></p></article>
+      <article class="tile-candidate-card"><h3>鐵匠鋪｜2×2 格 overlay</h3><div class="tile-art-preview"><figure>64 px<img src="overlay-shop-smithy-4x-candidate-20261026.png" width="64" height="64" alt="鐵匠鋪候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="overlay-shop-smithy-4x-candidate-20261026.png" width="96" height="96" alt="鐵匠鋪候選縮至96像素"></figure></div><p>SHA-256 <code>24d378dd0d75eb01573968b9420e81077172a9930026741cbbd2a7ee07d7d410</code></p></article>
+      <article class="tile-candidate-card"><h3>樹｜2×2 格 overlay</h3><div class="tile-art-preview"><figure>64 px<img src="overlay-tree-4x-candidate-20261026.png" width="64" height="64" alt="樹候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="overlay-tree-4x-candidate-20261026.png" width="96" height="96" alt="樹候選縮至96像素"></figure></div><p>SHA-256 <code>3972b8de6b0aeef93ace94c2c90b5e167206392c8727607b814591477d1cb7ea</code></p></article>
+      <article class="tile-candidate-card"><h3>房屋｜2×2 格 overlay</h3><div class="tile-art-preview"><figure>64 px<img src="overlay-house-4x-candidate-20261026.png" width="64" height="64" alt="房屋候選縮至64像素"></figure><figure>96 px<img class="large-preview" src="overlay-house-4x-candidate-20261026.png" width="96" height="96" alt="房屋候選縮至96像素"></figure></div><p>SHA-256 <code>0af23947af0fa9c7c82eb42a8fbacd52ba5f11ceca416257de5081aa52ed58ac</code></p></article>
+    </div>
+    <p class="caption">imagegen 工具未提供可查證的模型名稱；地表接縫／縮小讀性、透明 alpha、來源和錨點限制見候選 README。圖板為靜態文件，未執行瀏覽器或 E2E 測試。</p>
   </section>
   <p class="small">資料示例：甜蘿蔔 seedPrice 25、growthDays 3，base sell price = 98；優良品質倍率 125%，sell price = 123。詳情只列已知資料，沒有虛構戰鬥或成長屬性。</p>
   <p class="small">原創聲明：場景及像素小圖由本機影像模型生成／手繪 SVG 概念，沒有引用或重畫可辨識既有遊戲 IP。A/B 圖檔 SHA 與限制見同目錄 README。</p>
