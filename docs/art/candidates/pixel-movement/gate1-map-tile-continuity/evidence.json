@@ -60,6 +60,39 @@
         "spring-field-edge-e",
         "spring-field-edge-f"
       ],
+      "frameCounts": {
+        "baseSurfaces": [
+          {
+            "surface": "grass",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "field",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "path",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "water",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          }
+        ],
+        "fieldEdge": {
+          "sourceFrameCount": 16,
+          "displayedTileCount": 16
+        },
+        "mixedBoundary": {
+          "uniqueSourceFrameCount": 7,
+          "displayedTileCount": 9
+        },
+        "uniqueSourceFramesLoaded": 20
+      },
       "metrics": [
         {
           "surface": "grass",
@@ -67,7 +100,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "field",
@@ -75,7 +110,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "path",
@@ -83,7 +120,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "water",
@@ -91,7 +130,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         }
       ],
       "mixedCellFrames": [
@@ -168,6 +209,39 @@
         "summer-field-edge-e",
         "summer-field-edge-f"
       ],
+      "frameCounts": {
+        "baseSurfaces": [
+          {
+            "surface": "grass",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "field",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "path",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "water",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          }
+        ],
+        "fieldEdge": {
+          "sourceFrameCount": 16,
+          "displayedTileCount": 16
+        },
+        "mixedBoundary": {
+          "uniqueSourceFrameCount": 7,
+          "displayedTileCount": 9
+        },
+        "uniqueSourceFramesLoaded": 20
+      },
       "metrics": [
         {
           "surface": "grass",
@@ -175,7 +249,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "field",
@@ -183,7 +259,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "path",
@@ -191,7 +269,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "water",
@@ -199,7 +279,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         }
       ],
       "mixedCellFrames": [
@@ -276,6 +358,39 @@
         "autumn-field-edge-e",
         "autumn-field-edge-f"
       ],
+      "frameCounts": {
+        "baseSurfaces": [
+          {
+            "surface": "grass",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "field",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "path",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "water",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          }
+        ],
+        "fieldEdge": {
+          "sourceFrameCount": 16,
+          "displayedTileCount": 16
+        },
+        "mixedBoundary": {
+          "uniqueSourceFrameCount": 7,
+          "displayedTileCount": 9
+        },
+        "uniqueSourceFramesLoaded": 20
+      },
       "metrics": [
         {
           "surface": "grass",
@@ -283,7 +398,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "field",
@@ -291,7 +408,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "path",
@@ -299,7 +418,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "water",
@@ -307,7 +428,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         }
       ],
       "mixedCellFrames": [
@@ -384,6 +507,39 @@
         "winter-field-edge-e",
         "winter-field-edge-f"
       ],
+      "frameCounts": {
+        "baseSurfaces": [
+          {
+            "surface": "grass",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "field",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "path",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          },
+          {
+            "surface": "water",
+            "sourceFrameCount": 1,
+            "displayedTileCount": 9
+          }
+        ],
+        "fieldEdge": {
+          "sourceFrameCount": 16,
+          "displayedTileCount": 16
+        },
+        "mixedBoundary": {
+          "uniqueSourceFrameCount": 7,
+          "displayedTileCount": 9
+        },
+        "uniqueSourceFramesLoaded": 20
+      },
       "metrics": [
         {
           "surface": "grass",
@@ -391,7 +547,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "field",
@@ -399,7 +557,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "path",
@@ -407,7 +567,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         },
         {
           "surface": "water",
@@ -415,7 +577,9 @@
           "exactMatchCount": 64,
           "meanRgbDelta": 0,
           "maxRgbDelta": 0,
-          "sampleCount": 64
+          "sampleCount": 64,
+          "sourceFrameCount": 1,
+          "displayedTileCount": 9
         }
       ],
       "mixedCellFrames": [
@@ -445,6 +609,14 @@
       }
     }
   ],
+  "aggregateFrameCounts": {
+    "seasons": 4,
+    "baseSurfaceSourceFrames": 16,
+    "baseSurfaceDisplayedTiles": 144,
+    "fieldEdgeSourceFrames": 64,
+    "fieldEdgeDisplayedTiles": 64,
+    "mixedBoundaryDisplayedTiles": 36
+  },
   "metricMethod": "For each repeated 3x3 surface sample, compare RGB values of corresponding pixels across each tile left/right and top/bottom edge; 64 comparisons per surface. Alpha is not included. Measurements are observations, not a seamlessness quality gate.",
   "limitations": [
     "Automated edge RGB measurements do not establish human-perceived seamlessness.",

@@ -339,8 +339,8 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 ## 任務與驗收
 
 - [x] 新增隔離候選預覽：四季 3×3 重複地表、草地／田地 3×3 鄰接示意（圖格外視為草地，依 north/east/south/west bits 選 mask frame），呈現所有 64 個 field edge mask；此示意不是透明疊圖或正式遊戲地圖規則。
-- [ ] 計算且保存每個季節／表面的 tile frame 數、邊界樣本數、精確相等像素數、平均／最大 RGB 差；保留完整來源與截圖 hash。
+- [x] 計算且保存每個季節／表面的來源 tile frame 數、預覽顯示格數、邊界樣本數、精確相等像素數、平均／最大 RGB 差；保留完整來源與截圖 hash。每季每種基礎地表 1 張來源／9 個顯示格；field-edge 16／16；混合邊界 7 張不同來源／9 個顯示格。
 - [x] E2E 驗證四季、地表、遮罩、混合邊界假設、候選狀態、素材請求、錯誤和證據完整性；`npm run check` 全通過；完整 Chromium E2E 242/242（4 workers）。
 - [x] 更新 DF-QA-01、任務紀錄與繁中候選報告；不把缺少的土壤或隨機變體包裝成通過。
 - [ ] 收集人工接縫／紋理評分；候選仍未核准。
-- [ ] `npm run check`、完整 `npm run test:e2e`、Impact reconciliation、commit、PR Required Checks 與 merge。
+- [ ] 本次 closeout：`npm run check` 已通過、完整 `npm run test:e2e` 已通過 242／242；Impact reconciliation、commit、PR Required Checks 與 merge 待完成。
