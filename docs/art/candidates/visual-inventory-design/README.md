@@ -90,6 +90,12 @@
 
 甜蘿蔔資料：`seedPrice = 25`、`growthDays = 3`，基礎售價 `round(25 × 3 × 1.3) = 98`；優良品質倍率 125%，出貨價 `round(98 × 1.25) = 123`。內容來源 `content/crops.json`，規則來源 `src/domain/pricing.ts`。其他物品格子數量僅供版面示意。
 
+## VF-16 延伸候選與阻礙
+
+- 森林格線地表／overlay 候選及 24×16 出口對照、接縫和縮放限制：[`docs/art/candidates/vf16-forest/README.md`](../vf16-forest/README.md)。5 張正式候選仍未逐檔核准，未進入遊戲。
+- 服飾概念候選與 rig 評估：[`vf16-outfit-overlay/README.md`](vf16-outfit-overlay/README.md)。因現有角色圖沒有衣物遮罩／圖層，該概念無法可靠貼合 rig；使用者決定先保留候選與阻礙紀錄，不擴增角色分層或 runtime 換裝。
+- 4 格快捷欄已由 VF-16 實作，選擇工具與已擁有種子、存入各存檔；完整驗收與限制以後續共同分支測試結果為準。
+
 ## 限制與審核狀態
 
 - `candidate-a-scenes.png` 與 `candidate-b-scenes.png` 由本機影像模型生成；Golden Reference `docs/art/style-sheet.png` 僅作像素群與深棕輪廓的質感參照。兩 PNG 是氛圍概念圖，不是同地圖受控比較；原圖仍帶較柔筆觸，正式素材需像素清理與實際倍率檢視。
