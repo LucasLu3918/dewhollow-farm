@@ -204,6 +204,43 @@ test('importing a version 1 save migrates it and it loads', async ({ page }) => 
   expect((saved?.state as { schemaVersion: number }).schemaVersion).toBe(23);
 });
 
+test('saves and reloads a current v23 game without losing inventory, tools, clothing, map, or skills', async ({ page }) => {
+  await startGame(page);
+  const state = await page.evaluate(() => window.__dewhollow!.gameState());
+  expect(state.schemaVersion).toBe(23);
+  state.mapId = 'village';
+  state.player = { ...state.player, x: 7, y: 9, facing: 'down' };
+  state.inventory = {
+    capacity: 24,
+    stacks: [{ itemId: 'crop.moon-bean', quality: 'good', count: 3 }],
+  };
+  state.toolTiers = { ...state.toolTiers, hoe: 2, rod: 1 };
+  state.wearing = { player: 'sun-hat' };
+  state.skills = { ...state.skills, farming: 137, fishing: 42 };
+  await putRecord(page, { slot: 'slot-1', savedAt: '2026-10-27T00:00:00.000Z', state });
+
+  await page.reload();
+  await waitForScene(page);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().schemaVersion ?? 0)).toBe(23);
+  await press(page, 's');
+  await expect(page.locator('#hud-log')).toContainText('已存檔');
+
+  await page.reload();
+  await waitForScene(page);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
+  const reloaded = await page.evaluate(() => window.__dewhollow!.gameState());
+  expect(reloaded.schemaVersion).toBe(23);
+  expect(reloaded.inventory).toEqual({
+    capacity: 24,
+    stacks: [{ itemId: 'crop.moon-bean', quality: 'good', count: 3 }],
+  });
+  expect(reloaded.toolTiers).toMatchObject({ hoe: 2, rod: 1 });
+  expect(reloaded.wearing).toEqual({ player: 'sun-hat' });
+  expect(reloaded.skills).toMatchObject({ farming: 137, fishing: 42 });
+  expect(reloaded.player).toMatchObject({ x: 7, y: 9, facing: 'down' });
+});
+
 test('a corrupt save shows the real error, keeps the original file, and opens the slot panel', async ({ page }) => {
   await startGame(page);
   await putRecord(page, { slot: 'slot-1', savedAt: '2026-10-22T00:00:00.000Z', state: 'not a save' });

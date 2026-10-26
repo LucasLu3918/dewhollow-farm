@@ -359,6 +359,13 @@ export class InventoryPanel {
 
     this.detail.append(icon, name, category, quality, count);
 
+    if (entry.sellabilityLabel) {
+      const sellability = doc.createElement('p');
+      sellability.className = 'inventory-detail-sellability';
+      sellability.textContent = entry.sellabilityLabel;
+      this.detail.append(sellability);
+    }
+
     if (entry.sellPrice !== undefined) {
       const price = doc.createElement('p');
       price.className = 'inventory-detail-price';

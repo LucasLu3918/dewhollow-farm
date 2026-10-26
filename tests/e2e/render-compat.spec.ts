@@ -33,7 +33,7 @@ async function open(page: Page, query = ''): Promise<void> {
 }
 
 /** 擺出走路循環的各個相位，讀 WebGL 畫面，量玩家周圍「非背景」的面積，與靜止姿勢相比。 */
-async function areaRatios(page: Page, view: 'down' | 'left'): Promise<number[]> {
+async function areaRatios(page: Page, view: 'up' | 'down' | 'left' | 'right'): Promise<number[]> {
   return page.evaluate(async (v) => {
     const debug = window.__dewhollow;
     if (!debug) throw new Error('缺少 window.__dewhollow');
@@ -100,28 +100,68 @@ test('?compat=1 forces the workaround on and ?compat=0 forces it off', async ({ 
   expect(off.maxTextureUnits).toBeGreaterThan(1);
 });
 
-// 像素回歸：沒有保底時，SwiftShader 會把旋轉的上半身切掉一塊，面積比掉到 0.67。
-for (const view of ['down', 'left'] as const) {
-  test(`draws the whole character in every phase of the ${view} walk, even on a software renderer`, async ({ page }) => {
+// 像素回歸：預設 renderer 路徑下，四個朝向的走路相位都必須保持角色完整。
+for (const view of ['up', 'down', 'left', 'right'] as const) {
+  test(`draws the whole character in every phase of the ${view} walk, even on a software renderer`, async ({ page }, testInfo) => {
     await open(page);
+    const info = await compat(page);
+    expect(info.workaround).toBe(info.software);
     const ratios = await areaRatios(page, view);
     expect(ratios).toHaveLength(12);
     for (const [i, ratio] of ratios.entries()) {
       expect(ratio, `${view} 相位 ${i}`).toBeGreaterThan(0.97);
       expect(ratio, `${view} 相位 ${i}`).toBeLessThan(1.03);
     }
+    const userAgent = await page.evaluate(() => navigator.userAgent);
+    const evidence = {
+      renderer: info.renderer,
+      software: info.software,
+      workaround: info.workaround,
+      textureUnits: info.textureUnits,
+      maxTextureUnits: info.maxTextureUnits,
+      browser: userAgent.match(/Chrome\/([^ ]+)/)?.[1] ?? 'unknown',
+      view,
+      ratios,
+      minRatio: Math.min(...ratios),
+      maxRatio: Math.max(...ratios),
+      threshold: { minExclusive: 0.97, maxExclusive: 1.03 },
+    };
+    console.log(`[VF13_RENDER_PIXEL] ${JSON.stringify(evidence)}`);
+    await testInfo.attach(`renderer-default-${view}.json`, {
+      body: `${JSON.stringify(evidence, null, 2)}\n`,
+      contentType: 'application/json',
+    });
   });
 }
 
-// 金絲雀：關掉保底時，軟體繪圖器上應該「仍然會壞」。這個測試被標成預期失敗（test.fail）；
-// 哪天 Phaser 或 SwiftShader 修好了，它會因為「預期失敗卻通過」而報警，提醒我們可以移除保底（見 render-compat.ts）。
-test('canary: without the workaround, a software renderer still breaks (remove the workaround when this starts passing)', async ({ page }) => {
+// 強制關閉的像素結果只作診斷觀測；通過或出現破損，都不會自動授權移除 runtime 保底。
+test('diagnostic: reports forced-off pixel integrity without gating on renderer outcome', async ({ page }, testInfo) => {
   await open(page, '?compat=0');
   const info = await compat(page);
   test.skip(!info.software, '只有軟體繪圖器才有這個問題');
-  test.fail();
+  expect(info).toMatchObject({ workaround: false, override: 'off' });
   const ratios = await areaRatios(page, 'down');
-  for (const [i, ratio] of ratios.entries()) {
-    expect(ratio, `down 相位 ${i}`).toBeGreaterThan(0.97);
-  }
+  expect(ratios).toHaveLength(12);
+  expect(ratios.every(Number.isFinite)).toBe(true);
+  const brokenPhases = ratios.flatMap((ratio, phase) => ratio < 0.97 ? [phase] : []);
+  const userAgent = await page.evaluate(() => navigator.userAgent);
+  const evidence = {
+    renderer: info.renderer,
+    software: info.software,
+    browser: userAgent.match(/Chrome\/([^ ]+)/)?.[1] ?? 'unknown',
+    override: info.override,
+    workaround: info.workaround,
+    textureUnits: info.textureUnits,
+    maxTextureUnits: info.maxTextureUnits,
+    view: 'down',
+    ratios,
+    brokenPhases,
+    observation: brokenPhases.length > 0 ? 'forced-off-rendering-shows-integrity-regression' : 'forced-off-rendering-currently-within-threshold',
+    note: 'Diagnostic only. Keep the default software-renderer fallback and ?compat=1 unless a separately reviewed cross-renderer change removes them.',
+  };
+  await testInfo.attach('renderer-forced-off-diagnostic.json', {
+    body: `${JSON.stringify(evidence, null, 2)}\n`,
+    contentType: 'application/json',
+  });
+  console.log(`[VF13_RENDER_DIAGNOSTIC] ${JSON.stringify(evidence)}`);
 });

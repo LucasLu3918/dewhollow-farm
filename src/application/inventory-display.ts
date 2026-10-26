@@ -32,8 +32,10 @@ export interface InventoryDisplayEntry {
   count: number;
   quality: Quality;
   qualityLabel: string;
-  /** 沒有價格的物品不可出貨，因此不會有此欄位。 */
+  /** 可出貨物品的真實品質換算價格。 */
   sellPrice?: number;
+  /** 無 sellPrice 的物品明確標記不可出貨，不顯示 0 元價格。 */
+  sellabilityLabel?: '不可出貨';
   /** 由內容配方或 ItemDef 明確支援的操作與用途。 */
   uses: string[];
 }
@@ -73,6 +75,7 @@ export function inventoryDisplay(inventory: Inventory, index: ContentIndex): Inv
     };
 
     if (item.sellPrice !== undefined) entry.sellPrice = priceWithQuality(item.sellPrice, stack.quality);
+    else entry.sellabilityLabel = '不可出貨';
     if (item.kind === 'seed') entry.uses.unshift('播種');
     if (item.kind === 'decor') {
       entry.uses.unshift(item.wearable ? '穿戴' : '擺放');

@@ -69,6 +69,49 @@ test.describe('背包物品詳情', () => {
     expect(after.inventory).toEqual(before.inventory);
   });
 
+  test('keeps same-item quality stacks separate and shows each true quality-adjusted crop price', async ({ page }) => {
+    await start(page);
+    await replaceSessionState(page, (state) => {
+      state.inventory = {
+        capacity: 24,
+        stacks: [
+          { itemId: 'crop.moon-bean', quality: 'normal', count: 2 },
+          { itemId: 'crop.moon-bean', quality: 'good', count: 3 },
+        ],
+      };
+    });
+
+    await page.locator('#hud-inventory').click();
+    const stacks = page.locator('#inventory-grid [data-item-id="crop.moon-bean"]');
+    await expect(stacks).toHaveCount(2);
+    await expect(stacks.nth(0)).toHaveAttribute('data-quality', 'normal');
+    await expect(stacks.nth(1)).toHaveAttribute('data-quality', 'good');
+
+    const detail = page.locator('#inventory-detail');
+    await stacks.nth(0).click();
+    await expect(detail).toHaveAttribute('data-quality', 'normal');
+    await expect(detail).toContainText('售價：54 銅幣／個');
+
+    await stacks.nth(1).click();
+    await expect(detail).toHaveAttribute('data-quality', 'good');
+    await expect(detail).toContainText('售價：68 銅幣／個');
+    await expect(detail).toContainText('數量：3');
+  });
+
+  test('labels wood as not shippable without showing a zero sale price', async ({ page }) => {
+    await start(page);
+    await replaceSessionState(page, (state) => {
+      state.inventory = { capacity: 24, stacks: [{ itemId: 'wood', quality: 'normal', count: 3 }] };
+    });
+
+    await page.locator('#hud-inventory').click();
+    await page.locator('#inventory-grid [data-item-id="wood"]').click();
+    const detail = page.locator('#inventory-detail');
+    await expect(detail).toContainText('不可出貨');
+    await expect(detail).not.toContainText('售價：0');
+    await expect(detail.locator('.inventory-detail-price')).toHaveCount(0);
+  });
+
   test('shows the real full-bag refusal and preserves the serialized GameSession state', async ({ page }) => {
     await start(page);
     await replaceSessionState(page, (state) => {
@@ -92,6 +135,28 @@ test.describe('背包物品詳情', () => {
     await expect(detail.locator('.inventory-action-feedback')).toContainText('背包已滿');
     const after = await page.evaluate(() => JSON.stringify(window.__dewhollow!.gameState()));
     expect(after).toBe(before);
+  });
+
+  test('wears one held hat and commits inventory and wearing state together', async ({ page }) => {
+    await start(page);
+    await replaceSessionState(page, (state) => {
+      state.inventory = { capacity: 24, stacks: [{ itemId: 'sun-hat', quality: 'normal', count: 2 }] };
+      state.wearing = {};
+    });
+
+    await page.locator('#hud-inventory').click();
+    await page.locator('#inventory-grid [data-item-id="sun-hat"]').click();
+    const detail = page.locator('#inventory-detail');
+    const before = await page.evaluate(() => window.__dewhollow!.gameState());
+    await detail.getByRole('button', { name: '穿上' }).click();
+
+    await expect(detail.locator('.inventory-action-feedback')).toHaveAttribute('data-state', 'success');
+    const after = await page.evaluate(() => window.__dewhollow!.gameState());
+    expect(after.wearing.player).toBe('sun-hat');
+    expect(after.inventory.stacks).toEqual([{ itemId: 'sun-hat', quality: 'normal', count: 1 }]);
+    expect(after.inventory.stacks.reduce((sum, stack) => sum + stack.count, 0)).toBe(
+      before.inventory.stacks.reduce((sum, stack) => sum + stack.count, 0) - 1,
+    );
   });
 
   test('takes off the worn item through GameSession and refreshes the inventory detail', async ({ page }) => {

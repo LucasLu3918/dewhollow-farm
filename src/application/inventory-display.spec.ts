@@ -54,6 +54,7 @@ describe('inventoryDisplay', () => {
   it('omits the sell price for items without a sellPrice', () => {
     const entry = inventoryDisplay(inventoryWith('wood', 'fine'), shippedIndex)[0];
     expect(entry).not.toHaveProperty('sellPrice');
+    expect(entry?.sellabilityLabel).toBe('不可出貨');
   });
 
   it('fails explicitly when an inventory stack references an unknown item', () => {

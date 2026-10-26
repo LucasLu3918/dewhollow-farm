@@ -248,6 +248,22 @@ describe('InventoryPanel', () => {
     expect(detail.textContent).toContain('數量：3');
   });
 
+  it('labels a non-shippable item without presenting a zero sale price', () => {
+    const { panel, grid, detail } = panelFixture();
+    panel.setDataProvider(() => ({
+      capacity: 2,
+      entries: [{ itemId: 'wood', name: '木材', category: '材料', count: 3, quality: 'normal', qualityLabel: '普通', sellabilityLabel: '不可出貨', uses: [] }],
+      resolveIcon: () => ({ status: 'missing', diagnostic: 'missing-icon' }),
+    }));
+
+    panel.open();
+    grid.children[0]!.click();
+
+    expect(detail.textContent).toContain('不可出貨');
+    expect(detail.textContent).not.toContain('售價');
+    expect(detail.textContent).not.toContain('0 銅幣');
+  });
+
   it('dispatches the selected seed command and presents the application refusal without changing the selected stack', async () => {
     const { panel, grid, detail } = panelFixture();
     const entry: InventoryDisplayEntry = {
