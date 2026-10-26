@@ -91,6 +91,19 @@
 
 ---
 
+# DF-G1-CONTINUOUS-10-TILE-CHROMIUM-EVIDENCE 四方向持續移動證據
+
+- [x] 在 DEV-only pixel32 farm MapScene 對四方向逐一持續按住並完成 10 格連續移動。
+- [x] 記錄 keydown／keyup、每次 tile commit、候選動畫 frame、角色 pose、腳底錨點；第 5 格與放開停止後各保存畫面。
+- [x] 保存四份方向 JSON、八張截圖與繁中報告；候選維持 `candidate`／`approved: false`，沒有改 runtime、地圖、存檔、正式素材或核准狀態。
+- [ ] 人工美術／盲測與 iOS／Android 實機驗收維持待完成，不由本自動化任務代替。
+- [x] `npm run check` 通過（162 個測試檔，1,643 passed／1 skipped；build 2.808 MB）；完整 Chromium E2E 248/248（4 workers）通過。
+- [ ] Impact reconciliation、commit、PR Required Checks 與 merge 待完成。
+
+詳見 [四方向連續 10 格移動證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-continuous-10-tile.zh-TW.md)。
+
+---
+
 # Gate 1 整合候選預覽計畫
 
 ## 下一階段：MapScene pixel32 QA 候選 runtime

@@ -1,0 +1,3052 @@
+{
+  "direction": "right",
+  "initial": {
+    "x": 7,
+    "y": 9
+  },
+  "start": {
+    "x": 15,
+    "y": 15,
+    "facing": "right"
+  },
+  "end": {
+    "x": 25,
+    "y": 15
+  },
+  "candidate": true,
+  "approved": false,
+  "trace": {
+    "samples": [
+      {
+        "at": 3321.7,
+        "tile": {
+          "x": 16,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 999.1082666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0769501425745605,
+          "legB": 0,
+          "y": -1.3675557366026165
+        }
+      },
+      {
+        "at": 3338.5,
+        "tile": {
+          "x": 16,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1006.2207999999999,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.024612503606838,
+          "legB": 0,
+          "y": -2.5709365125166195
+        }
+      },
+      {
+        "at": 3355.1,
+        "tile": {
+          "x": 16,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1013.3333333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7279800219209864,
+          "legB": 0,
+          "y": -3.4641016151377606
+        }
+      },
+      {
+        "at": 3371.7,
+        "tile": {
+          "x": 16,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1020.4416,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102068017292256,
+          "legB": 0,
+          "y": -3.939133990212389
+        }
+      },
+      {
+        "at": 3388.4,
+        "tile": {
+          "x": 16,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1027.5498666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102297049945659,
+          "legB": 0,
+          "y": -3.939424825327821
+        }
+      },
+      {
+        "at": 3405.1,
+        "tile": {
+          "x": 16,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1034.6581333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.728639517033755,
+          "legB": 0,
+          "y": -3.464939069249213
+        }
+      },
+      {
+        "at": 3421.8,
+        "tile": {
+          "x": 16,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1041.7706666666668,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0256231569969656,
+          "legB": 0,
+          "y": -2.5722198819009088
+        }
+      },
+      {
+        "at": 3438.4,
+        "tile": {
+          "x": 16,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1048.8789333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0788098671729784,
+          "legB": 0,
+          "y": -1.3699172916482267
+        }
+      },
+      {
+        "at": 3455,
+        "tile": {
+          "x": 16,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1055.9872,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -0.00197920324152624,
+          "legB": 0,
+          "y": -0.0025132739574936385
+        }
+      },
+      {
+        "at": 3471.7,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1056,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -0.00197920324152624,
+          "legB": 0,
+          "y": -0.0025132739574936385
+        }
+      },
+      {
+        "at": 3488.4,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1063.1125333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.07757009805062,
+          "legB": 0,
+          "y": -1.3683429816515809
+        }
+      },
+      {
+        "at": 3505.1,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1070.2208,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0246125036068405,
+          "legB": 0,
+          "y": -2.570936512516623
+        }
+      },
+      {
+        "at": 3521.7,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1077.3290666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.727650094863477,
+          "legB": 0,
+          "y": -3.463682660144098
+        }
+      },
+      {
+        "at": 3538.4,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1084.4416,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.1020680172922575,
+          "legB": 0,
+          "y": -3.9391339902123907
+        }
+      },
+      {
+        "at": 3555.1,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1091.5541333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.1021826016574323,
+          "legB": 0,
+          "y": -3.939279494168168
+        }
+      },
+      {
+        "at": 3571.7,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1098.6624,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.728309829315892,
+          "legB": 0,
+          "y": -3.4645204181789104
+        }
+      },
+      {
+        "at": 3588.4,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1105.7706666666668,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0256231569969603,
+          "legB": 0,
+          "y": -2.572219881900902
+        }
+      },
+      {
+        "at": 3605,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1112.8789333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0788098671729718,
+          "legB": 0,
+          "y": -1.3699172916482183
+        }
+      },
+      {
+        "at": 3621.7,
+        "tile": {
+          "x": 17,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1119.9914666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -0.001319468875906481,
+          "legB": 0,
+          "y": -0.001675516032897119
+        }
+      },
+      {
+        "at": 3638.4,
+        "tile": {
+          "x": 18,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1120,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -0.001319468875906481,
+          "legB": 0,
+          "y": -0.001675516032897119
+        }
+      },
+      {
+        "at": 3655.1,
+        "tile": {
+          "x": 18,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1127.1125333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.077570098050621,
+          "legB": 0,
+          "y": -1.3683429816515824
+        }
+      },
+      {
+        "at": 3671.7,
+        "tile": {
+          "x": 18,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1134.2208,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0246125036068414,
+          "legB": 0,
+          "y": -2.570936512516624
+        }
+      },
+      {
+        "at": 3688.5,
+        "tile": {
+          "x": 18,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1141.3376,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7283098293159087,
+          "legB": 0,
+          "y": -3.4645204181789317
+        }
+      },
+      {
+        "at": 3705.1,
+        "tile": {
+          "x": 18,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1148.4501333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102297049945663,
+          "legB": 0,
+          "y": -3.939424825327826
+        }
+      },
+      {
+        "at": 3721.7,
+        "tile": {
+          "x": 18,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1155.5584,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.1020680172922526,
+          "legB": 0,
+          "y": -3.939133990212384
+        }
+      },
+      {
+        "at": 3738.4,
+        "tile": {
+          "x": 18,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1162.6709333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7276500948634617,
+          "legB": 0,
+          "y": -3.4636826601440784
+        }
+      },
+      {
+        "at": 3755.1,
+        "tile": {
+          "x": 18,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1169.7834666666668,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0241070436865005,
+          "legB": 0,
+          "y": -2.5702946586495243
+        }
+      },
+      {
+        "at": 3771.7,
+        "tile": {
+          "x": 18,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1176.896,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0763301398581597,
+          "legB": 0,
+          "y": -1.3667684315659172
+        }
+      },
+      {
+        "at": 3788.4,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1184,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0763301398581597,
+          "legB": 0,
+          "y": -1.3667684315659172
+        }
+      },
+      {
+        "at": 3805.1,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1191.1125333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.07757009805062,
+          "legB": 0,
+          "y": -1.3683429816515809
+        }
+      },
+      {
+        "at": 3821.7,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1198.2208,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0246125036068405,
+          "legB": 0,
+          "y": -2.570936512516623
+        }
+      },
+      {
+        "at": 3838.4,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1205.3333333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.72798002192099,
+          "legB": 0,
+          "y": -3.464101615137765
+        }
+      },
+      {
+        "at": 3855,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1212.4373333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.101953296855148,
+          "legB": 0,
+          "y": -3.938988313466855
+        }
+      },
+      {
+        "at": 3871.7,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1219.5456,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102411362151907,
+          "legB": 0,
+          "y": -3.9395699836849616
+        }
+      },
+      {
+        "at": 3888.4,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1226.6581333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7286395170337494,
+          "legB": 0,
+          "y": -3.4649390692492057
+        }
+      },
+      {
+        "at": 3905,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1233.7664,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.026128350422452,
+          "legB": 0,
+          "y": -2.5728613973618435
+        }
+      },
+      {
+        "at": 3921.7,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1240.8746666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0794296807649122,
+          "legB": 0,
+          "y": -1.3707043565268726
+        }
+      },
+      {
+        "at": 3938.4,
+        "tile": {
+          "x": 19,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1247.9872,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -0.0019792032415150494,
+          "legB": 0,
+          "y": -0.0025132739574794277
+        }
+      },
+      {
+        "at": 3955.1,
+        "tile": {
+          "x": 20,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1248,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -0.0019792032415150494,
+          "legB": 0,
+          "y": -0.0025132739574794277
+        }
+      },
+      {
+        "at": 3971.7,
+        "tile": {
+          "x": 20,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1255.1082666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0769501425745645,
+          "legB": 0,
+          "y": -1.3675557366026216
+        }
+      },
+      {
+        "at": 3988.4,
+        "tile": {
+          "x": 20,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1262.2208,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0246125036068436,
+          "legB": 0,
+          "y": -2.570936512516627
+        }
+      },
+      {
+        "at": 4005,
+        "tile": {
+          "x": 20,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1269.3290666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.727650094863479,
+          "legB": 0,
+          "y": -3.4636826601441
+        }
+      },
+      {
+        "at": 4021.8,
+        "tile": {
+          "x": 20,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1276.4458666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.1021826016574385,
+          "legB": 0,
+          "y": -3.939279494168176
+        }
+      },
+      {
+        "at": 4038.4,
+        "tile": {
+          "x": 20,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1283.5584000000001,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102068017292251,
+          "legB": 0,
+          "y": -3.9391339902123823
+        }
+      },
+      {
+        "at": 4055,
+        "tile": {
+          "x": 20,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1290.6666666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7279800219209713,
+          "legB": 0,
+          "y": -3.4641016151377415
+        }
+      },
+      {
+        "at": 4071.7,
+        "tile": {
+          "x": 20,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1297.7792,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.024612503606815,
+          "legB": 0,
+          "y": -2.570936512516591
+        }
+      },
+      {
+        "at": 4088.4,
+        "tile": {
+          "x": 20,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1304.8917333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0769501425745291,
+          "legB": 0,
+          "y": -1.3675557366025768
+        }
+      },
+      {
+        "at": 4105,
+        "tile": {
+          "x": 21,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1312,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0769501425745291,
+          "legB": 0,
+          "y": -1.3675557366025768
+        }
+      },
+      {
+        "at": 4121.7,
+        "tile": {
+          "x": 21,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1319.1082666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0769501425745671,
+          "legB": 0,
+          "y": -1.367555736602625
+        }
+      },
+      {
+        "at": 4138.4,
+        "tile": {
+          "x": 21,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1326.2208,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.024612503606844,
+          "legB": 0,
+          "y": -2.5709365125166275
+        }
+      },
+      {
+        "at": 4155.1,
+        "tile": {
+          "x": 21,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1333.3333333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.727980021920992,
+          "legB": 0,
+          "y": -3.464101615137768
+        }
+      },
+      {
+        "at": 4171.8,
+        "tile": {
+          "x": 21,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1340.4501333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102297049945664,
+          "legB": 0,
+          "y": -3.9394248253278277
+        }
+      },
+      {
+        "at": 4188.3,
+        "tile": {
+          "x": 21,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1347.5541333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.1021826016574314,
+          "legB": 0,
+          "y": -3.939279494168167
+        }
+      },
+      {
+        "at": 4205.1,
+        "tile": {
+          "x": 21,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1354.6666666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.727980021920969,
+          "legB": 0,
+          "y": -3.464101615137739
+        }
+      },
+      {
+        "at": 4221.7,
+        "tile": {
+          "x": 21,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1361.7792,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.024612503606811,
+          "legB": 0,
+          "y": -2.5709365125165857
+        }
+      },
+      {
+        "at": 4238.4,
+        "tile": {
+          "x": 21,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1368.8917333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0769501425745265,
+          "legB": 0,
+          "y": -1.3675557366025735
+        }
+      },
+      {
+        "at": 4255,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1376,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0769501425745265,
+          "legB": 0,
+          "y": -1.3675557366025735
+        }
+      },
+      {
+        "at": 4271.7,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1383.1125333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.077570098050625,
+          "legB": 0,
+          "y": -1.3683429816515875
+        }
+      },
+      {
+        "at": 4288.4,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1390.2250666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0251178747177208,
+          "legB": 0,
+          "y": -2.5715782536098044
+        }
+      },
+      {
+        "at": 4305.1,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1397.3376,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7283098293159127,
+          "legB": 0,
+          "y": -3.4645204181789366
+        }
+      },
+      {
+        "at": 4321.7,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1404.4458666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102182601657439,
+          "legB": 0,
+          "y": -3.9392794941681766
+        }
+      },
+      {
+        "at": 4338.4,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1411.5541333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.1021826016574323,
+          "legB": 0,
+          "y": -3.939279494168168
+        }
+      },
+      {
+        "at": 4355,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1418.6666666666665,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7279800219209736,
+          "legB": 0,
+          "y": -3.464101615137744
+        }
+      },
+      {
+        "at": 4371.7,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1425.7749333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.025117874717697,
+          "legB": 0,
+          "y": -2.571578253609774
+        }
+      },
+      {
+        "at": 4388.4,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1432.8874666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0775700980505953,
+          "legB": 0,
+          "y": -1.3683429816515496
+        }
+      },
+      {
+        "at": 4405.1,
+        "tile": {
+          "x": 22,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1440,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.5381500076218066e-14,
+          "legB": 0,
+          "y": -1.9532063588848338e-14
+        }
+      },
+      {
+        "at": 4421.7,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1440,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.5381500076218066e-14,
+          "legB": 0,
+          "y": -1.9532063588848338e-14
+        }
+      },
+      {
+        "at": 4438.4,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1447.1125333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0775700980506262,
+          "legB": 0,
+          "y": -1.3683429816515889
+        }
+      },
+      {
+        "at": 4455,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1454.2208,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0246125036068476,
+          "legB": 0,
+          "y": -2.570936512516632
+        }
+      },
+      {
+        "at": 4471.7,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1461.3290666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.727650094863479,
+          "legB": 0,
+          "y": -3.4636826601441006
+        }
+      },
+      {
+        "at": 4488.4,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1468.4415999999999,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102068017292258,
+          "legB": 0,
+          "y": -3.939133990212391
+        }
+      },
+      {
+        "at": 4505,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1475.5498666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102297049945657,
+          "legB": 0,
+          "y": -3.9394248253278183
+        }
+      },
+      {
+        "at": 4521.7,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1482.6624,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7283098293158896,
+          "legB": 0,
+          "y": -3.4645204181789078
+        }
+      },
+      {
+        "at": 4538.4,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1489.7749333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0251178747176906,
+          "legB": 0,
+          "y": -2.5715782536097658
+        }
+      },
+      {
+        "at": 4555.1,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1496.8874666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0775700980505833,
+          "legB": 0,
+          "y": -1.3683429816515345
+        }
+      },
+      {
+        "at": 4571.7,
+        "tile": {
+          "x": 23,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1503.9957333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -0.0006597344524083409,
+          "legB": 0,
+          "y": -0.0008377580348042424
+        }
+      },
+      {
+        "at": 4588.4,
+        "tile": {
+          "x": 24,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1504,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -0.0006597344524083409,
+          "legB": 0,
+          "y": -0.0008377580348042424
+        }
+      },
+      {
+        "at": 4605,
+        "tile": {
+          "x": 24,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1511.1082666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0769501425745758,
+          "legB": 0,
+          "y": -1.3675557366026359
+        }
+      },
+      {
+        "at": 4621.7,
+        "tile": {
+          "x": 24,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1518.2208,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0246125036068503,
+          "legB": 0,
+          "y": -2.5709365125166355
+        }
+      },
+      {
+        "at": 4638.4,
+        "tile": {
+          "x": 24,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1525.3333333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.727980021920995,
+          "legB": 0,
+          "y": -3.4641016151377713
+        }
+      },
+      {
+        "at": 4655,
+        "tile": {
+          "x": 24,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1532.4416,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.1020680172922597,
+          "legB": 0,
+          "y": -3.9391339902123934
+        }
+      },
+      {
+        "at": 4671.7,
+        "tile": {
+          "x": 24,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1539.5541333333333,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.1021826016574305,
+          "legB": 0,
+          "y": -3.939279494168166
+        }
+      },
+      {
+        "at": 4688.4,
+        "tile": {
+          "x": 24,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1546.6666666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7279800219209687,
+          "legB": 0,
+          "y": -3.464101615137738
+        }
+      },
+      {
+        "at": 4705.1,
+        "tile": {
+          "x": 24,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1553.7792,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0246125036068054,
+          "legB": 0,
+          "y": -2.5709365125165786
+        }
+      },
+      {
+        "at": 4721.7,
+        "tile": {
+          "x": 24,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1560.8874666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0775700980505794,
+          "legB": 0,
+          "y": -1.3683429816515293
+        }
+      },
+      {
+        "at": 4738.4,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": "right",
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1568,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0775700980505794,
+          "legB": 0,
+          "y": -1.3683429816515293
+        }
+      },
+      {
+        "at": 4755.1,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1575.1125333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0775700980506344,
+          "legB": 0,
+          "y": -1.3683429816515993
+        }
+      },
+      {
+        "at": 4771.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-contact-b",
+        "foot": {
+          "x": 1582.2250666666666,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.0251178747177287,
+          "legB": 0,
+          "y": -2.5715782536098146
+        }
+      },
+      {
+        "at": 4788.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1589.3333333333335,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7279800219209975,
+          "legB": 0,
+          "y": -3.464101615137775
+        }
+      },
+      {
+        "at": 4805.1,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1596.4458666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.102182601657441,
+          "legB": 0,
+          "y": -3.9392794941681797
+        }
+      },
+      {
+        "at": 4821.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1603.5584000000001,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -3.1020680172922486,
+          "legB": 0,
+          "y": -3.939133990212379
+        }
+      },
+      {
+        "at": 4838.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-passing",
+        "foot": {
+          "x": 1610.6666666666667,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.7279800219209625,
+          "legB": 0,
+          "y": -3.46410161513773
+        }
+      },
+      {
+        "at": 4855.1,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1617.7792000000002,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -2.024612503606797,
+          "legB": 0,
+          "y": -2.570936512516568
+        }
+      },
+      {
+        "at": 4871.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1624.8874666666668,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -1.0775700980505702,
+          "legB": 0,
+          "y": -1.3683429816515178
+        }
+      },
+      {
+        "at": 4888.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": true,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-contact-a",
+        "foot": {
+          "x": 1631.9957333333334,
+          "y": 1024
+        },
+        "pose": {
+          "legA": -0.0006597344523915543,
+          "legB": 0,
+          "y": -0.0008377580347829261
+        }
+      },
+      {
+        "at": 4905,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 4921.6,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 4938.4,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 4955,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 4971.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 4988.4,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5005,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5021.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5038.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5055.1,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5071.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5088.4,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5105,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5121.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5138.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5155,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5171.6,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5188.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5205.1,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5221.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5238.4,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5255,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5271.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5288.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5305,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5321.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5338.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5355.1,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5371.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5388.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5405,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5421.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5438.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5455,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5471.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5488.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5505,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5521.7,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5538.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5555,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5571.6,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5588.4,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5605,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5621.6,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      },
+      {
+        "at": 5638.3,
+        "tile": {
+          "x": 25,
+          "y": 15
+        },
+        "moving": false,
+        "pending": false,
+        "heldDirection": null,
+        "queuedTaps": 0,
+        "frame": "right-idle",
+        "foot": {
+          "x": 1632,
+          "y": 1024
+        },
+        "pose": {
+          "legA": 0,
+          "legB": 0,
+          "y": 0
+        }
+      }
+    ],
+    "commits": [
+      {
+        "at": 3321.7,
+        "tile": {
+          "x": 16,
+          "y": 15
+        }
+      },
+      {
+        "at": 3471.7,
+        "tile": {
+          "x": 17,
+          "y": 15
+        }
+      },
+      {
+        "at": 3638.4,
+        "tile": {
+          "x": 18,
+          "y": 15
+        }
+      },
+      {
+        "at": 3788.4,
+        "tile": {
+          "x": 19,
+          "y": 15
+        }
+      },
+      {
+        "at": 3955.1,
+        "tile": {
+          "x": 20,
+          "y": 15
+        }
+      },
+      {
+        "at": 4105,
+        "tile": {
+          "x": 21,
+          "y": 15
+        }
+      },
+      {
+        "at": 4255,
+        "tile": {
+          "x": 22,
+          "y": 15
+        }
+      },
+      {
+        "at": 4421.7,
+        "tile": {
+          "x": 23,
+          "y": 15
+        }
+      },
+      {
+        "at": 4588.4,
+        "tile": {
+          "x": 24,
+          "y": 15
+        }
+      },
+      {
+        "at": 4738.4,
+        "tile": {
+          "x": 25,
+          "y": 15
+        }
+      }
+    ],
+    "inputEvents": [
+      {
+        "at": 3314.800000011921,
+        "type": "keydown",
+        "key": "ArrowRight",
+        "repeat": false
+      },
+      {
+        "at": 4746.200000047684,
+        "type": "keyup",
+        "key": "ArrowRight",
+        "repeat": false
+      }
+    ],
+    "lastTile": {
+      "x": 25,
+      "y": 15
+    }
+  }
+}
