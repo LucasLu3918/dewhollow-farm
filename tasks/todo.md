@@ -138,6 +138,19 @@
 
 詳見 [pixel32 overlay 移動幀與深度交錯證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-overlay-walkframe-depth.zh-TW.md)。
 
+---
+
+# DF-G1-CONTINUOUS-10-TILE-CHROMIUM-EVIDENCE 四方向持續移動證據
+
+- [x] DEV-only Chromium 驗證右／下／左／上各持續按住完成 10 格，放開後停止；四方向專項 E2E 4/4 通過。
+- [x] 保存每方向 keydown／keyup、10 個 tile commit、候選 frame／pose／腳錨時間線，以及第 5 格與放開停止後畫面。
+- [x] 更新 DF-QA-01 狀態與繁中證據報告；候選仍未核准，沒有改 runtime、地圖、存檔或正式素材。
+- [x] `npm run check` 通過（162 個測試檔，1,643 passed／1 skipped；build 2.808 MB）；完整 Chromium E2E 248/248（4 workers）通過。
+- [ ] 完成 Impact reconciliation、commit、PR、Required Checks 與 merge。
+- [ ] 人工盲測／美術驗收與原生 iOS／Android 實機驗證仍待完成。
+
+詳見 [四方向連續 10 格移動證據](../docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-continuous-10-tile.zh-TW.md)。
+
 
 ---
 
