@@ -241,6 +241,14 @@ describe('itemIcons', () => {
     });
   });
 
+  it('resolves item icons beneath the configured Vite base path', () => {
+    const manifest = iconManifest({ 'item.sweet-radish': 'assets/items/sweet-radish.png' });
+    expect(resolveItemIcon(manifest, 'item.sweet-radish', new Set(['item.sweet-radish']), '/dewhollow/')).toEqual({
+      status: 'available',
+      src: '/dewhollow/assets/items/sweet-radish.png',
+    });
+  });
+
   it('validates and resolves canonical content IDs without rewriting them', () => {
     const itemIds = ['wood', 'fish.carp', 'recipe.sun-hat'];
     const itemIcons = Object.fromEntries(itemIds.map((id) => [id, `assets/items/${id.replaceAll('.', '-')}.png`]));

@@ -90,6 +90,11 @@ export function focusRestoreTarget(memory: FocusMemory | null, slots: readonly F
 const modalStack: PanelDialog[] = [];
 const trappedDocuments = new WeakSet<Document>();
 
+/** The last opened modal owns keyboard dismissal until it closes. */
+export function topmostOpenDialog(): OpenablePanel | undefined {
+  return modalStack.at(-1);
+}
+
 export class PanelDialog implements OpenablePanel {
   private open_ = false;
   private returnTarget: HTMLElement | null = null;

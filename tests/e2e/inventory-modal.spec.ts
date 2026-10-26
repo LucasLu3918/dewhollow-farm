@@ -83,6 +83,30 @@ test.describe('背包 modal ownership', () => {
     await expect(opener).toBeFocused();
   });
 
+  test('inventory blocks background HUD controls and Escape closes the topmost modal', async ({ page }) => {
+    await start(page);
+    await page.locator('#hud-inventory').click();
+    await expect(page.locator('#inventory-panel')).toBeVisible();
+
+    const settingsCovered = await page.locator('#hud-settings').evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return hit !== element && !element.contains(hit);
+    });
+    expect(settingsCovered).toBe(true);
+
+    // Exercise the stack even for programmatic modal opens that bypass the backdrop.
+    await page.locator('#hud-settings').evaluate((element: HTMLElement) => element.click());
+    await expect(page.locator('#settings-panel')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#settings-panel')).toBeHidden();
+    await expect(page.locator('#inventory-panel')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#inventory-panel')).toBeHidden();
+    await expect(page.locator('#settings-panel')).toBeHidden();
+  });
+
   test('Tab and Shift+Tab keep focus inside the inventory dialog', async ({ page }) => {
     await start(page);
     const panel = page.locator('#inventory-panel');

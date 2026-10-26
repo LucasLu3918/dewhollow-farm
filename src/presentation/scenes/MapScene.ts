@@ -69,7 +69,7 @@ import { SettingsPanel, type SettingsLabels } from '../settings-panel';
 import { isJoystickMovementSource, TouchControls } from '../touch-controls';
 import type { TouchLabels, TouchText } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
-import type { OpenablePanel } from '../panel-dialog';
+import { topmostOpenDialog, type OpenablePanel } from '../panel-dialog';
 import type { InventoryPanel } from '../inventory-panel';
 import { gateAction, type ActionGateAction } from '../action-gate';
 import { cameraViewportFor } from '../responsive/layout';
@@ -1211,7 +1211,9 @@ export class MapScene extends Phaser.Scene {
       if (openGroup && event?.key === 'Escape') {
         event.preventDefault();
         this.touchControls.cancelAll();
-        for (const panel of openGroup) panel.close();
+        const topmost = topmostOpenDialog();
+        if (topmost) topmost.close();
+        else for (const panel of openGroup) panel.close();
       }
       return null;
     }
@@ -1230,7 +1232,9 @@ export class MapScene extends Phaser.Scene {
     if (decision === 'ignore') return null;
     if (decision === 'close-modal') {
       event?.preventDefault();
-      for (const panel of openGroup ?? []) panel.close();
+      const topmost = topmostOpenDialog();
+      if (topmost) topmost.close();
+      else for (const panel of openGroup ?? []) panel.close();
       return null;
     }
     if (decision === 'finish-reel') {

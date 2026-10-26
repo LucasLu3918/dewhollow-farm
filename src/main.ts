@@ -202,7 +202,7 @@ async function bootstrap(): Promise<void> {
     return {
       capacity: currentInventory.capacity,
       entries: inventoryDisplay(currentInventory, index),
-      resolveIcon: (itemId) => resolveItemIcon(loaded.assets, itemId, knownItemIds),
+      resolveIcon: (itemId) => resolveItemIcon(loaded.assets, itemId, knownItemIds, import.meta.env.BASE_URL),
       wornItemId,
       wornItemName: wornItemId ? index.item(wornItemId).name : undefined,
     };

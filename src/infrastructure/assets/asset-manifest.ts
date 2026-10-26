@@ -94,13 +94,15 @@ export function resolveItemIcon(
   manifest: AssetManifest,
   itemId: string,
   knownItemIds: ReadonlySet<string>,
+  basePath = '/',
 ): ItemIconResolution {
   if (!knownItemIds.has(itemId)) return { status: 'missing', diagnostic: 'unknown-item' };
   const file = manifest.itemIcons?.[itemId];
   if (!file || !isSafeItemIconFile(file)) {
     return { status: 'missing', diagnostic: 'missing-icon' };
   }
-  return { status: 'available', src: `/${file}` };
+  const base = basePath.endsWith('/') ? basePath : `${basePath}/`;
+  return { status: 'available', src: `${base}${file}` };
 }
 
 function isSafeItemIconFile(file: string): boolean {
