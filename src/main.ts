@@ -52,7 +52,9 @@ import farm from '../content/maps/farm.json';
 import village from '../content/maps/village.json';
 import plaza from '../content/maps/plaza.json';
 import { createContentIndex } from './application/content-index';
+import { inventoryDisplay } from './application/inventory-display';
 import { NO_LEGACY } from './domain/legacy';
+import { PLAYER_WEARER } from './domain/decor';
 import { GameSession } from './application/game-session';
 import type { SaveRepository } from './application/ports';
 import { SaveSlotService, slotFromQuery } from './application/save-slots';
@@ -66,8 +68,10 @@ import { parseChangelog, parseHelpContent } from './infrastructure/content/info-
 import { MemorySaveRepository } from './infrastructure/persistence/memory-save-repository';
 import { IndexedDbSaveRepository, hasIndexedDb } from './infrastructure/persistence/indexeddb-save-repository';
 import { parseSaveRecord } from './infrastructure/persistence/save-schema';
+import { resolveItemIcon } from './infrastructure/assets/asset-manifest';
 import type { MigrationContext } from './infrastructure/persistence/save-migrations';
 import { Hud } from './presentation/hud';
+import { InventoryPanel } from './presentation/inventory-panel';
 import { HelpPanel } from './presentation/help-panel';
 import { SavePanel } from './presentation/save-panel';
 import { GAME_VERSION } from './version';
@@ -103,6 +107,7 @@ function markStageReady(): void {
  */
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
+  const inventory = new InventoryPanel(document);
   const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, merchant, decor, rating, legacy, maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
   // 操作說明的文字（狀態列提示、設定面板的動作名稱、虛擬按鍵）來自 content/controls.json，缺漏會在這裡報錯。
   const controls = parseControlsContent(controlsContent);
@@ -190,6 +195,18 @@ async function bootstrap(): Promise<void> {
     return;
   }
   const started: GameSession = session;
+  inventory.setDataProvider(() => {
+    const currentInventory = started.state.inventory;
+    const knownItemIds = new Set(currentInventory.stacks.map((stack) => stack.itemId));
+    const wornItemId = started.state.wearing[PLAYER_WEARER];
+    return {
+      capacity: currentInventory.capacity,
+      entries: inventoryDisplay(currentInventory, index),
+      resolveIcon: (itemId) => resolveItemIcon(loaded.assets, itemId, knownItemIds, import.meta.env.BASE_URL),
+      wornItemId,
+      wornItemName: wornItemId ? index.item(wornItemId).name : undefined,
+    };
+  });
 
   const game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -214,6 +231,7 @@ async function bootstrap(): Promise<void> {
         hud,
         help: helpPanel,
         saves,
+        inventory,
         settings,
         responsive,
         onReady: markStageReady,

@@ -153,8 +153,17 @@ async function pauseScene(page: Page): Promise<void> {
   });
 }
 
+async function hideQuickbarToggleForSceneSnapshot(page: Page): Promise<void> {
+  // Playwright's canvas element screenshot composites positioned sibling HUD controls.
+  // Keep this visual baseline limited to the world renderer, not the DOM quickbar toggle.
+  await page.locator('#quickbar-toggle').evaluate((button) => {
+    (button as HTMLElement).style.visibility = 'hidden';
+  });
+}
+
 async function capture(page: Page, name: string): Promise<void> {
   await pauseScene(page);
+  await hideQuickbarToggleForSceneSnapshot(page);
   await expect(page.locator('#game canvas')).toHaveScreenshot(name, { animations: 'disabled' });
 }
 
@@ -182,7 +191,7 @@ async function treeOcclusionChangeWhenPlayerHidden(page: Page, playerSprite: Spr
       return context.getImageData(0, 0, canvas.width, canvas.height);
     };
     const treeImage = new Image();
-    treeImage.src = '/assets/tiles/tree-2x.png';
+    treeImage.src = debug.mapId() === 'forest' ? '/assets/forest/tree.png' : '/assets/tiles/tree-2x.png';
     await treeImage.decode();
     const treeMaskCanvas = document.createElement('canvas');
     treeMaskCanvas.width = treeImage.width;
@@ -368,7 +377,7 @@ test('field edges stay walkable while farm buildings, greenhouse fence, forest t
   await walk(page, 'ArrowDown'); // (14,8)
   await walk(page, 'ArrowRight'); // (15,8), immediately below the tree at (15,7)
   const treeSprites = await sprites(page);
-  const tree = treeSprites.find((sprite) => sprite.key === 'tile.tree' && sprite.left === 15 * 64 && sprite.top === 7 * 64);
+  const tree = treeSprites.find((sprite) => sprite.key === 'scene.forest.tree' && sprite.left === 15 * 64 && sprite.top === 7 * 64);
   expect(tree, 'forest tree overlay at (15,7)').toBeDefined();
   const actor = await player(page);
   expect(actor.top + actor.height).toBeGreaterThan(tree!.top);
@@ -393,11 +402,35 @@ test('a forest tree covers the player when they overlap from behind', async ({ p
   await expect.poll(() => mapId(page)).toBe('forest');
 
   const sceneSprites = await sprites(page);
-  const tree = sceneSprites.find((sprite) => sprite.key === 'tile.tree' && sprite.left === 15 * 64 && sprite.top === 7 * 64);
+  const tree = sceneSprites.find((sprite) => sprite.key === 'scene.forest.tree' && sprite.left === 15 * 64 && sprite.top === 7 * 64);
   const playerSprite = sceneSprites.find((sprite) => sprite.key === 'player.down');
   const actor = await player(page);
   expect(tree, 'forest tree overlay at (15,7)').toBeDefined();
   expect(playerSprite, 'player facing down for the behind-tree view').toBeDefined();
+  expect(sceneSprites.map((sprite) => sprite.key)).toEqual(expect.arrayContaining([
+    'scene.forest.grass',
+    'scene.forest.path',
+    'scene.forest.moss',
+    'scene.forest.rock',
+  ]));
+  expect(tree, 'the approved forest tree retains a one-tile visual footprint').toMatchObject({ width: 64, height: 64 });
+  const integratedHashes = await page.evaluate(async () => {
+    const files = [
+      ['/assets/forest/ground-grass.png', '839c2cfd2de5c063a8b12933beffa42f27647381a8b765d90e90ce6c25f1b1c5'],
+      ['/assets/forest/ground-path.png', 'd697f250602cbb1f4f1b2755cce6e58876e451ef977864dbdef47badff09e00e'],
+      ['/assets/forest/ground-moss.png', 'eb2d1e1037ee2d67b4122f05a1845a36c9f9904ede10d72f875698a2b06516f7'],
+      ['/assets/forest/tree.png', 'd9a43c1d9a6fa1948dc30e25fb6a164b6578ef207186cf727c0bb22d8f24e10c'],
+      ['/assets/forest/rock.png', '5928ba117c42b5f1b334f93771cf079724452def76f19a9dd8b8295df9363171'],
+    ] as const;
+    return Promise.all(files.map(async ([file, expected]) => {
+      const response = await fetch(file);
+      if (!response.ok) throw new Error(`Could not load ${file}: ${response.status}`);
+      const digest = await crypto.subtle.digest('SHA-256', await response.arrayBuffer());
+      const actual = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+      return { file, expected, actual };
+    }));
+  });
+  for (const result of integratedHashes) expect(result.actual, result.file).toBe(result.expected);
   expect(actor.left + actor.width).toBeGreaterThan(tree!.left);
   expect(actor.left).toBeLessThan(tree!.left + tree!.width);
   expect(actor.top + actor.height).toBeGreaterThan(tree!.top);
@@ -417,5 +450,6 @@ test('a forest tree covers the player when they overlap from behind', async ({ p
   expect(evidence.opaqueOverlapSamples, JSON.stringify(evidence)).toBeGreaterThan(8);
   expect(evidence.changedPercent, JSON.stringify(evidence)).toBeLessThanOrEqual(2);
   expect(evidence.meanRgbDelta, JSON.stringify(evidence)).toBeLessThan(10);
+  await hideQuickbarToggleForSceneSnapshot(page);
   await expect(page.locator('#game canvas')).toHaveScreenshot('forest-tree-occlusion.png', { animations: 'disabled' });
 });

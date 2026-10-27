@@ -622,6 +622,42 @@ describe('tools and seeds', () => {
     expect(planted.state.inventory).toEqual(selected.inventory);
     expect(planted.messages).toContain('這個季節種不了這種作物');
   });
+
+  it('assigns one of four quickbar slots to an owned seed without consuming it', () => {
+    const state = start({ inventory: bagOf([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]) });
+    const out = executeCommand(state, {
+      type: 'assignHotbarSlot', slot: 2, item: { kind: 'seed', cropId: 'moon-bean' },
+    }, index);
+
+    expect(out.state.hotbar).toEqual([null, null, { kind: 'seed', cropId: 'moon-bean' }, null]);
+    expect(out.state.inventory).toEqual(state.inventory);
+  });
+
+  it('assigns tools and clears a quickbar slot', () => {
+    const state = start();
+    const assigned = executeCommand(state, {
+      type: 'assignHotbarSlot', slot: 0, item: { kind: 'tool', tool: 'axe' },
+    }, index).state;
+    expect(assigned.hotbar[0]).toEqual({ kind: 'tool', tool: 'axe' });
+
+    const cleared = executeCommand(assigned, { type: 'assignHotbarSlot', slot: 0, item: null }, index).state;
+    expect(cleared.hotbar[0]).toBeNull();
+  });
+
+  it('refuses an invalid slot or a seed that is not currently owned', () => {
+    const state = start();
+    const badSlot = executeCommand(state, {
+      type: 'assignHotbarSlot', slot: 4, item: { kind: 'tool', tool: 'axe' },
+    }, index);
+    const missingSeed = executeCommand(state, {
+      type: 'assignHotbarSlot', slot: 0, item: { kind: 'seed', cropId: 'moon-bean' },
+    }, index);
+
+    expect(badSlot.state).toEqual(state);
+    expect(missingSeed.state).toEqual(state);
+    expect(badSlot.state.inventory).toEqual(state.inventory);
+    expect(missingSeed.state.inventory).toEqual(state.inventory);
+  });
 });
 
 describe('seasons and weather', () => {

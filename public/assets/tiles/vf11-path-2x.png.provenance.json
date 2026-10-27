@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "ab80a0809a674f5675bd6ccca3a33ce8cd722ec18156819de87da81d6071d515",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "tile.path",
+  "candidate_filename": "tile-path-2x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:53Z",
+  "integrated_filename": "vf11-path-2x.png",
+  "schema_version": 1,
+  "sha256": "53f82edb07b05e74c3f5de8dbee7a667b0189d50daa0992d6f1770dbb18842e6"
+}

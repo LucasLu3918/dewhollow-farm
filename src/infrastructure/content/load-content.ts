@@ -140,7 +140,7 @@ export function loadContent(raw: RawContentFiles): LoadedContent {
   const maps = raw.maps.map((m) => mapFileSchema.parse(m));
   const start = startFileSchema.parse(raw.start);
   const tuning = tuningFileSchema.parse(raw.tuning);
-  const assets = assetsFileSchema.parse(raw.assets);
+  const assets: AssetManifest = assetsFileSchema.parse(raw.assets);
   const rigs: RigManifest = rigsFileSchema.parse(raw.rigs);
   const companions: CompanionManifest = companionsFileSchema.parse(raw.companions);
   const tools: ToolManifest = toolsFileSchema.parse(raw.tools);

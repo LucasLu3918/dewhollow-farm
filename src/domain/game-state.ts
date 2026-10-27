@@ -30,7 +30,13 @@ import { emptyAchievements, type AchievementState } from './achievements';
 import { emptyMerchantLog, type MerchantLog } from './traveling-merchant';
 import type { DecorPlacement } from './decor';
 
-export const SAVE_SCHEMA_VERSION = 23;
+export const SAVE_SCHEMA_VERSION = 24;
+
+export type HotbarItem =
+  | { kind: 'tool'; tool: ToolId }
+  | { kind: 'seed'; cropId: string }
+  | null;
+export type Hotbar = [HotbarItem, HotbarItem, HotbarItem, HotbarItem];
 
 export interface PlayerState extends Point {
   facing: Direction;
@@ -112,6 +118,8 @@ export interface GameState {
   /** 最深到過的檢查點層數（從入口下來會直接到這裡）；至少是第 1 層。 */
   mineCheckpoint: number;
   selectedSeed: string;
+  /** 四格快捷欄只保存工具或種子設定；每格的種子是否仍持有由使用時檢查。 */
+  hotbar: Hotbar;
   /** 累計真實遊玩秒數，供平衡分析與顯示。 */
   playtimeSeconds: number;
   /** 本年賺到的金幣總和（不含花費）；換年時移到 previousYearIncome（見 income.ts）。 */
@@ -191,6 +199,7 @@ export function createNewGame(content: ContentPack, seed: number): GameState {
     mineSeed: advanceRng(seed >>> 0),
     mineCheckpoint: 1,
     selectedSeed: selectedSeed.id,
+    hotbar: [null, null, null, null],
     playtimeSeconds: 0,
     yearlyIncome: 0,
     previousYearIncome: 0,

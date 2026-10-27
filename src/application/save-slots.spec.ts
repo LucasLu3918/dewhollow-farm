@@ -244,8 +244,8 @@ describe('匯入的驗證', () => {
     expect(writes).toHaveLength(0);
   });
 
-  it('來自更新版本的檔案（v24）被拒絕，並提示更新遊戲', async () => {
-    const newer = JSON.stringify({ slot: 'slot-1', savedAt: 'x', state: { ...createNewGame(pack, 1), schemaVersion: 24 } });
+  it('來自更新版本的檔案（v25）被拒絕，並提示更新遊戲', async () => {
+    const newer = JSON.stringify({ slot: 'slot-1', savedAt: 'x', state: { ...createNewGame(pack, 1), schemaVersion: 25 } });
     const { repository } = spyRepository();
     await expect(serviceWith(repository).readImport(newer)).rejects.toThrow(/更新版本/);
   });
@@ -254,7 +254,7 @@ describe('匯入的驗證', () => {
     const v1 = JSON.stringify({ slot: 'slot-1', savedAt: '2026-10-20T10:00:00.000Z', state: V1_STATE });
     const { repository } = spyRepository();
     const record = await serviceWith(repository).readImport(v1);
-    expect(record.state.schemaVersion).toBe(23);
+    expect(record.state.schemaVersion).toBe(24);
     expect(record.state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
   });
 

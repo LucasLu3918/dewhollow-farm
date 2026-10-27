@@ -27,6 +27,7 @@
         <span id="hud-mine" aria-label="礦坑狀態"></span>
         <span class="status-actions">
           <button id="hud-action" class="status-button hud-action" type="button" aria-label="主要動作：沒有可互動的目標" disabled>沒有可互動的目標</button>
+          <button id="hud-inventory" class="status-button inventory-open" type="button" aria-label="開啟背包">背包</button>
           <button id="hud-saves" class="status-button" type="button" aria-label="存檔槽，可讀取、新遊戲、刪除、匯出與匯入（或按 L）">存檔</button>
           <button id="hud-settings" class="status-button" type="button" aria-label="設定：按鍵、字級、色盲模式、閃光與震動、觸控（或按 O）">設定</button>
           <button id="hud-help" class="status-button" type="button" aria-label="說明、操作按鍵、更新日誌與隱私說明（或按 ?）">說明</button>
@@ -34,8 +35,43 @@
           <span id="hud-version" class="version"></span>
         </span>
       </header>
-      <div id="game" class="stage" role="region" aria-label="晨露農場遊戲畫面。用方向鍵移動，按問號鍵看操作說明"><p class="loading" role="status">農場載入中…</p></div>
+      <div id="game" class="stage" role="region" aria-label="晨露農場遊戲畫面。用方向鍵移動，按問號鍵看操作說明">
+        <p class="loading" role="status">農場載入中…</p>
+        <button id="quickbar-toggle" class="quickbar-toggle" type="button" aria-expanded="false" aria-controls="quickbar">快捷欄</button>
+        <nav id="quickbar" class="quickbar" aria-label="四格工具與種子快捷欄">
+          <button data-hotbar-use="0" type="button" disabled>1 空格</button>
+          <button data-hotbar-use="1" type="button" disabled>2 空格</button>
+          <button data-hotbar-use="2" type="button" disabled>3 空格</button>
+          <button data-hotbar-use="3" type="button" disabled>4 空格</button>
+          <button data-hotbar-edit-mode type="button" aria-pressed="false">編輯</button>
+        </nav>
+      </div>
       <div id="touch-controls" class="touch-controls" hidden></div>
+      <section id="inventory-panel" class="inventory-panel" aria-labelledby="inventory-title" role="dialog" aria-modal="true" hidden>
+        <header class="inventory-header">
+          <div>
+            <p class="inventory-eyebrow">晨露農場 · 隨身收納</p>
+            <h2 id="inventory-title">我的背包</h2>
+          </div>
+          <button id="inventory-close" class="inventory-close" type="button">關閉</button>
+        </header>
+        <div id="inventory-content" class="inventory-content">
+          <div class="inventory-toolbar">
+            <nav class="inventory-filters" aria-label="背包物品分類">
+              <button id="inventory-filter-all" type="button" aria-pressed="true">全部</button>
+              <button id="inventory-filter-farming" type="button" aria-pressed="false">農耕</button>
+              <button id="inventory-filter-materials" type="button" aria-pressed="false">材料</button>
+              <button id="inventory-filter-food" type="button" aria-pressed="false">食物</button>
+              <button id="inventory-filter-wearables" type="button" aria-pressed="false">服飾</button>
+              <button id="inventory-filter-other" type="button" aria-pressed="false">其他</button>
+            </nav>
+            <p id="inventory-capacity" class="inventory-capacity" aria-live="polite">0 / 24</p>
+          </div>
+          <p id="inventory-full" class="inventory-full" role="status" hidden>背包已滿</p>
+          <p id="inventory-empty" class="inventory-empty" hidden>這個分類目前沒有物品。</p>
+          <div id="inventory-grid" class="inventory-grid" role="grid" aria-label="背包格子"></div>
+        </div>
+      </section>
       <section id="tool-seed-panel" class="shop-panel tool-seed-panel" aria-labelledby="tool-seed-title" role="dialog" aria-modal="true" hidden>
         <header><h2 id="tool-seed-title">選擇工具</h2></header>
         <p id="tool-seed-note" class="tool-seed-note" hidden></p>

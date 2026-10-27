@@ -3,6 +3,8 @@ import type { ContentPack, Direction, MapDef, Point } from '../../domain/content
 import { plotKey, type PlotMap, type PlotState } from '../../domain/farm';
 import { tileAt } from '../../domain/world';
 import { groundLayerFor, isGroundLayer } from '../map-layers';
+import { sceneOverlaysFor } from '../scene-overlays';
+import { forestSceneAssetFor } from '../forest-scene-art';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import { resolveInteraction, type InteractionLabelKey } from '../../application/interaction';
@@ -54,6 +56,7 @@ import { gainedItems } from '../yield-feedback';
 import { footstepKind, touchesWater, type FootstepEnv } from '../footstep-surface';
 import { shipIconsFor, shippedItemIds } from '../ship-animation';
 import type { Inventory } from '../../domain/inventory';
+import type { GameState } from '../../domain/game-state';
 import type { SoundPlayer } from '../audio/sound-player';
 import type { MusicPlayer } from '../audio/music-player';
 import { ACTION_SOUND } from '../audio/sound-ids';
@@ -67,11 +70,13 @@ import { SettingsPanel, type SettingsLabels } from '../settings-panel';
 import { isJoystickMovementSource, TouchControls } from '../touch-controls';
 import type { TouchLabels, TouchText } from '../touch-pad';
 import { reducedEffects } from '../accessibility';
-import type { OpenablePanel } from '../panel-dialog';
+import { topmostOpenDialog, type OpenablePanel } from '../panel-dialog';
+import type { InventoryPanel } from '../inventory-panel';
 import { gateAction, type ActionGateAction } from '../action-gate';
 import { cameraViewportFor } from '../responsive/layout';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
 import { ToolSeedSelector } from '../tool-seed-selector';
+import { Hotbar } from '../hotbar';
 import { ContinuousFarmActions, farmActionTarget } from '../continuous-farm-actions';
 import { calculatePixelViewportPolicy } from '../pixel-viewport/policy';
 import { renderProfileFor } from '../pixel-viewport/profiles';
@@ -127,6 +132,8 @@ export interface MapSceneDeps {
   /** 說明頁（? 鍵）與存檔槽（L 鍵）；打開時遊戲的按鍵只用來關閉（Esc）。 */
   help: HelpPanel;
   saves: SavePanel;
+  /** 背包：共用 DOM modal stack，並由 MapScene 處理 Esc 和遊戲輸入阻擋。 */
+  inventory: OpenablePanel & Pick<InventoryPanel, 'open' | 'setCommandHandler' | 'refresh'>;
   /** 玩家偏好（按鍵、字級、閃光與震動等），不進存檔。 */
   settings: SettingsService;
   responsive: ResponsiveLayoutController;
@@ -292,6 +299,8 @@ declare global {
   interface Window {
     __dewhollow?: {
       cameraScroll(): { x: number; y: number };
+      /** Read-only current GameSession snapshot for local E2E assertions. */
+      gameState(): GameState;
       pixelViewport(): {
         profile: string;
         worldTilesVisible: { width: number; height: number };
@@ -429,6 +438,8 @@ export class MapScene extends Phaser.Scene {
     groundImage: Phaser.GameObjects.Image;
     objectImage?: Phaser.GameObjects.Image;
   }[] = [];
+  /** Map-specific static art overlays; they are render-only and carry no world or collision state. */
+  private sceneOverlaySprites: Phaser.GameObjects.Image[] = [];
   private shopPanel!: ShopPanel;
   private kitchenPanel!: KitchenPanel;
   private workshopPanel!: WorkshopPanel;
@@ -447,6 +458,7 @@ export class MapScene extends Phaser.Scene {
   private lastContinuousCancelReason = 'not-cancelled';
   private unsubscribeContinuousSetting: (() => void) | null = null;
   private toolSeedSelector!: ToolSeedSelector;
+  private hotbar!: Hotbar;
   /** 夜釣星星進行中的計時器與甩竿的時刻（一圈的時限，見 star-fishing.ts）。 */
   private starTimer: Phaser.Time.TimerEvent | null = null;
   private starStartedAt = 0;
@@ -534,8 +546,12 @@ export class MapScene extends Phaser.Scene {
     }, (source, direction) => this.setMovementInput(source, direction));
     this.toolSeedSelector = new ToolSeedSelector(document, deps.index, (command) => {
       // Direct selectors use distinct gate actions and preserve the selected ID in the command.
-      void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command);
+      if (command.type === 'assignHotbarSlot') void this.run(command);
+      else void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command);
     });
+    this.hotbar = new Hotbar(document, deps.index, () => deps.session.state,
+      (command) => { void this.handleAction(command.type === 'selectSeed' ? 'selectSeed' : 'selectTool', undefined, command); },
+      (slot, state) => this.openHotbarAssignment(slot, state));
     deps.hud.bindToolSeedSelectors(
       (wheel, pointer) => this.openToolSeedSelector('tool', wheel, pointer),
       (wheel, pointer) => this.openToolSeedSelector('seed', wheel, pointer),
@@ -553,6 +569,7 @@ export class MapScene extends Phaser.Scene {
     this.repairPanel = new RepairPanel(document, deps.index, (command) => void this.run(command));
     this.collectionPanel = new CollectionPanel(document, deps.index);
     this.legacyPanel = new LegacyPanel(document, deps.index, (command) => void this.run(command));
+    deps.inventory.setCommandHandler((command) => this.run(command));
     deps.hud.bindSkills(() => {
       this.touchControls.cancelAll();
       this.skillPanel.toggle(deps.session.state);
@@ -570,6 +587,7 @@ export class MapScene extends Phaser.Scene {
         this.repairPanel,
         this.collectionPanel,
         this.legacyPanel,
+        deps.inventory,
       ],
       [deps.help, deps.saves, this.settingsPanel, this.toolSeedSelector],
     ];
@@ -720,6 +738,7 @@ export class MapScene extends Phaser.Scene {
     if (import.meta.env.DEV) {
       window.__dewhollow = {
         cameraScroll: () => ({ x: camera.scrollX, y: camera.scrollY }),
+        gameState: () => structuredClone(this.deps.session.state),
         pixelViewport: () => this.pixelViewportDebugInfo(),
         movement: () => ({
           heldDirection: this.movementScheduler?.heldDirection ?? null,
@@ -1016,6 +1035,13 @@ export class MapScene extends Phaser.Scene {
     this.toolSeedSelector.open(mode, wheel, this.deps.session.state, pointer);
   }
 
+  private openHotbarAssignment(slot: number, state: GameState): void {
+    if (this.hasTouchInputBlocker()) return;
+    this.cancelMovementInput();
+    this.touchControls.cancelAll();
+    this.toolSeedSelector.openAssignment(slot, state);
+  }
+
   /** Resolve the latest held keyboard/touch direction into one presentation scheduler. */
   private setMovementInput(source: string, direction: Direction | null): void {
     const alreadyHeld = this.unifiedMovementInput.heldDirections.some((held) => held.source === source);
@@ -1148,6 +1174,25 @@ export class MapScene extends Phaser.Scene {
     const { hud, sounds } = this.deps;
     if (action !== 'interact' && !isMovementAction(action)) this.continuousFarmActions.stop('non-farm-action');
     if (this.settingsPanel.isCapturing()) return null;
+    const openGroup = this.modalGroups.find((group) => group.some((panel) => panel.isOpen()));
+    if (this.hasTouchInputBlocker() && (action === 'mute' || action === 'music')) {
+      event?.preventDefault();
+      this.touchControls.cancelAll();
+      return null;
+    }
+    if (action === 'inventory') {
+      event?.preventDefault();
+      if (this.deps.inventory.isOpen()) {
+        this.cancelMovementInput();
+        this.touchControls.cancelAll();
+        this.deps.inventory.close();
+      } else if (!this.hasTouchInputBlocker()) {
+        this.cancelMovementInput();
+        this.touchControls.cancelAll();
+        this.deps.inventory.open();
+      }
+      return null;
+    }
     if (action === 'mute') {
       // 靜音是玩家的偏好，不是遊戲指令，所以不經過應用層。
       event?.preventDefault();
@@ -1162,13 +1207,14 @@ export class MapScene extends Phaser.Scene {
       hud.messages([playing ? '背景音樂開始播放（按 B 暫停）' : '背景音樂已暫停（按 B 播放）']);
       return null;
     }
-    const openGroup = this.modalGroups.find((group) => group.some((panel) => panel.isOpen()));
     if (!action) {
       // Escape 不一定綁定成遊戲動作；保留鍵盤的原生面板關閉行為。
       if (openGroup && event?.key === 'Escape') {
         event.preventDefault();
         this.touchControls.cancelAll();
-        for (const panel of openGroup) panel.close();
+        const topmost = topmostOpenDialog();
+        if (topmost) topmost.close();
+        else for (const panel of openGroup) panel.close();
       }
       return null;
     }
@@ -1187,7 +1233,9 @@ export class MapScene extends Phaser.Scene {
     if (decision === 'ignore') return null;
     if (decision === 'close-modal') {
       event?.preventDefault();
-      for (const panel of openGroup ?? []) panel.close();
+      const topmost = topmostOpenDialog();
+      if (topmost) topmost.close();
+      else for (const panel of openGroup ?? []) panel.close();
       return null;
     }
     if (decision === 'finish-reel') {
@@ -1365,6 +1413,7 @@ export class MapScene extends Phaser.Scene {
     this.collectionPanel.refresh(session.state);
     this.legacyPanel.refresh(session.state);
     this.refresh();
+    this.deps.inventory.refresh();
     if (session.state.mapId !== previousMapId || this.hasTouchInputBlocker()) this.touchControls.cancelAll();
     return commandOutcome;
   }
@@ -1584,6 +1633,7 @@ export class MapScene extends Phaser.Scene {
   /** 依目前狀態重畫。地圖切換時整張重建，其餘情況只更新田地、方向與玩家位置。 */
   private refresh(): void {
     const state = this.deps.session.state;
+    this.hotbar.refresh(state);
     const map = this.deps.index.map(state.mapId);
     this.deps.hud.update(state, this.deps.pack);
     const interaction = resolveInteraction(state, this.deps.index);
@@ -1808,9 +1858,9 @@ export class MapScene extends Phaser.Scene {
     for (const sprite of this.tileSprites) {
       const kind = effectiveKind(sprite.base, changeAt(state.worldChanges, state.mapId, sprite.x, sprite.y));
       const ground = isGroundLayer(kind) ? kind : sprite.ground;
-      const groundKey = `tile.${ground}`;
+      const groundKey = forestSceneAssetFor(state.mapId, ground, sprite.x, sprite.y) ?? `tile.${ground}`;
       if (sprite.groundImage.texture.key !== groundKey) this.applyAsset(sprite.groundImage, groundKey);
-      if (ground === 'grass' && this.shownSeason && sprite.groundImage.texture.key !== PIXEL32_MAP_ATLAS_KEY) {
+      if (ground === 'grass' && groundKey === 'tile.grass' && this.shownSeason && sprite.groundImage.texture.key !== PIXEL32_MAP_ATLAS_KEY) {
         sprite.groundImage.setTint(seasonGrassTint(this.shownSeason));
       }
       else sprite.groundImage.clearTint();
@@ -1818,7 +1868,7 @@ export class MapScene extends Phaser.Scene {
       if (isGroundLayer(kind)) {
         sprite.objectImage?.setVisible(false);
       } else {
-        const objectKey = `tile.${kind}`;
+        const objectKey = forestSceneAssetFor(state.mapId, kind, sprite.x, sprite.y) ?? `tile.${kind}`;
         if (!sprite.objectImage) {
           sprite.objectImage = this.image(objectKey, sprite.x, sprite.y, 1);
         } else {
@@ -1840,6 +1890,7 @@ export class MapScene extends Phaser.Scene {
   private drawMap(mapId: string): void {
     this.clearPixel32CandidateOverlays();
     this.clearPixel32CandidateInteractables();
+    this.clearSceneOverlays();
     // Tree overlays live on the scene display list so their foot depth can sort
     // against actor roots. Destroy those roots explicitly before clearing the tile container.
     for (const sprite of this.tileSprites) {
@@ -1855,8 +1906,10 @@ export class MapScene extends Phaser.Scene {
         const tile = tileAt(map, x, y);
         if (!tile) continue;
         const ground = groundLayerFor(map, x, y);
-        const groundImage = this.image(`tile.${ground}`, x, y, 0);
-        const objectImage = isGroundLayer(tile.kind) ? undefined : this.image(`tile.${tile.kind}`, x, y, 1);
+        const groundKey = forestSceneAssetFor(mapId, ground, x, y) ?? `tile.${ground}`;
+        const groundImage = this.image(groundKey, x, y, 0);
+        const objectKey = forestSceneAssetFor(mapId, tile.kind, x, y) ?? `tile.${tile.kind}`;
+        const objectImage = isGroundLayer(tile.kind) ? undefined : this.image(objectKey, x, y, 1);
         this.tileSprites.push({ x, y, base: tile.kind, ground, groundImage, objectImage });
         this.world.add(groundImage);
         if (objectImage) this.placeObjectImage(objectImage, tile.kind, y);
@@ -1865,8 +1918,29 @@ export class MapScene extends Phaser.Scene {
 
     this.clearActors();
     this.createResidents(map);
+    this.drawSceneOverlays(mapId);
     this.drawPixel32CandidateOverlays(mapId);
     this.drawPixel32CandidateInteractables(mapId);
+  }
+
+  private clearSceneOverlays(): void {
+    for (const image of this.sceneOverlaySprites) image.destroy();
+    this.sceneOverlaySprites = [];
+  }
+
+  /** Render approved, map-specific large art at tile anchors without changing map or world state. */
+  private drawSceneOverlays(mapId: string): void {
+    for (const overlay of sceneOverlaysFor(mapId)) {
+      const { textureId, flipX, scale } = resolveAsset(this.deps.assets, overlay.assetId);
+      const footX = (overlay.anchorTile.x + 0.5) * TILE_SIZE;
+      const footY = (overlay.anchorTile.y + 1) * TILE_SIZE;
+      const image = this.add.image(footX, footY, textureId)
+        .setOrigin(0.5, 240 / 256)
+        .setFlipX(flipX)
+        .setScale(scale)
+        .setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
+      this.sceneOverlaySprites.push(image);
+    }
   }
 
   private clearPixel32CandidateOverlays(): void {
@@ -2219,6 +2293,7 @@ export class MapScene extends Phaser.Scene {
     const images = [
       ...this.world.getAll().filter((c): c is Phaser.GameObjects.Image => c instanceof Phaser.GameObjects.Image),
       ...tileRootImages,
+      ...this.sceneOverlaySprites,
     ];
     const others = images.map((image) => {
       const bounds = image.getBounds();

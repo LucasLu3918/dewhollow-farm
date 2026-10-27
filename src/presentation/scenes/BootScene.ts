@@ -12,6 +12,7 @@ import type { SoundPlayer } from '../audio/sound-player';
 import type { MusicPlayer } from '../audio/music-player';
 import type { HelpPanel } from '../help-panel';
 import type { SavePanel } from '../save-panel';
+import type { InventoryPanel } from '../inventory-panel';
 import type { SettingsService } from '../../application/settings';
 import { registerEmoteTextures } from '../emote';
 import { registerAnimalTextures } from '../animal-art';
@@ -70,6 +71,7 @@ export interface BootDeps {
   hud: Hud;
   help: HelpPanel;
   saves: SavePanel;
+  inventory: InventoryPanel;
   settings: SettingsService;
   responsive: ResponsiveLayoutController;
   /** 地圖場景的鍵盤與畫面都接好時呼叫一次（移除開機載入提示，見 main.ts）。 */
@@ -157,6 +159,7 @@ export class BootScene extends Phaser.Scene {
       terrain: this.deps.terrain,
       help: this.deps.help,
       saves: this.deps.saves,
+      inventory: this.deps.inventory,
       settings: this.deps.settings,
       responsive: this.deps.responsive,
       onReady: this.deps.onReady,

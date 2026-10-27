@@ -12,7 +12,7 @@ function controlsHint(bindings: Bindings): string {
 }
 
 const DEFAULT_HINT =
-  '方向鍵移動 · X 互動 · Z 切換工具 · C 切換種子 · A/P/R/G 拿斧頭/鎬/釣竿/鐮刀 · V/E/Q 小屋擺放/穿/脫 · K 技能與天賦 · F 居民與好感 · I 圖鑑 · J 委託與佈告欄 · S 存檔 · L 存檔槽 · O 設定 · B 背景音樂 · M 靜音 · ? 說明（以上為目前的按鍵，可在設定中改）';
+  '方向鍵移動 · X 互動 · Z 切換工具 · N 切換種子 · A/P/R/G 拿斧頭/鎬/釣竿/鐮刀 · V/E/Q 小屋擺放/穿/脫 · K 技能與天賦 · F 居民與好感 · I 背包 · C 圖鑑 · J 委託與佈告欄 · S 存檔 · L 存檔槽 · O 設定 · B 背景音樂 · M 靜音 · ? 說明（以上為目前的按鍵，可在設定中改）';
 
 function rebind(action: Parameters<typeof assignKey>[1], key: string) {
   const result = assignKey(DEFAULT_BINDINGS, action, key);
@@ -29,9 +29,10 @@ describe('controlsHint with default bindings', () => {
     expect(controlsHint(DEFAULT_BINDINGS).startsWith('方向鍵移動 · ')).toBe(true);
   });
 
-  it('includes the collection key I and the hut keys V/E/Q', () => {
+  it('includes the inventory key I, collection key C, and hut keys V/E/Q', () => {
     const text = controlsHint(DEFAULT_BINDINGS);
-    expect(text).toContain('I 圖鑑');
+    expect(text).toContain('I 背包');
+    expect(text).toContain('C 圖鑑');
     expect(text).toContain('V/E/Q 小屋擺放/穿/脫');
   });
 
@@ -51,6 +52,12 @@ describe('controlsHint after rebinding', () => {
     const text = controlsHint(rebind('collection', 'y'));
     expect(text).toContain('Y 圖鑑');
     expect(text).not.toContain('I 圖鑑');
+  });
+
+  it('follows the rebound inventory key', () => {
+    const text = controlsHint(rebind('inventory', 'y'));
+    expect(text).toContain('Y 背包');
+    expect(text).not.toContain('I 背包');
   });
 
   it('follows rebound hut keys in the merged segment', () => {

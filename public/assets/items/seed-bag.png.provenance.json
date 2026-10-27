@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "18d59f6955a395b2946ff56dd6dc946b25b2629946270ff32918685cbcad84d9",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "seed.sweet-radish",
+  "candidate_filename": "seed-bag.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T13:53:28Z",
+  "integrated_filename": "seed-bag.png",
+  "schema_version": 1,
+  "sha256": "2ab355b18d6a9d3779b78087d1318e7e32acd018f0d436e13eacdc04b25e8884"
+}

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 512" shape-rendering="crispEdges">
+  <defs>
+    <symbol id="pix-radish" viewBox="0 0 64 64">
+      <path fill="#39291f" d="M24 7h8v4h8v4h-8v4h-8v-4h-8v-4h8zM16 19h32v8h-4v8h-4v8h-4v8h-8v-4h-4v-8h-4v-8h-4zM24 51h8v4h-4v5h-4z"/>
+      <path fill="#5b8b45" d="M20 12h8v5h-8zM28 16h8v4h-8zM36 12h7v4h-7zM40 16h5v5h-5z"/>
+      <path fill="#bf4f3c" d="M20 23h24v8h-4v8h-4v8h-8v-4h-4v-8h-4z"/>
+      <path fill="#e66d4b" d="M24 24h8v4h-8zM20 28h4v8h-4zM32 32h4v8h-4z"/>
+      <path fill="#f7bd72" d="M24 28h4v4h-4zM36 40h4v4h-4z"/>
+      <path fill="#793a32" d="M24 48h8v4h-8z"/>
+    </symbol>
+    <symbol id="pix-seed" viewBox="0 0 64 64">
+      <path fill="#39291f" d="M16 12h32v4h4v36h-4v4H16v-4h-4V16h4zM20 8h24v4H20z"/>
+      <path fill="#d3a354" d="M20 16h24v4h4v28h-4v4H20v-4h-4V20h4z"/>
+      <path fill="#f1d28a" d="M20 20h20v4H20zM20 24h4v12h-4z"/>
+      <path fill="#6e5131" d="M24 36h16v4H24zM28 40h12v4H28z"/>
+      <path fill="#8eaa59" d="M24 28h4v4h-4zM32 28h4v4h-4zM40 28h4v4h-4z"/>
+      <path fill="#fff0be" d="M24 44h16v4H24z"/>
+    </symbol>
+    <symbol id="pix-wood" viewBox="0 0 64 64">
+      <path fill="#39291f" d="M12 20h40v8h-4v16h4v8H12v-8h4V28h-4z"/>
+      <path fill="#98613d" d="M16 24h32v4H16zM20 28h24v16h4v4H16v-4h4z"/>
+      <path fill="#c78b51" d="M20 28h8v4h-8zM20 32h4v8h-4zM32 28h4v4h-4z"/>
+      <path fill="#70452f" d="M28 32h8v4h-8zM36 36h8v4h-8zM24 40h8v4h-8z"/>
+      <path fill="#e0ad67" d="M16 44h8v4h-8zM40 24h8v4h-8z"/>
+    </symbol>
+    <symbol id="pix-ore" viewBox="0 0 64 64">
+      <path fill="#39291f" d="M24 8h16v4h8v8h4v20h-4v8h-8v8H24v-4h-8v-8h-4V24h4v-8h8z"/>
+      <path fill="#788b87" d="M24 12h12v4h8v8h4v14h-4v6h-8v8H24v-4h-4v-8h-4V24h4v-8h4z"/>
+      <path fill="#b9d0bd" d="M24 16h8v4h-8zM20 20h4v8h-4zM36 20h8v4h-8z"/>
+      <path fill="#587273" d="M20 32h8v4h-8zM28 36h8v8h-8zM40 32h8v6h-8z"/>
+      <path fill="#e0bd68" d="M32 24h8v8h-4v4h-8v-8h4z"/>
+      <path fill="#f4df91" d="M32 24h4v4h-4z"/>
+    </symbol>
+    <symbol id="pix-fish" viewBox="0 0 64 64">
+      <path fill="#39291f" d="M12 28h8v-8h8v-4h16v4h8v8h8v16h-8v8h-8v4H28v-4h-8v-8h-8z"/>
+      <path fill="#668b88" d="M16 28h8v-8h8v4h12v4h8v8h-8v8H32v4h-8v-8h-8z"/>
+      <path fill="#a9d1b0" d="M24 24h8v4h-8zM32 28h8v4h-8zM20 32h4v8h-4z"/>
+      <path fill="#45666b" d="M24 40h8v4h-8zM36 36h8v4h-8z"/>
+      <path fill="#d98a55" d="M44 28h8v4h-8zM44 40h8v4h-8zM28 48h12v4H28z"/>
+      <path fill="#f5e8bf" d="M40 28h4v4h-4z"/>
+      <path fill="#39291f" d="M40 28h4v4h-4z"/>
+    </symbol>
+    <symbol id="pix-dish" viewBox="0 0 64 64">
+      <path fill="#39291f" d="M12 32h8v-8h8v-4h16v4h8v8h4v8h-4v8h-8v4H20v-4h-4v-8h-4z"/>
+      <path fill="#d7e2c5" d="M16 32h8v-4h8v-4h12v4h8v8h4v4h-4v4h-8v4H24v-4h-4v-4h-4z"/>
+      <path fill="#a7c18c" d="M20 32h8v4h-8zM40 28h8v4h-8zM24 40h8v4h-8z"/>
+      <path fill="#df9956" d="M28 28h8v8h-4v4h-8v-8h4z"/>
+      <path fill="#b65a41" d="M36 36h8v4h-8z"/>
+      <path fill="#f3d071" d="M32 24h4v4h-4zM44 36h4v4h-4z"/>
+      <path fill="#76523a" d="M24 48h20v4H24z"/>
+    </symbol>
+    <symbol id="atlas" viewBox="0 0 768 512">
+      <rect width="768" height="512" fill="#d7c796"/>
+      <g fill="#eadfb8" stroke="#4a3829" stroke-width="3">
+        <rect x="8" y="8" width="240" height="240"/><rect x="264" y="8" width="240" height="240"/><rect x="520" y="8" width="240" height="240"/>
+        <rect x="8" y="264" width="240" height="240"/><rect x="264" y="264" width="240" height="240"/><rect x="520" y="264" width="240" height="240"/>
+      </g>
+      <g transform="translate(80 80) scale(1.5)"><use href="#pix-radish"/></g>
+      <g transform="translate(336 80) scale(1.5)"><use href="#pix-seed"/></g>
+      <g transform="translate(592 80) scale(1.5)"><use href="#pix-wood"/></g>
+      <g transform="translate(80 336) scale(1.5)"><use href="#pix-ore"/></g>
+      <g transform="translate(336 336) scale(1.5)"><use href="#pix-fish"/></g>
+      <g transform="translate(592 336) scale(1.5)"><use href="#pix-dish"/></g>
+    </symbol>
+  </defs>
+  <use href="#atlas"/>
+</svg>

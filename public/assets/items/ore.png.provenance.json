@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "a515f355a0fa6cde998d6eed32dc0c67dfac343fd6a7f5e2c43f9e4846d9154e",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "copper-ore",
+  "candidate_filename": "ore.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T13:53:28Z",
+  "integrated_filename": "ore.png",
+  "schema_version": 1,
+  "sha256": "d4df6f786b76863832ef711f9b917d867b57a7dc3ae9a5e8e5887ba8e7668a74"
+}

@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "7ca2472ef3a79d509870f7f20db5a5d386edf14107dae460cbea5a0f63cd703e",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "dish.creek-stew",
+  "candidate_filename": "stew.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T13:53:29Z",
+  "integrated_filename": "stew.png",
+  "schema_version": 1,
+  "sha256": "8b1d9c211b552049f8d1326b9a3b71f17f751532119abbcac87c9ce2b98df3c3"
+}

@@ -1,36 +1,128 @@
 {
   "version": 1,
+  "publicSourceFiles": [
+    {
+      "file": "assets/tiles/door-2x.png",
+      "purpose": "gate1-source-only",
+      "source": "Retained exact-hash Gate 1 candidate source used by tools/art generation and checks; not runtime game art."
+    },
+    {
+      "file": "assets/tiles/fence-2x.png",
+      "purpose": "gate1-source-only",
+      "source": "Retained Gate 1 candidate source used by asset metadata and checks; not runtime game art."
+    },
+    {
+      "file": "assets/tiles/field-2x.png",
+      "purpose": "gate1-source-only",
+      "source": "Retained Gate 1 candidate source referenced by asset metadata; not runtime game art."
+    },
+    {
+      "file": "assets/tiles/grass-2x.png",
+      "purpose": "gate1-source-only",
+      "source": "Retained Gate 1 candidate source referenced by asset metadata; not runtime game art."
+    },
+    {
+      "file": "assets/tiles/path-2x.png",
+      "purpose": "gate1-source-only",
+      "source": "Retained Gate 1 candidate source referenced by asset metadata; not runtime game art."
+    },
+    {
+      "file": "assets/tiles/shipbox-2x.png",
+      "purpose": "gate1-source-only",
+      "source": "Retained exact-hash Gate 1 candidate source used by tools/art generation and checks; not runtime game art."
+    },
+    {
+      "file": "assets/tiles/vf11-door-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-fence-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-field-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-grass-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-house-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-path-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-shipbox-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-shop-general-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-shop-smithy-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-tree-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/vf11-wall-2x.png.provenance.json",
+      "purpose": "asset-provenance-sidecar",
+      "source": "Per-asset VF-11 source approval and provenance metadata; not game content or a runtime asset."
+    },
+    {
+      "file": "assets/tiles/wall-2x.png",
+      "purpose": "gate1-source-only",
+      "source": "Retained Gate 1 candidate source referenced by asset metadata; not runtime game art."
+    }
+  ],
   "assets": [
     {
       "id": "tile.grass",
       "kind": "tile",
       "color": "#7fae6b",
-      "source": "OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。",
-      "file": "assets/tiles/grass-2x.png",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.grass, SHA-256 c392ed3eaa096ffec14b2c622f0737852146da5e290f9af021458c7c88f527df; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-grass-2x.png",
       "density": 2
     },
     {
       "id": "tile.field",
       "kind": "tile",
       "color": "#8a6a48",
-      "source": "OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。",
-      "file": "assets/tiles/field-2x.png",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.field, SHA-256 87929b9296e120f0f565a12fedb90bd4a6103d1fca3ea6847722d156fa52011c; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-field-2x.png",
       "density": 2
     },
     {
       "id": "tile.path",
       "kind": "tile",
       "color": "#c9b38a",
-      "source": "OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。",
-      "file": "assets/tiles/path-2x.png",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.path, SHA-256 53f82edb07b05e74c3f5de8dbee7a667b0189d50daa0992d6f1770dbb18842e6; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-path-2x.png",
       "density": 2
     },
     {
       "id": "tile.wall",
       "kind": "tile",
       "color": "#5c5a63",
-      "source": "OpenAI built-in image generation tool（2026-10-23），原創全彩像素地表；無縫處理由 tools/art/tile_finalize.py --seamless 完成，輸出 RGBA8888。",
-      "file": "assets/tiles/wall-2x.png",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.wall, SHA-256 bf8da937dfb069d284197051f8f7dba8ef2163229a2e87f1a821147982bb28b6; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-wall-2x.png",
       "density": 2
     },
     {
@@ -45,16 +137,16 @@
       "id": "tile.shipbox",
       "kind": "overlay",
       "color": "#a0764e",
-      "source": "OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。",
-      "file": "assets/tiles/shipbox-2x.png",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.shipbox, SHA-256 bc1905a68908ff720e0800f9bef5745f28b44ddaef54a08156531c5d9d738035; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-shipbox-2x.png",
       "density": 2
     },
     {
       "id": "tile.door",
       "kind": "overlay",
       "color": "#e0b25c",
-      "source": "OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。",
-      "file": "assets/tiles/door-2x.png",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.door, SHA-256 85f5ca05d866e4407d69fdef9e23c437d81996c27734cc35b54f8534edf7a3fd; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-door-2x.png",
       "density": 2
     },
     {
@@ -267,6 +359,46 @@
       "density": 2
     },
     {
+      "id": "scene.forest.grass",
+      "kind": "tile",
+      "color": "#547447",
+      "file": "assets/forest/ground-grass.png",
+      "density": 2,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 839c2cfd2de5c063a8b12933beffa42f27647381a8b765d90e90ce6c25f1b1c5; model name and license terms unavailable; exact-byte integration, forest-only runtime use."
+    },
+    {
+      "id": "scene.forest.path",
+      "kind": "tile",
+      "color": "#8f7654",
+      "file": "assets/forest/ground-path.png",
+      "density": 2,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 d697f250602cbb1f4f1b2755cce6e58876e451ef977864dbdef47badff09e00e; model name and license terms unavailable; exact-byte integration, forest-only runtime use."
+    },
+    {
+      "id": "scene.forest.moss",
+      "kind": "tile",
+      "color": "#3d6246",
+      "file": "assets/forest/ground-moss.png",
+      "density": 2,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 eb2d1e1037ee2d67b4122f05a1845a36c9f9904ede10d72f875698a2b06516f7; model name and license terms unavailable; exact-byte integration, forest-only runtime use."
+    },
+    {
+      "id": "scene.forest.tree",
+      "kind": "overlay",
+      "color": "#35613b",
+      "file": "assets/forest/tree.png",
+      "density": 4,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 d9a43c1d9a6fa1948dc30e25fb6a164b6578ef207186cf727c0bb22d8f24e10c; model name and license terms unavailable; exact-byte integration, forest-only runtime use at one existing blocked tile per tree."
+    },
+    {
+      "id": "scene.forest.rock",
+      "kind": "overlay",
+      "color": "#78736c",
+      "file": "assets/forest/rock.png",
+      "density": 2,
+      "source": "OpenAI built-in image generation tool (2026-10-27), original forest scene asset approved by user, SHA-256 5928ba117c42b5f1b334f93771cf079724452def76f19a9dd8b8295df9363171; model name and license terms unavailable; exact-byte integration, forest-only runtime use at one existing blocked tile per rock."
+    },
+    {
       "id": "tile.water",
       "kind": "tile",
       "color": "#3f7fb5",
@@ -414,8 +546,8 @@
       "id": "tile.fence",
       "kind": "overlay",
       "color": "#8b6f47",
-      "source": "OpenAI built-in image generation tool（2026-10-23），依專案原創物件設計生成透明像素圖層；未使用第三方遊戲素材；tools/art/tile_finalize.py --overlay 輸出 RGBA8888。",
-      "file": "assets/tiles/fence-2x.png",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for tile.fence, SHA-256 569613d3c4be2c6ca7cf40173e753649c282012f8378f1169d1b74401046ea2c; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-fence-2x.png",
       "density": 2
     },
     {
@@ -477,6 +609,46 @@
       "kind": "object",
       "file": "assets/icons/icon-maskable-512.png",
       "source": "程式產生：tools/pwa/make-icons.mjs 以 64×64 邏輯畫布繪製像素風草地、太陽與幼苗，再以最近鄰放大輸出 RGBA8888；無外部素材。"
+    },
+    {
+      "id": "scene.village.general-shop",
+      "kind": "overlay",
+      "color": "#b3814f",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for scene.village.general-shop, SHA-256 b4236b568a6ac5c6c05a9b4744a92c50fdfe39bc132900a883ca13c6d7aa7f33; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-shop-general-2x.png",
+      "density": 2
+    },
+    {
+      "id": "scene.village.smithy",
+      "kind": "overlay",
+      "color": "#707e86",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for scene.village.smithy, SHA-256 24d378dd0d75eb01573968b9420e81077172a9930026741cbbd2a7ee07d7d410; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-shop-smithy-2x.png",
+      "density": 2
+    },
+    {
+      "id": "scene.farm.tree",
+      "kind": "overlay",
+      "color": "#4f8737",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for scene.farm.tree, SHA-256 3972b8de6b0aeef93ace94c2c90b5e167206392c8727607b814591477d1cb7ea; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-tree-2x.png",
+      "density": 2
+    },
+    {
+      "id": "scene.farm.house",
+      "kind": "overlay",
+      "color": "#9c6744",
+      "source": "OpenAI built-in image generation tool (2026-10-26), original scene candidate approved for scene.farm.house, SHA-256 0af23947af0fa9c7c82eb42a8fbacd52ba5f11ceca416257de5081aa52ed58ac; model name and license terms unavailable; exact-byte integration with per-file provenance.",
+      "file": "assets/tiles/vf11-house-2x.png",
+      "density": 2
     }
-  ]
+  ],
+  "itemIcons": {
+    "crop.sweet-radish": "assets/items/sweet-turnip.png",
+    "seed.sweet-radish": "assets/items/seed-bag.png",
+    "wood": "assets/items/wood.png",
+    "copper-ore": "assets/items/ore.png",
+    "fish.carp": "assets/items/fish.png",
+    "dish.creek-stew": "assets/items/stew.png"
+  }
 }

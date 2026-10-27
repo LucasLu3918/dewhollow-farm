@@ -817,7 +817,14 @@ export const startFileSchema = startSchema;
 export const rigsFileSchema = z.object({ version: z.literal(1), rigs: z.array(rigSchema) });
 export const toolsFileSchema = z.object({ version: z.literal(1), tools: z.array(toolSchema) });
 export const companionsFileSchema = z.object({ version: z.literal(1), companions: z.array(companionSchema) });
-export const assetsFileSchema = z.object({ version: z.literal(1), assets: z.array(assetSchema) });
+export const assetsFileSchema = z.object({
+  version: z.literal(1),
+  assets: z.array(assetSchema),
+  itemIcons: z.record(
+    z.string().regex(/^(?:(?:item|building|recipe|fish|crop|seed|animal|dish|decor)\.)?[a-z0-9]+(?:-[a-z0-9]+)*$/),
+    z.string().regex(/^assets\/items\/(?:[a-z0-9_-]+\/)*[a-z0-9_-]+\.png$/i),
+  ).optional(),
+});
 
 /** 音效：程式合成用的音軌（見 src/presentation/audio/synth.ts）。 */
 const hexColorSchema = z.string().regex(/^#[0-9a-f]{6}$/, '顏色必須是小寫的 #rrggbb');

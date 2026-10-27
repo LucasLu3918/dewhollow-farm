@@ -166,10 +166,10 @@ test('pixel32 candidate runtime composes farm crops, cat following, and tree dep
 
   await putSave(page, 'forest', { x: 15, y: 7, facing: 'down' }, {});
   const forestBehind = await sceneSnapshot(page);
-  const treeBehind = forestBehind.sprites.find((sprite) => sprite.key === 'tile.tree' && sprite.left === 15 * 64 && sprite.top === 7 * 64) as Sprite | undefined;
+  const treeBehind = forestBehind.sprites.find((sprite) => sprite.key === 'scene.forest.tree' && sprite.left === 15 * 64 && sprite.top === 7 * 64) as Sprite | undefined;
   const playerBehind = forestBehind.actors.find((actor) => actor.id === 'player') as Actor | undefined;
   expect(treeBehind).toBeDefined();
-  expect(treeBehind!.key).toBe('tile.tree'); // Tree is deliberately reported as existing-art fallback.
+  expect(treeBehind!.key).toBe('scene.forest.tree'); // Approved forest art remains outside the Pixel32 candidate atlas.
   expect(playerBehind).toBeDefined();
   expect(boundsOverlap(playerBehind!, treeBehind!), 'player overlaps tree art while behind its depth layer').toBe(true);
   expect(treeBehind!.depth).toBeGreaterThan(playerBehind!.depth);
@@ -178,7 +178,7 @@ test('pixel32 candidate runtime composes farm crops, cat following, and tree dep
 
   await putSave(page, 'forest', { x: 15, y: 8, facing: 'up' }, {});
   const forestFront = await sceneSnapshot(page);
-  const treeFront = forestFront.sprites.find((sprite) => sprite.key === 'tile.tree' && sprite.left === 15 * 64 && sprite.top === 7 * 64) as Sprite | undefined;
+  const treeFront = forestFront.sprites.find((sprite) => sprite.key === 'scene.forest.tree' && sprite.left === 15 * 64 && sprite.top === 7 * 64) as Sprite | undefined;
   const playerFront = forestFront.actors.find((actor) => actor.id === 'player') as Actor | undefined;
   expect(treeFront && playerFront).toBeTruthy();
   expect(boundsOverlap(playerFront!, treeFront!), 'player overlaps tree art while in front of its depth layer').toBe(true);
@@ -209,7 +209,7 @@ test('pixel32 candidate runtime composes farm crops, cat following, and tree dep
     },
     limitations: [
       'This evidence covers existing farm and forest MapScene regions, not a complete fixed 12x10 candidate scene.',
-      'Tree, crop, and companion art are existing-art fallbacks, not pixel32 candidate assets.',
+      'The approved forest tree, crop, and companion art are separate from the unapproved Pixel32 candidate assets.',
       'The test seeds and migrates an isolated IndexedDB fixture; it does not change production save format or user save data.',
       'Chromium evidence does not establish native-device behavior, exact art approval, or Gate 1 completion.',
     ],

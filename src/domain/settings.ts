@@ -76,6 +76,26 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+/** 新增動作時補齊舊版 key table；舊預設的 I/C 會遷移到新的背包/圖鑑/種子配置。 */
+function bindingsWithInventory(rawBindings: Record<string, unknown>): Partial<Record<ActionId, string>> {
+  const table: Partial<Record<ActionId, string>> = {};
+  for (const action of ACTION_IDS) {
+    const key = rawBindings[action];
+    if (typeof key === 'string') table[action] = key;
+  }
+  if (typeof rawBindings.inventory === 'string') return table;
+
+  // The previous defaults assigned I to collection and C to seed cycling. Preserve
+  // user mappings while moving those defaults away from the new inventory binding.
+  if (table.collection === 'i') table.collection = 'c';
+  if (table.cycleSeed === 'c') table.cycleSeed = 'n';
+  const occupied = new Set(Object.values(table));
+  const candidates = ['i', ...'abcdefghijklmnopqrstuvwxyz'.split('').filter((key) => key !== 'i')];
+  const inventoryKey = candidates.find((key) => !occupied.has(key));
+  if (inventoryKey) table.inventory = inventoryKey;
+  return table;
+}
+
 /**
  * 從不可信的原始資料（localStorage 讀出的 JSON）整理出完整的偏好。
  * 逐欄檢查：不合格的欄位用預設值，合格的欄位保留；按鍵表若不合格（缺動作、重複、或含 Esc）整張退回預設。
@@ -90,12 +110,8 @@ export function sanitizeSettings(raw: unknown): Settings {
 
   const rawBindings = fields.bindings;
   if (isObject(rawBindings)) {
-    // 只取認得的動作，多出來的欄位直接丟掉。
-    const table: Partial<Record<ActionId, string>> = {};
-    for (const action of ACTION_IDS) {
-      const key = rawBindings[action];
-      if (typeof key === 'string') table[action] = key;
-    }
+    // 只取認得的動作，多出來的欄位直接丟掉；舊表新增動作時保留原有有效綁定。
+    const table = bindingsWithInventory(rawBindings);
     if (bindingsAreValid(table)) base.bindings = table as Bindings;
   }
   if (typeof fields.fontSize === 'string' && (FONT_SIZES as readonly string[]).includes(fields.fontSize)) {

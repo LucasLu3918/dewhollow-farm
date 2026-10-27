@@ -21,6 +21,7 @@ export const ACTION_IDS = [
   'takeOff',
   'skills',
   'residents',
+  'inventory',
   'collection',
   'quests',
   'saves',
@@ -34,7 +35,7 @@ export type ActionId = (typeof ACTION_IDS)[number];
 
 export type Bindings = Readonly<Record<ActionId, string>>;
 
-/** 遊戲出貨時的預設按鍵；與改版前的按鍵完全相同。 */
+/** 遊戲預設按鍵；玩家可在設定中重新綁定。 */
 export const DEFAULT_BINDINGS: Bindings = Object.freeze({
   moveUp: 'ArrowUp',
   moveDown: 'ArrowDown',
@@ -42,7 +43,7 @@ export const DEFAULT_BINDINGS: Bindings = Object.freeze({
   moveRight: 'ArrowRight',
   interact: 'x',
   cycleTool: 'z',
-  cycleSeed: 'c',
+  cycleSeed: 'n',
   takeAxe: 'a',
   takePick: 'p',
   takeRod: 'r',
@@ -53,7 +54,8 @@ export const DEFAULT_BINDINGS: Bindings = Object.freeze({
   takeOff: 'q',
   skills: 'k',
   residents: 'f',
-  collection: 'i',
+  inventory: 'i',
+  collection: 'c',
   quests: 'j',
   saves: 'l',
   settings: 'o',

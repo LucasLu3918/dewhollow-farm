@@ -22,7 +22,7 @@ function v18State(overrides: Record<string, unknown> = {}): Record<string, unkno
 describe('migrateState v18 → v19（圖鑑與成就）', () => {
   it('bumps the save to version 19', () => {
     const migrated = migrateState(v18State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(23);
+    expect(migrated.schemaVersion).toBe(24);
   });
 
   it('starts the dex with nothing found and nothing claimed', () => {
@@ -59,6 +59,6 @@ describe('migrateState v18 → v19（圖鑑與成就）', () => {
   });
 
   it('a state from a version newer than 19 is still refused', () => {
-    expect(() => migrateState({ schemaVersion: 24 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState({ schemaVersion: 25 }, context)).toThrow(SaveFormatError);
   });
 });

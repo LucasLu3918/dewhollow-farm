@@ -17,7 +17,8 @@ export class ToolSeedSelector {
   private readonly list: HTMLElement;
   private readonly page: HTMLElement;
   private readonly note: HTMLElement;
-  private mode: 'tool' | 'seed' = 'tool';
+  private mode: 'tool' | 'seed' | 'assign' = 'tool';
+  private assignmentSlot: number | null = null;
   private wheel = false;
   private pageIndex = 0;
   private state: GameState | null = null;
@@ -70,17 +71,30 @@ export class ToolSeedSelector {
   close(): void {
     this.cancelWheelGesture();
     this.state = null;
+    this.assignmentSlot = null;
     this.dialog.close();
   }
 
   open(mode: 'tool' | 'seed', wheel: boolean, state: GameState, pointer?: HeldPointerStart): void {
     this.mode = mode;
+    this.assignmentSlot = null;
     this.wheel = wheel;
     this.pageIndex = 0;
     this.state = state;
     this.dialog.open();
     this.render();
     if (wheel && pointer) this.beginWheelGesture(pointer);
+  }
+
+  openAssignment(slot: number, state: GameState): void {
+    if (!Number.isInteger(slot) || slot < 0 || slot >= state.hotbar.length) return;
+    this.mode = 'assign';
+    this.assignmentSlot = slot;
+    this.wheel = false;
+    this.pageIndex = 0;
+    this.state = state;
+    this.dialog.open();
+    this.render();
   }
 
   cancelWheelGesture(): void {
@@ -139,6 +153,24 @@ export class ToolSeedSelector {
   private entries(): { id: string; name: string; count?: number; command: Command }[] {
     const state = this.state;
     if (!state) return [];
+    if (this.mode === 'assign') {
+      const slot = this.assignmentSlot;
+      if (slot === null) return [];
+      return [
+        { id: 'clear', name: '清空此格', command: { type: 'assignHotbarSlot', slot, item: null } },
+        ...TOOL_IDS.map((tool) => ({
+          id: `tool:${tool}`, name: TOOL_NAMES[tool], command: { type: 'assignHotbarSlot' as const, slot, item: { kind: 'tool' as const, tool } },
+        })),
+        ...this.index.cropIds().flatMap((cropId) => {
+          const count = countOf(state.inventory, seedItemId(cropId));
+          if (count < 1) return [];
+          return [{
+            id: `seed:${cropId}`, name: this.index.crop(cropId).name, count,
+            command: { type: 'assignHotbarSlot' as const, slot, item: { kind: 'seed' as const, cropId } },
+          }];
+        }),
+      ];
+    }
     if (this.mode === 'tool') return TOOL_IDS.map((tool) => ({
       id: tool, name: TOOL_NAMES[tool], command: { type: 'takeTool', tool },
     }));
@@ -157,14 +189,16 @@ export class ToolSeedSelector {
     this.pageIndex = page.pageIndex;
     const pages = page.pageCount;
     const visible = this.wheel ? page.items : all;
-    this.title.textContent = this.mode === 'tool' ? (this.wheel ? '工具輪盤' : '選擇工具') : (this.wheel ? '種子輪盤' : '選擇種子');
+    this.title.textContent = this.mode === 'assign'
+      ? `設定快捷欄第${(this.assignmentSlot ?? 0) + 1}格`
+      : this.mode === 'tool' ? (this.wheel ? '工具輪盤' : '選擇工具') : (this.wheel ? '種子輪盤' : '選擇種子');
     this.note.hidden = this.mode !== 'seed';
     this.note.textContent = '非當季種子仍可選；一般田地的播種季節限制照常套用，溫室除外。';
     this.list.classList.toggle('tool-seed-wheel', this.wheel);
     this.list.replaceChildren();
     if (visible.length === 0) {
       const empty = this.doc.createElement('li');
-      empty.textContent = this.mode === 'seed' ? '背包裡沒有種子' : '沒有可選項目';
+      empty.textContent = this.mode === 'seed' ? '背包裡沒有種子' : this.mode === 'assign' ? '沒有可設定的項目' : '沒有可選項目';
       this.list.append(empty);
     }
     for (const [index, entry] of visible.entries()) {

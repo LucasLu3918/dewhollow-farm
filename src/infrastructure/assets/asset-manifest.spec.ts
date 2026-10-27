@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import assets from '../../../content/assets.json';
+import fish from '../../../content/fish.json';
+import items from '../../../content/items.json';
 import { assetsFileSchema } from '../content/content-schema';
 import {
   assetProblems,
   displayScale,
   missingFiles,
   resolveAsset,
+  resolveItemIcon,
   type AssetEntry,
   type AssetManifest,
 } from './asset-manifest';
@@ -42,6 +45,54 @@ describe('assetsFileSchema density', () => {
 
   it('rejects zero, fractions and absurd values', () => {
     for (const density of [0, 1.5, 5, -2, '2']) expect(parse(density).success).toBe(false);
+  });
+});
+
+describe('assetsFileSchema itemIcons', () => {
+  it('accepts an optional item-id to asset-path map', () => {
+    expect(assetsFileSchema.safeParse({
+      version: 1,
+      assets: [],
+      itemIcons: { 'item.sweet-radish': 'assets/items/sweet-radish.png' },
+    }).success).toBe(true);
+    expect(assetsFileSchema.safeParse({ version: 1, assets: [] }).success).toBe(true);
+  });
+
+  it('rejects map keys that are not item ids', () => {
+    expect(assetsFileSchema.safeParse({
+      version: 1,
+      assets: [],
+      itemIcons: { 'tile.grass': 'assets/items/sweet-radish.png' },
+    }).success).toBe(false);
+  });
+
+  it('accepts canonical IDs from shipped inventory content, including dotted IDs', () => {
+    const itemIcons = Object.fromEntries([
+      ...items.items.map(({ id }) => [id, 'assets/items/example.png']),
+      ...fish.fish.map(({ id }) => [`fish.${id}`, 'assets/items/example.png']),
+      ['crop.sweet-radish', 'assets/items/example.png'],
+      ['seed.sweet-radish', 'assets/items/example.png'],
+    ]);
+
+    expect(assetsFileSchema.safeParse({ version: 1, assets: [], itemIcons }).success).toBe(true);
+  });
+
+  it('rejects malformed canonical IDs and path-like keys', () => {
+    for (const itemId of ['item.', '.wood', 'fish..carp', 'fish/carp', '../wood', ' wood', 'tile.grass']) {
+      expect(assetsFileSchema.safeParse({
+        version: 1,
+        assets: [],
+        itemIcons: { [itemId]: 'assets/items/example.png' },
+      }).success, itemId).toBe(false);
+    }
+  });
+
+  it('rejects paths outside the local item icon directory', () => {
+    expect(assetsFileSchema.safeParse({
+      version: 1,
+      assets: [],
+      itemIcons: { 'item.sweet-radish': '../private.png' },
+    }).success).toBe(false);
   });
 });
 
@@ -163,6 +214,68 @@ describe('missingFiles', () => {
   });
 });
 
+describe('itemIcons', () => {
+  const iconManifest = (itemIcons?: Record<string, string>): AssetManifest => ({
+    version: 1,
+    assets: [],
+    ...(itemIcons === undefined ? {} : { itemIcons }),
+  });
+
+  it('is optional for existing manifests', () => {
+    expect(assetProblems(iconManifest())).toEqual([]);
+    expect(resolveItemIcon(iconManifest(), 'item.sweet-radish', new Set(['item.sweet-radish']))).toEqual({
+      status: 'missing',
+      diagnostic: 'missing-icon',
+    });
+  });
+
+  it('resolves a declared item icon only for a known item ID', () => {
+    const manifest = iconManifest({ 'item.sweet-radish': 'assets/items/sweet-radish.png' });
+    expect(resolveItemIcon(manifest, 'item.sweet-radish', new Set(['item.sweet-radish']))).toEqual({
+      status: 'available',
+      src: '/assets/items/sweet-radish.png',
+    });
+    expect(resolveItemIcon(manifest, 'item.unknown', new Set(['item.sweet-radish']))).toEqual({
+      status: 'missing',
+      diagnostic: 'unknown-item',
+    });
+  });
+
+  it('resolves item icons beneath the configured Vite base path', () => {
+    const manifest = iconManifest({ 'item.sweet-radish': 'assets/items/sweet-radish.png' });
+    expect(resolveItemIcon(manifest, 'item.sweet-radish', new Set(['item.sweet-radish']), '/dewhollow/')).toEqual({
+      status: 'available',
+      src: '/dewhollow/assets/items/sweet-radish.png',
+    });
+  });
+
+  it('validates and resolves canonical content IDs without rewriting them', () => {
+    const itemIds = ['wood', 'fish.carp', 'recipe.sun-hat'];
+    const itemIcons = Object.fromEntries(itemIds.map((id) => [id, `assets/items/${id.replaceAll('.', '-')}.png`]));
+    const manifest = iconManifest(itemIcons);
+
+    expect(assetProblems(manifest)).toEqual([]);
+    for (const id of itemIds) {
+      expect(resolveItemIcon(manifest, id, new Set(itemIds))).toEqual({
+        status: 'available',
+        src: `/${itemIcons[id]}`,
+      });
+    }
+  });
+
+  it('reports item icon entries with unsafe file paths', () => {
+    expect(assetProblems(iconManifest({ 'item.sweet-radish': '../private.png' }))).toContain(
+      '物品 item.sweet-radish 的圖示路徑必須在 assets/ 底下：../private.png',
+    );
+  });
+
+  it('rejects malformed inventory IDs even when the manifest bypasses content schema parsing', () => {
+    expect(assetProblems(iconManifest({ '../wood': 'assets/items/wood.png' }))).toContain(
+      '物品圖示 id 格式無效：../wood',
+    );
+  });
+});
+
 describe('shipped assets', () => {
   // Vite 的 glob：鍵是專案根目錄起算的路徑；這裡只看有哪些檔案存在。
   const onDisk = new Set(Object.keys(import.meta.glob('/public/assets/**/*.png')).map((p) => p.replace('/public/', '')));
@@ -174,6 +287,21 @@ describe('shipped assets', () => {
 
   it('has no asset problems', () => {
     expect(assetProblems(manifest)).toEqual([]);
+  });
+
+  it('resolves every shipped icon to a public PNG for its canonical inventory ID', () => {
+    const knownItemIds = new Set([
+      ...items.items.map(({ id }) => id),
+      ...fish.fish.map(({ id }) => `fish.${id}`),
+      ...Object.keys(manifest.itemIcons ?? {}),
+    ]);
+    for (const [itemId, file] of Object.entries(manifest.itemIcons ?? {})) {
+      expect(onDisk, itemId).toContain(file);
+      expect(resolveItemIcon(manifest, itemId, knownItemIds), itemId).toEqual({
+        status: 'available',
+        src: `/${file}`,
+      });
+    }
   });
 
   it('gives the player a front, back and side image, and mirrors the side for facing right', () => {

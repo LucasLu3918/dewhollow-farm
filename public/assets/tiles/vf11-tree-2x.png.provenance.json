@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "65979b698c028cfaa6639bd64c193ee20ef0efdfcb994b0c6bd316fa061e1aeb",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "scene.farm.tree",
+  "candidate_filename": "overlay-tree-4x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:54Z",
+  "integrated_filename": "vf11-tree-2x.png",
+  "schema_version": 1,
+  "sha256": "3972b8de6b0aeef93ace94c2c90b5e167206392c8727607b814591477d1cb7ea"
+}

@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "2afdd93bb3bc219840cb65a3ab2192311e842fa288e77ebe80bf2efff381a5ef",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "tile.field",
+  "candidate_filename": "tile-field-2x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:54Z",
+  "integrated_filename": "vf11-field-2x.png",
+  "schema_version": 1,
+  "sha256": "87929b9296e120f0f565a12fedb90bd4a6103d1fca3ea6847722d156fa52011c"
+}

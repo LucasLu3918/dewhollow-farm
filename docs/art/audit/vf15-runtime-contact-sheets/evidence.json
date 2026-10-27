@@ -1,0 +1,295 @@
+{
+  "capture": "Formal runtime assets only; candidate mode disabled.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "formalAssets": {
+    "player": [
+      {
+        "key": "player.down",
+        "size": {
+          "width": 128,
+          "height": 160
+        }
+      },
+      {
+        "key": "player.up",
+        "size": {
+          "width": 128,
+          "height": 160
+        }
+      },
+      {
+        "key": "player.left",
+        "size": {
+          "width": 128,
+          "height": 160
+        }
+      }
+    ],
+    "pets": [
+      {
+        "key": "pet.cat",
+        "size": {
+          "width": 96,
+          "height": 96
+        }
+      },
+      {
+        "key": "pet.marsupial",
+        "size": {
+          "width": 96,
+          "height": 96
+        }
+      }
+    ],
+    "candidateMode": false,
+    "renderer": {
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+      "software": true,
+      "workaround": true,
+      "override": null,
+      "textureUnits": 1,
+      "maxTextureUnits": 16
+    },
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36"
+  },
+  "sourceFiles": {
+    "player.down": "public/assets/characters/xiaohan-2x.png",
+    "player.up": "public/assets/characters/xiaohan-back-2x.png",
+    "player.left": "public/assets/characters/xiaohan-side-2x.png",
+    "player.right": "public/assets/characters/xiaohan-side-2x.png (mirrored from player.left)",
+    "pet.cat": "public/assets/characters/cat-2x.png",
+    "pet.marsupial": "public/assets/characters/marsupial-2x.png"
+  },
+  "sourceHashes": {
+    "player.down": "e7f19903932679bdc378d70fab1cc407e82e0c2a03ad557623f8e7bbfd3d85e1",
+    "player.up": "7957c0064392269cc4edfbb8ffd1f470bff6c1ae71a10ba929f9eaaa7976b300",
+    "player.left": "067293dbe2d12d7ec1f620f7c5b073ddd9971afd3138d782ce8d7ec94f3909a8",
+    "pet.cat": "e128d8295d4d1fc8cf3ff52dc70d176b3b0ea8b6087a6f350b6feeef4c8468e5",
+    "pet.marsupial": "614fc13c48dab042962c7dc39f2353890d5f038e04076205a99cad27aed822d7"
+  },
+  "player": {
+    "cells": [
+      {
+        "label": "down/rest",
+        "pose": {
+          "y": 0,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "legA": 0,
+          "legB": 0,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "down/step-A lift",
+        "pose": {
+          "y": -2.82842712474619,
+          "rotation": 0.039492292783629916,
+          "scaleX": 0.9840900974233027,
+          "scaleY": 1.0318198051533947,
+          "legA": -4.949747468305832,
+          "legB": 0,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "down/step-B lift",
+        "pose": {
+          "y": -2.82842712474619,
+          "rotation": -0.039492292783629916,
+          "scaleX": 0.9840900974233027,
+          "scaleY": 1.0318198051533947,
+          "legA": 0,
+          "legB": -4.949747468305832,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "down/passing",
+        "pose": {
+          "y": -4,
+          "rotation": 0.05585053606381855,
+          "scaleX": 0.9775,
+          "scaleY": 1.045,
+          "legA": -7,
+          "legB": 0,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "up/rest",
+        "pose": {
+          "y": 0,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "legA": 0,
+          "legB": 0,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "up/step-A lift",
+        "pose": {
+          "y": -2.82842712474619,
+          "rotation": 0.039492292783629916,
+          "scaleX": 0.9840900974233027,
+          "scaleY": 1.0318198051533947,
+          "legA": -4.949747468305832,
+          "legB": 0,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "up/step-B lift",
+        "pose": {
+          "y": -2.82842712474619,
+          "rotation": -0.039492292783629916,
+          "scaleX": 0.9840900974233027,
+          "scaleY": 1.0318198051533947,
+          "legA": 0,
+          "legB": -4.949747468305832,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "up/passing",
+        "pose": {
+          "y": -4,
+          "rotation": 0.05585053606381855,
+          "scaleX": 0.9775,
+          "scaleY": 1.045,
+          "legA": -7,
+          "legB": 0,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "left/rest",
+        "pose": {
+          "y": 0,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "legA": 0,
+          "legB": 0,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "left/step-A lift",
+        "pose": {
+          "y": -2.82842712474619,
+          "rotation": 0.039492292783629916,
+          "scaleX": 0.9840900974233027,
+          "scaleY": 1.0318198051533947,
+          "legA": -2.2273863607376243,
+          "legB": 0,
+          "stretch": 0.09899494936611665
+        }
+      },
+      {
+        "label": "left/step-B lift",
+        "pose": {
+          "y": -2.82842712474619,
+          "rotation": -0.039492292783629916,
+          "scaleX": 0.9840900974233027,
+          "scaleY": 1.0318198051533947,
+          "legA": -2.2273863607376243,
+          "legB": 0,
+          "stretch": -0.09899494936611665
+        }
+      },
+      {
+        "label": "left/passing",
+        "pose": {
+          "y": -4,
+          "rotation": 0.05585053606381855,
+          "scaleX": 0.9775,
+          "scaleY": 1.045,
+          "legA": -3.15,
+          "legB": 0,
+          "stretch": 0.14
+        }
+      },
+      {
+        "label": "right/rest",
+        "pose": {
+          "y": 0,
+          "rotation": 0,
+          "scaleX": 1,
+          "scaleY": 1,
+          "legA": 0,
+          "legB": 0,
+          "stretch": 0
+        }
+      },
+      {
+        "label": "right/step-A lift",
+        "pose": {
+          "y": -2.82842712474619,
+          "rotation": 0.039492292783629916,
+          "scaleX": 0.9840900974233027,
+          "scaleY": 1.0318198051533947,
+          "legA": -2.2273863607376243,
+          "legB": 0,
+          "stretch": 0.09899494936611665
+        }
+      },
+      {
+        "label": "right/step-B lift",
+        "pose": {
+          "y": -2.82842712474619,
+          "rotation": -0.039492292783629916,
+          "scaleX": 0.9840900974233027,
+          "scaleY": 1.0318198051533947,
+          "legA": -2.2273863607376243,
+          "legB": 0,
+          "stretch": -0.09899494936611665
+        }
+      },
+      {
+        "label": "right/passing",
+        "pose": {
+          "y": -4,
+          "rotation": 0.05585053606381855,
+          "scaleX": 0.9775,
+          "scaleY": 1.045,
+          "legA": -3.15,
+          "legB": 0,
+          "stretch": 0.14
+        }
+      }
+    ],
+    "dimensions": {
+      "width": 768,
+      "height": 600
+    },
+    "sha256": "7d6c7e044289ae4ac270865fea9f0ead20c3dcee87531169ace819a0e347556c",
+    "contactSheet": "player-four-directions.png"
+  },
+  "pets": {
+    "cells": [
+      {
+        "label": "Cat · rest · farm"
+      },
+      {
+        "label": "Quokka · village"
+      }
+    ],
+    "dimensions": {
+      "width": 352,
+      "height": 106
+    },
+    "sha256": "f40fd34eee7cab3dfb32b307c836854e6e5da7a061cd997038b3f93eff087150",
+    "cellSha256": {
+      "catRest": "359d0ca4ec1c6956b85d164519ec8d003587167346828941cd0e03dfd1df3300",
+      "marsupialRest": "3793ea81fc86d2e2c148bc5ad67ebbff2c8a5dc7efc23cde16b28ec0fba958af"
+    },
+    "contactSheet": "pet-silhouettes.png"
+  }
+}

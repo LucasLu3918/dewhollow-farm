@@ -180,9 +180,10 @@ else return vec4(0.0);                                                          
 - 單元：`render-compat.spec.ts`（名稱判斷、網址開關、讀取失敗的處理）。
 - e2e：`render-compat.spec.ts`
   - 偵測與套用結果一致（`window.__dewhollow.renderCompat()`）；強制開關有作用。
-  - **像素回歸**：擺出四個方向各 12 個相位，讀 WebGL 畫面量面積，全部要在 0.97～1.03。CI 的 Chromium 就是 SwiftShader，所以這個測試有意義；**已用變異測試確認：停用保底時 4 項全部失敗**。
-  - **金絲雀**：`?compat=0` 時預期仍然會壞（`test.fail`）。哪天 Phaser 或 SwiftShader 修好，它會因「預期失敗卻通過」報警，提醒可以移除保底。
-- 升級 Phaser 時，先看金絲雀有沒有報警。
+  - **預設路徑像素回歸**：擺出 up／down／left／right 四個方向各 12 個相位，讀 WebGL 畫面量玩家面積；每一項必須在 0.97～1.03，且確認軟體 renderer 預設保底狀態與偵測結果相同。現行測試附上 renderer 名稱、瀏覽器版本與逐相位比值。
+  - **強制關閉診斷**：`?compat=0` 只在軟體 renderer 上取樣 down 向 12 個相位，附上目前 renderer／瀏覽器／比值與觀測分類；不以「應當失敗」設成 `test.fail`，因此 renderer 行為變化不會再造成 xpass 假紅。此診斷不會修改預設設定，也不代表停用保底受到支援。
+- 歷史紀錄：較早 Chromium／SwiftShader 環境曾以變異測試觀察到停用保底時四個方向的回歸案例失敗；2026-10-26 的完整套件與單獨重跑則在 Google Chrome for Testing `156.0.8078.4`（revision 1248）觀察到 down 向 canary xpass（預期失敗的斷言反而通過）。新版診斷保留當前比值作為證據，不把舊變異結果當成現況。
+- **單一 renderer 的 xpass 不足以證明 Phaser／所有軟體或硬體 renderer 都已修復，也不能作為移除保底的依據。** Phaser 升級或 renderer 行為改變時，檢閱附帶的當前診斷；仍維持軟體 renderer 預設保底及 `?compat=1` 強制啟用。移除保底須另做跨 renderer／版本驗證與獨立變更審查。
 
 ### 尚未解決與限制
 

@@ -19,7 +19,7 @@ function v21State(overrides: Record<string, unknown> = {}): Record<string, unkno
 describe('migrateState v21 → v22（裝飾擺放、服飾穿戴、旅行商人）', () => {
   it('bumps the save to version 22', () => {
     const migrated = migrateState(v21State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(23);
+    expect(migrated.schemaVersion).toBe(24);
   });
 
   it('starts with no decor placed and nothing worn', () => {
@@ -47,6 +47,6 @@ describe('migrateState v21 → v22（裝飾擺放、服飾穿戴、旅行商人�
   });
 
   it('a state from a version newer than 22 is still refused', () => {
-    expect(() => migrateState({ schemaVersion: 24 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState({ schemaVersion: 25 }, context)).toThrow(SaveFormatError);
   });
 });

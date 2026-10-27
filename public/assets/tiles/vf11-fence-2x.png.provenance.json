@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "714561cb550cd37e57c5173d24ff61ba5e05db795842f48b7f4385c7de6d718b",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "tile.fence",
+  "candidate_filename": "overlay-fence-2x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:54Z",
+  "integrated_filename": "vf11-fence-2x.png",
+  "schema_version": 1,
+  "sha256": "569613d3c4be2c6ca7cf40173e753649c282012f8378f1169d1b74401046ea2c"
+}

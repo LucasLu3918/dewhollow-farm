@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "0483c93392bc892c517fbb4ae9271e89f552f4305cb1dc5c807f74e3f7d82483",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "fish.carp",
+  "candidate_filename": "fish.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T13:53:28Z",
+  "integrated_filename": "fish.png",
+  "schema_version": 1,
+  "sha256": "027fa69938e6a2aa456992641bbfbf6aa8bcf10bdc3a5cdb0927afcf5c6e216a"
+}

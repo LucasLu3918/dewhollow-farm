@@ -18,7 +18,13 @@ export interface AssetEntry {
 export interface AssetManifest {
   version: 1;
   assets: AssetEntry[];
+  /** Optional production UI icons keyed by full item id (for example `item.sweet-radish`). */
+  itemIcons?: Record<string, string>;
 }
+
+export type ItemIconResolution =
+  | { status: 'available'; src: string }
+  | { status: 'missing'; diagnostic: 'missing-icon' | 'unknown-item' };
 
 /** 遊戲運行時需要的素材 id。地圖上的格子以 `tile.<kind>` 命名。 */
 export function requiredAssetIds(tileKinds: readonly string[], cropIds: readonly string[], npcIds: readonly string[]): string[] {
@@ -72,7 +78,39 @@ export function assetProblems(manifest: AssetManifest): string[] {
       problems.push(`素材 ${entry.id} 的檔案路徑必須在 assets/ 底下：${entry.file}`);
     }
   }
+  for (const [itemId, file] of Object.entries(manifest.itemIcons ?? {})) {
+    if (!isValidInventoryItemId(itemId)) {
+      problems.push(`物品圖示 id 格式無效：${itemId}`);
+    }
+    if (!isSafeItemIconFile(file)) {
+      problems.push(`物品 ${itemId} 的圖示路徑必須在 assets/ 底下：${file}`);
+    }
+  }
   return problems;
+}
+
+/** Resolves an optional inventory icon. Unknown ids and known items without artwork stay explicit. */
+export function resolveItemIcon(
+  manifest: AssetManifest,
+  itemId: string,
+  knownItemIds: ReadonlySet<string>,
+  basePath = '/',
+): ItemIconResolution {
+  if (!knownItemIds.has(itemId)) return { status: 'missing', diagnostic: 'unknown-item' };
+  const file = manifest.itemIcons?.[itemId];
+  if (!file || !isSafeItemIconFile(file)) {
+    return { status: 'missing', diagnostic: 'missing-icon' };
+  }
+  const base = basePath.endsWith('/') ? basePath : `${basePath}/`;
+  return { status: 'available', src: `${base}${file}` };
+}
+
+function isSafeItemIconFile(file: string): boolean {
+  return /^assets\/items\/(?:[a-z0-9_-]+\/)*[a-z0-9_-]+\.png$/i.test(file);
+}
+
+function isValidInventoryItemId(itemId: string): boolean {
+  return /^(?:(?:item|building|recipe|fish|crop|seed|animal|dish|decor)\.)?[a-z0-9]+(?:-[a-z0-9]+)*$/.test(itemId);
 }
 
 function mirrorProblems(entry: AssetEntry, byId: ReadonlyMap<string, AssetEntry>): string[] {

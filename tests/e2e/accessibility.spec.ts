@@ -40,6 +40,9 @@ test.describe('按鍵重新綁定', () => {
     await startGame(page);
     await openSettings(page);
     await expect(keyRow(page, '互動').locator('kbd')).toHaveText('X');
+    await expect(keyRow(page, '背包').locator('kbd')).toHaveText('I');
+    await expect(keyRow(page, '圖鑑與成就').locator('kbd')).toHaveText('C');
+    await expect(keyRow(page, '切換種子').locator('kbd')).toHaveText('N');
     await expect(keyRow(page, '上移').locator('kbd')).toHaveText('↑');
   });
 
@@ -83,8 +86,8 @@ test.describe('按鍵重新綁定', () => {
     await startGame(page);
     await openSettings(page);
     await page.locator('#settings-keys button[data-action="interact"]').click();
-    await page.keyboard.press('n');
-    await expect(keyRow(page, '互動').locator('kbd')).toHaveText('N');
+    await page.keyboard.press('u');
+    await expect(keyRow(page, '互動').locator('kbd')).toHaveText('U');
     await page.locator('#settings-reset').click();
     await expect(keyRow(page, '互動').locator('kbd')).toHaveText('X');
   });
@@ -93,13 +96,13 @@ test.describe('按鍵重新綁定', () => {
     await startGame(page);
     await openSettings(page);
     await page.locator('#settings-keys button[data-action="interact"]').click();
-    await page.keyboard.press('n');
-    await expect(keyRow(page, '互動').locator('kbd')).toHaveText('N');
+    await page.keyboard.press('u');
+    await expect(keyRow(page, '互動').locator('kbd')).toHaveText('U');
     await page.reload();
     await expect(page.locator('#game canvas')).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).not.toBe('');
     await openSettings(page);
-    await expect(keyRow(page, '互動').locator('kbd')).toHaveText('N');
+    await expect(keyRow(page, '互動').locator('kbd')).toHaveText('U');
   });
 
   test('Esc 關閉設定面板', async ({ page }) => {

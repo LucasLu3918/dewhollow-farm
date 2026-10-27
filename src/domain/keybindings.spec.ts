@@ -25,6 +25,9 @@ describe('default bindings', () => {
     expect(DEFAULT_BINDINGS.takeSickle).toBe('g');
     expect(DEFAULT_BINDINGS.help).toBe('?');
     expect(DEFAULT_BINDINGS.mute).toBe('m');
+    expect(DEFAULT_BINDINGS.inventory).toBe('i');
+    expect(DEFAULT_BINDINGS.collection).toBe('c');
+    expect(DEFAULT_BINDINGS.cycleSeed).toBe('n');
   });
 
   it('resetBindings returns a fresh copy of the defaults, not the shared object', () => {
@@ -52,13 +55,16 @@ describe('actionForKey', () => {
     expect(actionForKey(DEFAULT_BINDINGS, 'X')).toBe('interact');
     expect(actionForKey(DEFAULT_BINDINGS, 'ArrowLeft')).toBe('moveLeft');
     expect(actionForKey(DEFAULT_BINDINGS, 'F13')).toBeNull();
+    expect(actionForKey(DEFAULT_BINDINGS, 'I')).toBe('inventory');
+    expect(actionForKey(DEFAULT_BINDINGS, 'C')).toBe('collection');
+    expect(actionForKey(DEFAULT_BINDINGS, 'N')).toBe('cycleSeed');
   });
 
   it('follows a rebinding: the new key works and the old key no longer does', () => {
-    const result = assignKey(DEFAULT_BINDINGS, 'interact', 'n');
+    const result = assignKey(DEFAULT_BINDINGS, 'interact', 'u');
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(actionForKey(result.bindings, 'n')).toBe('interact');
+    expect(actionForKey(result.bindings, 'u')).toBe('interact');
     expect(actionForKey(result.bindings, 'x')).toBeNull();
   });
 });

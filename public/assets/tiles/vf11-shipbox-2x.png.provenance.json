@@ -1,0 +1,12 @@
+{
+  "approval_record_sha256": "4d92144c91487509d9485645eafd75a7c3d85b994d933002e05b8cafa8555c4f",
+  "approved_at": "2026-10-26",
+  "approver": "human",
+  "asset_key": "tile.shipbox",
+  "candidate_filename": "overlay-shipbox-2x-candidate-20261026.png",
+  "decision": "approved",
+  "integrated_at": "2026-10-26T15:41:54Z",
+  "integrated_filename": "vf11-shipbox-2x.png",
+  "schema_version": 1,
+  "sha256": "bc1905a68908ff720e0800f9bef5745f28b44ddaef54a08156531c5d9d738035"
+}

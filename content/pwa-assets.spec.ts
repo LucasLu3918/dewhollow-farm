@@ -25,8 +25,9 @@ const licenses = Object.values(import.meta.glob('/docs/LICENSES.md', { query: '?
 const gitignore = Object.values(import.meta.glob('/.gitignore', { query: '?raw', import: 'default', eager: true }))[0] as string;
 const indexHtml = Object.values(import.meta.glob('/index.html', { query: '?raw', import: 'default', eager: true }))[0] as string;
 
-/** 不需要登錄為素材的 public/ 檔案（只有 manifest 本身）。 */
+/** 明確列出的 public 非遊戲素材；不可用通配規則略過新檔案。 */
 const UNREGISTERED_ALLOWED = new Set(['manifest.webmanifest']);
+const PUBLIC_SOURCE_PURPOSES = new Set(['gate1-source-only', 'asset-provenance-sidecar']);
 
 describe('web app manifest', () => {
   it('名稱、語言、顯示模式與起始網址正確', () => {
@@ -75,7 +76,23 @@ describe('素材與 public/ 的登錄', () => {
   });
 
   it('public/ 裡每個檔案都登錄在 assets.json（或在允許清單中）', () => {
-    const registered = new Set(assets.assets.flatMap((a) => ('file' in a && a.file ? [`${a.file}`] : [])));
+    const itemIconFiles = Object.values(assets.itemIcons ?? {});
+    const sourceFiles = assets.publicSourceFiles ?? [];
+    const sourceOnlyPaths = sourceFiles.map(({ file }) => file);
+    expect(new Set(sourceOnlyPaths).size).toBe(sourceOnlyPaths.length);
+    for (const sourceFile of sourceFiles) {
+      expect(PUBLIC_SOURCE_PURPOSES, sourceFile.file).toContain(sourceFile.purpose);
+      expect(sourceFile.source.trim(), sourceFile.file).not.toBe('');
+      expect(assets.assets.some((asset) => 'file' in asset && asset.file === sourceFile.file), sourceFile.file).toBe(false);
+      expect(itemIconFiles, sourceFile.file).not.toContain(sourceFile.file);
+      expect(publicFiles, sourceFile.file).toContain(sourceFile.file);
+    }
+    const registered = new Set([
+      ...assets.assets.flatMap((a) => ('file' in a && a.file ? [`${a.file}`] : [])),
+      ...itemIconFiles,
+      ...itemIconFiles.map((file) => `${file}.provenance.json`),
+      ...sourceOnlyPaths,
+    ]);
     const unregistered = publicFiles.filter((file) => !registered.has(file) && !UNREGISTERED_ALLOWED.has(file));
     expect(unregistered).toEqual([]);
   });

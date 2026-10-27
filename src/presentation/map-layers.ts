@@ -3,7 +3,7 @@ import { tileAt } from '../domain/world';
 
 /** Opaque surfaces fill the grid; all other tile kinds are transparent objects rendered above them. */
 const GROUND_KINDS: ReadonlySet<GroundKind> = new Set([
-  'grass', 'field', 'path', 'water', 'floor', 'cave', 'wall',
+  'grass', 'field', 'path', 'water', 'floor', 'cave',
 ]);
 
 export function isGroundLayer(kind: TileKind): kind is GroundKind {
