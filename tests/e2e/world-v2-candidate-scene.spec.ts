@@ -14,7 +14,7 @@ type CandidateDebug = {
     mapId: string;
     frames: string[];
     layers: Array<{ frame: string; layer: 'ground' | 'object'; x: number; y: number }>;
-    placements: Array<{ frame: string; x: number; y: number }>;
+    placements: Array<{ frame: string; x: number; y: number; depth: number }>;
   };
 };
 
@@ -34,8 +34,11 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
 
 async function capture(page: Page, name: string): Promise<void> {
   if (!saveEvidence) return;
+  const root = name.startsWith('house-')
+    ? 'docs/art/candidates/pixel-movement/df-v2-030-house-interior/screenshots'
+    : 'docs/art/candidates/pixel-movement/gate1-world-v2-scene/screenshots';
   await page.locator('#game').screenshot({
-    path: `docs/art/candidates/pixel-movement/gate1-world-v2-scene/screenshots/${name}.png`,
+    path: `${root}/${name}.png`,
     animations: 'disabled',
     scale: 'css',
   });
@@ -55,8 +58,8 @@ test('DEV world-v2 farm and house scene candidate stays opt-in and renders both 
   const candidateAssetPaths = [
     '/docs/art/candidates/pixel-movement/gate1-world-v2-scene/farm/manifest.json',
     '/docs/art/candidates/pixel-movement/gate1-world-v2-scene/farm/atlas.png',
-    '/docs/art/candidates/pixel-movement/gate1-world-v2-scene/house/manifest.json',
-    '/docs/art/candidates/pixel-movement/gate1-world-v2-scene/house/atlas.png',
+    '/docs/art/candidates/pixel-movement/df-v2-030-house-interior/manifest.json',
+    '/docs/art/candidates/pixel-movement/df-v2-030-house-interior/atlas.png',
   ];
   const assetResponses = candidateAssetPaths.map((path) => page.waitForResponse((response) => response.url().includes(path)));
   await page.goto('/?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1SceneVisual=world-v2-cozy');
@@ -101,6 +104,15 @@ test('DEV world-v2 farm and house scene candidate stays opt-in and renders both 
     'gate1-world-v2-house-atlas:storage',
     'gate1-world-v2-house-atlas:pet-bed',
     'gate1-world-v2-house-atlas:door-threshold',
+    'gate1-world-v2-house-atlas:wardrobe',
+    'gate1-world-v2-house-atlas:stove',
+    'gate1-world-v2-house-atlas:table',
+    'gate1-world-v2-house-atlas:chair',
+    'gate1-world-v2-house-atlas:entry-mat',
+    'gate1-world-v2-house-atlas:shoe-storage',
+    'gate1-world-v2-house-atlas:water-bowl',
+    'gate1-world-v2-house-atlas:shelf-books',
+    'gate1-world-v2-house-atlas:plant',
   ]));
   await expect.poll(() => page.evaluate(() => {
     const scene = (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate();
@@ -109,14 +121,36 @@ test('DEV world-v2 farm and house scene candidate stays opt-in and renders both 
   await expect.poll(() => page.evaluate(() => {
     const scene = (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate();
     return scene?.placements.map((placement) => placement.frame) ?? [];
+  })).toEqual(expect.arrayContaining([
+    'bed', 'plant', 'kitchen-counter', 'stove', 'shelf-books', 'workbench', 'storage',
+    'wardrobe', 'shoe-storage', 'table', 'chair', 'pet-bed', 'water-bowl', 'entry-mat',
+    'rug', 'door-threshold',
+  ]));
+  await expect.poll(() => page.evaluate(() => {
+    const scene = (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate();
+    return scene?.placements.map((placement) => placement.frame) ?? [];
   })).not.toContain('wall-window');
+  const depths = await page.evaluate(() => {
+    const placements = (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate().placements ?? [];
+    return Object.fromEntries(placements.map(({ frame, depth }) => [frame, depth]));
+  });
+  const shelfDepth = depths['shelf-books'];
+  const rugDepth = depths.rug;
+  const bedDepth = depths.bed;
+  expect(shelfDepth).toBeDefined();
+  expect(rugDepth).toBeDefined();
+  expect(bedDepth).toBeDefined();
+  expect(shelfDepth!).toBeLessThan(bedDepth!);
+  expect(rugDepth!).toBeLessThan(bedDepth!);
   await walk(page, 'ArrowRight', 1);
   await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.movement().tile ?? null)).toMatchObject({ x: 11, y: 18 });
+  await walk(page, 'ArrowUp', 8);
   await capture(page, 'house-mobile');
-  await page.setViewportSize({ width: 1280, height: 896 });
+  await page.setViewportSize({ width: 1280, height: 720 });
   await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate().mapId ?? '')).toBe('house');
   await capture(page, 'house-desktop');
 
+  await walk(page, 'ArrowDown', 8);
   await walk(page, 'ArrowLeft', 1);
   await page.keyboard.press('ArrowDown');
   await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.mapId() ?? '')).toBe('farm');

@@ -117,11 +117,12 @@ export class BootScene extends Phaser.Scene {
       this.load.image(PIXEL32_ANIMATION_ATLAS_KEY, `${root}/pixel32-animation/player-4dir.png`);
     }
     if (this.worldV2SceneCandidateRequested()) {
-      const root = '/docs/art/candidates/pixel-movement/gate1-world-v2-scene';
-      this.load.json(WORLD_V2_FARM_MANIFEST_KEY, `${root}/farm/manifest.json`);
-      this.load.image(WORLD_V2_FARM_ATLAS_KEY, `${root}/farm/atlas.png`);
-      this.load.json(WORLD_V2_HOUSE_MANIFEST_KEY, `${root}/house/manifest.json`);
-      this.load.image(WORLD_V2_HOUSE_ATLAS_KEY, `${root}/house/atlas.png`);
+      const farmRoot = '/docs/art/candidates/pixel-movement/gate1-world-v2-scene/farm';
+      const houseRoot = '/docs/art/candidates/pixel-movement/df-v2-030-house-interior';
+      this.load.json(WORLD_V2_FARM_MANIFEST_KEY, `${farmRoot}/manifest.json`);
+      this.load.image(WORLD_V2_FARM_ATLAS_KEY, `${farmRoot}/atlas.png`);
+      this.load.json(WORLD_V2_HOUSE_MANIFEST_KEY, `${houseRoot}/manifest.json`);
+      this.load.image(WORLD_V2_HOUSE_ATLAS_KEY, `${houseRoot}/atlas.png`);
     }
     if (this.pixel32CandidateReviewRequested()) {
       const root = '/docs/art/candidates/pixel-movement';

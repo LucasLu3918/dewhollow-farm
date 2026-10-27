@@ -19,8 +19,11 @@ export const WORLD_V2_FARM_REQUIRED_FRAMES = [
 export const WORLD_V2_HOUSE_REQUIRED_FRAMES = [
   'floor-a', 'floor-b', 'wall-middle', 'wall-left-corner', 'wall-right-corner',
   'wall-top', 'wall-bottom', 'wall-window', 'door-threshold', 'rug', 'bed',
-  'kitchen-counter', 'workbench', 'storage', 'pet-bed',
+  'kitchen-counter', 'stove', 'workbench', 'storage', 'wardrobe', 'table', 'chair',
+  'entry-mat', 'shoe-storage', 'pet-bed', 'water-bowl', 'shelf-books', 'plant',
 ] as const;
+
+const CANDIDATE_HOUSE_MAP_IDS = new Set(['house', 'house-wing', 'house-full']);
 
 /** Validate the fixed 32px/2x candidate contract and require every requested frame to stay unapproved. */
 export function worldV2CandidateFramesFromManifest(
@@ -102,10 +105,9 @@ export function worldV2SceneCandidateFrameFor(
     return null;
   }
 
-  // This art slice only provides the 10x7 starter-house composition. Larger
-  // remodel maps keep their complete legacy rendering until they have layouts
-  // and matching furniture candidates of their own.
-  if (map.id !== 'house') return null;
+  // The presentation-only adapter shares one authored 22x20 composition across
+  // the three remodel variants; each variant retains its own rules and save data.
+  if (map.id !== 'house' && (!CANDIDATE_HOUSE_MAP_IDS.has(map.id) || map.width !== 22 || map.height !== 20)) return null;
   if (layer === 'ground') {
     const ground = isGroundLayer(tile.kind) ? tile.kind : groundLayerFor(map, x, y);
     if (ground === 'floor') return (x + y) % 2 === 0 ? 'floor-a' : 'floor-b';

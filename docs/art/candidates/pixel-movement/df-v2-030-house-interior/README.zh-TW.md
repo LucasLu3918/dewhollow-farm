@@ -39,3 +39,9 @@ node docs/art/candidates/pixel-movement/df-v2-030-house-interior/generate.mjs
 ```
 
 生成器不讀取外部輸入；相同 Node/zlib 環境下會輸出相同 PNG/manifest bytes。檢查項目：manifest frame ID 唯一、frame bounds 位於 atlas 內、所有 frame 為候選且 `approved:false`、foot anchor/pivot 在 bounds 內、RGBA frame hash 可由 atlas crop 重算、兩個地板的上下與左右邊緣一致、牆 tile 的左右邊緣一致。Atlas SHA-256：`28d397a2f6c9933f3c2e749f1cf9a0b3b676ba109bc7aa18b4c386e2e5acc0c7`。
+
+## P3-031 候選呈現驗收
+
+DEV 預覽使用 `?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1SceneVisual=world-v2-cozy` 明確啟用。renderer 將現有 `MapDef` 地板／牆格映射到本 pack，並依 `composition.placements` 及 frame `layer` 呈現家具；`house`、`house-wing`、`house-full` 共用此 22×20 presentation-only 配置。候選圖仍是 `approved:false`，正式素材清單、地圖資料、碰撞、互動、內容 JSON 與存檔均不受此預覽影響。地毯／書架置於角色後方，其他家具依腳底 Y 排序。
+
+Playwright 驗收：`tests/e2e/world-v2-candidate-scene.spec.ts` 通過，檢查 opt-in 資產載入、完整家具 placement、牆與家具分層、玩家進出地圖、場景清理與遊戲狀態不變。手機圖是玩家在室內中段的實際視角，22×20 房間寬於手機可視範圍；桌面圖以較大瀏覽器視窗檢視較多配置。實際圖檔尺寸及 SHA-256 見 `evidence.json`。截圖為候選視覺檢查材料，尚非正式素材核准。

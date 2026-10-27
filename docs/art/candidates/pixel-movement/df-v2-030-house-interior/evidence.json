@@ -1,0 +1,36 @@
+{
+  "task": "P3-031 house renderer integration",
+  "status": "candidate",
+  "approved": false,
+  "route": "/?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1SceneVisual=world-v2-cozy",
+  "browserTest": {
+    "command": "SAVE_WORLD_V2_SCENE_EVIDENCE=1 npm run test:e2e -- tests/e2e/world-v2-candidate-scene.spec.ts --workers=1",
+    "result": "passed",
+    "assertions": [
+      "farm and house candidate assets load only on the explicit DEV opt-in route",
+      "all authored house furniture placements are present and wall tiles stay in the map layer",
+      "back-layer shelf and rug depth precedes foreground furniture depth",
+      "indoor/outdoor transitions clear candidate sprites and preserve gameplay state"
+    ]
+  },
+  "screenshots": [
+    {
+      "file": "screenshots/house-mobile.png",
+      "viewport": { "width": 390, "height": 844 },
+      "image": { "width": 358, "height": 580 },
+      "sha256": "76db99d2903fabfa54d0af99812cc4fcc47ae8093fe498d1eb5d9967ac7e9fc4",
+      "view": "player gameplay view from the center aisle; the full 22x20 room is wider than a mobile viewport"
+    },
+    {
+      "file": "screenshots/house-desktop.png",
+      "viewport": { "width": 1280, "height": 720 },
+      "image": { "width": 584, "height": 437 },
+      "sha256": "21234442fcc7e4bcfe90c014ef9fa6f3088360ffba92dfd2fd03e7ee68d97fd6",
+      "view": "desktop gameplay view from the center aisle"
+    }
+  ],
+  "limitations": [
+    "Screenshots show gameplay viewport slices, not a top-down full-room map export.",
+    "This candidate remains unapproved and is not registered as production art."
+  ]
+}

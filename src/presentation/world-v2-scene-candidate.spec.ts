@@ -131,11 +131,19 @@ describe('world-v2 scene candidate gate', () => {
     expect(house.rows).toEqual(['#####', '#BKW#', '#...#', '##D##']);
   });
 
-  it('keeps remodeled houses on the legacy renderer until matching layouts exist', () => {
+  it('maps the 22x20 interior adapter across all remodeled house variants', () => {
     for (const id of ['house-wing', 'house-full']) {
-      const remodeledHouse = { ...house, id };
-      expect(worldV2SceneCandidateFrameFor(remodeledHouse, 0, 0, 'ground')).toBeNull();
-      expect(worldV2SceneCandidateFrameFor(remodeledHouse, 0, 0, 'object')).toBeNull();
+      const remodeledHouse = {
+        ...house,
+        id,
+        width: 22,
+        height: 20,
+        rows: Array.from({ length: 20 }, (_, y) => y === 0 || y === 19 ? '#'.repeat(22) : `#${'.'.repeat(20)}#`),
+      };
+      expect(worldV2SceneCandidateFrameFor(remodeledHouse, 0, 0, 'object')).toBe('wall-left-corner');
+      expect(worldV2SceneCandidateFrameFor(remodeledHouse, 11, 0, 'object')).toBe('wall-window');
+      expect(worldV2SceneCandidateFrameFor(remodeledHouse, 2, 2, 'ground')).toBe('floor-a');
+      expect(worldV2SceneCandidateFrameFor(remodeledHouse, 3, 2, 'ground')).toBe('floor-b');
     }
   });
 });

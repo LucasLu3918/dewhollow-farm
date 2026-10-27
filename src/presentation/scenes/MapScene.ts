@@ -131,6 +131,7 @@ interface WorldV2CandidateFrameMetadata {
   width: number;
   height: number;
   footAnchor?: { x: number; y: number };
+  layer?: string;
 }
 
 interface WorldV2CandidateManifestMetadata {
@@ -138,9 +139,10 @@ interface WorldV2CandidateManifestMetadata {
     id: string;
     rect: { width: number; height: number };
     footAnchor?: { x: number; y: number };
+    layer?: string;
   }>;
-  layoutSuggestion?: {
-    placements?: Array<{ frame: string; anchorTile: { x: number; y: number }; layer: string }>;
+  composition?: {
+    placements?: Array<{ frame: string; anchorTile: { x: number; y: number } }>;
   };
 }
 
@@ -377,7 +379,7 @@ declare global {
         mapId: string;
         frames: string[];
         layers: Array<{ frame: string; layer: 'ground' | 'object'; x: number; y: number }>;
-        placements: Array<{ frame: string; x: number; y: number }>;
+        placements: Array<{ frame: string; x: number; y: number; depth: number }>;
       };
       /** DEV-only, unapproved pixel32 map overlay fixture. */
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
@@ -829,7 +831,12 @@ export class MapScene extends Phaser.Scene {
           ]).filter(({ sprite }) => sprite.visible
             && (sprite.texture.key === WORLD_V2_FARM_ATLAS_KEY || sprite.texture.key === WORLD_V2_HOUSE_ATLAS_KEY))
             .map(({ sprite, layer, x, y }) => ({ frame: sprite.frame.name, layer, x, y })),
-          placements: this.worldV2CandidateSprites.map((sprite) => ({ frame: sprite.frame.name, x: sprite.x, y: sprite.y })),
+          placements: this.worldV2CandidateSprites.map((sprite) => ({
+            frame: sprite.frame.name,
+            x: sprite.x,
+            y: sprite.y,
+            depth: sprite.depth,
+          })),
         }),
         pose: () => ({ ...this.rig.currentPose() }),
         rig: () => {
@@ -2015,10 +2022,15 @@ export class MapScene extends Phaser.Scene {
       this.addWorldV2CandidateSprite(WORLD_V2_FARM_ATLAS_KEY, WORLD_V2_FARM_MANIFEST_KEY, 'house-exterior', 2, 4, 'back');
       this.addWorldV2CandidateSprite(WORLD_V2_FARM_ATLAS_KEY, WORLD_V2_FARM_MANIFEST_KEY, 'house-front', 2, 4, 'front');
       this.addWorldV2CandidateSprite(WORLD_V2_FARM_ATLAS_KEY, WORLD_V2_FARM_MANIFEST_KEY, 'tree-canopy', 33, 21, 'front');
-    } else if (mapId === 'house') {
+    } else if (mapId === 'house' || mapId === 'house-wing' || mapId === 'house-full') {
       const manifest = this.cache.json.get(WORLD_V2_HOUSE_MANIFEST_KEY) as WorldV2CandidateManifestMetadata | undefined;
-      for (const placement of manifest?.layoutSuggestion?.placements ?? []) {
-        const backLayer = placement.layer === 'back-wall' || placement.layer === 'ground-object';
+      const frames = manifest?.frames;
+      for (const placement of manifest?.composition?.placements ?? []) {
+        const metadata = Array.isArray(frames)
+          ? frames.find((frame) => frame.id === placement.frame)
+          : frames?.[placement.frame];
+        const authoredLayer = metadata?.layer;
+        const backLayer = authoredLayer === 'back-wall' || authoredLayer === 'back-wall-object' || authoredLayer === 'ground-detail';
         this.addWorldV2CandidateSprite(
           WORLD_V2_HOUSE_ATLAS_KEY,
           WORLD_V2_HOUSE_MANIFEST_KEY,
@@ -2516,7 +2528,8 @@ export class MapScene extends Phaser.Scene {
         .setDepth(depth);
     }
     if (this.worldV2SceneCandidate && mapLayer === 'object'
-      && this.deps.session.state.mapId === 'house' && this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) {
+      && ['house', 'house-wing', 'house-full'].includes(this.deps.session.state.mapId)
+      && this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) {
       return this.add.image(x * TILE_SIZE, y * TILE_SIZE, WORLD_V2_HOUSE_ATLAS_KEY, 'floor-a')
         .setVisible(false)
         .setData('worldV2CandidateTile', { x, y, layer: mapLayer })
@@ -2557,7 +2570,7 @@ export class MapScene extends Phaser.Scene {
       || !this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) return null;
     const map = this.deps.index.map(this.deps.session.state.mapId);
     const tile = tileAt(map, x, y);
-    if (!tile || (!map.id.startsWith('house') && map.id !== 'farm')) return null;
+    if (!tile || (!['house', 'house-wing', 'house-full'].includes(map.id) && map.id !== 'farm')) return null;
     const candidateFrame = worldV2SceneCandidateFrameFor(map, x, y, layer);
     if (!candidateFrame) return null;
     const textureKey = map.id === 'farm' ? WORLD_V2_FARM_ATLAS_KEY : WORLD_V2_HOUSE_ATLAS_KEY;
