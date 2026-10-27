@@ -17,7 +17,7 @@ import type { TerrainDef } from '../../infrastructure/content/content-schema';
 import type { HeldPointerStart, Hud } from '../hud';
 import type { HelpPanel } from '../help-panel';
 import type { SavePanel } from '../save-panel';
-import { cameraBounds, deadzoneOf, mapZoomFor } from '../camera';
+import { cameraBounds } from '../camera';
 import { TILE_SIZE } from '../constants';
 import { nightAlpha, particleKind, particlePosition, seasonGrassTint, weatherDim } from '../atmosphere';
 import type { Season } from '../../domain/calendar';
@@ -73,13 +73,12 @@ import { reducedEffects } from '../accessibility';
 import { topmostOpenDialog, type OpenablePanel } from '../panel-dialog';
 import type { InventoryPanel } from '../inventory-panel';
 import { gateAction, type ActionGateAction } from '../action-gate';
-import { cameraViewportFor } from '../responsive/layout';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
 import { ToolSeedSelector } from '../tool-seed-selector';
 import { Hotbar } from '../hotbar';
 import { ContinuousFarmActions, farmActionTarget } from '../continuous-farm-actions';
-import { calculatePixelViewportPolicy } from '../pixel-viewport/policy';
 import { renderProfileFor } from '../pixel-viewport/profiles';
+import { ViewportCoordinator } from '../viewport/viewport-coordinator';
 import { resolveCandidateArt, type CandidateCropStage, type CandidateId } from '../candidate-art';
 import { candidateFrameAt, type CandidateDirection } from '../candidate-sprite-animator';
 import {
@@ -398,6 +397,7 @@ export class MapScene extends Phaser.Scene {
   private static worldGenerationCount = 0;
   private worldGeneration = 0;
   private deps!: MapSceneDeps;
+  private readonly viewportCoordinator = new ViewportCoordinator();
   private world!: Phaser.GameObjects.Container;
   /** Non-interactive one-tile outline for the current authoritative interaction target. */
   private interactionTargetGfx: Phaser.GameObjects.Graphics | null = null;
@@ -700,33 +700,26 @@ export class MapScene extends Phaser.Scene {
     const applyLayout = (layout: ReturnType<ResponsiveLayoutController['get']>): void => {
       const previousCamera = { x: camera.x, y: camera.y, width: camera.width, height: camera.height, zoom: camera.zoom };
       const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
-      const touchInput = layout.pointer.coarse || layout.pointer.touchPoints > 0;
-      const pixelViewport = calculatePixelViewportPolicy({
-        container: layout.worldRect,
-        safeArea: layout.safeRect,
-        dpr: window.devicePixelRatio || 1,
-        orientation: layout.orientation,
+      const viewportPlan = this.viewportCoordinator.apply({
+        layout,
         profile: profile.id,
-        input: touchInput ? 'touch' : 'pointer',
+        dpr: window.devicePixelRatio || 1,
+      }, {
+        gameSize: () => this.scale.gameSize,
+        setGameSize: (size) => this.scale.setGameSize(size.width, size.height),
+        setCameraViewport: (viewport) => camera.setViewport(viewport.x, viewport.y, viewport.width, viewport.height),
+        setCameraZoom: (zoom) => camera.setZoom(zoom),
+        setCameraDeadzone: (deadzone) => camera.setDeadzone(deadzone.width, deadzone.height),
       });
+      const { pixelViewport, cameraViewport: viewport, touchInput } = viewportPlan;
       const canvasHost = this.game.canvas.parentElement;
       if (canvasHost) {
         if (profile.id === 'legacy' && !touchInput) delete canvasHost.dataset.pixelProfile;
         else canvasHost.dataset.pixelProfile = profile.id;
       }
-      if (this.scale.gameSize.width !== pixelViewport.renderResolution.width
-        || this.scale.gameSize.height !== pixelViewport.renderResolution.height) {
-        this.scale.setGameSize(pixelViewport.renderResolution.width, pixelViewport.renderResolution.height);
-      }
       const designSize = pixelViewport.renderResolution;
-      const viewport = cameraViewportFor(layout, designSize);
-      camera.setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
       this.nightShade?.setSize(designSize.width, designSize.height);
       this.weatherShade?.setSize(designSize.width, designSize.height);
-      const zoom = profile.id === 'legacy'
-        ? mapZoomFor({ cameraWidth: camera.width, coarse: touchInput, portrait: layout.orientation === 'portrait' })
-        : camera.width / (pixelViewport.worldTilesVisible.width * TILE_SIZE);
-      camera.setZoom(zoom);
       if (this.pixel32CandidateReviewContainer && (
         previousCamera.x !== camera.x || previousCamera.y !== camera.y || previousCamera.width !== camera.width
         || previousCamera.height !== camera.height || previousCamera.zoom !== camera.zoom
@@ -737,8 +730,6 @@ export class MapScene extends Phaser.Scene {
         this.createPixel32CandidateReview();
         this.pixel32CandidateReviewContainer?.setVisible(visible);
       }
-      const zone = deadzoneOf({ width: camera.width / camera.zoom, height: camera.height / camera.zoom });
-      camera.setDeadzone(zone.width, zone.height);
       const state = this.deps.session.state;
       this.frameCamera(this.deps.index.map(state.mapId), state.player);
     };
@@ -934,14 +925,10 @@ export class MapScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const layout = this.deps.responsive.get();
     const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
-    const touchInput = layout.pointer.coarse || layout.pointer.touchPoints > 0;
-    const pixelViewport = calculatePixelViewportPolicy({
-      container: layout.worldRect,
-      safeArea: layout.safeRect,
-      dpr: window.devicePixelRatio || 1,
-      orientation: layout.orientation,
+    const { pixelViewport } = this.viewportCoordinator.calculate({
+      layout,
       profile: profile.id,
-      input: touchInput ? 'touch' : 'pointer',
+      dpr: window.devicePixelRatio || 1,
     });
     return {
       profile: profile.id,
