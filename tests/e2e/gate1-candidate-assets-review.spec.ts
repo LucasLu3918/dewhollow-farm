@@ -23,6 +23,7 @@ test('candidate board follows viewport resize and preserves its hidden state', a
   await page.evaluate(() => window.__dewhollow?.pauseScene({ preservePose: false }));
   const initialItems = await page.evaluate(() => window.__dewhollow!.candidateAssetReview().items);
   await page.evaluate(() => window.__dewhollow?.setCandidateAssetReviewVisible(false));
+  await expect.poll(() => page.evaluate(() => window.__dewhollow!.candidateAssetReview().visible)).toBe(false);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.responsiveLayout().orientation)).toBe('portrait');
   await expect.poll(() => page.evaluate(() => window.__dewhollow!.candidateAssetReview().items)).not.toEqual(initialItems);
@@ -32,10 +33,9 @@ test('candidate board follows viewport resize and preserves its hidden state', a
     const items = debug.candidateAssetReview().items;
     return items.length === 22 && items.every((item) => item.y + 16 * item.scale <= height);
   })).toBe(true);
-  const hidden = await page.locator('#game canvas').screenshot({ animations: 'disabled' });
+  await expect.poll(() => page.evaluate(() => window.__dewhollow!.candidateAssetReview().visible)).toBe(false);
   await page.evaluate(() => window.__dewhollow?.setCandidateAssetReviewVisible(true));
-  const visible = await page.locator('#game canvas').screenshot({ animations: 'disabled' });
-  expect(hidden.equals(visible)).toBe(false);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow!.candidateAssetReview().visible)).toBe(true);
 });
 
 test('captures DEV-only crop, pet, tool, and object candidates across five viewports and three DPR values', async ({ browser }, testInfo) => {

@@ -346,7 +346,7 @@ declare global {
       pixel32CandidateInteractables(): { enabled: boolean; status: string | null; approved: boolean | null; items: Pixel32InteractableDebugInfo[] };
       setCandidateInteractableFrame(id: string, frame: string): boolean;
       /** DEV-only contact sheet for unapproved crops, pet directions, held tools, and object states. */
-      candidateAssetReview(): { enabled: boolean; items: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }>; limitations: string[] };
+      candidateAssetReview(): { enabled: boolean; visible: boolean; items: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }>; limitations: string[] };
       /** DEV-only candidate cat follower visual; existing follow path and depth remain authoritative. */
       candidatePetFollow(): {
         enabled: boolean;
@@ -877,6 +877,7 @@ export class MapScene extends Phaser.Scene {
         },
         candidateAssetReview: () => ({
           enabled: this.pixel32CandidateAssets && this.pixel32CandidateReviewContainer?.active === true,
+          visible: this.pixel32CandidateReviewContainer?.visible === true,
           items: this.pixel32CandidateReviewItems.map((item) => ({ ...item })),
           limitations: [
             'Sprites are candidate-only review samples; the board does not change tools, collisions, companion AI, or save data.',
