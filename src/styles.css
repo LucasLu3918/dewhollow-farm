@@ -443,12 +443,14 @@ a:focus-visible {
   list-style: none;
   margin: 0;
   padding: 0;
-  min-height: 3.2em;
+  height: 3.2em;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
   font-size: calc(14px * var(--font-scale));
 }
 
 .log li {
-  padding: 2px 0;
+  padding: 0;
   color: var(--ink);
 }
 
@@ -1462,8 +1464,8 @@ a:focus-visible {
 
 /*
  * 直式手機（寬度 600px 以內）的首屏版面，由上到下：狀態列（主要資訊在前，次要資訊與按鈕在後）→ 遊戲畫面 → 訊息列 → 虛擬按鍵。
- * 訊息列是獨立的一條（不疊在地圖上），只顯示最近兩則、單行省略；沒有訊息時不佔高度。
- * 間距用各區塊的 margin 而非 grid gap，讓空的訊息列連 gap 都不留。
+ * 訊息列是獨立的一條（不疊在地圖上），保留固定高度供訊息捲動。
+ * 間距用各區塊的 margin 而非 grid gap。
  * 這裡的 orientation 與下方的橫式規則互斥，不會疊在一起。
  */
 @media (max-width: 600px) and (orientation: portrait) {
@@ -1564,19 +1566,12 @@ a:focus-visible {
     margin-bottom: 8px;
   }
 
-  /* 訊息列：獨立一列在遊戲畫面與虛擬按鍵之間；沒有訊息時沒有外框、不佔高度；aria-live 仍在 DOM 裡。 */
+  /* 訊息列保留固定空間，訊息增減不改變遊戲區高度。 */
   .panel {
     grid-column: 1;
     grid-row: 3;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: none;
-  }
-
-  .panel:has(> .log:not(:empty)) {
+    margin: 0 0 8px;
     padding: 4px 8px;
-    margin-bottom: 8px;
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
     background: var(--panel);
@@ -1589,17 +1584,6 @@ a:focus-visible {
   .log {
     min-height: 0;
     font-size: calc(14px * var(--font-scale));
-  }
-
-  .log li {
-    padding: 1px 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .log li:not(:nth-last-child(-n + 2)) {
-    display: none;
   }
 
   /*
@@ -1778,7 +1762,6 @@ a:focus-visible {
   }
 
   .panel:has(> .log:empty) {
-    padding: 0;
     border-color: transparent;
     background: none;
   }
@@ -1790,17 +1773,6 @@ a:focus-visible {
   .log {
     min-height: 0;
     font-size: calc(14px * var(--font-scale));
-  }
-
-  .log li {
-    padding: 1px 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .log li:not(:nth-last-child(-n + 2)) {
-    display: none;
   }
 
   /*

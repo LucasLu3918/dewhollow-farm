@@ -53,6 +53,9 @@ export class Hud {
     this.mine = required(doc, '#hud-mine');
     this.version = required(doc, '#hud-version');
     this.log = required(doc, '#hud-log');
+    this.log.tabIndex = 0;
+    // Keep browser scrolling and Tab navigation while preventing game shortcuts.
+    this.log.addEventListener('keydown', (event) => event.stopPropagation());
     this.hint = required(doc, '#hud-hint');
     this.mainAction = required(doc, '#hud-action');
   }
@@ -294,11 +297,20 @@ export class Hud {
   }
 
   private append(text: string, level: 'info' | 'error'): void {
+    const following = this.log.scrollHeight - this.log.clientHeight - this.log.scrollTop <= 1;
+    const oldestWillBeRemoved = this.log.children.length >= LOG_LIMIT;
+    const logTop = this.log.getBoundingClientRect().top;
+    const anchor = Array.from(this.log.children).find((child, index) =>
+      (!oldestWillBeRemoved || index > 0) && child.getBoundingClientRect().bottom > logTop,
+    );
+    const anchorTop = anchor?.getBoundingClientRect().top;
     const item = document.createElement('li');
     item.textContent = levelMarker(level, this.colorblind) + text;
     item.className = level;
     this.log.append(item);
     while (this.log.children.length > LOG_LIMIT) this.log.firstElementChild?.remove();
+    if (following) this.log.scrollTop = this.log.scrollHeight;
+    else if (anchor && anchorTop !== undefined) this.log.scrollTop += anchor.getBoundingClientRect().top - anchorTop;
   }
 }
 
