@@ -1,6 +1,13 @@
 import type { Rect } from '../responsive/metrics';
 import { cameraViewportFor, type ResponsiveLayout } from '../responsive/layout';
-import { deadzoneOf, mapZoomFor, type Size } from '../camera';
+import {
+  DEFAULT_SCENE_ZOOM_CAP,
+  INTERIOR_TOUCH_SCENE_ZOOM_CAP,
+  deadzoneOf,
+  mapZoomFor,
+  sceneZoomFor,
+  type Size,
+} from '../camera';
 import { calculatePixelViewportPolicy, type PixelViewportPolicy } from '../pixel-viewport/policy';
 import type { RenderProfileId } from '../pixel-viewport/profiles';
 import { TILE_SIZE } from '../constants';
@@ -10,6 +17,10 @@ export interface ViewportCoordinatorInput {
   layout: ResponsiveLayout;
   profile: RenderProfileId;
   dpr: number;
+  /** Current scene size in world units; omitted only for viewport-only diagnostics. */
+  mapWorldSize?: Size;
+  /** Explicit scene classification; only mobile interiors receive the larger framing cap. */
+  sceneKind?: 'interior' | 'exterior';
 }
 
 /** Values derived from one responsive snapshot and applied together by the scene. */
@@ -47,13 +58,19 @@ export class ViewportCoordinator {
       input: touchInput ? 'touch' : 'pointer',
     });
     const cameraViewport = cameraViewportFor(layout, pixelViewport.renderResolution);
-    const zoom = pixelViewport.profile.id === 'legacy'
+    const baseZoom = pixelViewport.profile.id === 'legacy'
       ? mapZoomFor({
         cameraWidth: cameraViewport.width,
         coarse: touchInput,
         portrait: layout.orientation === 'portrait',
       })
       : cameraViewport.width / (pixelViewport.worldTilesVisible.width * TILE_SIZE);
+    const zoomCap = touchInput && input.sceneKind === 'interior'
+      ? INTERIOR_TOUCH_SCENE_ZOOM_CAP
+      : DEFAULT_SCENE_ZOOM_CAP;
+    const zoom = input.mapWorldSize
+      ? sceneZoomFor(baseZoom, input.mapWorldSize, cameraViewport, zoomCap)
+      : baseZoom;
 
     return {
       pixelViewport,

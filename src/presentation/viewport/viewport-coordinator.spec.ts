@@ -71,4 +71,47 @@ describe('ViewportCoordinator', () => {
     expect(desktop.cameraViewport.width).toBeGreaterThan(0);
     expect(desktop.deadzone.height).toBeGreaterThan(0);
   });
+
+  it('adds scene cover zoom only when a map is smaller than its camera viewport', () => {
+    const coordinator = new ViewportCoordinator();
+    const layout = layoutFor(metrics(1280, 800, false), 'external');
+    const base = coordinator.calculate({ layout, profile: 'legacy', dpr: 1 });
+    const small = coordinator.calculate({
+      layout, profile: 'legacy', dpr: 1, mapWorldSize: { width: 640, height: 448 },
+    });
+    const large = coordinator.calculate({
+      layout, profile: 'legacy', dpr: 1, mapWorldSize: { width: 2560, height: 1920 },
+    });
+
+    expect(small.zoom).toBeGreaterThan(base.zoom);
+    expect(small.zoom).toBeLessThanOrEqual(2);
+    expect(small.cameraViewport.width / small.zoom).toBeLessThanOrEqual(640);
+    expect(small.cameraViewport.height / small.zoom).toBeLessThanOrEqual(448);
+    expect(large.zoom).toBe(base.zoom);
+  });
+
+  it('uses the larger cap only for touch interiors and keeps outdoor framing capped at the default', () => {
+    const coordinator = new ViewportCoordinator();
+    const mobile = layoutFor(metrics(390, 844, true), 'external');
+    const desktop = layoutFor(metrics(1280, 800, false), 'external');
+    const house = coordinator.calculate({
+      layout: mobile, profile: 'legacy', dpr: 3, mapWorldSize: { width: 640, height: 448 }, sceneKind: 'interior',
+    });
+    const coop = coordinator.calculate({
+      layout: mobile, profile: 'legacy', dpr: 3, mapWorldSize: { width: 512, height: 384 }, sceneKind: 'interior',
+    });
+    const exterior = coordinator.calculate({
+      layout: mobile, profile: 'legacy', dpr: 3, mapWorldSize: { width: 640, height: 448 }, sceneKind: 'exterior',
+    });
+    const desktopHouse = coordinator.calculate({
+      layout: desktop, profile: 'legacy', dpr: 1, mapWorldSize: { width: 640, height: 448 }, sceneKind: 'interior',
+    });
+
+    expect(house.zoom).toBeCloseTo(1216 / 448);
+    expect(coop.zoom).toBeCloseTo(1216 / 384);
+    expect(house.zoom).toBeLessThanOrEqual(3.25);
+    expect(coop.zoom).toBeLessThanOrEqual(3.25);
+    expect(exterior.zoom).toBe(2);
+    expect(desktopHouse.zoom).toBeCloseTo(768 / 448);
+  });
 });

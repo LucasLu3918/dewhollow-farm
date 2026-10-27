@@ -100,6 +100,8 @@ import {
 import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
 import { advanceMovement, cancelMovement, commitStep, createMovementScheduler, queueMovementTap, rejectStep, requestNextStep, setMovementIntent, type MovementSchedulerState } from '../movement-scheduler/movement-scheduler';
 
+const INTERIOR_MAP_IDS = new Set(['house', 'coop', 'cowbarn', 'house-full', 'house-wing']);
+
 /** 鍵盤事件與虛擬按鍵共用的形狀：只需要按鍵名稱與 preventDefault。 */
 type KeyLike = Pick<KeyboardEvent, 'key' | 'preventDefault'>;
 
@@ -398,6 +400,7 @@ export class MapScene extends Phaser.Scene {
   private worldGeneration = 0;
   private deps!: MapSceneDeps;
   private readonly viewportCoordinator = new ViewportCoordinator();
+  private applyResponsiveLayout?: (layout: ReturnType<ResponsiveLayoutController['get']>) => void;
   private world!: Phaser.GameObjects.Container;
   /** Non-interactive one-tile outline for the current authoritative interaction target. */
   private interactionTargetGfx: Phaser.GameObjects.Graphics | null = null;
@@ -699,11 +702,15 @@ export class MapScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const applyLayout = (layout: ReturnType<ResponsiveLayoutController['get']>): void => {
       const previousCamera = { x: camera.x, y: camera.y, width: camera.width, height: camera.height, zoom: camera.zoom };
+      const state = this.deps.session.state;
+      const map = this.deps.index.map(state.mapId);
       const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
       const viewportPlan = this.viewportCoordinator.apply({
         layout,
         profile: profile.id,
         dpr: window.devicePixelRatio || 1,
+        mapWorldSize: { width: map.width * TILE_SIZE, height: map.height * TILE_SIZE },
+        sceneKind: INTERIOR_MAP_IDS.has(map.id) ? 'interior' : 'exterior',
       }, {
         gameSize: () => this.scale.gameSize,
         setGameSize: (size) => this.scale.setGameSize(size.width, size.height),
@@ -730,11 +737,14 @@ export class MapScene extends Phaser.Scene {
         this.createPixel32CandidateReview();
         this.pixel32CandidateReviewContainer?.setVisible(visible);
       }
-      const state = this.deps.session.state;
-      this.frameCamera(this.deps.index.map(state.mapId), state.player);
+      this.frameCamera(map, state.player);
     };
+    this.applyResponsiveLayout = applyLayout;
     const unsubscribeLayout = this.deps.responsive.subscribe(applyLayout);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, unsubscribeLayout);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      unsubscribeLayout();
+      this.applyResponsiveLayout = undefined;
+    });
     // 跟隨骨架的軸心（腳底中心，不含身體起伏，鏡頭才不會跟著抖）；位移量把跟隨點移到格子中心。
     camera.startFollow(this.rig.root, true, FOLLOW_LERP, FOLLOW_LERP, 0, TILE_SIZE / 2);
     if (import.meta.env.DEV) {
@@ -1654,7 +1664,8 @@ export class MapScene extends Phaser.Scene {
       this.drawMap(map.id);
       const stand = standOf(state.player.x, state.player.y);
       this.rig.teleport(stand.x, stand.y);
-      this.frameCamera(map, state.player);
+      this.applyResponsiveLayout?.(this.deps.responsive.get());
+      if (!this.applyResponsiveLayout) this.frameCamera(map, state.player);
     }
 
     this.showFacing(state.player.facing);
