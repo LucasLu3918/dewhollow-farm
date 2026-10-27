@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { MapDef, TileKind } from '../domain/content';
 import {
   worldV2CandidateFramesFromManifest,
+  worldV2FarmSceneCandidatePlacements,
   worldV2SceneCandidateFrameFor,
   worldV2SceneCandidateRequested,
 } from './world-v2-scene-candidate';
@@ -49,6 +50,14 @@ const farmBoundary: MapDef = {
 };
 
 describe('world-v2 scene candidate gate', () => {
+  it('keeps farmhouse, front lip, and tree canopy clustered around the existing front-yard layout', () => {
+    expect(worldV2FarmSceneCandidatePlacements()).toEqual([
+      { frame: 'house-exterior', anchorTile: { x: 2, y: 4 }, layer: 'back' },
+      { frame: 'house-front', anchorTile: { x: 2, y: 4 }, layer: 'front' },
+      { frame: 'tree-canopy', anchorTile: { x: 10, y: 8 }, layer: 'front' },
+    ]);
+  });
+
   it('requires DEV, the Pixel32 runtime, and the exact scene visual opt-in', () => {
     expect(worldV2SceneCandidateRequested(new URLSearchParams('gate1SceneVisual=world-v2-cozy'), true, 'pixel32', true)).toBe(true);
     expect(worldV2SceneCandidateRequested(new URLSearchParams('gate1SceneVisual=world-v2-cozy'), false, 'pixel32', true)).toBe(false);

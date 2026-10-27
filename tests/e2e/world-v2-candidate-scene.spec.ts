@@ -4,6 +4,7 @@ const nodeProcess = (globalThis as typeof globalThis & {
   process?: { env?: Record<string, string | undefined> };
 }).process;
 const saveEvidence = nodeProcess?.env?.SAVE_WORLD_V2_SCENE_EVIDENCE === '1';
+const saveFarmEvidence = nodeProcess?.env?.SAVE_WORLD_V2_FARM_EVIDENCE === '1';
 
 type CandidateDebug = {
   mapId(): string;
@@ -33,7 +34,7 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
 }
 
 async function capture(page: Page, name: string): Promise<void> {
-  if (!saveEvidence) return;
+  if (!saveEvidence && (name.startsWith('house-') || !saveFarmEvidence)) return;
   const root = name.startsWith('house-')
     ? 'docs/art/candidates/pixel-movement/df-v2-030-house-interior/screenshots'
     : 'docs/art/candidates/pixel-movement/gate1-world-v2-scene/screenshots';
@@ -50,7 +51,7 @@ test('DEV world-v2 farm and house scene candidate stays opt-in and renders both 
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('requestfailed', (request) => failedRequests.push(`${request.method()} ${request.url()}`));
 
-  await page.setViewportSize({ width: 2560, height: 1920 });
+  await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/?renderProfile=pixel32&gate1Runtime=pixel32-map-animation');
   await expect(page.locator('#game canvas')).toBeVisible();
   await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate().enabled ?? true)).toBe(false);
@@ -71,9 +72,18 @@ test('DEV world-v2 farm and house scene candidate stays opt-in and renders both 
     'gate1-world-v2-farm-atlas:house-exterior',
     'gate1-world-v2-farm-atlas:house-front',
     'gate1-world-v2-farm-atlas:tree-canopy',
+    'gate1-world-v2-farm-atlas:shipping-crate',
     'gate1-world-v2-farm-atlas:stone-wall',
     'gate1-world-v2-farm-atlas:fence-horizontal',
     'gate1-world-v2-farm-atlas:fence-vertical',
+  ]));
+  const initialFarmScene = await page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow!.worldV2SceneCandidate());
+  expect(initialFarmScene.layers.some(({ frame }) => frame.startsWith('path-mask-'))).toBe(true);
+  expect(initialFarmScene.layers.some(({ frame }) => frame.startsWith('field-mask-'))).toBe(true);
+  expect(initialFarmScene.placements).toEqual(expect.arrayContaining([
+    expect.objectContaining({ frame: 'house-exterior', x: 160, y: 320 }),
+    expect.objectContaining({ frame: 'house-front', x: 160, y: 320 }),
+    expect.objectContaining({ frame: 'tree-canopy', x: 672, y: 576 }),
   ]));
   const initialStateWithoutLocation = await page.evaluate(() => {
     const state = structuredClone((window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow!.gameState());

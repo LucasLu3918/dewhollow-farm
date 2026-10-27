@@ -5,14 +5,14 @@
   "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1SceneVisual=world-v2-cozy",
   "capture": {
     "provider": "Playwright Chromium local DEV server",
-    "capturedAt": "2026-10-27T16:38:34Z",
-    "sourceRevision": "e4ce6fb59304677842d432d58ae91691d9af3ade + working tree",
-    "test": "npx playwright test tests/e2e/world-v2-candidate-scene.spec.ts --workers=1",
+    "capturedAt": "2026-10-27T19:07:43Z",
+    "sourceRevision": "752be39cc452596dfcda3c3638cc7a199b96c740 + working tree",
+    "test": "SAVE_WORLD_V2_FARM_EVIDENCE=1 npm run test:e2e -- tests/e2e/world-v2-candidate-scene.spec.ts --workers=1",
     "testResult": "passed",
     "browserViewport": {
       "farmDesktop": {
-        "width": 2560,
-        "height": 1920
+        "width": 1280,
+        "height": 720
       },
       "houseDesktop": {
         "width": 1280,
@@ -45,19 +45,19 @@
   "screenshots": {
     "farm-desktop.png": {
       "path": "screenshots/farm-desktop.png",
-      "sha256": "e11875e167140dbf058e4b5fb472cce6214248043614dce2b781655af0a2a586",
+      "sha256": "34fc73752906cb01350c46cdd5e56b28a58018920d8b1868e3746df424bc62d7",
       "artifactSize": {
-        "width": 928,
-        "height": 1637
+        "width": 584,
+        "height": 437
       },
       "browserViewport": {
-        "width": 2560,
-        "height": 1920
+        "width": 1280,
+        "height": 720
       }
     },
     "farm-mobile.png": {
       "path": "screenshots/farm-mobile.png",
-      "sha256": "16d9fd3782186ec92cfe165f48f94845a6762346d04ccf15295019fb6d37ba87",
+      "sha256": "5f4a7572425a2bd03824f3c0f798c24e295c4a8eee9d6c52c50d301576d7b660",
       "artifactSize": {
         "width": 358,
         "height": 580
@@ -94,7 +94,8 @@
   },
   "checks": [
     "Candidate atlas/manifest assets load only with the exact DEV Pixel32 scene opt-in.",
-    "Farm candidate overlay, stone-wall, horizontal-fence, and vertical-fence frames are observed in MapScene.",
+    "Farmhouse and front lip stay on the existing MapDef door anchor; the tree canopy is placed at (10,8), visible on both target viewports and clear of the existing crop rows and one-tile road.",
+    "Candidate shipping crate, path masks, crop masks, stone-wall, horizontal-fence, and vertical-fence frames are observed in MapScene.",
     "House ground and object frames use separate layers; manifest furniture placement frames are observed.",
     "Farm-to-house and house-to-farm movement succeeds; return clears house overlays and preserves all state except map/player location.",
     "Responsive viewport changes preserve the candidate route; no page errors or failed requests were observed."

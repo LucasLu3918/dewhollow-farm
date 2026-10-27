@@ -25,6 +25,18 @@ export const WORLD_V2_HOUSE_REQUIRED_FRAMES = [
 
 const CANDIDATE_HOUSE_MAP_IDS = new Set(['house', 'house-wing', 'house-full']);
 
+export function worldV2FarmSceneCandidatePlacements(): readonly {
+  frame: string;
+  anchorTile: { x: number; y: number };
+  layer: 'back' | 'front';
+}[] {
+  return [
+    { frame: 'house-exterior', anchorTile: { x: 2, y: 4 }, layer: 'back' },
+    { frame: 'house-front', anchorTile: { x: 2, y: 4 }, layer: 'front' },
+    { frame: 'tree-canopy', anchorTile: { x: 10, y: 8 }, layer: 'front' },
+  ];
+}
+
 /** Validate the fixed 32px/2x candidate contract and require every requested frame to stay unapproved. */
 export function worldV2CandidateFramesFromManifest(
   value: unknown,

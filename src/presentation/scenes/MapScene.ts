@@ -111,6 +111,7 @@ import {
   WORLD_V2_FARM_MANIFEST_KEY,
   WORLD_V2_HOUSE_ATLAS_KEY,
   WORLD_V2_HOUSE_MANIFEST_KEY,
+  worldV2FarmSceneCandidatePlacements,
   worldV2SceneCandidateFrameFor,
 } from '../world-v2-scene-candidate';
 import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
@@ -2019,9 +2020,16 @@ export class MapScene extends Phaser.Scene {
   private drawWorldV2CandidateOverlays(mapId: string): void {
     if (!this.worldV2SceneCandidate) return;
     if (mapId === 'farm') {
-      this.addWorldV2CandidateSprite(WORLD_V2_FARM_ATLAS_KEY, WORLD_V2_FARM_MANIFEST_KEY, 'house-exterior', 2, 4, 'back');
-      this.addWorldV2CandidateSprite(WORLD_V2_FARM_ATLAS_KEY, WORLD_V2_FARM_MANIFEST_KEY, 'house-front', 2, 4, 'front');
-      this.addWorldV2CandidateSprite(WORLD_V2_FARM_ATLAS_KEY, WORLD_V2_FARM_MANIFEST_KEY, 'tree-canopy', 33, 21, 'front');
+      for (const placement of worldV2FarmSceneCandidatePlacements()) {
+        this.addWorldV2CandidateSprite(
+          WORLD_V2_FARM_ATLAS_KEY,
+          WORLD_V2_FARM_MANIFEST_KEY,
+          placement.frame,
+          placement.anchorTile.x,
+          placement.anchorTile.y,
+          placement.layer,
+        );
+      }
     } else if (mapId === 'house' || mapId === 'house-wing' || mapId === 'house-full') {
       const manifest = this.cache.json.get(WORLD_V2_HOUSE_MANIFEST_KEY) as WorldV2CandidateManifestMetadata | undefined;
       const frames = manifest?.frames;
