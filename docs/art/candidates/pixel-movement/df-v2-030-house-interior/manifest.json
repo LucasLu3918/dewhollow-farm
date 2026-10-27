@@ -1,0 +1,1112 @@
+{
+  "schemaVersion": 1,
+  "title": "DF-V2-030 cozy farmhouse interior visual vocabulary",
+  "status": "candidate",
+  "candidate": true,
+  "approved": false,
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "anchorConvention": "integer-pixel-index"
+  },
+  "palette": {
+    "outline": "#382E2D",
+    "ink": "#493936",
+    "cool": "#566B68",
+    "shadow": "#48362F",
+    "wall": "#C79B67",
+    "wallHi": "#F7D8A2",
+    "wallShade": "#A97852",
+    "base": "#6E503E",
+    "plank": "#AF8258",
+    "plankAlt": "#A97B53",
+    "plankLight": "#C59663",
+    "plankHi": "#DBAC72",
+    "plankDark": "#80583F",
+    "cream": "#F3DEB7",
+    "linen": "#EAD9BB",
+    "sage": "#748B65",
+    "sageHi": "#A5B184",
+    "green": "#647C55",
+    "greenDark": "#425743",
+    "rust": "#A65F49",
+    "rustHi": "#D18A60",
+    "blue": "#73979A",
+    "blueHi": "#B4D1C4",
+    "glass": "#A8C7B6",
+    "gold": "#E9C276",
+    "stone": "#A5A18A",
+    "stoneDark": "#686B5D",
+    "rug": "#8D644E",
+    "rugHi": "#D6B77C",
+    "rugDark": "#5B4D48",
+    "white": "#F2E8D4"
+  },
+  "atlas": {
+    "file": "atlas.png",
+    "width": 768,
+    "height": 512,
+    "sha256": "28d397a2f6c9933f3c2e749f1cf9a0b3b676ba109bc7aa18b4c386e2e5acc0c7"
+  },
+  "composition": {
+    "mapSizeTiles": {
+      "width": 22,
+      "height": 20
+    },
+    "coordinateOrigin": "top-left; x increases right, y increases down",
+    "proposalOnly": true,
+    "entrance": {
+      "tiles": [
+        10,
+        11
+      ],
+      "edge": "south",
+      "approach": {
+        "x": [
+          10,
+          11
+        ],
+        "y": [
+          14,
+          19
+        ]
+      }
+    },
+    "mainPaths": [
+      {
+        "name": "north-south-entry-spine",
+        "x": [
+          10,
+          11
+        ],
+        "y": [
+          2,
+          19
+        ]
+      },
+      {
+        "name": "east-west-cross-aisle",
+        "x": [
+          2,
+          19
+        ],
+        "y": [
+          9,
+          10
+        ]
+      }
+    ],
+    "regions": [
+      {
+        "name": "bedroom",
+        "x": [
+          1,
+          8
+        ],
+        "y": [
+          2,
+          8
+        ]
+      },
+      {
+        "name": "kitchen",
+        "x": [
+          14,
+          20
+        ],
+        "y": [
+          2,
+          7
+        ]
+      },
+      {
+        "name": "craft-and-storage",
+        "x": [
+          1,
+          8
+        ],
+        "y": [
+          12,
+          17
+        ]
+      },
+      {
+        "name": "dining-and-sitting",
+        "x": [
+          14,
+          20
+        ],
+        "y": [
+          12,
+          17
+        ]
+      }
+    ],
+    "layoutAssumptions": [
+      "Decorative proposal only; does not alter existing map data or collision rules.",
+      "Two-tile-wide paths remain unobstructed; furniture footprints are reserved on adjacent cells.",
+      "Back-wall assets occupy perimeter rows y=0..1; south entrance occupies x=10..11.",
+      "Foot anchors are bottom-center native pixels; placement adapter may map these to 64-unit world tiles."
+    ],
+    "placements": [
+      {
+        "frame": "bed",
+        "anchorTile": {
+          "x": 4,
+          "y": 7
+        }
+      },
+      {
+        "frame": "plant",
+        "anchorTile": {
+          "x": 2,
+          "y": 2
+        }
+      },
+      {
+        "frame": "kitchen-counter",
+        "anchorTile": {
+          "x": 16,
+          "y": 6
+        }
+      },
+      {
+        "frame": "stove",
+        "anchorTile": {
+          "x": 18,
+          "y": 6
+        }
+      },
+      {
+        "frame": "shelf-books",
+        "anchorTile": {
+          "x": 17,
+          "y": 1
+        }
+      },
+      {
+        "frame": "workbench",
+        "anchorTile": {
+          "x": 4,
+          "y": 15
+        }
+      },
+      {
+        "frame": "storage",
+        "anchorTile": {
+          "x": 7,
+          "y": 15
+        }
+      },
+      {
+        "frame": "wardrobe",
+        "anchorTile": {
+          "x": 3,
+          "y": 4
+        }
+      },
+      {
+        "frame": "shoe-storage",
+        "anchorTile": {
+          "x": 15,
+          "y": 16
+        }
+      },
+      {
+        "frame": "table",
+        "anchorTile": {
+          "x": 17,
+          "y": 14
+        }
+      },
+      {
+        "frame": "chair",
+        "anchorTile": {
+          "x": 16,
+          "y": 16
+        }
+      },
+      {
+        "frame": "pet-bed",
+        "anchorTile": {
+          "x": 19,
+          "y": 16
+        }
+      },
+      {
+        "frame": "water-bowl",
+        "anchorTile": {
+          "x": 18,
+          "y": 17
+        }
+      },
+      {
+        "frame": "entry-mat",
+        "anchorTile": {
+          "x": 10,
+          "y": 17
+        }
+      },
+      {
+        "frame": "rug",
+        "anchorTile": {
+          "x": 14,
+          "y": 11
+        }
+      },
+      {
+        "frame": "door-threshold",
+        "anchorTile": {
+          "x": 10,
+          "y": 18
+        }
+      }
+    ]
+  },
+  "frames": [
+    {
+      "id": "floor-a",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "layer": "ground",
+      "role": "ground-tile",
+      "tileable": true,
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "a7ebd6ae89aeffa320d9a5c074322344e3f21bc592fb1f6b34722f73c767b0b7",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "floor-b",
+      "rect": {
+        "x": 128,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "layer": "ground",
+      "role": "ground-tile",
+      "tileable": true,
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "02de9375259d501bf507e71d26f6922df0127d7a3f4a36e0fad521b5f2e327fe",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "wall-middle",
+      "rect": {
+        "x": 256,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "layer": "back-wall",
+      "role": "wall-tile",
+      "tileable": true,
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "eddedee27666217b74e7af594e110c9a2518a682f565fda7323339240303ba85",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "wall-left-corner",
+      "rect": {
+        "x": 384,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "layer": "back-wall",
+      "role": "wall-tile",
+      "tileable": false,
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "086a920cd953180c3f69c52e4a874e9b668ab6507ced57a8f063aa7439eea087",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "wall-right-corner",
+      "rect": {
+        "x": 512,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "layer": "back-wall",
+      "role": "wall-tile",
+      "tileable": false,
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "8f949967274cbc90e444fc8d1f66d9d0d06a45dbf3a6bdcb4f3c1f4c44837019",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "wall-top",
+      "rect": {
+        "x": 640,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "layer": "back-wall",
+      "role": "wall-tile",
+      "tileable": true,
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "dd9ac0673d3966c863f295425842c45773f7031532a0977d6e4aa5f11b55e009",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "wall-bottom",
+      "rect": {
+        "x": 0,
+        "y": 128,
+        "width": 32,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "layer": "back-wall",
+      "role": "wall-tile",
+      "tileable": true,
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "42d9d0edf5a5030bb20ca460f886970f54d8e094861445b9d0a4a71f6a012419",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "wall-window",
+      "rect": {
+        "x": 128,
+        "y": 128,
+        "width": 32,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "layer": "back-wall",
+      "role": "wall-tile",
+      "tileable": false,
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "d7a9ddce3f527243bfaf8752f3d85ca5f1cfaa7e7b53cd13c87b2bda29321f1f",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "door-threshold",
+      "rect": {
+        "x": 256,
+        "y": 128,
+        "width": 64,
+        "height": 64
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 64
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 63
+      },
+      "footAnchor": {
+        "x": 32,
+        "y": 63
+      },
+      "sha256": "3b6f3a644aa5df6c54eb5365c9bdebed6860565587a9c443c6292c79e2fde81c",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "rug",
+      "rect": {
+        "x": 384,
+        "y": 128,
+        "width": 96,
+        "height": 64
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 96,
+        "height": 64
+      },
+      "nativeWidth": 96,
+      "nativeHeight": 64,
+      "layer": "ground-detail",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        3,
+        2
+      ],
+      "pivot": {
+        "x": 48,
+        "y": 63
+      },
+      "footAnchor": {
+        "x": 48,
+        "y": 63
+      },
+      "sha256": "7cca84e52ec6c584d78060f839036ae823552078deadc352f07d5163448af7e3",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "bed",
+      "rect": {
+        "x": 512,
+        "y": 128,
+        "width": 96,
+        "height": 96
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 96,
+        "height": 96
+      },
+      "nativeWidth": 96,
+      "nativeHeight": 96,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        3,
+        3
+      ],
+      "pivot": {
+        "x": 48,
+        "y": 95
+      },
+      "footAnchor": {
+        "x": 48,
+        "y": 95
+      },
+      "sha256": "48e2e02c59d129512c9c99e3016ccd7afa0cfcb012cc3f1a87e4828742840f09",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "kitchen-counter",
+      "rect": {
+        "x": 640,
+        "y": 128,
+        "width": 96,
+        "height": 64
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 96,
+        "height": 64
+      },
+      "nativeWidth": 96,
+      "nativeHeight": 64,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        3,
+        2
+      ],
+      "pivot": {
+        "x": 48,
+        "y": 63
+      },
+      "footAnchor": {
+        "x": 48,
+        "y": 63
+      },
+      "sha256": "49d671b7b9e9f964f57138489f1f15fe73b9a37a376cd71e1197b9aa7ad6149c",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "stove",
+      "rect": {
+        "x": 0,
+        "y": 256,
+        "width": 32,
+        "height": 48
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 48
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        1,
+        2
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "sha256": "526b48affc2215fe9c2b944cffd90b65c6bac34955e8863f9631cd20efe8b399",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "workbench",
+      "rect": {
+        "x": 128,
+        "y": 256,
+        "width": 96,
+        "height": 64
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 96,
+        "height": 64
+      },
+      "nativeWidth": 96,
+      "nativeHeight": 64,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        3,
+        2
+      ],
+      "pivot": {
+        "x": 48,
+        "y": 63
+      },
+      "footAnchor": {
+        "x": 48,
+        "y": 63
+      },
+      "sha256": "17c9e9516bc50755e030584793183f607f7cb9c67e1aaad688c64309a2df482f",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "storage",
+      "rect": {
+        "x": 256,
+        "y": 256,
+        "width": 64,
+        "height": 96
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 96
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 96,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        2,
+        3
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 95
+      },
+      "footAnchor": {
+        "x": 32,
+        "y": 95
+      },
+      "sha256": "5bb3ac6d46f643b8ab355579e21514ea2cacd809621c617529a51495d97cc0b2",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "wardrobe",
+      "rect": {
+        "x": 384,
+        "y": 256,
+        "width": 64,
+        "height": 96
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 96
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 96,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        2,
+        3
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 95
+      },
+      "footAnchor": {
+        "x": 32,
+        "y": 95
+      },
+      "sha256": "9e5f25f5e3e7352926b6a7d11b6a6f1f90145b7f01e16a686d696ef5129eb01d",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "table",
+      "rect": {
+        "x": 512,
+        "y": 256,
+        "width": 64,
+        "height": 64
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 64
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 63
+      },
+      "footAnchor": {
+        "x": 32,
+        "y": 63
+      },
+      "sha256": "2f2456f417eaa7dd3ed3d05dfef35ce2b624868d4b6710cf18091b5943ad42f1",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "chair",
+      "rect": {
+        "x": 640,
+        "y": 256,
+        "width": 32,
+        "height": 48
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 48
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 48,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        1,
+        2
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 47
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 47
+      },
+      "sha256": "b2a6df0afcb8df182eaf760c06ffccd206ff47962e43d7842b9cfbcd7cb11d8f",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "entry-mat",
+      "rect": {
+        "x": 0,
+        "y": 384,
+        "width": 64,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 32
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 32,
+      "layer": "ground-detail",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        2,
+        1
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 32,
+        "y": 31
+      },
+      "sha256": "430325bcbc8c0840d1dac008852ab29e593caa940b1332d30bc648f54435b81b",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "shoe-storage",
+      "rect": {
+        "x": 128,
+        "y": 384,
+        "width": 64,
+        "height": 64
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 64
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 63
+      },
+      "footAnchor": {
+        "x": 32,
+        "y": 63
+      },
+      "sha256": "9f9ce60afe4461962fdc788b9be5bce6c9607d7951f314f2e69227ceb40434d9",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "pet-bed",
+      "rect": {
+        "x": 256,
+        "y": 384,
+        "width": 64,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 32
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 32,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        2,
+        1
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 32,
+        "y": 31
+      },
+      "sha256": "3c60101a1f1acb13906b56a82fbcceef9070337854712ff65d47ad6e8c7731bb",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "water-bowl",
+      "rect": {
+        "x": 384,
+        "y": 384,
+        "width": 32,
+        "height": 32
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "baac029878c36616f208ca39fc72c19854193f27b82f9a21054ec3796631f3e4",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "shelf-books",
+      "rect": {
+        "x": 512,
+        "y": 384,
+        "width": 64,
+        "height": 64
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 64,
+        "height": 64
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "layer": "back-wall-object",
+      "role": "wall-tile",
+      "tileable": false,
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "pivot": {
+        "x": 32,
+        "y": 63
+      },
+      "footAnchor": {
+        "x": 32,
+        "y": 63
+      },
+      "sha256": "e37203d6e984a5645c1eecc8519580bbfb7d3776818721b68418c014cde6b3d3",
+      "candidate": true,
+      "approved": false
+    },
+    {
+      "id": "plant",
+      "rect": {
+        "x": 640,
+        "y": 384,
+        "width": 32,
+        "height": 64
+      },
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 64
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 64,
+      "layer": "object",
+      "role": "furniture",
+      "tileable": false,
+      "footprintTiles": [
+        1,
+        2
+      ],
+      "pivot": {
+        "x": 16,
+        "y": 63
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 63
+      },
+      "sha256": "33fda86243938175a8f6c79a927d301717e1e381730940bc9403d6d85ca2de13",
+      "candidate": true,
+      "approved": false
+    }
+  ]
+}
