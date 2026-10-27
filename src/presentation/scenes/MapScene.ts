@@ -2,9 +2,18 @@ import Phaser from 'phaser';
 import type { ContentPack, Direction, MapDef, Point } from '../../domain/content';
 import { plotKey, type PlotMap, type PlotState } from '../../domain/farm';
 import { tileAt } from '../../domain/world';
-import { groundLayerFor, isGroundLayer } from '../map-layers';
+import { isGroundLayer } from '../map-layers';
 import { sceneOverlaysFor } from '../scene-overlays';
 import { forestSceneAssetFor } from '../forest-scene-art';
+import { actorDepth, foregroundDepth } from '../actor-depth';
+import { legacyMapRenderPlan, plotRenderPlan } from '../map-render-plan';
+import {
+  clearMapTileLayers,
+  placeDepthSortedMapObject,
+  renderMapTileLayers,
+  renderPlotLayer,
+  type MapTileSprite,
+} from '../map-scene-renderer';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import { resolveInteraction, type InteractionLabelKey } from '../../application/interaction';
@@ -201,9 +210,6 @@ const REACT_DURATION_MS = 320;
 
 /** 居民在地圖角色下方；玩家與跟隨寵物共用深度帶，再依腳底位置決定前後。 */
 const DEPTH_RESIDENT = 5;
-const DEPTH_ACTOR_BASE = 10;
-const DEPTH_PLAYER_TIE_BREAK = 0.001;
-const DEPTH_TREE_TIE_BREAK = 0.001;
 /** 擺在地板上的裝飾：在地板之上、動物之下。 */
 const DEPTH_DECOR = 3;
 /** 天色與天氣的遮罩、粒子，在世界之上、HUD（DOM）之下。 */
@@ -433,14 +439,7 @@ export class MapScene extends Phaser.Scene {
    */
   private heldPlots = new Map<string, PlotState | null>();
   /** 每格的地面底層與透明物件層：地圖變化（砍樹、採野薄荷）即時更新對應圖層。 */
-  private tileSprites: {
-    x: number;
-    y: number;
-    base: TileKind;
-    ground: TileKind;
-    groundImage: Phaser.GameObjects.Image;
-    objectImage?: Phaser.GameObjects.Image;
-  }[] = [];
+  private tileSprites: MapTileSprite<Phaser.GameObjects.Image>[] = [];
   /** Map-specific static art overlays; they are render-only and carry no world or collision state. */
   private sceneOverlaySprites: Phaser.GameObjects.Image[] = [];
   private shopPanel!: ShopPanel;
@@ -1901,30 +1900,18 @@ export class MapScene extends Phaser.Scene {
     this.clearPixel32CandidateOverlays();
     this.clearPixel32CandidateInteractables();
     this.clearSceneOverlays();
-    // Tree overlays live on the scene display list so their foot depth can sort
-    // against actor roots. Destroy those roots explicitly before clearing the tile container.
-    for (const sprite of this.tileSprites) {
-      if (sprite.objectImage && sprite.objectImage.parentContainer !== this.world) sprite.objectImage.destroy();
-    }
-    this.world.removeAll(true);
+    clearMapTileLayers(this.tileSprites, this.world);
     this.heldPlots.clear();
     this.tileSprites = [];
     const map = this.deps.index.map(mapId);
-
-    for (let y = 0; y < map.height; y += 1) {
-      for (let x = 0; x < map.width; x += 1) {
-        const tile = tileAt(map, x, y);
-        if (!tile) continue;
-        const ground = groundLayerFor(map, x, y);
-        const groundKey = forestSceneAssetFor(mapId, ground, x, y) ?? `tile.${ground}`;
-        const groundImage = this.image(groundKey, x, y, 0);
-        const objectKey = forestSceneAssetFor(mapId, tile.kind, x, y) ?? `tile.${tile.kind}`;
-        const objectImage = isGroundLayer(tile.kind) ? undefined : this.image(objectKey, x, y, 1);
-        this.tileSprites.push({ x, y, base: tile.kind, ground, groundImage, objectImage });
-        this.world.add(groundImage);
-        if (objectImage) this.placeObjectImage(objectImage, tile.kind, y);
-      }
-    }
+    this.tileSprites = renderMapTileLayers(legacyMapRenderPlan(map), {
+      image: (kind, x, y, depth) => {
+        const key = forestSceneAssetFor(mapId, kind, x, y) ?? `tile.${kind}`;
+        return this.image(key, x, y, depth);
+      },
+      addGround: (image) => this.world.add(image),
+      placeObject: (image, kind, y) => this.placeObjectImage(image, kind, y),
+    });
 
     this.clearActors();
     this.createResidents(map);
@@ -1948,7 +1935,7 @@ export class MapScene extends Phaser.Scene {
         .setOrigin(0.5, 240 / 256)
         .setFlipX(flipX)
         .setScale(scale)
-        .setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
+        .setDepth(foregroundDepth(footY));
       this.sceneOverlaySprites.push(image);
     }
   }
@@ -1974,7 +1961,7 @@ export class MapScene extends Phaser.Scene {
         this.world.add(image);
         image.setDepth(1);
       } else {
-        image.setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
+        image.setDepth(foregroundDepth(footY));
       }
       this.pixel32CandidateOverlaySprites.push({ descriptor, image });
     }
@@ -2128,31 +2115,27 @@ export class MapScene extends Phaser.Scene {
       else delete shown[key];
     }
 
-    for (const [key, plot] of Object.entries(shown)) {
-      const [x, y] = key.split(',').map(Number);
-      if (x === undefined || y === undefined) continue;
-      if (x < 0 || y < 0 || x >= map.width || y >= map.height) continue;
-
-      const soil = this.image('tile.soil', x, y, 1);
-      soil.setData('plot', true);
-      if (plot.watered) soil.setTint(0x6fa8dc);
-      this.world.add(soil);
-
-      if (plot.crop) {
-        const crop = this.deps.index.crop(plot.crop.cropId);
-        const ratio = Math.min(1, plot.crop.growthDays / crop.growthDays);
-        const stage: CandidateCropStage = ratio < 0.25 ? 'seed' : ratio < 0.7 ? 'sprout' : 'mature';
-        const sprite = this.image(`crop.${crop.id}`, x, y, 2, stage);
-        const growthScale = 0.5 + 0.5 * ratio;
+    const plans = plotRenderPlan(shown, map, (cropId) => this.deps.index.crop(cropId).growthDays);
+    renderPlotLayer(plans, {
+      soil: (plot) => {
+        const soil = this.image('tile.soil', plot.x, plot.y, 1);
+        soil.setData('plot', true);
+        if (plot.watered) soil.setTint(0x6fa8dc);
+        return soil;
+      },
+      crop: (plot) => {
+        const crop = plot.crop!;
+        const sprite = this.image(`crop.${crop.cropId}`, plot.x, plot.y, 2, crop.stage);
         const displayScale = sprite.texture.key === 'gate1-candidate-atlas' || sprite.texture.key === PIXEL32_CROPS_ATLAS_KEY
-          ? sprite.scaleX * growthScale
-          : growthScale;
+          ? sprite.scaleX * crop.scale
+          : crop.scale;
         sprite.setScale(displayScale);
-        sprite.setAlpha(0.5 + 0.5 * ratio);
+        sprite.setAlpha(crop.alpha);
         sprite.setData('plot', true);
-        this.world.add(sprite);
-      }
-    }
+        return sprite;
+      },
+      add: (image) => this.world.add(image),
+    });
   }
 
   private movePlayer(x: number, y: number): void {
@@ -2221,23 +2204,19 @@ export class MapScene extends Phaser.Scene {
   }
 
   private actorDepth(footY: number, player: boolean): number {
-    return DEPTH_ACTOR_BASE + footY / TILE_SIZE + (player ? DEPTH_PLAYER_TIE_BREAK : 0);
+    return actorDepth(footY, player ? 'player' : 'resident');
   }
 
   /** Tree overlays share the scene display list with actor roots, using the image bottom as their foot anchor. */
   private placeObjectImage(image: Phaser.GameObjects.Image, kind: TileKind, tileY: number): void {
-    if (kind !== 'tree') {
-      if (image.parentContainer !== this.world) this.world.add(image);
-      image.setDepth(1);
-      return;
-    }
-
-    if (image.parentContainer === this.world) this.world.remove(image);
-    // A tree at the same foot Y renders just ahead of the player; lower actors
-    // still win naturally because their per-tile depth step is much larger.
-    const footY = image.getBounds().bottom || (tileY + 1) * TILE_SIZE;
-    image.setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
-    this.children.bringToTop(image);
+    placeDepthSortedMapObject(
+      image,
+      kind,
+      tileY,
+      this.world,
+      { add: (object) => this.world.add(object), remove: (object) => this.world.remove(object) },
+      (tree) => this.children.bringToTop(tree),
+    );
   }
 
   /** 每一畫面更新：夜色依時間、變暗依天氣、粒子依天氣與時間。 */
