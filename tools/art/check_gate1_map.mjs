@@ -5,6 +5,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { inflateSync } from 'node:zlib';
+import { measureTileWrapSeams, summarizeFrameAlpha } from './map_tile_seams.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_MANIFEST = resolve(HERE, '../../docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/manifest.json');
@@ -15,6 +16,16 @@ function fail(message) { throw new Error(`Gate 1 pixel32 map candidate: ${messag
 function crc32(bytes) {
   const table = crc32.table ??= Uint32Array.from({ length: 256 }, (_, n) => { let v = n; for (let i = 0; i < 8; i++) v = v & 1 ? 0xedb88320 ^ (v >>> 1) : v >>> 1; return v >>> 0; });
   let crc = 0xffffffff; for (const byte of bytes) crc = table[(crc ^ byte) & 255] ^ (crc >>> 8); return (crc ^ 0xffffffff) >>> 0;
+}
+
+function paeth(left, above, upperLeft) {
+  const prediction = left + above - upperLeft;
+  const leftDistance = Math.abs(prediction - left);
+  const aboveDistance = Math.abs(prediction - above);
+  const upperLeftDistance = Math.abs(prediction - upperLeft);
+  if (leftDistance <= aboveDistance && leftDistance <= upperLeftDistance) return left;
+  if (aboveDistance <= upperLeftDistance) return above;
+  return upperLeft;
 }
 
 function parsePng(bytes) {
@@ -28,7 +39,7 @@ function parsePng(bytes) {
     const type = bytes.toString('ascii', offset + 4, offset + 8); const chunkData = bytes.subarray(offset + 8, offset + 8 + length);
     if (crc32(bytes.subarray(offset + 4, offset + 8 + length)) !== bytes.readUInt32BE(offset + 8 + length)) fail(`PNG ${type} CRC mismatch`);
     if (type === 'IHDR') {
-      if (length !== 13 || chunkData[8] !== 8 || chunkData[9] !== 6) fail('atlas must use 8-bit RGBA pixels');
+      if (length !== 13 || chunkData[8] !== 8 || chunkData[9] !== 6 || chunkData[10] !== 0 || chunkData[11] !== 0 || chunkData[12] !== 0) fail('atlas must use non-interlaced 8-bit RGBA pixels');
       dimensions = { width: chunkData.readUInt32BE(0), height: chunkData.readUInt32BE(4) };
       if (dimensions.width > 1024 || dimensions.height > 1024) fail('PNG dimensions exceed the candidate decoder limit');
     }
@@ -37,10 +48,31 @@ function parsePng(bytes) {
     if (type === 'IEND') { ended = true; break; }
   }
   if (!ended || offset !== bytes.length || !dimensions) fail('PNG structure is incomplete or has trailing data');
-  const rowBytes = dimensions.width * 4 + 1;
+  const bytesPerPixel = 4;
+  const rowBytes = dimensions.width * bytesPerPixel + 1;
   const decoded = inflateSync(Buffer.concat(imageChunks), { maxOutputLength: rowBytes * dimensions.height });
   if (decoded.length !== rowBytes * dimensions.height) fail('decoded PNG pixel data does not match atlas dimensions');
-  return dimensions;
+  const pixels = Buffer.alloc(dimensions.width * dimensions.height * bytesPerPixel);
+  for (let y = 0; y < dimensions.height; y += 1) {
+    const sourceOffset = y * rowBytes;
+    const filter = decoded[sourceOffset];
+    if (filter > 4) fail(`unsupported PNG row filter ${filter}`);
+    const destinationOffset = y * dimensions.width * bytesPerPixel;
+    const previousRowOffset = destinationOffset - dimensions.width * bytesPerPixel;
+    for (let x = 0; x < dimensions.width * bytesPerPixel; x += 1) {
+      const raw = decoded[sourceOffset + 1 + x];
+      const left = x >= bytesPerPixel ? pixels[destinationOffset + x - bytesPerPixel] : 0;
+      const above = y > 0 ? pixels[previousRowOffset + x] : 0;
+      const upperLeft = y > 0 && x >= bytesPerPixel ? pixels[previousRowOffset + x - bytesPerPixel] : 0;
+      const predictor = filter === 0 ? 0
+        : filter === 1 ? left
+          : filter === 2 ? above
+            : filter === 3 ? Math.floor((left + above) / 2)
+              : paeth(left, above, upperLeft);
+      pixels[destinationOffset + x] = (raw + predictor) & 255;
+    }
+  }
+  return { ...dimensions, pixels };
 }
 
 function parseArgs(args) {
@@ -63,7 +95,9 @@ async function main() {
   if (atlasInfo.size > 2 * 1024 * 1024) fail('atlas exceeds the 2 MB candidate limit');
   const atlasBytes = await readFile(atlasPath);
   if (sha256(atlasBytes) !== manifest.atlas.sha256) fail('atlas SHA-256 does not match the manifest');
-  const dimensions = parsePng(atlasBytes);
+  const decodedAtlas = parsePng(atlasBytes);
+  const { width, height, pixels } = decodedAtlas;
+  const dimensions = { width, height };
   if (dimensions.width !== manifest.atlas.width || dimensions.height !== manifest.atlas.height) fail('atlas dimensions do not match the manifest');
   const sourceHash = sha256(await readFile(GENERATOR));
   if (sourceHash !== manifest.source?.generatorSha256) fail('generator SHA-256 does not match the manifest; regenerate candidate files');
@@ -82,7 +116,14 @@ async function main() {
     }
   }
   for (const season of seasons) {
-    for (const surface of ['grass', 'field', 'path', 'water']) if (!frames[`${season}-${surface}`]) fail(`missing ${season} ${surface} frame`);
+    for (const surface of ['grass', 'field', 'path', 'water']) {
+      const frame = frames[`${season}-${surface}`];
+      if (!frame || frame.season !== season || frame.surface !== surface || frame.width !== 32 || frame.height !== 32 || frame.tileable !== true || frame.approved !== false) fail(`invalid ${season} ${surface} tileable frame`);
+    }
+    for (const surface of ['dry-soil', 'wet-soil']) {
+      const frame = frames[`${season}-${surface}`];
+      if (!frame || frame.season !== season || frame.surface !== surface || frame.width !== 32 || frame.height !== 32 || frame.tileable !== true || frame.approved !== false) fail(`invalid ${season} ${surface} frame`);
+    }
     for (let mask = 0; mask < 16; mask++) {
       const frame = frames[`${season}-field-edge-${mask.toString(16)}`];
       if (!frame || frame.autotileMask !== mask || frame.season !== season || frame.width !== 32 || frame.height !== 32 || frame.approved !== false) fail(`invalid ${season} autotile frame ${mask.toString(16)}`);
@@ -93,7 +134,28 @@ async function main() {
     if (!frame || frame.width !== widthTiles * 32 || frame.height !== heightTiles * 32 || frame.widthTiles !== widthTiles || frame.heightTiles !== heightTiles || frame.layer !== layer || frame.approved !== false) fail(`invalid multi-tile or occlusion frame ${name}`);
     if (!frame.footAnchor || frame.footAnchor.x < 0 || frame.footAnchor.x > frame.width || frame.footAnchor.y < 0 || frame.footAnchor.y > frame.height) fail(`${name} foot anchor is outside its frame`);
   }
-  console.log(`PASS: ${Object.keys(frames).length} candidate frames, 4 seasons, 64 autotile variants, multi-tile building and canopy occlusion; atlas ${dimensions.width}x${dimensions.height} (${atlasInfo.size} bytes)`);
+  if (!frames['wood-floor'] || frames['wood-floor'].surface !== 'wood-floor' || frames['wood-floor'].tileable !== true || frames['wood-floor'].width !== 32 || frames['wood-floor'].height !== 32 || frames['wood-floor'].approved !== false) fail('invalid tileable wood-floor frame');
+  const wallCorners = ['nw', 'ne', 'sw', 'se'];
+  for (const corner of wallCorners) {
+    const frame = frames[`wall-corner-${corner}`];
+    if (!frame || frame.kind !== 'wall-corner' || frame.corner !== corner || frame.surface !== 'wall' || frame.layer !== 'back' || frame.width !== 32 || frame.height !== 32 || frame.approved !== false) fail(`invalid wall corner ${corner}`);
+  }
+
+  const tileableFrames = frameEntries.filter(([, frame]) => frame.tileable === true);
+  const surfaceFamilies = new Set(tileableFrames.map(([, frame]) => frame.surface));
+  if (surfaceFamilies.size !== 7) fail(`expected 7 tileable surface families, found ${surfaceFamilies.size}`);
+  for (const [name, frame] of tileableFrames) {
+    if (frame.width !== 32 || frame.height !== 32) fail(`tileable frame ${name} must be 32x32`);
+    const seam = measureTileWrapSeams(pixels, dimensions.width, frame);
+    if (seam.maxChannelDelta !== 0) fail(`tileable frame ${name} has a wrapped RGBA edge seam (max delta ${seam.maxChannelDelta})`);
+  }
+
+  const shadow = frames['ground-shadow'];
+  if (!shadow || shadow.kind !== 'shadow' || shadow.surface !== 'shadow' || shadow.width !== 32 || shadow.height !== 12 || shadow.hasTransparency !== true || shadow.containsPartialAlpha !== true || shadow.approved !== false) fail('invalid transparent ground shadow frame');
+  const shadowAlpha = summarizeFrameAlpha(pixels, dimensions.width, shadow);
+  if (shadowAlpha.transparentPixels === 0 || shadowAlpha.partialAlphaPixels === 0 || shadowAlpha.transparentBorderPixels !== 2 * shadow.width + 2 * (shadow.height - 2)) fail('ground shadow must contain transparent and partial-alpha pixels, with a fully transparent border');
+
+  console.log(`PASS: ${Object.keys(frames).length} candidate frames, 4 seasons, 64 autotile variants, 7 tileable surface families with exact RGBA seams, transparent ground shadow, wall corners and multi-tile building and canopy occlusion; atlas ${dimensions.width}x${dimensions.height} (${atlasInfo.size} bytes)`);
 }
 
 try { await main(); } catch (error) { console.error(error instanceof Error ? error.message : String(error)); process.exitCode = 1; }

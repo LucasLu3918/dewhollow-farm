@@ -12,8 +12,8 @@
     <main class="shell">
       <header>
         <p class="eyebrow">GATE 1 · 候選素材 QA</p>
-        <h1>四季圖塊接縫觀察</h1>
-        <p class="intro">以 3×3 重複圖塊觀察草地、田地、道路與水面；下方列出每季全部 16 種田地邊緣遮罩。像素差是量測資料，不代表主觀無縫評分。</p>
+        <h1>世界地表圖塊接縫檢查</h1>
+        <p class="intro">以 3×3 重複觀察七種可平鋪地表，並量測水平、垂直相鄰像素的 RGBA 差；四種牆角與半透明地面陰影分開檢視。候選仍待人工確認完整場景的色彩與材質表現。</p>
       </header>
       <section class="controls" aria-label="季節選擇">
         <fieldset>
@@ -29,8 +29,13 @@
       </section>
       <section class="card" aria-labelledby="repeat-title">
         <div class="card-heading"><h2 id="repeat-title">3×3 重複樣本</h2><span>同一 frame 重複 · 最近鄰顯示</span></div>
-        <canvas id="repeat-preview" width="800" height="184" role="img" aria-label="四種地表的 3×3 重複圖塊樣本"></canvas>
-        <div class="surface-labels" aria-hidden="true"><span>草地</span><span>田地</span><span>道路</span><span>水面</span></div>
+        <canvas id="repeat-preview" width="1000" height="184" role="img" aria-label="七種可平鋪地表的 3×3 重複圖塊樣本"></canvas>
+        <div class="surface-labels" aria-hidden="true"><span>草地</span><span>田地</span><span>道路</span><span>水面</span><span>乾土</span><span>濕土</span><span>木地板</span></div>
+      </section>
+      <section class="card" aria-labelledby="details-title">
+        <div class="card-heading"><h2 id="details-title">牆角與地面陰影候選</h2><span>四種牆角 · 具有透明邊界與部分 alpha 的陰影</span></div>
+        <canvas id="details-preview" width="800" height="104" role="img" aria-label="四種木牆角候選與一個 RGBA 地面陰影候選"></canvas>
+        <div id="corner-labels" class="corner-labels" aria-hidden="true"></div>
       </section>
       <section class="card" aria-labelledby="mask-title">
         <div class="card-heading"><h2 id="mask-title">田地邊緣遮罩 0–15</h2><span>16 種 frame · 當季全數顯示</span></div>
@@ -44,8 +49,8 @@
         <p id="mixed-frame-list" class="mixed-frames"></p>
       </section>
       <section class="metrics card" aria-labelledby="metrics-title">
-        <div class="card-heading"><h2 id="metrics-title">相鄰像素觀測</h2><span>只記錄數值，不設通過門檻</span></div>
-        <p class="metric-note">每個 3×3 樣本計算水平與垂直接縫兩側對應像素的 RGB 絕對差；色彩與紋理觀感仍需人工檢視。</p>
+        <div class="card-heading"><h2 id="metrics-title">RGBA 重複邊界檢查</h2><span>可平鋪地表的每組最大通道差必須為 0</span></div>
+        <p class="metric-note">每種地表取單一 32×32 frame，逐行／逐列比較水平接縫右／左像素與垂直接縫下／上像素的 RGBA 通道。這是精確相鄰邊界的機器檢查，不代表完整畫面美術審核。</p>
         <div id="metrics" class="metric-grid" aria-live="polite"></div>
       </section>
       <footer>

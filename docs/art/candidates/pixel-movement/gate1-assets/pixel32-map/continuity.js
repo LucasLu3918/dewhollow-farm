@@ -19,17 +19,20 @@ const atlasContext = atlasCanvas.getContext('2d', { willReadFrequently: true });
 atlasContext.drawImage(atlas, 0, 0);
 const atlasPixels = atlasContext.getImageData(0, 0, atlasCanvas.width, atlasCanvas.height).data;
 const seasons = manifest.seasons;
-const surfaces = ['grass', 'field', 'path', 'water'];
-const surfaceNames = { grass: '草地', field: '田地', path: '道路', water: '水面' };
+const surfaces = ['grass', 'field', 'path', 'water', 'dry-soil', 'wet-soil', 'wood-floor'];
+const surfaceNames = { grass: '草地', field: '田地', path: '道路', water: '水面', 'dry-soil': '乾土', 'wet-soil': '濕土', 'wood-floor': '木地板' };
 const repeatCanvas = document.querySelector('#repeat-preview');
 const repeatContext = repeatCanvas.getContext('2d', { willReadFrequently: true });
 const maskCanvas = document.querySelector('#mask-preview');
 const maskContext = maskCanvas.getContext('2d');
 const mixedCanvas = document.querySelector('#mixed-preview');
 const mixedContext = mixedCanvas.getContext('2d');
+const detailsCanvas = document.querySelector('#details-preview');
+const detailsContext = detailsCanvas.getContext('2d');
 repeatContext.imageSmoothingEnabled = false;
 maskContext.imageSmoothingEnabled = false;
 mixedContext.imageSmoothingEnabled = false;
+detailsContext.imageSmoothingEnabled = false;
 const seasonButtons = [...document.querySelectorAll('[data-season]')];
 const loadedFrameIds = [];
 let season = seasons[0];
@@ -54,7 +57,7 @@ function seamMetrics(frameId) {
   let totalDelta = 0;
   let maxDelta = 0;
   const addPair = (a, b) => {
-    const delta = Math.abs(atlasPixels[a] - atlasPixels[b]) + Math.abs(atlasPixels[a + 1] - atlasPixels[b + 1]) + Math.abs(atlasPixels[a + 2] - atlasPixels[b + 2]);
+    const delta = Math.max(...[0, 1, 2, 3].map((channel) => Math.abs(atlasPixels[a + channel] - atlasPixels[b + channel])));
     sampleCount += 1;
     if (delta === 0) exactMatchCount += 1;
     totalDelta += delta;
@@ -68,7 +71,23 @@ function seamMetrics(frameId) {
     addPair(rightEdge, leftEdge);
     addPair(bottomEdge, topEdge);
   }
-  return { exactMatchCount, meanRgbDelta: sampleCount ? Number((totalDelta / sampleCount).toFixed(4)) : 0, maxRgbDelta: maxDelta, sampleCount };
+  return { exactMatchCount, meanRgbaDelta: sampleCount ? Number((totalDelta / sampleCount).toFixed(4)) : 0, maxRgbaDelta: maxDelta, sampleCount, passed: maxDelta === 0 };
+}
+
+function alphaMetrics(frameId) {
+  const frame = frameFor(frameId);
+  let transparentPixels = 0;
+  let partialAlphaPixels = 0;
+  let opaquePixels = 0;
+  let transparentBorderPixels = 0;
+  for (let y = 0; y < frame.height; y += 1) for (let x = 0; x < frame.width; x += 1) {
+    const alpha = atlasPixels[((frame.y + y) * atlasCanvas.width + frame.x + x) * 4 + 3];
+    if (alpha === 0) transparentPixels += 1;
+    else if (alpha < 255) partialAlphaPixels += 1;
+    else opaquePixels += 1;
+    if ((x === 0 || x === frame.width - 1 || y === 0 || y === frame.height - 1) && alpha === 0) transparentBorderPixels += 1;
+  }
+  return { transparentPixels, partialAlphaPixels, opaquePixels, transparentBorderPixels };
 }
 
 function render() {
@@ -78,8 +97,8 @@ function render() {
   mixedContext.clearRect(0, 0, mixedCanvas.width, mixedCanvas.height);
   const metrics = [];
   surfaces.forEach((surface, column) => {
-    const frameId = `${season}-${surface}`;
-    const startX = 52 + column * 200;
+    const frameId = surface === 'wood-floor' ? surface : `${season}-${surface}`;
+    const startX = 8 + column * 140;
     const startY = 8;
     for (let y = 0; y < 3; y += 1) for (let x = 0; x < 3; x += 1) {
       drawFrame(repeatContext, frameId, startX + x * tile, startY + y * tile);
@@ -119,8 +138,22 @@ function render() {
     drawFrame(mixedContext, id, 352 + x * tile, 8 + y * tile);
   }
   document.querySelector('#mixed-frame-list').textContent = `3×3 格子順序（左至右、上至下）：${mixedFrames.join(' · ')}`;
-  document.querySelector('#metrics').innerHTML = metrics.map((item) => `<div class="metric" data-surface="${item.surface}"><strong>${item.label}</strong><span>完全相同 ${item.exactMatchCount}/${item.sampleCount}<br>平均 RGB 差 ${item.meanRgbDelta}<br>最大 RGB 差 ${item.maxRgbDelta}</span></div>`).join('');
-  document.querySelector('#readout').textContent = `${season} · 4 種地表，各 3×3 重複 · field mask 0–f 共 16 種 · candidate / approved=false`;
+  const wallCornerIds = ['nw', 'ne', 'sw', 'se'].map((corner) => `wall-corner-${corner}`);
+  wallCornerIds.forEach((id, index) => drawFrame(detailsContext, id, 16 + index * 112, 12, 64, 64));
+  const shadowId = 'ground-shadow';
+  drawFrame(detailsContext, shadowId, 520, 32, 128, 48);
+  const shadowAlpha = alphaMetrics(shadowId);
+  document.querySelector('#corner-labels').replaceChildren(...[
+    ...wallCornerIds.map((id) => ({ id, label: id.replace('wall-corner-', '').toUpperCase() })),
+    { id: shadowId, label: 'GROUND SHADOW · RGBA' },
+  ].map(({ id, label }) => {
+    const item = document.createElement('span');
+    item.textContent = label;
+    item.dataset.frameId = id;
+    return item;
+  }));
+  document.querySelector('#metrics').innerHTML = metrics.map((item) => `<div class="metric" data-surface="${item.surface}" data-seam-passed="${item.passed}"><strong>${item.label}</strong><span>${item.passed ? 'PASS' : 'FAIL'} · 完全相同 ${item.exactMatchCount}/${item.sampleCount}<br>平均 RGBA 通道差 ${item.meanRgbaDelta}<br>最大 RGBA 通道差 ${item.maxRgbaDelta}</span></div>`).join('');
+  document.querySelector('#readout').textContent = `${season} · 7 種可平鋪地表，各 3×3 重複 · RGBA 邊界差必須為 0 · field mask 0–f 共 16 種 · candidate / approved=false`;
   document.querySelector('#source-hashes').textContent = `manifest ${manifestSha256} · atlas ${manifest.atlas.sha256} · generator ${manifest.source.generatorSha256}`;
   repeatCanvas.dataset.season = season;
   repeatCanvas.dataset.candidateStatus = manifest.status;
@@ -128,10 +161,12 @@ function render() {
   repeatCanvas.dataset.loadedFrameIds = loadedFrameIds.join(',');
   repeatCanvas.dataset.maskIds = maskIds.join(',');
   repeatCanvas.dataset.metrics = JSON.stringify(metrics);
+  repeatCanvas.dataset.tileableSurfaceIds = surfaces.map((surface) => surface === 'wood-floor' ? surface : `${season}-${surface}`).join(',');
+  repeatCanvas.dataset.seamPassed = String(metrics.every((item) => item.passed));
   repeatCanvas.dataset.frameCounts = JSON.stringify({
     baseSurfaces: surfaces.map((surface) => ({
       surface,
-      sourceFrameCount: Object.values(manifest.frames).filter((frame) => frame.season === season && frame.surface === surface && frame.autotileMask === undefined).length,
+      sourceFrameCount: manifest.frames[surface === 'wood-floor' ? surface : `${season}-${surface}`] ? 1 : 0,
       displayedTileCount: 9,
     })),
     fieldEdge: { sourceFrameCount: maskIds.length, displayedTileCount: maskIds.length },
@@ -139,6 +174,7 @@ function render() {
       uniqueSourceFrameCount: new Set(mixedFrames).size,
       displayedTileCount: mixedFrames.length,
     },
+    details: { wallCornerIds, shadowId, shadowAlpha },
     uniqueSourceFramesLoaded: new Set(loadedFrameIds).size,
   });
   repeatCanvas.dataset.mixedCellFrames = mixedFrames.join(',');
@@ -149,6 +185,11 @@ function render() {
   repeatCanvas.dataset.manifestSha256 = manifestSha256;
   maskCanvas.dataset.season = season;
   maskCanvas.dataset.maskIds = maskIds.join(',');
+  detailsCanvas.dataset.wallCornerIds = wallCornerIds.join(',');
+  detailsCanvas.dataset.shadowId = shadowId;
+  detailsCanvas.dataset.shadowAlpha = JSON.stringify(shadowAlpha);
+  detailsCanvas.dataset.candidateStatus = manifest.status;
+  detailsCanvas.dataset.approved = String(manifest.approved);
 }
 
 seasonButtons.forEach((button) => button.addEventListener('click', () => {
