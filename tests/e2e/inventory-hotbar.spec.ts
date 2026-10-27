@@ -83,7 +83,7 @@ test('assigns tools and owned seeds, uses keyboard and touch, and persists them 
   }
 });
 
-test('migrates a v23 save to four empty quickbar slots and saves as v24', async ({ page }) => {
+test('migrates a v23 save to four empty quickbar slots and saves as v25', async ({ page }) => {
   await start(page);
   const old = await page.evaluate(() => window.__dewhollow!.gameState());
   old.schemaVersion = 23 as GameState['schemaVersion'];
@@ -92,12 +92,12 @@ test('migrates a v23 save to four empty quickbar slots and saves as v24', async 
   await page.reload();
   await expect(page.locator('#game')).toHaveAttribute('data-ready', 'true');
   const migrated = await page.evaluate(() => window.__dewhollow!.gameState());
-  expect(migrated.schemaVersion).toBe(24);
+  expect(migrated.schemaVersion).toBe(25);
   expect(migrated.hotbar).toEqual([null, null, null, null]);
 
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
-  expect((await readSavedState(page)).schemaVersion).toBe(24);
+  expect((await readSavedState(page)).schemaVersion).toBe(25);
   expect((await readSavedState(page)).hotbar).toEqual([null, null, null, null]);
 });
 

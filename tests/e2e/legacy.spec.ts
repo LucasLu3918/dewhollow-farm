@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * 床邊的公告：農場評級、豐收重置（第 2 年春季第 1 天）與傳承（主線第 5 章完成後）。
- * 存檔是一份 v23 的存檔，站在小屋的 (2,2) 面向左邊的公告 (1,2)（床的正下方），按 X 打開面板。
+ * 存檔使用目前 schema，站在小屋的 (2,5) 面向上方的公告 (2,4)，按 X 打開面板。
  * 兩個動作都要按兩次（第一次只顯示說明，第二次才確認）。
  * 注意：這份測試需要在本機 5173 port 執行 playwright，本次任務未執行（見交付報告）。
  */
@@ -12,14 +12,14 @@ function record(overrides: Record<string, unknown>): Record<string, unknown> {
     slot: 'slot-1',
     savedAt: '2026-10-22T10:00:00.000Z',
     state: {
-      schemaVersion: 23,
+      schemaVersion: 25,
       calendar: { year: 2, season: 'spring', day: 1, minuteOfDay: 360 },
       weather: 'sunny',
       forecast: 'sunny',
       energy: { current: 100, max: 100 },
       gold: 900,
       mapId: 'house',
-      player: { x: 2, y: 2, facing: 'left' },
+      player: { x: 2, y: 5, facing: 'up' },
       plots: {},
       inventory: { capacity: 24, stacks: [{ itemId: 'hay', quality: 'normal', count: 2 }] },
       shipBox: { entries: [] },
@@ -60,6 +60,7 @@ function record(overrides: Record<string, unknown>): Record<string, unknown> {
       mineSeed: 9,
       mineCheckpoint: 1,
       selectedSeed: 'moon-bean',
+      hotbar: [null, null, null, null],
       rng: 12345,
       playtimeSeconds: 0,
       yearlyIncome: 0,
@@ -133,7 +134,7 @@ test('豐收重置：第一次按只顯示說明，第二次確認後清空農�
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
   const saved = await readRecord(page);
-  expect(saved.state.schemaVersion).toBe(24);
+  expect(saved.state.schemaVersion).toBe(25);
   expect(saved.state.resetBonus).toBe(1);
   expect(saved.state.gold).toBe(100);
   expect(saved.state.flags).not.toHaveProperty('house-wing');

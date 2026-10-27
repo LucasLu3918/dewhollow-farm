@@ -49,7 +49,7 @@ for (const [name, fixture] of fixtures) {
 
     const assertState = async () => {
       const state = await page.evaluate(() => window.__dewhollow!.gameState());
-      expect(state).toMatchObject({ schemaVersion: 24, mapId: expected.mapId, player: expected.player,
+      expect(state).toMatchObject({ schemaVersion: 25, mapId: expected.mapId, player: expected.player,
         plots: expected.plots, inventory: expected.inventory, shipBox: expected.shipBox,
         decor: expected.decor, flags: expected.flags, gold: expected.gold, hotbar: expected.hotbar });
     };

@@ -139,11 +139,11 @@ async function walkToShipBox(page: Page): Promise<void> {
 }
 
 async function walkToBed(page: Page): Promise<void> {
-  for (const key of ['ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowUp']) {
+  for (const key of [...Array(9).fill('ArrowUp'), ...Array(6).fill('ArrowLeft'), 'ArrowUp']) {
     await page.keyboard.press(key);
     await waitForMovementIdle(page);
   }
-  await page.keyboard.press('ArrowLeft'); // Stand at (2,1), facing the bed at (1,1).
+  await page.keyboard.press('ArrowUp'); // Stand at (4,8), facing the bed at (4,7).
   await waitForMovementIdle(page);
 }
 
@@ -159,7 +159,7 @@ test.describe('訊息不應改變世界畫布尺寸', () => {
       {
         name: '互動', key: 'x', message: scene.id === 'house' ? '你睡了一覺' : '背包裡沒有可出貨的作物',
         target: scene.id === 'house'
-          ? { action: 'sleep', tile: { x: 1, y: 1 } }
+          ? { action: 'sleep', tile: { x: 4, y: 7 } }
           : { action: 'shipAll', tile: { x: 2, y: 7 } },
       },
     ]) {

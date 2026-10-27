@@ -85,16 +85,15 @@ test('a whole year of sleeping passes through every season without a page error'
   page.on('pageerror', (error) => errors.push(error.message));
   await waitForGame(page);
 
-  // 出生點 (7,9)：從 (7,9) 走進小屋的床邊 (2,1)，面向床（左邊）。之後每按一次 x 就睡一晚。
+  // 出生點 (7,9)：走進小屋後，從 (10,18) 前往床邊 (4,8)，面向床。之後每按一次 x 就睡一晚。
   await walk(page, 'ArrowUp', 4);
   await walk(page, 'ArrowLeft', 5);
   await walk(page, 'ArrowUp', 1);
   await expect.poll(() => mapId(page)).toBe('house');
-  // 工作台在 (4,1)，繞過它：(4,5) → (4,2) → (2,2) → (2,1)，最後往左轉向床 (1,1)。
-  await walk(page, 'ArrowUp', 3);
-  await walk(page, 'ArrowLeft', 2);
+  // 工作台位於南側，沿入口走道往北再轉西到床邊。
+  await walk(page, 'ArrowUp', 9);
+  await walk(page, 'ArrowLeft', 6);
   await walk(page, 'ArrowUp', 1);
-  await walk(page, 'ArrowLeft', 1);
 
   const seasons: [number, string][] = [
     [20, '現在是夏天'],
@@ -119,19 +118,19 @@ test('a whole year of sleeping passes through every season without a page error'
 
 test('the farmhouse has its bed inside, and furniture blocks the way', async ({ page }) => {
   await waitForGame(page);
-  // 田邊 (7,9) → (7,5) → (2,5)，走進小屋的門 (2,4)，落在 (4,5)。
+  // 田邊 (7,9) → (7,5) → (2,5)，走進小屋的門 (2,4)，落在新入口 (10,18)。
   await walk(page, 'ArrowUp', 4);
   await walk(page, 'ArrowLeft', 5);
   await walk(page, 'ArrowUp', 1);
   await expect.poll(() => mapId(page)).toBe('house');
-  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 4, y: 5 });
+  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 10, y: 18 });
 
-  // 工作台在 (4,1)，先走到 (4,2)，往右到 (6,2)，再往上到 (6,1)；右邊就是廚房 (7,1)：位置不變。
-  await walk(page, 'ArrowUp', 3);
-  await walk(page, 'ArrowRight', 2);
+  // 走到廚房 (18,6) 下方，向上嘗試進入家具應被阻擋。
+  await walk(page, 'ArrowUp', 9);
+  await walk(page, 'ArrowRight', 8);
+  await walk(page, 'ArrowUp', 2);
   await walk(page, 'ArrowUp', 1);
-  await walk(page, 'ArrowRight', 1);
-  await expect.poll(async () => (await player(page)).tileX).toBe(6);
+  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 18, y: 7 });
 });
 
 test('the forest\'s north door leads to the mine entrance, where a fallen rock blocks the cave', async ({ page }) => {

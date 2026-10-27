@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 type Scene = 'house' | 'coop';
 const sceneSize = {
-  house: { width: 10 * 64, height: 7 * 64 },
+  house: { width: 22 * 64, height: 20 * 64 },
   coop: { width: 8 * 64, height: 6 * 64 },
 } satisfies Record<Scene, { width: number; height: number }>;
 

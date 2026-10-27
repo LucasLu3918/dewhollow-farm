@@ -1,9 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/**
- * M4（P1）：料理。路線：農場出生點 (7,9) → 往上到 (7,5)，左到 (2,5)，進小屋的門 (2,4)，落在小屋 (4,5)；
- * 往上到 (4,2)，右到 (7,2)，面向上方的廚房 (7,1)。開廚房的面板後，沒有材料就做不成菜。
- */
+/** M4（P1）：從小屋入口走到廚房前，驗證無材料時料理會被拒絕。 */
 interface Actor {
   id: string;
   busy: boolean;
@@ -33,9 +30,10 @@ test('the kitchen opens a panel of recipes; without ingredients a dish cannot be
   await walk(page, 'ArrowLeft', 5);
   await walk(page, 'ArrowUp', 1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
-  await walk(page, 'ArrowUp', 3);
-  await walk(page, 'ArrowRight', 3);
-  await walk(page, 'ArrowUp', 1); // 廚房在上方；按上鍵只會轉向（廚房擋住）
+  await walk(page, 'ArrowUp', 9); // (10,9)
+  await walk(page, 'ArrowRight', 8); // (18,9)
+  await walk(page, 'ArrowUp', 2); // (18,7)
+  await walk(page, 'ArrowUp', 1); // 廚房在前方，擋住移動
   await page.keyboard.press('x');
 
   await expect(page.locator('#kitchen-panel')).toBeVisible();

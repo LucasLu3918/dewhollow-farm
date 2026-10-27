@@ -30,7 +30,7 @@ import { emptyAchievements, type AchievementState } from './achievements';
 import { emptyMerchantLog, type MerchantLog } from './traveling-merchant';
 import type { DecorPlacement } from './decor';
 
-export const SAVE_SCHEMA_VERSION = 24;
+export const SAVE_SCHEMA_VERSION = 25;
 
 export type HotbarItem =
   | { kind: 'tool'; tool: ToolId }

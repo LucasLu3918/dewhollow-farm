@@ -12,7 +12,7 @@ describe('world-v2 synthetic save fixtures', () => {
     const original = structuredClone(v1);
     const state = parseSaveRecord(v1, context).state;
     expect(v1).toEqual(original);
-    expect(state.schemaVersion).toBe(24);
+    expect(state.schemaVersion).toBe(25);
     expect(state.plots['4,3']).toEqual({ watered: true, crop: { cropId: 'moon-bean', growthDays: 1 }, dryDays: 0 });
     expect(state.plots['5,3']).toEqual({ watered: false, crop: null, dryDays: 0 });
     expect(state.inventory.stacks).toContainEqual({ itemId: 'seed.moon-bean', quality: 'normal', count: 2 });
@@ -21,14 +21,18 @@ describe('world-v2 synthetic save fixtures', () => {
 
   it('migrates v23 with empty hotbar and preserves house and farm data', () => {
     const state = parseSaveRecord(v23, context).state;
-    expect(state).toMatchObject({ schemaVersion: 24, mapId: 'house-wing', player: v23.state.player,
-      plots: v23.state.plots, decor: v23.state.decor, gold: v23.state.gold, flags: v23.state.flags,
+    expect(state).toMatchObject({ schemaVersion: 25, mapId: 'house-wing', player: { x: v23.state.player.x + 6, y: v23.state.player.y + 7, facing: v23.state.player.facing },
+      plots: v23.state.plots, decor: { 'house-wing': v23.state.decor['house-wing'].map((piece) => ({ ...piece, x: piece.x + 6, y: piece.y + 7 })) }, gold: v23.state.gold, flags: v23.state.flags,
       hotbar: [null, null, null, null] });
   });
 
-  it('validates the current v24 record and preserves its populated hotbar', () => {
+  it('migrates a v24 farm record and any saved house decor to v25 while preserving its hotbar', () => {
     const state = parseSaveRecord(v24, context).state;
-    expect(state).toEqual(v24.state);
+    expect(state).toMatchObject({
+      ...v24.state,
+      schemaVersion: 25,
+      decor: { 'house-wing': [{ itemId: 'night-canvas', x: 17, y: 11 }] },
+    });
     expect(state.hotbar[0]).toEqual({ kind: 'tool', tool: 'hoe' });
   });
 });

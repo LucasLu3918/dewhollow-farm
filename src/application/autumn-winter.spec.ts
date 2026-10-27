@@ -236,7 +236,7 @@ describe('溫室：改建、入口與冬季種植', () => {
       calendar: at('autumn', 20, 1300),
       mapId: 'house',
       flags: { greenhouse: true },
-      player: { x: 1, y: 2, facing: 'up' },
+      player: { x: 4, y: 8, facing: 'up' },
       plots: {
         [plotKey(31, 22)]: plot('bell-pumpkin', 3, false),
         [plotKey(10, 13)]: plot('bell-pumpkin', 3, false),

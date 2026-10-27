@@ -81,7 +81,7 @@ const raw: RawContentFiles = {
 };
 
 const FIELD = plotKey(4, 4);
-const BED_SIDE = { x: 2, y: 1, facing: 'left' as const };
+const BED_SIDE = { x: 4, y: 8, facing: 'up' as const };
 
 describe('a full year of play', () => {
   it('runs 80 days through every season without errors or impossible states', () => {

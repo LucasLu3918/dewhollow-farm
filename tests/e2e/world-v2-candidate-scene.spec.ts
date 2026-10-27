@@ -105,13 +105,13 @@ test('DEV world-v2 farm and house scene candidate stays opt-in and renders both 
   await expect.poll(() => page.evaluate(() => {
     const scene = (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate();
     return scene?.layers.filter((entry) => entry.frame === 'wall-window');
-  })).toEqual([{ frame: 'wall-window', layer: 'object', x: 5, y: 0 }]);
+  })).toEqual([{ frame: 'wall-window', layer: 'object', x: 11, y: 0 }]);
   await expect.poll(() => page.evaluate(() => {
     const scene = (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate();
     return scene?.placements.map((placement) => placement.frame) ?? [];
   })).not.toContain('wall-window');
   await walk(page, 'ArrowRight', 1);
-  await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.movement().tile ?? null)).toMatchObject({ x: 5, y: 5 });
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.movement().tile ?? null)).toMatchObject({ x: 11, y: 18 });
   await capture(page, 'house-mobile');
   await page.setViewportSize({ width: 1280, height: 896 });
   await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate().mapId ?? '')).toBe('house');

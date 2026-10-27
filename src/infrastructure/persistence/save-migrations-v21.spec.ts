@@ -21,7 +21,7 @@ function v20State(overrides: Record<string, unknown> = {}): Record<string, unkno
 describe('migrateState v20 → v21（羊與布、小屋擴建、商店季節限定）', () => {
   it('bumps the save to version 21', () => {
     const migrated = migrateState(v20State(), context) as Record<string, unknown>;
-    expect(migrated.schemaVersion).toBe(24);
+    expect(migrated.schemaVersion).toBe(25);
   });
 
   it('starts with no sheep: the pasture was never stocked in an old save', () => {
@@ -57,6 +57,6 @@ describe('migrateState v20 → v21（羊與布、小屋擴建、商店季節限�
   });
 
   it('a state from a version newer than 21 is still refused', () => {
-    expect(() => migrateState({ schemaVersion: 25 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState({ schemaVersion: 26 }, context)).toThrow(SaveFormatError);
   });
 });

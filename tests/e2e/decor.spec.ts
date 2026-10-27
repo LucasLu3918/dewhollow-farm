@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * 小屋裡的裝飾與服飾。存檔是一份 v11 的存檔（背包裡有一件星空燈串與一件衣服），讀取後遷移成 v22。
- * 站在小屋的 (4,2) 面向下方的空地板 (4,3)，按 V 擺放；按 E 穿上衣服；按 S 存檔後檢查紀錄。
+ * 小屋裡的裝飾與服飾。存檔是一份 v11 的存檔（背包裡有一件星空燈串與一件衣服），讀取後遷移成 v25。
+ * v11 存檔遷移到新版 22x20 小屋後，站在 (10,9) 面向下方的空地板 (10,10)，按 V 擺放；按 E 穿上衣服；按 S 存檔後檢查紀錄。
  * 注意：這份測試需要在本機 5173 port 執行 playwright，本次任務未執行（見交付報告）。
  */
 const V11_RECORD = {
@@ -96,7 +96,7 @@ test('V places a decor in the house, E puts on the clothes, and both are saved',
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
   const saved = await readRecord(page);
-  expect(saved.state.schemaVersion).toBe(24);
-  expect(saved.state.decor).toEqual({ house: [{ itemId: 'star-string', x: 4, y: 3 }] });
+  expect(saved.state.schemaVersion).toBe(25);
+  expect(saved.state.decor).toEqual({ house: [{ itemId: 'star-string', x: 10, y: 10 }] });
   expect(saved.state.wearing).toEqual({ player: 'clothes' });
 });

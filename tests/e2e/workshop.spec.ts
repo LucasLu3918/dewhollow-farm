@@ -1,9 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/**
- * M4（P1 之後）：加工機（醃漬、烘乾）。路線：農場出生點 (7,9) → 往上到 (7,5)，左到 (2,5)，進小屋的門 (2,4)，
- * 落在小屋 (4,5)；往上到 (4,2)，右到 (8,2)，面向上方的加工台 (8,1)。開面板後，沒有材料就放不進去。
- */
+/** M4（P1 之後）：從小屋入口走到加工機前，確認沒有材料時無法放入。 */
 interface Actor {
   id: string;
   busy: boolean;
@@ -33,9 +30,11 @@ test('the workshop opens a panel of recipes; without ingredients nothing goes in
   await walk(page, 'ArrowLeft', 5);
   await walk(page, 'ArrowUp', 1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
-  await walk(page, 'ArrowUp', 3);
-  await walk(page, 'ArrowRight', 4);
-  await walk(page, 'ArrowUp', 1); // 加工台在上方；按上鍵只會轉向（加工台擋住）
+  await walk(page, 'ArrowUp', 9); // (10,9)
+  await walk(page, 'ArrowLeft', 4);
+  await walk(page, 'ArrowDown', 7); // (6,16)，繞過加工機
+  await walk(page, 'ArrowRight', 1); // (7,16)
+  await walk(page, 'ArrowUp', 1); // 加工台在上方，擋住移動
   await page.keyboard.press('x');
 
   await expect(page.locator('#workshop-panel')).toBeVisible();

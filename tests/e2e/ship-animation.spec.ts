@@ -51,8 +51,8 @@ async function settle(page: Page): Promise<void> {
  * 結束時玩家在田邊 (7,5)，面向 (7,4)。
  */
 async function harvestMoonBean(page: Page): Promise<void> {
-  const toBed = ['ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowUp', 'ArrowLeft'];
-  const backToField = ['ArrowRight', 'ArrowDown', 'ArrowDown', 'ArrowDown', 'ArrowDown', 'ArrowRight', 'ArrowDown', 'ArrowDown', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowUp'];
+  const toBed = [...Array(5).fill('ArrowLeft'), 'ArrowUp', ...Array(9).fill('ArrowUp'), ...Array(6).fill('ArrowLeft'), 'ArrowUp'];
+  const backToField = [...Array(6).fill('ArrowRight'), 'ArrowDown', ...Array(9).fill('ArrowDown'), 'ArrowDown', ...Array(5).fill('ArrowRight'), 'ArrowDown', 'ArrowUp'];
 
   await press(page, 'ArrowUp', 4); // → (7,5) 面向 (7,4)
   await settle(page);

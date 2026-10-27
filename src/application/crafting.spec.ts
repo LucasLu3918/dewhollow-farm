@@ -47,7 +47,7 @@ import repairs from '../../content/repairs.json';
 import randomEvents from '../../content/events-random.json';
 
 /**
- * M4b：合成（工作台）。站在小屋的工作台 (4,1) 前面，也就是 (4,2) 面向上方。
+ * M4b：合成（工作台）。站在小屋的工作台 (4,15) 前面，也就是 (4,16) 面向上方。
  */
 const { pack } = loadContent({
   crops,
@@ -86,7 +86,7 @@ function at(overrides: Partial<GameState> = {}, facing: 'up' | 'left' = 'up'): G
   return {
     ...createNewGame(pack, 7),
     mapId: 'house',
-    player: { x: 4, y: 2, facing },
+    player: { x: 4, y: 16, facing },
     tool: 'hoe',
     fishing: null,
     animals: [],
@@ -143,7 +143,7 @@ describe('crafting at the workbench', () => {
   });
 
   it('is refused unless the player stands in front of the workbench', () => {
-    const state = withItems(at({ player: { x: 4, y: 2, facing: 'left' } }), { wood: 2 });
+    const state = withItems(at({ player: { x: 4, y: 16, facing: 'left' } }), { wood: 2 });
     const out = run(state, { type: 'craft', recipeId: 'fence' });
     expect(out.messages).toContain('要站在工作台前面才能合成');
     expect(countOf(out.state.inventory, 'wood')).toBe(2);
@@ -183,7 +183,7 @@ describe('crafting at the workbench', () => {
 
 describe('a sprinkler (灑水器)', () => {
   it('waters every planted field overnight, even on a sunny day', () => {
-    const bed = { x: 2, y: 1, facing: 'left' as const };
+    const bed = { x: 4, y: 8, facing: 'up' as const };
     const planted = { watered: false, crop: { cropId: 'moon-bean', growthDays: 0 }, dryDays: 0 };
     const withSprinkler = run(at({ flags: { sprinkler: true }, weather: 'sunny', plots: { '5,3': planted }, player: bed }), { type: 'interact' });
     expect(withSprinkler.events).toContainEqual({ type: 'slept' });

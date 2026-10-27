@@ -1,9 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/**
- * M4b：工作台（合成）。路線：農場出生點 (7,9) → 往上到 (7,5)，左到 (2,5)，進小屋的門 (2,4)，落在小屋 (4,5)；
- * 往上到 (4,2)，面向上方的工作台 (4,1)。新玩家的耕作等級是 0，灑水器要 4 級，所以面板會說明條件，按下去會被拒絕。
- */
+/** M4b：從小屋入口走到工作台前，確認未解鎖的合成配方會被拒絕。 */
 interface Actor {
   id: string;
   busy: boolean;
@@ -33,8 +30,11 @@ test('the workbench lists recipes with their unlock conditions; a locked recipe 
   await walk(page, 'ArrowLeft', 5);
   await walk(page, 'ArrowUp', 1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
-  await walk(page, 'ArrowUp', 3);
-  await walk(page, 'ArrowUp', 1); // 工作台在上方；按上鍵只會轉向（工作台擋住）
+  await walk(page, 'ArrowUp', 9); // (10,9)
+  await walk(page, 'ArrowLeft', 7);
+  await walk(page, 'ArrowDown', 7); // (3,16)，繞過工作台
+  await walk(page, 'ArrowRight', 1); // (4,16)
+  await walk(page, 'ArrowUp', 1); // 工作台在上方，擋住移動
   await page.keyboard.press('x');
 
   await expect(page.locator('#workbench-panel')).toBeVisible();
