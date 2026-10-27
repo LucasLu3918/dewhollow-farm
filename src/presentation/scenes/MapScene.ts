@@ -698,6 +698,7 @@ export class MapScene extends Phaser.Scene {
   private setupCamera(): void {
     const camera = this.cameras.main;
     const applyLayout = (layout: ReturnType<ResponsiveLayoutController['get']>): void => {
+      const previousCamera = { x: camera.x, y: camera.y, width: camera.width, height: camera.height, zoom: camera.zoom };
       const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
       const touchInput = layout.pointer.coarse || layout.pointer.touchPoints > 0;
       const pixelViewport = calculatePixelViewportPolicy({
@@ -726,6 +727,16 @@ export class MapScene extends Phaser.Scene {
         ? mapZoomFor({ cameraWidth: camera.width, coarse: touchInput, portrait: layout.orientation === 'portrait' })
         : camera.width / (pixelViewport.worldTilesVisible.width * TILE_SIZE);
       camera.setZoom(zoom);
+      if (this.pixel32CandidateReviewContainer && (
+        previousCamera.x !== camera.x || previousCamera.y !== camera.y || previousCamera.width !== camera.width
+        || previousCamera.height !== camera.height || previousCamera.zoom !== camera.zoom
+      )) {
+        const visible = this.pixel32CandidateReviewContainer.visible;
+        this.pixel32CandidateReviewContainer.destroy(true);
+        this.pixel32CandidateReviewItems = [];
+        this.createPixel32CandidateReview();
+        this.pixel32CandidateReviewContainer?.setVisible(visible);
+      }
       const zone = deadzoneOf({ width: camera.width / camera.zoom, height: camera.height / camera.zoom });
       camera.setDeadzone(zone.width, zone.height);
       const state = this.deps.session.state;
