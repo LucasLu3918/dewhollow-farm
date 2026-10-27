@@ -43,6 +43,16 @@ import {
   pixel32InteractablesPreviewRequested,
   pixel32CandidateRuntimeRequested,
 } from '../pixel32-candidate-runtime';
+import {
+  WORLD_V2_FARM_ATLAS_KEY,
+  WORLD_V2_FARM_MANIFEST_KEY,
+  WORLD_V2_FARM_REQUIRED_FRAMES,
+  WORLD_V2_HOUSE_ATLAS_KEY,
+  WORLD_V2_HOUSE_MANIFEST_KEY,
+  WORLD_V2_HOUSE_REQUIRED_FRAMES,
+  worldV2CandidateFramesFromManifest,
+  worldV2SceneCandidateRequested,
+} from '../world-v2-scene-candidate';
 
 interface CandidateManifest {
   status: string;
@@ -106,6 +116,13 @@ export class BootScene extends Phaser.Scene {
       this.load.json(PIXEL32_ANIMATION_MANIFEST_KEY, `${root}/pixel32-animation/manifest.json`);
       this.load.image(PIXEL32_ANIMATION_ATLAS_KEY, `${root}/pixel32-animation/player-4dir.png`);
     }
+    if (this.worldV2SceneCandidateRequested()) {
+      const root = '/docs/art/candidates/pixel-movement/gate1-world-v2-scene';
+      this.load.json(WORLD_V2_FARM_MANIFEST_KEY, `${root}/farm/manifest.json`);
+      this.load.image(WORLD_V2_FARM_ATLAS_KEY, `${root}/farm/atlas.png`);
+      this.load.json(WORLD_V2_HOUSE_MANIFEST_KEY, `${root}/house/manifest.json`);
+      this.load.image(WORLD_V2_HOUSE_ATLAS_KEY, `${root}/house/atlas.png`);
+    }
     if (this.pixel32CandidateReviewRequested()) {
       const root = '/docs/art/candidates/pixel-movement';
       this.load.json(PIXEL32_CROPS_MANIFEST_KEY, `${root}/gate1-assets/pixel32-crops/manifest.json`);
@@ -126,6 +143,7 @@ export class BootScene extends Phaser.Scene {
     const pixel32CandidateRuntime = this.registerPixel32CandidateAtlases();
     const pixel32CandidateAssets = this.registerPixel32CandidateReviewAtlases();
     const pixel32InteractablesPreview = this.registerPixel32InteractablesPreviewAtlas();
+    const worldV2SceneCandidate = this.registerWorldV2SceneCandidateAtlases();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
     registerAnimalTextures(this);
     for (const entry of this.deps.assets.assets) {
@@ -169,11 +187,18 @@ export class BootScene extends Phaser.Scene {
     this.registry.set('gate1-pixel32-candidate-runtime', pixel32CandidateRuntime);
     this.registry.set('gate1-pixel32-candidate-assets', pixel32CandidateAssets);
     this.registry.set('gate1-pixel32-interactables-preview', pixel32InteractablesPreview);
+    this.registry.set('gate1-world-v2-scene-candidate', worldV2SceneCandidate);
     this.scene.start('map', sceneDeps);
   }
 
   private pixel32RuntimeRequested(): boolean {
     return pixel32CandidateRuntimeRequested(new URLSearchParams(window.location.search), import.meta.env.DEV);
+  }
+
+  private worldV2SceneCandidateRequested(): boolean {
+    const search = new URLSearchParams(window.location.search);
+    const profile = renderProfileFor(search.get('renderProfile'), true);
+    return worldV2SceneCandidateRequested(search, import.meta.env.DEV, profile.id, this.pixel32RuntimeRequested());
   }
 
   private pixel32CandidateReviewRequested(): boolean {
@@ -203,6 +228,28 @@ export class BootScene extends Phaser.Scene {
 
     this.registerFrames(PIXEL32_MAP_ATLAS_KEY, mapFrames);
     this.registerFrames(PIXEL32_ANIMATION_ATLAS_KEY, animationFrames);
+    return true;
+  }
+
+  private registerWorldV2SceneCandidateAtlases(): boolean {
+    if (!this.worldV2SceneCandidateRequested()
+      || !this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
+      || !this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) return false;
+
+    const farmFrames = worldV2CandidateFramesFromManifest(
+      this.cache.json.get(WORLD_V2_FARM_MANIFEST_KEY),
+      'atlas.png',
+      WORLD_V2_FARM_REQUIRED_FRAMES,
+    );
+    const houseFrames = worldV2CandidateFramesFromManifest(
+      this.cache.json.get(WORLD_V2_HOUSE_MANIFEST_KEY),
+      'atlas.png',
+      WORLD_V2_HOUSE_REQUIRED_FRAMES,
+    );
+    if (!farmFrames || !houseFrames) return false;
+
+    this.registerFrames(WORLD_V2_FARM_ATLAS_KEY, farmFrames);
+    this.registerFrames(WORLD_V2_HOUSE_ATLAS_KEY, houseFrames);
     return true;
   }
 

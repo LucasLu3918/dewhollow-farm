@@ -106,6 +106,13 @@ import {
   pixel32MapFrameFor,
   pixel32OverlayPreviewRequested,
 } from '../pixel32-candidate-runtime';
+import {
+  WORLD_V2_FARM_ATLAS_KEY,
+  WORLD_V2_FARM_MANIFEST_KEY,
+  WORLD_V2_HOUSE_ATLAS_KEY,
+  WORLD_V2_HOUSE_MANIFEST_KEY,
+  worldV2SceneCandidateFrameFor,
+} from '../world-v2-scene-candidate';
 import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
 import { advanceMovement, cancelMovement, commitStep, createMovementScheduler, queueMovementTap, rejectStep, requestNextStep, setMovementIntent, type MovementSchedulerState } from '../movement-scheduler/movement-scheduler';
 
@@ -118,6 +125,23 @@ interface DeferredPlayerAction {
   command: Command;
   waitForFarmAnimation: boolean;
   resolve: (outcome: CommandOutcome | null) => void;
+}
+
+interface WorldV2CandidateFrameMetadata {
+  width: number;
+  height: number;
+  footAnchor?: { x: number; y: number };
+}
+
+interface WorldV2CandidateManifestMetadata {
+  frames?: Record<string, WorldV2CandidateFrameMetadata> | Array<{
+    id: string;
+    rect: { width: number; height: number };
+    footAnchor?: { x: number; y: number };
+  }>;
+  layoutSuggestion?: {
+    placements?: Array<{ frame: string; anchorTile: { x: number; y: number }; layer: string }>;
+  };
 }
 
 export interface MapSceneDeps {
@@ -347,6 +371,14 @@ declare global {
         playerFrame: string | null;
         playerVisible: boolean;
       };
+      /** DEV-only world-v2 farm/house scene sample, including exact visible candidate frames. */
+      worldV2SceneCandidate(): {
+        enabled: boolean;
+        mapId: string;
+        frames: string[];
+        layers: Array<{ frame: string; layer: 'ground' | 'object'; x: number; y: number }>;
+        placements: Array<{ frame: string; x: number; y: number }>;
+      };
       /** DEV-only, unapproved pixel32 map overlay fixture. */
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
       /** DEV-only unapproved door/shipbox candidates, isolated from map and interaction state. */
@@ -414,6 +446,8 @@ export class MapScene extends Phaser.Scene {
   private rig!: CharacterRig;
   private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
   private pixel32CandidateRuntime = false;
+  private worldV2SceneCandidate = false;
+  private worldV2CandidateSprites: Phaser.GameObjects.Image[] = [];
   private pixel32CandidateAssets = false;
   private pixel32CandidatePetFollow = false;
   private pixel32CandidateReviewItems: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }> = [];
@@ -607,6 +641,10 @@ export class MapScene extends Phaser.Scene {
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
     this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
     this.pixel32CandidateRuntime = this.registry.get('gate1-pixel32-candidate-runtime') === true;
+    this.worldV2SceneCandidate = this.registry.get('gate1-world-v2-scene-candidate') === true
+      && this.pixel32CandidateRuntime
+      && this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
+      && this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY);
     this.pixel32CandidateAssets = this.registry.get('gate1-pixel32-candidate-assets') === true && this.pixel32CandidateRuntime;
     this.pixel32CandidatePetFollow = pixel32CandidatePetFollowRequested(
       new URLSearchParams(window.location.search),
@@ -657,6 +695,7 @@ export class MapScene extends Phaser.Scene {
       this.continuousFarmActions.stop('scene-shutdown');
       // Phaser may already have removed the DisplayList; settle animation promises without drawing shutdown impacts.
       this.rig.shutdown();
+      this.clearWorldV2CandidateSprites();
       this.pixel32CandidateSprite?.destroy();
       this.pixel32CandidateSprite = null;
       this.clearPixel32CandidateOverlays();
@@ -774,6 +813,24 @@ export class MapScene extends Phaser.Scene {
         mapId: () => this.deps.session.state.mapId,
         sprites: () => this.debugSprites(),
         candidateArt: () => this.candidateArtDebugInfo(),
+        worldV2SceneCandidate: () => ({
+          enabled: this.worldV2SceneCandidate,
+          mapId: this.deps.session.state.mapId,
+          frames: [...new Set([
+            ...this.worldV2CandidateSprites.map((sprite) => `${sprite.texture.key}:${sprite.frame.name}`),
+            ...this.tileSprites.flatMap((tile) => [tile.groundImage, tile.objectImage]
+              .filter((sprite): sprite is Phaser.GameObjects.Image => Boolean(sprite))
+              .filter((sprite) => sprite.visible && (sprite.texture.key === WORLD_V2_FARM_ATLAS_KEY || sprite.texture.key === WORLD_V2_HOUSE_ATLAS_KEY))
+              .map((sprite) => `${sprite.texture.key}:${sprite.frame.name}`)),
+          ])],
+          layers: this.tileSprites.flatMap((tile) => [
+            { sprite: tile.groundImage, layer: 'ground' as const, x: tile.x, y: tile.y },
+            ...(tile.objectImage ? [{ sprite: tile.objectImage, layer: 'object' as const, x: tile.x, y: tile.y }] : []),
+          ]).filter(({ sprite }) => sprite.visible
+            && (sprite.texture.key === WORLD_V2_FARM_ATLAS_KEY || sprite.texture.key === WORLD_V2_HOUSE_ATLAS_KEY))
+            .map(({ sprite, layer, x, y }) => ({ frame: sprite.frame.name, layer, x, y })),
+          placements: this.worldV2CandidateSprites.map((sprite) => ({ frame: sprite.frame.name, x: sprite.x, y: sprite.y })),
+        }),
         pose: () => ({ ...this.rig.currentPose() }),
         rig: () => {
           const { view, mode, visible } = this.rig.debugInfo();
@@ -1879,7 +1936,7 @@ export class MapScene extends Phaser.Scene {
       } else {
         const objectKey = forestSceneAssetFor(state.mapId, kind, sprite.x, sprite.y) ?? `tile.${kind}`;
         if (!sprite.objectImage) {
-          sprite.objectImage = this.image(objectKey, sprite.x, sprite.y, 1);
+          sprite.objectImage = this.image(objectKey, sprite.x, sprite.y, 1, undefined, 'object');
         } else {
           this.applyAsset(sprite.objectImage, objectKey);
         }
@@ -1897,6 +1954,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   private drawMap(mapId: string): void {
+    this.clearWorldV2CandidateSprites();
     this.clearPixel32CandidateOverlays();
     this.clearPixel32CandidateInteractables();
     this.clearSceneOverlays();
@@ -1907,7 +1965,7 @@ export class MapScene extends Phaser.Scene {
     this.tileSprites = renderMapTileLayers(legacyMapRenderPlan(map), {
       image: (kind, x, y, depth) => {
         const key = forestSceneAssetFor(mapId, kind, x, y) ?? `tile.${kind}`;
-        return this.image(key, x, y, depth);
+        return this.image(key, x, y, depth, undefined, depth === 0 ? 'ground' : 'object');
       },
       addGround: (image) => this.world.add(image),
       placeObject: (image, kind, y) => this.placeObjectImage(image, kind, y),
@@ -1916,6 +1974,7 @@ export class MapScene extends Phaser.Scene {
     this.clearActors();
     this.createResidents(map);
     this.drawSceneOverlays(mapId);
+    this.drawWorldV2CandidateOverlays(mapId);
     this.drawPixel32CandidateOverlays(mapId);
     this.drawPixel32CandidateInteractables(mapId);
   }
@@ -1927,6 +1986,10 @@ export class MapScene extends Phaser.Scene {
 
   /** Render approved, map-specific large art at tile anchors without changing map or world state. */
   private drawSceneOverlays(mapId: string): void {
+    if (this.worldV2SceneCandidate && mapId === 'farm') {
+      // The candidate farm scene supplies its own house and tree art below.
+      return;
+    }
     for (const overlay of sceneOverlaysFor(mapId)) {
       const { textureId, flipX, scale } = resolveAsset(this.deps.assets, overlay.assetId);
       const footX = (overlay.anchorTile.x + 0.5) * TILE_SIZE;
@@ -1938,6 +2001,69 @@ export class MapScene extends Phaser.Scene {
         .setDepth(foregroundDepth(footY));
       this.sceneOverlaySprites.push(image);
     }
+  }
+
+  private clearWorldV2CandidateSprites(): void {
+    for (const sprite of this.worldV2CandidateSprites) sprite.destroy();
+    this.worldV2CandidateSprites = [];
+  }
+
+  /** DEV-only art composition; map data, collisions, interactions and save state remain authoritative. */
+  private drawWorldV2CandidateOverlays(mapId: string): void {
+    if (!this.worldV2SceneCandidate) return;
+    if (mapId === 'farm') {
+      this.addWorldV2CandidateSprite(WORLD_V2_FARM_ATLAS_KEY, WORLD_V2_FARM_MANIFEST_KEY, 'house-exterior', 2, 4, 'back');
+      this.addWorldV2CandidateSprite(WORLD_V2_FARM_ATLAS_KEY, WORLD_V2_FARM_MANIFEST_KEY, 'house-front', 2, 4, 'front');
+      this.addWorldV2CandidateSprite(WORLD_V2_FARM_ATLAS_KEY, WORLD_V2_FARM_MANIFEST_KEY, 'tree-canopy', 33, 21, 'front');
+    } else if (mapId === 'house') {
+      const manifest = this.cache.json.get(WORLD_V2_HOUSE_MANIFEST_KEY) as WorldV2CandidateManifestMetadata | undefined;
+      for (const placement of manifest?.layoutSuggestion?.placements ?? []) {
+        const backLayer = placement.layer === 'back-wall' || placement.layer === 'ground-object';
+        this.addWorldV2CandidateSprite(
+          WORLD_V2_HOUSE_ATLAS_KEY,
+          WORLD_V2_HOUSE_MANIFEST_KEY,
+          placement.frame,
+          placement.anchorTile.x,
+          placement.anchorTile.y,
+          backLayer ? 'back' : 'front',
+        );
+      }
+    }
+  }
+
+  private addWorldV2CandidateSprite(
+    textureKey: string,
+    manifestKey: string,
+    frameName: string,
+    tileX: number,
+    tileY: number,
+    layer: 'back' | 'front',
+  ): void {
+    const texture = this.textures.get(textureKey);
+    if (!texture?.has(frameName)) return;
+    const manifest = this.cache.json.get(manifestKey) as WorldV2CandidateManifestMetadata | undefined;
+    const frames = manifest?.frames;
+    const metadata = Array.isArray(frames)
+      ? frames.find((frame) => frame.id === frameName)
+      : frames?.[frameName];
+    const frameMetadata = metadata as (WorldV2CandidateFrameMetadata & { rect?: { width: number; height: number } }) | undefined;
+    const nativeWidth = frameMetadata?.rect?.width ?? frameMetadata?.width;
+    const nativeHeight = frameMetadata?.rect?.height ?? frameMetadata?.height;
+    const footAnchor = frameMetadata?.footAnchor;
+    const originX = footAnchor && nativeWidth ? footAnchor.x / nativeWidth : 0.5;
+    const originY = footAnchor && nativeHeight ? footAnchor.y / nativeHeight : 1;
+    const footX = tileX * TILE_SIZE + TILE_SIZE / 2;
+    const footY = (tileY + 1) * TILE_SIZE;
+    const sprite = this.add.image(footX, footY, textureKey, frameName)
+      .setOrigin(originX, originY)
+      .setScale(2);
+    if (layer === 'back') {
+      this.world.add(sprite);
+      sprite.setDepth(1);
+    } else {
+      sprite.setDepth(foregroundDepth(footY));
+    }
+    this.worldV2CandidateSprites.push(sprite);
   }
 
   private clearPixel32CandidateOverlays(): void {
@@ -2251,6 +2377,21 @@ export class MapScene extends Phaser.Scene {
    * 並記下基準縮放，讓壓扁伸展等效果以它為準。
    */
   private applyAsset(image: Phaser.GameObjects.Image, assetId: string): void {
+    if (image.getData('worldV2CandidateHiddenObject') === true) {
+      image.setVisible(false);
+      return;
+    }
+    const candidateTile = image.getData('worldV2CandidateTile') as { x: number; y: number; layer?: 'ground' | 'object' } | undefined;
+    const candidateSceneFrame = candidateTile
+      ? this.worldV2SceneCandidateFrame(assetId, candidateTile.x, candidateTile.y, candidateTile.layer ?? 'ground')
+      : null;
+    if (candidateSceneFrame) {
+      image.setTexture(candidateSceneFrame.textureKey, candidateSceneFrame.frame);
+      image.setFlipX(false);
+      image.setScale(2);
+      image.setData('baseScale', 2);
+      return;
+    }
     const pixel32Frame = this.pixel32MapFrame(assetId, image.x, image.y);
     if (pixel32Frame) {
       image.setTexture(PIXEL32_MAP_ATLAS_KEY, pixel32Frame);
@@ -2355,7 +2496,33 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 格子的圖：2x 母版以 0.5 倍顯示，仍是 64 px 的格子（占位圖的縮放是 1）。 */
-  private image(key: string, x: number, y: number, depth: number, cropStage?: CandidateCropStage): Phaser.GameObjects.Image {
+  private image(
+    key: string,
+    x: number,
+    y: number,
+    depth: number,
+    cropStage?: CandidateCropStage,
+    mapLayer?: 'ground' | 'object',
+  ): Phaser.GameObjects.Image {
+    const candidateSceneFrame = mapLayer ? this.worldV2SceneCandidateFrame(key, x, y, mapLayer) : null;
+    if (candidateSceneFrame) {
+      const { textureKey, frame, object } = candidateSceneFrame;
+      const imageX = object ? (x + 0.5) * TILE_SIZE : x * TILE_SIZE;
+      const imageY = object ? (y + 1) * TILE_SIZE : y * TILE_SIZE;
+      return this.add.image(imageX, imageY, textureKey, frame)
+        .setOrigin(object ? 0.5 : 0, object ? 1 : 0)
+        .setScale(2)
+        .setData('worldV2CandidateTile', { x, y, layer: mapLayer })
+        .setDepth(depth);
+    }
+    if (this.worldV2SceneCandidate && mapLayer === 'object'
+      && this.deps.session.state.mapId === 'house' && this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) {
+      return this.add.image(x * TILE_SIZE, y * TILE_SIZE, WORLD_V2_HOUSE_ATLAS_KEY, 'floor-a')
+        .setVisible(false)
+        .setData('worldV2CandidateTile', { x, y, layer: mapLayer })
+        .setData('worldV2CandidateHiddenObject', true)
+        .setDepth(depth);
+    }
     const pixel32Frame = this.pixel32MapFrame(key, x * TILE_SIZE, y * TILE_SIZE);
     if (pixel32Frame) {
       return this.add
@@ -2378,6 +2545,25 @@ export class MapScene extends Phaser.Scene {
       .setOrigin(0)
       .setScale(scale)
       .setDepth(depth);
+  }
+
+  private worldV2SceneCandidateFrame(
+    key: string,
+    x: number,
+    y: number,
+    layer: 'ground' | 'object',
+  ): { textureKey: string; frame: string; object: boolean } | null {
+    if (!this.worldV2SceneCandidate || !this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
+      || !this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) return null;
+    const map = this.deps.index.map(this.deps.session.state.mapId);
+    const tile = tileAt(map, x, y);
+    if (!tile || (!map.id.startsWith('house') && map.id !== 'farm')) return null;
+    const candidateFrame = worldV2SceneCandidateFrameFor(map, x, y, layer);
+    if (!candidateFrame) return null;
+    const textureKey = map.id === 'farm' ? WORLD_V2_FARM_ATLAS_KEY : WORLD_V2_HOUSE_ATLAS_KEY;
+    return this.textures.get(textureKey).has(candidateFrame)
+      ? { textureKey, frame: candidateFrame, object: layer === 'object' }
+      : null;
   }
 
   private pixel32MapFrame(assetId: string, worldX: number, worldY: number): string | null {

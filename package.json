@@ -20,9 +20,10 @@
     "assets:gate1:crops:check": "node tools/art/check_gate1_crops.mjs",
     "assets:gate1:interactables:check": "node tools/art/check_gate1_interactables.mjs",
     "assets:gate1:pets:check": "node tools/art/check_gate1_pets_pixel32.mjs",
+    "assets:gate1:world-v2-scene:check": "node tools/art/check_gate1_world_v2_scene.mjs",
     "licenses": "node tools/licenses/generate.mjs",
     "icons": "node tools/pwa/make-icons.mjs",
-    "check": "npm run assets:gate1:check && npm run assets:gate1:animation:check && npm run assets:gate1:map:check && npm run assets:gate1:crops:check && npm run assets:gate1:interactables:check && npm run assets:gate1:pets:check && npm run typecheck && npm test && npm run build && npm run budget"
+    "check": "npm run assets:gate1:check && npm run assets:gate1:animation:check && npm run assets:gate1:map:check && npm run assets:gate1:crops:check && npm run assets:gate1:interactables:check && npm run assets:gate1:pets:check && npm run assets:gate1:world-v2-scene:check && npm run typecheck && npm test && npm run build && npm run budget"
   },
   "dependencies": {
     "dexie": "^4.4.6",

@@ -1,0 +1,830 @@
+{
+  "schemaVersion": 1,
+  "title": "Dewhollow World v2 Pixel32 farmhouse interior candidate",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "hand-authored integer pixel primitives; deterministic PNG encoding",
+    "generator": "generate.mjs",
+    "generatorSha256": "8d7b24780629934374b8a5a006aaa00556ebddeac85d5c7d303a4836dcfcaf90"
+  },
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "anchorConvention": "integer-pixel-index"
+  },
+  "palette": {
+    "outline": "#382E2D",
+    "ink": "#493936",
+    "shade": "#566B68",
+    "shadeDeep": "#48362F",
+    "wall": "#C79B67",
+    "wallLight": "#E0B982",
+    "wallShade": "#A97852",
+    "base": "#6E503E",
+    "plank": "#AF8258",
+    "plankAlt": "#A97B53",
+    "plankLight": "#C59663",
+    "plankHi": "#DBAC72",
+    "plankDark": "#80583F",
+    "cream": "#F3DEB7",
+    "linen": "#EAD9BB",
+    "sage": "#748B65",
+    "sageLight": "#A5B184",
+    "green": "#647C55",
+    "greenDark": "#425743",
+    "rust": "#A65F49",
+    "rustLight": "#D18A60",
+    "blue": "#73979A",
+    "blueLight": "#B4D1C4",
+    "glass": "#A8C7B6",
+    "gold": "#E9C276",
+    "stone": "#A5A18A",
+    "stoneDark": "#686B5D",
+    "pot": "#AC684F",
+    "soil": "#5B4638",
+    "rug": "#8D644E",
+    "rugLight": "#D6B77C",
+    "rugDark": "#5B4D48",
+    "white": "#F2E8D4"
+  },
+  "atlas": {
+    "file": "atlas.png",
+    "width": 512,
+    "height": 512,
+    "sha256": "cbf374f7df1f3adc9af03878188ee78d397ce86da127300e12447cefd0a583c2"
+  },
+  "layoutSuggestion": {
+    "map": "house (legacy 10x7 MapDef; data unchanged)",
+    "centralWalkway": "reserve x=4..5 from y=2..5; entrance approach x=4..5,y=5..6; rugs are ground-only and walkable",
+    "placements": [
+      {
+        "frame": "wall-shelf",
+        "anchorTile": {
+          "x": 8,
+          "y": 0
+        },
+        "layer": "back-wall"
+      },
+      {
+        "frame": "bed",
+        "anchorTile": {
+          "x": 2,
+          "y": 3
+        },
+        "layer": "object"
+      },
+      {
+        "frame": "bedside-table",
+        "anchorTile": {
+          "x": 1,
+          "y": 3
+        },
+        "layer": "object"
+      },
+      {
+        "frame": "kitchen-counter",
+        "anchorTile": {
+          "x": 8,
+          "y": 3
+        },
+        "layer": "object"
+      },
+      {
+        "frame": "stove",
+        "anchorTile": {
+          "x": 8,
+          "y": 2
+        },
+        "layer": "object-detail"
+      },
+      {
+        "frame": "workbench",
+        "anchorTile": {
+          "x": 2,
+          "y": 5
+        },
+        "layer": "object"
+      },
+      {
+        "frame": "storage",
+        "anchorTile": {
+          "x": 8,
+          "y": 5
+        },
+        "layer": "object"
+      },
+      {
+        "frame": "pet-bed",
+        "anchorTile": {
+          "x": 6,
+          "y": 5
+        },
+        "layer": "object"
+      },
+      {
+        "frame": "rug",
+        "anchorTile": {
+          "x": 5,
+          "y": 5
+        },
+        "layer": "ground-object"
+      },
+      {
+        "frame": "door-threshold",
+        "anchorTile": {
+          "x": 4,
+          "y": 6
+        },
+        "layer": "ground-object"
+      }
+    ]
+  },
+  "frames": [
+    {
+      "id": "floor-a",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "role": "ground-tile",
+      "layer": "ground",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "floor",
+        "plank"
+      ],
+      "approved": false
+    },
+    {
+      "id": "floor-b",
+      "rect": {
+        "x": 32,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "role": "ground-tile",
+      "layer": "ground",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "floor",
+        "plank"
+      ],
+      "approved": false
+    },
+    {
+      "id": "floor-c",
+      "rect": {
+        "x": 64,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "role": "ground-tile",
+      "layer": "ground",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "floor",
+        "plank"
+      ],
+      "approved": false
+    },
+    {
+      "id": "floor-d",
+      "rect": {
+        "x": 96,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "role": "ground-tile",
+      "layer": "ground",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "floor",
+        "plank"
+      ],
+      "approved": false
+    },
+    {
+      "id": "wall-middle",
+      "rect": {
+        "x": 128,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "role": "wall-tile",
+      "layer": "back-wall",
+      "tileable": false,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "wall",
+        "plank"
+      ],
+      "approved": false
+    },
+    {
+      "id": "wall-left-corner",
+      "rect": {
+        "x": 160,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "role": "wall-tile",
+      "layer": "back-wall",
+      "tileable": false,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "wall",
+        "corner"
+      ],
+      "approved": false
+    },
+    {
+      "id": "wall-right-corner",
+      "rect": {
+        "x": 192,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "role": "wall-tile",
+      "layer": "back-wall",
+      "tileable": false,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "wall",
+        "corner"
+      ],
+      "approved": false
+    },
+    {
+      "id": "wall-top",
+      "rect": {
+        "x": 224,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "role": "wall-tile",
+      "layer": "back-wall",
+      "tileable": false,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "wall",
+        "top-cap"
+      ],
+      "approved": false
+    },
+    {
+      "id": "wall-bottom",
+      "rect": {
+        "x": 256,
+        "y": 0,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "role": "wall-tile",
+      "layer": "back-wall",
+      "tileable": false,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "wall",
+        "baseboard"
+      ],
+      "approved": false
+    },
+    {
+      "id": "wall-window",
+      "rect": {
+        "x": 288,
+        "y": 0,
+        "width": 64,
+        "height": 64
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "kind": "wall-prop",
+      "role": "wall-overlay",
+      "layer": "back-wall",
+      "tileable": false,
+      "footAnchor": {
+        "x": 32,
+        "y": 62
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "tags": [
+        "window",
+        "glass",
+        "warm-light"
+      ],
+      "approved": false
+    },
+    {
+      "id": "door-leaf",
+      "rect": {
+        "x": 352,
+        "y": 0,
+        "width": 32,
+        "height": 64
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 64,
+      "kind": "wall-prop",
+      "role": "wall-overlay",
+      "layer": "back-wall",
+      "tileable": false,
+      "footAnchor": {
+        "x": 16,
+        "y": 62
+      },
+      "pivot": {
+        "x": 16,
+        "y": 62
+      },
+      "footprintTiles": [
+        1,
+        2
+      ],
+      "tags": [
+        "door",
+        "entry"
+      ],
+      "approved": false
+    },
+    {
+      "id": "door-threshold",
+      "rect": {
+        "x": 384,
+        "y": 0,
+        "width": 64,
+        "height": 32
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 32,
+      "kind": "threshold",
+      "role": "ground-overlay",
+      "layer": "ground-object",
+      "tileable": false,
+      "footAnchor": {
+        "x": 32,
+        "y": 29
+      },
+      "pivot": {
+        "x": 32,
+        "y": 29
+      },
+      "footprintTiles": [
+        2,
+        1
+      ],
+      "tags": [
+        "doorway",
+        "walkable"
+      ],
+      "approved": false
+    },
+    {
+      "id": "bed",
+      "rect": {
+        "x": 448,
+        "y": 0,
+        "width": 64,
+        "height": 64
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "kind": "furniture",
+      "role": "furniture",
+      "layer": "object",
+      "tileable": false,
+      "footAnchor": {
+        "x": 32,
+        "y": 62
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "tags": [
+        "bed",
+        "sleep"
+      ],
+      "approved": false
+    },
+    {
+      "id": "bedside-table",
+      "rect": {
+        "x": 0,
+        "y": 32,
+        "width": 32,
+        "height": 64
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 64,
+      "kind": "furniture",
+      "role": "furniture",
+      "layer": "object",
+      "tileable": false,
+      "footAnchor": {
+        "x": 16,
+        "y": 59
+      },
+      "pivot": {
+        "x": 16,
+        "y": 59
+      },
+      "footprintTiles": [
+        1,
+        2
+      ],
+      "tags": [
+        "table",
+        "plant"
+      ],
+      "approved": false
+    },
+    {
+      "id": "kitchen-counter",
+      "rect": {
+        "x": 32,
+        "y": 32,
+        "width": 96,
+        "height": 64
+      },
+      "nativeWidth": 96,
+      "nativeHeight": 64,
+      "kind": "furniture",
+      "role": "furniture",
+      "layer": "object",
+      "tileable": false,
+      "footAnchor": {
+        "x": 48,
+        "y": 62
+      },
+      "pivot": {
+        "x": 48,
+        "y": 62
+      },
+      "footprintTiles": [
+        3,
+        2
+      ],
+      "tags": [
+        "kitchen",
+        "counter"
+      ],
+      "approved": false
+    },
+    {
+      "id": "stove",
+      "rect": {
+        "x": 128,
+        "y": 32,
+        "width": 32,
+        "height": 32
+      },
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "furniture-overlay",
+      "role": "fixture-overlay",
+      "layer": "object-detail",
+      "tileable": false,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "tags": [
+        "stove",
+        "kitchen",
+        "counter-top"
+      ],
+      "approved": false
+    },
+    {
+      "id": "workbench",
+      "rect": {
+        "x": 160,
+        "y": 32,
+        "width": 64,
+        "height": 64
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "kind": "furniture",
+      "role": "furniture",
+      "layer": "object",
+      "tileable": false,
+      "footAnchor": {
+        "x": 32,
+        "y": 60
+      },
+      "pivot": {
+        "x": 32,
+        "y": 60
+      },
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "tags": [
+        "workbench",
+        "storage"
+      ],
+      "approved": false
+    },
+    {
+      "id": "storage",
+      "rect": {
+        "x": 224,
+        "y": 32,
+        "width": 64,
+        "height": 64
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "kind": "furniture",
+      "role": "furniture",
+      "layer": "object",
+      "tileable": false,
+      "footAnchor": {
+        "x": 32,
+        "y": 62
+      },
+      "pivot": {
+        "x": 32,
+        "y": 62
+      },
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "tags": [
+        "storage",
+        "cabinet"
+      ],
+      "approved": false
+    },
+    {
+      "id": "pet-bed",
+      "rect": {
+        "x": 384,
+        "y": 32,
+        "width": 64,
+        "height": 32
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 32,
+      "kind": "furniture",
+      "role": "furniture",
+      "layer": "object",
+      "tileable": false,
+      "footAnchor": {
+        "x": 32,
+        "y": 26
+      },
+      "pivot": {
+        "x": 32,
+        "y": 26
+      },
+      "footprintTiles": [
+        2,
+        1
+      ],
+      "tags": [
+        "pet-bed",
+        "cat"
+      ],
+      "approved": false
+    },
+    {
+      "id": "rug",
+      "rect": {
+        "x": 288,
+        "y": 64,
+        "width": 96,
+        "height": 64
+      },
+      "nativeWidth": 96,
+      "nativeHeight": 64,
+      "kind": "rug",
+      "role": "ground-overlay",
+      "layer": "ground-object",
+      "tileable": false,
+      "footAnchor": {
+        "x": 48,
+        "y": 47
+      },
+      "pivot": {
+        "x": 48,
+        "y": 47
+      },
+      "footprintTiles": [
+        3,
+        2
+      ],
+      "tags": [
+        "rug",
+        "living-area"
+      ],
+      "approved": false
+    },
+    {
+      "id": "wall-shelf",
+      "rect": {
+        "x": 384,
+        "y": 64,
+        "width": 64,
+        "height": 32
+      },
+      "nativeWidth": 64,
+      "nativeHeight": 32,
+      "kind": "wall-prop",
+      "role": "wall-overlay",
+      "layer": "back-wall",
+      "tileable": false,
+      "footAnchor": {
+        "x": 32,
+        "y": 27
+      },
+      "pivot": {
+        "x": 32,
+        "y": 27
+      },
+      "footprintTiles": [
+        2,
+        1
+      ],
+      "tags": [
+        "shelf",
+        "plant",
+        "pot"
+      ],
+      "approved": false
+    }
+  ],
+  "limitations": [
+    "Candidate art study only. It does not replace house MapDef, collision, interaction, save data, production assets, or content/assets.json.",
+    "The suggested placements require MapScene review; the 10x7 legacy room limits furniture spacing and is not a final redesigned layout.",
+    "All objects are code-authored pixel candidates; anchors and footprints are metadata hints and need rendered human review.",
+    "Frames marked tileable use exact repeated border pixels; visual suitability, composition, and mobile readability are not machine-verified."
+  ]
+}
