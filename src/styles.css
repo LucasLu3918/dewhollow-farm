@@ -464,7 +464,7 @@ a:focus-visible {
   align-items: center;
   gap: 10px;
   min-height: 64px;
-  padding: 8px 12px;
+  padding: 8px 12px 7.25px;
 }
 
 .hud-toast {
