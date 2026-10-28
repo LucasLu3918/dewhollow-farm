@@ -77,7 +77,8 @@ describe('Gate 1 pixel32 map candidate checker', () => {
   it('accepts the complete four-season candidate', () => {
     const result = fixture().run();
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain('64 autotile variants');
+    expect(result.stdout).toContain('225 candidate frames');
+    expect(result.stdout).toContain('64 field-edge and 128 dry/wet soil autotile variants');
     expect(result.stdout).toContain('multi-tile building and canopy occlusion');
   });
 

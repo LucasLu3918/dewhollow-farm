@@ -90,6 +90,7 @@ async function main() {
   const seasons = ['spring', 'summer', 'autumn', 'winter'];
   if (JSON.stringify(manifest.seasons) !== JSON.stringify(seasons)) fail('all four seasons must be present in canonical order');
   if (manifest.autotile?.variantsPerSeason !== 16 || manifest.autotile?.maskBits?.north !== 1 || manifest.autotile?.maskBits?.west !== 8) fail('four-neighbor autotile mask contract is incomplete');
+  if (manifest.autotile?.soilVariantsPerSeasonAndMoisture !== 16 || manifest.autotile?.soilMaskBits?.north !== 1 || manifest.autotile?.soilMaskBits?.east !== 2 || manifest.autotile?.soilMaskBits?.south !== 4 || manifest.autotile?.soilMaskBits?.west !== 8) fail('four-neighbor dry/wet soil autotile contract is incomplete');
   const atlasPath = resolve(dirname(manifestPath), manifest.atlas?.file ?? '');
   const atlasInfo = await stat(atlasPath);
   if (atlasInfo.size > 2 * 1024 * 1024) fail('atlas exceeds the 2 MB candidate limit');
@@ -124,6 +125,14 @@ async function main() {
       const frame = frames[`${season}-${surface}`];
       if (!frame || frame.season !== season || frame.surface !== surface || frame.width !== 32 || frame.height !== 32 || frame.tileable !== true || frame.approved !== false) fail(`invalid ${season} ${surface} frame`);
     }
+    for (const [moisture, surface] of [['dry', 'dry-soil'], ['wet', 'wet-soil']]) {
+      for (let mask = 0; mask < 16; mask += 1) {
+        const frame = frames[`${season}-${moisture}-soil-edge-${mask.toString(16)}`];
+        if (!frame || frame.season !== season || frame.surface !== surface || frame.moisture !== moisture || frame.autotileMask !== mask || frame.maskMeaning !== 'same-moisture-soil-neighbors; edge accents mark exposed sides' || frame.width !== 32 || frame.height !== 32 || frame.approved !== false) {
+          fail(`invalid ${season} ${moisture} soil autotile frame ${mask.toString(16)}`);
+        }
+      }
+    }
     for (let mask = 0; mask < 16; mask++) {
       const frame = frames[`${season}-field-edge-${mask.toString(16)}`];
       if (!frame || frame.autotileMask !== mask || frame.season !== season || frame.width !== 32 || frame.height !== 32 || frame.approved !== false) fail(`invalid ${season} autotile frame ${mask.toString(16)}`);
@@ -155,7 +164,7 @@ async function main() {
   const shadowAlpha = summarizeFrameAlpha(pixels, dimensions.width, shadow);
   if (shadowAlpha.transparentPixels === 0 || shadowAlpha.partialAlphaPixels === 0 || shadowAlpha.transparentBorderPixels !== 2 * shadow.width + 2 * (shadow.height - 2)) fail('ground shadow must contain transparent and partial-alpha pixels, with a fully transparent border');
 
-  console.log(`PASS: ${Object.keys(frames).length} candidate frames, 4 seasons, 64 autotile variants, 7 tileable surface families with exact RGBA seams, transparent ground shadow, wall corners and multi-tile building and canopy occlusion; atlas ${dimensions.width}x${dimensions.height} (${atlasInfo.size} bytes)`);
+  console.log(`PASS: ${Object.keys(frames).length} candidate frames, 4 seasons, 64 field-edge and 128 dry/wet soil autotile variants, 7 tileable surface families with exact RGBA seams, transparent ground shadow, wall corners and multi-tile building and canopy occlusion; atlas ${dimensions.width}x${dimensions.height} (${atlasInfo.size} bytes)`);
 }
 
 try { await main(); } catch (error) { console.error(error instanceof Error ? error.message : String(error)); process.exitCode = 1; }

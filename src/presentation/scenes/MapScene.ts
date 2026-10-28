@@ -7,6 +7,7 @@ import { sceneOverlaysFor } from '../scene-overlays';
 import { forestSceneAssetFor } from '../forest-scene-art';
 import { actorDepth, foregroundDepth } from '../actor-depth';
 import { legacyMapRenderPlan, plotRenderPlan } from '../map-render-plan';
+import { plotNeighborMask, resolvePlotVisual } from '../plot-visual';
 import {
   clearMapTileLayers,
   placeDepthSortedMapObject,
@@ -2264,9 +2265,27 @@ export class MapScene extends Phaser.Scene {
     const plans = plotRenderPlan(shown, map, (cropId) => this.deps.index.crop(cropId).growthDays);
     renderPlotLayer(plans, {
       soil: (plot) => {
-        const soil = this.image('tile.soil', plot.x, plot.y, 1);
+        const state = shown[plotKey(plot.x, plot.y)];
+        const visual = state
+          ? resolvePlotVisual(
+            state,
+            null,
+            plotNeighborMask(plot.x, plot.y, shown, state.watered),
+            this.deps.session.state.calendar.season,
+          )
+          : null;
+        const candidateFrame = visual?.soilFrame;
+        const useCandidateFrame = this.pixel32CandidateRuntime
+          && this.textures.exists(PIXEL32_MAP_ATLAS_KEY)
+          && candidateFrame !== undefined
+          && this.textures.get(PIXEL32_MAP_ATLAS_KEY).has(candidateFrame);
+        const soil = useCandidateFrame
+          ? this.add.image(plot.x * TILE_SIZE, plot.y * TILE_SIZE, PIXEL32_MAP_ATLAS_KEY, candidateFrame)
+            .setOrigin(0).setScale(2).setDepth(1).setData('baseScale', 2)
+          : this.image('tile.soil', plot.x, plot.y, 1);
         soil.setData('plot', true);
-        if (plot.watered) soil.setTint(0x6fa8dc);
+        if (visual) soil.setData('plotVisual', visual);
+        if (plot.watered && !useCandidateFrame) soil.setTint(0x6fa8dc);
         return soil;
       },
       crop: (plot) => {

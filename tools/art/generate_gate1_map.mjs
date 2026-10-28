@@ -8,7 +8,8 @@ import { fileURLToPath } from 'node:url';
 const OUT = resolve(dirname(fileURLToPath(import.meta.url)), '../../docs/art/candidates/pixel-movement/gate1-assets/pixel32-map');
 const TILE = 32;
 const WIDTH = 512;
-const HEIGHT = 512;
+// The rows below hold additive soil edge variants. Existing frame coordinates stay fixed.
+const HEIGHT = 576;
 const PALETTES = {
   spring: { grass: '#82ad70', grassEdge: '#a4c77c', field: '#79563f', fieldEdge: '#a57b55', path: '#c5a678', water: '#76aeb5', drySoil: '#997350', drySoilEdge: '#b38a61', wetSoil: '#58463b', wetSoilEdge: '#755c49', woodFloor: '#a9754f', woodLight: '#c08b60', woodDark: '#81583f', accent: '#d98579', roof: '#9b6250', wall: '#e3c99b', wallDark: '#a87d50', ink: '#493d3c', leaf: '#638d5b', shadow: '#293236' },
   summer: { grass: '#76a665', grassEdge: '#98c172', field: '#785239', fieldEdge: '#a97b50', path: '#cbb47e', water: '#65a9b5', drySoil: '#94704b', drySoilEdge: '#b0895b', wetSoil: '#574439', wetSoilEdge: '#74583f', woodFloor: '#a9754f', woodLight: '#c08b60', woodDark: '#81583f', accent: '#e3ae52', roof: '#945546', wall: '#e6d09c', wallDark: '#aa8053', ink: '#493d3c', leaf: '#51834b', shadow: '#293236' },
@@ -89,6 +90,17 @@ function soilTile(base, accent, wet = false) {
     ? [[5, 7, 6, 2], [19, 10, 7, 2], [10, 19, 5, 2], [23, 23, 4, 2]]
     : [[5, 6, 3, 2], [19, 8, 4, 2], [10, 17, 3, 2], [24, 20, 3, 2], [16, 25, 4, 2]];
   for (const [x, y, width, height] of marks) c.rect(x, y, width, height, accent);
+  return c;
+}
+
+function soilEdgeTile(base, accent, wet, sameSoilNeighborMask) {
+  const c = soilTile(base, accent, wet);
+  // Mask bits indicate adjacent plots with the same moisture state. Draw a crisp
+  // inner edge only where that same-soil neighbor is absent.
+  if (!(sameSoilNeighborMask & 1)) c.rect(0, 0, TILE, 3, accent);
+  if (!(sameSoilNeighborMask & 2)) c.rect(29, 0, 3, TILE, accent);
+  if (!(sameSoilNeighborMask & 4)) c.rect(0, 29, TILE, 3, accent);
+  if (!(sameSoilNeighborMask & 8)) c.rect(0, 0, 3, TILE, accent);
   return c;
 }
 
@@ -183,6 +195,32 @@ async function main() {
   place('house-back', house(spring), { gridX: 0, gridY: 6, kind: 'building', meta: { widthTiles: 3, heightTiles: 2, footAnchor: { x: 48, y: 64 }, pivot: { x: 48, y: 64 }, layer: 'back', approved: false } });
   place('house-front', house(spring, true), { gridX: 0, gridY: 8, kind: 'occlusion', meta: { widthTiles: 3, heightTiles: 2, footAnchor: { x: 48, y: 64 }, pivot: { x: 48, y: 64 }, layer: 'front', approved: false } });
   place('tree-canopy', tree(spring), { gridX: 3, gridY: 6, kind: 'occlusion', meta: { widthTiles: 2, heightTiles: 2, footAnchor: { x: 32, y: 64 }, pivot: { x: 32, y: 64 }, layer: 'front', approved: false } });
+  // Append mask frames in reserved rows below the original atlas content. Do not
+  // shift any existing candidate frame or overlap the fixed multi-tile examples.
+  let soilMaskFrame = 0;
+  for (const season of SEASONS) {
+    const p = PALETTES[season];
+    for (const [moisture, base, accent, wet] of [['dry', p.drySoil, p.drySoilEdge, false], ['wet', p.wetSoil, p.wetSoilEdge, true]]) {
+      for (let mask = 0; mask < 16; mask += 1) {
+        const key = `${season}-${moisture}-soil-edge-${mask.toString(16)}`;
+        place(key, soilEdgeTile(base, accent, wet, mask), {
+          gridX: soilMaskFrame % 16,
+          gridY: 10 + Math.floor(soilMaskFrame / 16),
+          meta: {
+            season,
+            surface: `${moisture}-soil`,
+            moisture,
+            autotileMask: mask,
+            maskMeaning: 'same-moisture-soil-neighbors; edge accents mark exposed sides',
+            footAnchor: { x: 16, y: 31 },
+            pivot: { x: 16, y: 31 },
+            approved: false,
+          },
+        });
+        soilMaskFrame += 1;
+      }
+    }
+  }
   const atlasBytes = pngBytes(atlas, COLORS); const generatorHash = sha256(await readFile(fileURLToPath(import.meta.url)));
   await mkdir(OUT, { recursive: true }); await writeFile(resolve(OUT, 'map-atlas.png'), atlasBytes);
   const manifest = {
@@ -191,7 +229,11 @@ async function main() {
     pixelContract: { nativeTileSize: TILE, worldTileSize: 64, displayScale: 2, sampling: 'nearest-neighbor', origin: 'top-left', rectConvention: 'half-open', anchorConvention: 'integer-pixel-index' },
     atlas: { file: 'map-atlas.png', width: WIDTH, height: HEIGHT, sha256: sha256(atlasBytes) },
     seasons: SEASONS,
-    autotile: { surface: 'field', edgeSurface: 'grass', maskBits: { north: 1, east: 2, south: 4, west: 8 }, variantsPerSeason: 16 },
+    autotile: {
+      surface: 'field', edgeSurface: 'grass', maskBits: { north: 1, east: 2, south: 4, west: 8 }, variantsPerSeason: 16,
+      soilMaskBits: { north: 1, east: 2, south: 4, west: 8 }, soilVariantsPerSeasonAndMoisture: 16,
+      soilMaskMeaning: 'A set bit means an adjacent plot shares the same moisture; accented edges mark missing same-moisture neighbors.',
+    },
     frames,
     limitations: ['Candidate preview only; not approved or registered as production assets.', 'Seasonal variants and autotile masks are hand-authored visual studies, not production game map rules.', 'Building, wall-corner, shadow, and canopy frames demonstrate layer ordering and do not alter collision or map data.', 'Seam checker validates exact RGBA wrap edges for frames explicitly marked tileable; it cannot establish perceived suitability or cross-surface art quality.', 'Final colors, tile readability, seamless edges, building silhouette, and mobile readability require Gate 1 human review.'],
   };
