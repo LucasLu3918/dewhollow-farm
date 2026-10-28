@@ -62,6 +62,17 @@ import {
   worldV2SceneCandidateRequested,
 } from '../world-v2-scene-candidate';
 import {
+  INDOOR_FARM_ATLAS_KEY,
+  INDOOR_FARM_MANIFEST_KEY,
+  INDOOR_FARM_REQUIRED_FRAMES,
+  INDOOR_MINE_ATLAS_KEY,
+  INDOOR_MINE_MANIFEST_KEY,
+  INDOOR_MINE_REQUIRED_FRAMES,
+  INDOOR_SCENE_CANDIDATE_REGISTRY_KEY,
+  indoorSceneCandidateFramesFromManifest,
+  indoorSceneCandidateRequested,
+} from '../indoor-scene-candidate';
+import {
   TOWN_SCENE_CANDIDATE_ATLAS_FILE,
   TOWN_SCENE_CANDIDATE_ATLAS_KEY,
   TOWN_SCENE_CANDIDATE_MANIFEST_KEY,
@@ -150,6 +161,13 @@ export class BootScene extends Phaser.Scene {
       this.load.json(WORLD_V2_HOUSE_MANIFEST_KEY, `${houseRoot}/manifest.json`);
       this.load.image(WORLD_V2_HOUSE_ATLAS_KEY, `${houseRoot}/atlas.png`);
     }
+    if (this.indoorSceneCandidateRequested()) {
+      const root = '/docs/art/candidates/pixel-movement';
+      this.load.json(INDOOR_FARM_MANIFEST_KEY, `${root}/p6-062-farm-interiors/manifest.json`);
+      this.load.image(INDOOR_FARM_ATLAS_KEY, `${root}/p6-062-farm-interiors/atlas.png`);
+      this.load.json(INDOOR_MINE_MANIFEST_KEY, `${root}/p6-062-mine/manifest.json`);
+      this.load.image(INDOOR_MINE_ATLAS_KEY, `${root}/p6-062-mine/atlas.png`);
+    }
     if (this.pixel32CandidateReviewRequested()) {
       const root = '/docs/art/candidates/pixel-movement';
       this.load.json(PIXEL32_CROPS_MANIFEST_KEY, `${root}/gate1-assets/pixel32-crops/manifest.json`);
@@ -171,6 +189,7 @@ export class BootScene extends Phaser.Scene {
     const pixel32CandidateAssets = this.registerPixel32CandidateReviewAtlases();
     const pixel32InteractablesPreview = this.registerPixel32InteractablesPreviewAtlas();
     const worldV2SceneCandidate = this.registerWorldV2SceneCandidateAtlases();
+    const indoorSceneCandidate = this.registerIndoorSceneCandidateAtlases();
     const lakeShoreCandidate = this.registerLakeShoreCandidateAtlas();
     const townSceneCandidate = this.registerTownSceneCandidateAtlas();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
@@ -217,6 +236,7 @@ export class BootScene extends Phaser.Scene {
     this.registry.set('gate1-pixel32-candidate-assets', pixel32CandidateAssets);
     this.registry.set('gate1-pixel32-interactables-preview', pixel32InteractablesPreview);
     this.registry.set('gate1-world-v2-scene-candidate', worldV2SceneCandidate);
+    this.registry.set(INDOOR_SCENE_CANDIDATE_REGISTRY_KEY, indoorSceneCandidate);
     this.registry.set(LAKE_SHORE_CANDIDATE_REGISTRY_KEY, lakeShoreCandidate);
     this.registry.set(TOWN_SCENE_CANDIDATE_REGISTRY_KEY, townSceneCandidate);
     this.scene.start('map', sceneDeps);
@@ -246,6 +266,12 @@ export class BootScene extends Phaser.Scene {
     const search = new URLSearchParams(window.location.search);
     const profile = renderProfileFor(search.get('renderProfile'), true);
     return worldV2SceneCandidateRequested(search, import.meta.env.DEV, profile.id, this.pixel32RuntimeRequested());
+  }
+
+  private indoorSceneCandidateRequested(): boolean {
+    const search = new URLSearchParams(window.location.search);
+    const profile = renderProfileFor(search.get('renderProfile'), true);
+    return indoorSceneCandidateRequested(search, import.meta.env.DEV, profile.id, this.pixel32RuntimeRequested());
   }
 
   private pixel32CandidateReviewRequested(): boolean {
@@ -316,6 +342,24 @@ export class BootScene extends Phaser.Scene {
 
     this.registerFrames(WORLD_V2_FARM_ATLAS_KEY, farmFrames);
     this.registerFrames(WORLD_V2_HOUSE_ATLAS_KEY, houseFrames);
+    return true;
+  }
+
+  private registerIndoorSceneCandidateAtlases(): boolean {
+    if (!this.indoorSceneCandidateRequested()
+      || !this.textures.exists(INDOOR_FARM_ATLAS_KEY)
+      || !this.textures.exists(INDOOR_MINE_ATLAS_KEY)) return false;
+
+    const farmFrames = indoorSceneCandidateFramesFromManifest(
+      this.cache.json.get(INDOOR_FARM_MANIFEST_KEY), 'atlas.png', INDOOR_FARM_REQUIRED_FRAMES,
+    );
+    const mineFrames = indoorSceneCandidateFramesFromManifest(
+      this.cache.json.get(INDOOR_MINE_MANIFEST_KEY), 'atlas.png', INDOOR_MINE_REQUIRED_FRAMES,
+    );
+    if (!farmFrames || !mineFrames) return false;
+
+    this.registerFrames(INDOOR_FARM_ATLAS_KEY, farmFrames);
+    this.registerFrames(INDOOR_MINE_ATLAS_KEY, mineFrames);
     return true;
   }
 

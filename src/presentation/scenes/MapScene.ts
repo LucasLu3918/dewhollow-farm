@@ -134,6 +134,13 @@ import {
   worldV2FarmSceneCandidatePlacements,
   worldV2SceneCandidateFrameFor,
 } from '../world-v2-scene-candidate';
+import {
+  INDOOR_FARM_ATLAS_KEY,
+  INDOOR_MINE_ATLAS_KEY,
+  INDOOR_SCENE_CANDIDATE_REGISTRY_KEY,
+  indoorSceneCandidateFrameFor,
+  indoorSceneCandidateRequested,
+} from '../indoor-scene-candidate';
 import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
 import { advanceMovement, cancelMovement, commitStep, createMovementScheduler, queueMovementTap, rejectStep, requestNextStep, setMovementIntent, type MovementSchedulerState } from '../movement-scheduler/movement-scheduler';
 
@@ -428,6 +435,13 @@ declare global {
         layers: Array<{ frame: string; layer: 'ground' | 'object'; x: number; y: number }>;
         placements: Array<{ frame: string; x: number; y: number; depth: number }>;
       };
+      /** DEV-only P6-062 indoor candidate frame coverage for the current authoritative map. */
+      indoorSceneCandidate(): {
+        enabled: boolean;
+        mapId: string;
+        frames: string[];
+        layers: Array<{ frame: string; layer: 'ground' | 'object'; x: number; y: number }>;
+      };
       /** DEV-only, unapproved pixel32 map overlay fixture. */
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
       /** DEV-only unapproved door/shipbox candidates, isolated from map and interaction state. */
@@ -500,6 +514,7 @@ export class MapScene extends Phaser.Scene {
   private townSceneCandidate = false;
   private movementStepDurationMs = CONTINUOUS_STEP_DURATION_MS;
   private worldV2SceneCandidate = false;
+  private indoorSceneCandidate = false;
   private worldV2CandidateSprites: Phaser.GameObjects.Image[] = [];
   private pixel32CandidateAssets = false;
   private pixel32CandidatePetFollow = false;
@@ -716,6 +731,16 @@ export class MapScene extends Phaser.Scene {
       && this.pixel32CandidateRuntime
       && this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
       && this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY);
+    this.indoorSceneCandidate = this.registry.get(INDOOR_SCENE_CANDIDATE_REGISTRY_KEY) === true
+      && this.pixel32CandidateRuntime
+      && indoorSceneCandidateRequested(
+        new URLSearchParams(window.location.search),
+        import.meta.env.DEV,
+        renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), true).id,
+        this.pixel32CandidateRuntime,
+      )
+      && this.textures.exists(INDOOR_FARM_ATLAS_KEY)
+      && this.textures.exists(INDOOR_MINE_ATLAS_KEY);
     this.pixel32CandidateAssets = this.registry.get('gate1-pixel32-candidate-assets') === true && this.pixel32CandidateRuntime;
     this.pixel32CandidatePetFollow = pixel32CandidatePetFollowRequested(
       new URLSearchParams(window.location.search),
@@ -916,6 +941,21 @@ export class MapScene extends Phaser.Scene {
             y: sprite.y,
             depth: sprite.depth,
           })),
+        }),
+        indoorSceneCandidate: () => ({
+          enabled: this.indoorSceneCandidate,
+          mapId: this.deps.session.state.mapId,
+          frames: [...new Set(this.tileSprites.flatMap((tile) => [tile.groundImage, tile.objectImage]
+            .filter((sprite): sprite is Phaser.GameObjects.Image => Boolean(sprite))
+            .filter((sprite) => sprite.visible
+              && (sprite.texture.key === INDOOR_FARM_ATLAS_KEY || sprite.texture.key === INDOOR_MINE_ATLAS_KEY))
+            .map((sprite) => `${sprite.texture.key}:${sprite.frame.name}`)))],
+          layers: this.tileSprites.flatMap((tile) => [
+            { sprite: tile.groundImage, layer: 'ground' as const, x: tile.x, y: tile.y },
+            ...(tile.objectImage ? [{ sprite: tile.objectImage, layer: 'object' as const, x: tile.x, y: tile.y }] : []),
+          ]).filter(({ sprite }) => sprite.visible
+            && (sprite.texture.key === INDOOR_FARM_ATLAS_KEY || sprite.texture.key === INDOOR_MINE_ATLAS_KEY))
+            .map(({ sprite, layer, x, y }) => ({ frame: sprite.frame.name, layer, x, y })),
         }),
         pose: () => ({ ...this.rig.currentPose() }),
         rig: () => {
@@ -2779,6 +2819,22 @@ export class MapScene extends Phaser.Scene {
     y: number,
     layer: 'ground' | 'object',
   ): { textureKey: string; frame: string; object: boolean } | null {
+    if (this.indoorSceneCandidate) {
+      const map = this.deps.index.map(this.deps.session.state.mapId);
+      const candidate = indoorSceneCandidateFrameFor(
+        map,
+        x,
+        y,
+        layer,
+        this.deps.session.state.flags.greenhouse === true,
+      );
+      const textureKey = candidate?.atlas === 'farm' ? INDOOR_FARM_ATLAS_KEY
+        : candidate?.atlas === 'mine' ? INDOOR_MINE_ATLAS_KEY : null;
+      if (candidate && textureKey && this.textures.exists(textureKey)
+        && this.textures.get(textureKey).has(candidate.frame)) {
+        return { textureKey, frame: candidate.frame, object: layer === 'object' };
+      }
+    }
     if (!this.worldV2SceneCandidate || !this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
       || !this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) return null;
     const map = this.deps.index.map(this.deps.session.state.mapId);

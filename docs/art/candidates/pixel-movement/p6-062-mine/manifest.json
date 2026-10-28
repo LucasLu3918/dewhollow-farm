@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 1,
+  "id": "dewhollow-p6-062-mine-candidate",
+  "title": "Dewhollow Farm Pixel32 mine scene candidate",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "hand-authored integer pixel primitives; deterministic atlas generator",
+    "generator": "generate.mjs",
+    "generatorSha256": "cc895a15d2a4a4fbc7da7dbab169a45e6f9df4ad64d14f0d60fc96b17d90f149"
+  },
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "anchorConvention": "integer-pixel-index",
+    "alpha": "RGBA; opaque tile pixels"
+  },
+  "palette": {
+    "floor": "#666B63",
+    "floorLight": "#85877A",
+    "floorDark": "#4B514D",
+    "wall": "#77796E",
+    "wallLight": "#A5A18A",
+    "wallDark": "#444943",
+    "rock": "#817E70",
+    "rockLight": "#B0A58C",
+    "rockDark": "#514D48",
+    "ink": "#382E2D",
+    "shadow": "#566B68",
+    "wood": "#805B43",
+    "woodLight": "#B18759",
+    "glow": "#F7D8A2",
+    "copper": "#C87847",
+    "copperLight": "#E4A05B",
+    "silver": "#9DAFB0",
+    "silverLight": "#D2D9C7",
+    "gold": "#D5A749",
+    "goldLight": "#F0D079",
+    "lanternGlow": "#E9C276"
+  },
+  "atlas": {
+    "file": "atlas.png",
+    "width": 256,
+    "height": 64,
+    "sha256": "2e38bb3442df09bdc2002498ed895bc70126c9c12e3f0d33cdf0f814f90f0b49"
+  },
+  "frames": {
+    "cave-floor": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "cave-floor",
+      "kind": "tile",
+      "layer": "ground",
+      "surface": "cave-stone-and-timber",
+      "tileable": true,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "cave-floor-variant": {
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "cave-floor-variant",
+      "kind": "tile",
+      "layer": "ground",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "rock-wall": {
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "stratified-rock-wall",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": true,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "loose-rock": {
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "breakable-rock",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "ore-copper": {
+      "x": 128,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "copper-ore",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "ore-silver": {
+      "x": 160,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "silver-ore",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "ore-gold": {
+      "x": 192,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "gold-ore",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "stairs-up": {
+      "x": 224,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "stairs-up",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "stairs-down": {
+      "x": 0,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "stairs-down",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "cave-mouth": {
+      "x": 32,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "mine-entrance",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "mine-exit-door": {
+      "x": 64,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "forest-exit-door",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "mine-support": {
+      "x": 96,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "timber-support",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "mine-lantern": {
+      "x": 128,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "lantern",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    },
+    "mine-elevator": {
+      "x": 160,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "role": "elevator-cage",
+      "kind": "object",
+      "layer": "object",
+      "surface": "cave-stone-and-timber",
+      "tileable": false,
+      "shadow": false,
+      "collisionFootprint": "visual guidance only; existing MapDef rules remain authoritative"
+    }
+  },
+  "mapCoverage": {
+    "static": [
+      "mine-entrance: wall/rock -> rock-wall or loose-rock; path -> cave-floor; cave -> cave-mouth; door -> mine-exit-door"
+    ],
+    "dynamic": [
+      "mine-1..mine-N (all generated layers use cave floor, rock, ore and stairs tile kinds)"
+    ],
+    "oreIds": [
+      "ore-copper",
+      "ore-silver",
+      "ore-gold"
+    ],
+    "note": "Frame mapping is a candidate presentation concern; dynamic MapDef and mining rules remain authoritative."
+  },
+  "limitations": [
+    "All frames remain unapproved candidate art; do not register them in content/assets.json or public/.",
+    "Atlas provides visual samples for dynamic mine MapDef kinds; it does not alter generation, collision, ore yields, stairs or save data.",
+    "Mine support, lantern and elevator frames are staging references and are not auto-placed by MapDef.",
+    "Tile seams and in-game readability still require DEV preview and human review."
+  ]
+}
