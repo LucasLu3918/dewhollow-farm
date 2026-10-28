@@ -25,6 +25,13 @@ const configurations = [
   { family: '手機直向', width: 390, height: 844, dpr: 3, isMobile: true, hasTouch: true },
   { family: '手機橫向', width: 844, height: 390, dpr: 3, isMobile: true, hasTouch: true },
 ] as const;
+const nodeProcess = (globalThis as typeof globalThis & {
+  process?: { env?: Record<string, string | undefined> };
+}).process;
+const configuredCycles = Number(nodeProcess?.env?.['DEWHOLLOW_VIEWPORT_CYCLES'] ?? '10');
+if (configuredCycles !== 10 && configuredCycles !== 100) {
+  throw new Error('DEWHOLLOW_VIEWPORT_CYCLES must be either 10 (default smoke) or 100 (extended stress).');
+}
 
 async function instrumentResizeObserver(context: BrowserContext): Promise<void> {
   await context.addInitScript(() => {
@@ -220,8 +227,8 @@ test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
     });
   }
 
-  test('100 次互動、存檔面板、移動、進出小屋及存讀檔維持同場景 viewport', async ({ browser }, testInfo) => {
-    test.setTimeout(15 * 60 * 1_000);
+  test(`${configuredCycles}-cycle viewport stability across interaction, save, movement, house round trips and reload`, async ({ browser }, testInfo) => {
+    test.setTimeout(configuredCycles === 100 ? 35 * 60 * 1_000 : 5 * 60 * 1_000);
     const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
     try {
       await instrumentResizeObserver(context);
@@ -241,7 +248,8 @@ test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
       expectSameViewport(await captureStableSnapshot(page), baseline);
       const measurements: Array<{ cycle: number; step: string; snapshot: ViewportSnapshot }> = [];
 
-      for (let cycle = 1; cycle <= 100; cycle += 1) {
+      const stressStartedAt = Date.now();
+      for (let cycle = 1; cycle <= configuredCycles; cycle += 1) {
         // 從房門外向下走到出貨箱北側，再用真正的互動鍵執行 shipAll。
         await move(page, 'ArrowDown');
         const atShipbox = await captureStableSnapshot(page);
@@ -301,10 +309,25 @@ test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
         expectSameViewport(afterReload, baseline);
         measurements.push({ cycle, step: 'reload', snapshot: afterReload });
         await expectObserverSettleWindow(page, 100);
+
+        if (cycle % 10 === 0) {
+          const progress = {
+            completedCycles: cycle,
+            totalCycles: configuredCycles,
+            measurementsCaptured: measurements.length,
+            lastMeasurement: measurements[measurements.length - 1],
+            elapsedMs: Date.now() - stressStartedAt,
+          };
+          await testInfo.attach(`viewport-cycle-progress-${cycle}.json`, {
+            body: JSON.stringify(progress, null, 2),
+            contentType: 'application/json',
+          });
+          console.log(`[viewport stress] cycle=${progress.completedCycles}/${progress.totalCycles} measurements=${progress.measurementsCaptured} elapsedMs=${progress.elapsedMs} lastStep=${progress.lastMeasurement?.step}`);
+        }
       }
 
-      expect(measurements).toHaveLength(900);
-      await testInfo.attach('viewport-100-cycle-measurements.json', {
+      expect(measurements).toHaveLength(configuredCycles * 9);
+      await testInfo.attach(`viewport-${configuredCycles}-cycle-measurements.json`, {
         body: JSON.stringify({ viewport: { width: 1280, height: 720 }, dpr: 1, baseline, measurements }, null, 2),
         contentType: 'application/json',
       });

@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:stress": "DEWHOLLOW_VIEWPORT_CYCLES=100 playwright test tests/e2e/viewport-cycle-stability.spec.ts --grep='100-cycle viewport stability' --workers=1",
     "sim": "SIM_REPORT=1 vitest run tests/sim",
     "budget": "node tools/build/check-dist.mjs",
     "assets:gate1:check": "node tools/art/check_gate1_assets.mjs",

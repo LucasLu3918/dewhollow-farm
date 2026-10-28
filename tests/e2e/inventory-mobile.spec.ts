@@ -43,6 +43,11 @@ async function assertPanelFits(page: Page, width: number, height: number): Promi
   const targets = page.locator('#inventory-close, #inventory-panel .inventory-filters button, #inventory-grid button, #inventory-detail button');
   for (let index = 0; index < await targets.count(); index += 1) {
     const target = targets.nth(index);
+    await expect.poll(async () => {
+      const bounds = await target.boundingBox();
+      return bounds === null ? 0 : Math.min(bounds.width, bounds.height);
+    }, { message: `${width}×${height}: touch target ${index} reaches its 44px minimum after layout settles` })
+      .toBeGreaterThanOrEqual(44);
     const bounds = await target.boundingBox();
     expect(bounds, `${width}×${height}: touch target ${index} bounds`).not.toBeNull();
     expect(bounds!.width, `${width}×${height}: touch target ${index} width`).toBeGreaterThanOrEqual(44);
