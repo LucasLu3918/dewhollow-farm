@@ -73,6 +73,12 @@ import {
   indoorSceneCandidateRequested,
 } from '../indoor-scene-candidate';
 import {
+  SEASON_WEATHER_CANDIDATE_ATLAS_KEY,
+  SEASON_WEATHER_CANDIDATE_MANIFEST_KEY,
+  seasonWeatherCandidateFramesFromManifest,
+  seasonWeatherCandidateRequested,
+} from '../season-weather-candidate';
+import {
   TOWN_SCENE_CANDIDATE_ATLAS_FILE,
   TOWN_SCENE_CANDIDATE_ATLAS_KEY,
   TOWN_SCENE_CANDIDATE_MANIFEST_KEY,
@@ -168,6 +174,11 @@ export class BootScene extends Phaser.Scene {
       this.load.json(INDOOR_MINE_MANIFEST_KEY, `${root}/p6-062-mine/manifest.json`);
       this.load.image(INDOOR_MINE_ATLAS_KEY, `${root}/p6-062-mine/atlas.png`);
     }
+    if (this.seasonWeatherCandidateRequested()) {
+      const root = '/docs/art/candidates/pixel-movement/p6-063-season-weather';
+      this.load.json(SEASON_WEATHER_CANDIDATE_MANIFEST_KEY, `${root}/manifest.json`);
+      this.load.image(SEASON_WEATHER_CANDIDATE_ATLAS_KEY, `${root}/atlas.png`);
+    }
     if (this.pixel32CandidateReviewRequested()) {
       const root = '/docs/art/candidates/pixel-movement';
       this.load.json(PIXEL32_CROPS_MANIFEST_KEY, `${root}/gate1-assets/pixel32-crops/manifest.json`);
@@ -190,6 +201,7 @@ export class BootScene extends Phaser.Scene {
     const pixel32InteractablesPreview = this.registerPixel32InteractablesPreviewAtlas();
     const worldV2SceneCandidate = this.registerWorldV2SceneCandidateAtlases();
     const indoorSceneCandidate = this.registerIndoorSceneCandidateAtlases();
+    const seasonWeatherCandidate = this.registerSeasonWeatherCandidateAtlas();
     const lakeShoreCandidate = this.registerLakeShoreCandidateAtlas();
     const townSceneCandidate = this.registerTownSceneCandidateAtlas();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
@@ -237,6 +249,7 @@ export class BootScene extends Phaser.Scene {
     this.registry.set('gate1-pixel32-interactables-preview', pixel32InteractablesPreview);
     this.registry.set('gate1-world-v2-scene-candidate', worldV2SceneCandidate);
     this.registry.set(INDOOR_SCENE_CANDIDATE_REGISTRY_KEY, indoorSceneCandidate);
+    this.registry.set('gate1-p6-063-season-weather-candidate', seasonWeatherCandidate);
     this.registry.set(LAKE_SHORE_CANDIDATE_REGISTRY_KEY, lakeShoreCandidate);
     this.registry.set(TOWN_SCENE_CANDIDATE_REGISTRY_KEY, townSceneCandidate);
     this.scene.start('map', sceneDeps);
@@ -361,6 +374,26 @@ export class BootScene extends Phaser.Scene {
     this.registerFrames(INDOOR_FARM_ATLAS_KEY, farmFrames);
     this.registerFrames(INDOOR_MINE_ATLAS_KEY, mineFrames);
     return true;
+  }
+
+  private registerSeasonWeatherCandidateAtlas(): boolean {
+    if (!this.seasonWeatherCandidateRequested() || !this.textures.exists(SEASON_WEATHER_CANDIDATE_ATLAS_KEY)) return false;
+    const frames = seasonWeatherCandidateFramesFromManifest(this.cache.json.get(SEASON_WEATHER_CANDIDATE_MANIFEST_KEY));
+    if (!frames) return false;
+    this.registerFrames(SEASON_WEATHER_CANDIDATE_ATLAS_KEY, frames);
+    return true;
+  }
+
+  private seasonWeatherCandidateRequested(): boolean {
+    const search = new URLSearchParams(window.location.search);
+    const dev = import.meta.env.DEV;
+    return seasonWeatherCandidateRequested(
+      search,
+      dev,
+      renderProfileFor(search.get('renderProfile'), dev).id,
+      this.pixel32RuntimeRequested(),
+      this.worldV2SceneCandidateRequested(),
+    );
   }
 
   private registerPixel32CandidateReviewAtlases(): boolean {

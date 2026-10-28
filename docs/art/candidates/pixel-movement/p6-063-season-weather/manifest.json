@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 1,
+  "id": "dewhollow-p6-063-season-weather-candidate",
+  "title": "Dewhollow Pixel32 four-season and ambience candidate",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "hand-authored integer pixel primitives with deterministic PNG encoding",
+    "generator": "generate.mjs",
+    "generatorSha256": "68d588a09b52cafc7ed686d85f392900fcbcc2ba27cf7f6b16627da5b9b7fd93"
+  },
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "anchorConvention": "integer-pixel-index"
+  },
+  "palette": {
+    "ink": "#382E2D",
+    "outline": "#493936",
+    "shade": "#566B68",
+    "soil": "#876047",
+    "soilLight": "#A67D57",
+    "spring": "#648A53",
+    "springLight": "#85AB67",
+    "springDark": "#486745",
+    "summer": "#557947",
+    "summerLight": "#78A45A",
+    "summerDark": "#3F603C",
+    "autumn": "#A66B42",
+    "autumnLight": "#CC9851",
+    "autumnDark": "#744A38",
+    "winter": "#B8C7BD",
+    "winterLight": "#DFE6DA",
+    "winterDark": "#798E89",
+    "bark": "#80583F",
+    "barkLight": "#AF8258",
+    "blossom": "#E5A9A9",
+    "berry": "#A84E55",
+    "gold": "#E9C276",
+    "sky": "#84A9B0",
+    "dusk": "#9A7184",
+    "night": "#34465F",
+    "rain": "#7296A8",
+    "white": "#FFFFFF",
+    "springFoliage": "#5F965E",
+    "springFoliageLight": "#91C27A",
+    "springFoliageDark": "#44724D",
+    "summerFoliage": "#4C7D46",
+    "summerFoliageLight": "#7EAA58",
+    "summerFoliageDark": "#355E3D",
+    "autumnFoliage": "#A66B42",
+    "autumnFoliageLight": "#D29A50",
+    "autumnFoliageDark": "#744A38",
+    "winterFoliage": "#879E96",
+    "winterFoliageLight": "#C8D6CB",
+    "winterFoliageDark": "#637B77",
+    "sunset": "#E9A56C"
+  },
+  "atlas": {
+    "file": "atlas.png",
+    "width": 384,
+    "height": 128,
+    "sha256": "45e8aacdd37d8f3ca5223d0783bffca11d99d34a42605c2729a35a680f32be56"
+  },
+  "frames": {
+    "season-spring": {
+      "x": 0,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "role": "seasonal-ground",
+      "season": "spring",
+      "composable": false,
+      "description": "seam-safe spring ground with scattered first-bloom flecks",
+      "anchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "751d532146312f6b6fba927c3b81a1b5dd451718559a31a50ce7bf324f4b6a0f"
+    },
+    "season-summer": {
+      "x": 32,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "role": "seasonal-ground",
+      "season": "summer",
+      "composable": false,
+      "description": "seam-safe summer ground with sunlit grass flecks",
+      "anchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "9324710b7e68e78a7bc7d4d41f2defe8905626eb089ac0b9c2327da95bef994e"
+    },
+    "season-autumn": {
+      "x": 64,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "role": "seasonal-ground",
+      "season": "autumn",
+      "composable": false,
+      "description": "seam-safe autumn ground with fallen leaf flecks",
+      "anchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "8b08469479d6d0c5733f28c01bad7c7b8f3165ac36e13d172addaa9a809d6317"
+    },
+    "season-winter": {
+      "x": 96,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "role": "seasonal-ground",
+      "season": "winter",
+      "composable": false,
+      "description": "seam-safe winter ground with scattered snow flecks",
+      "anchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "sha256": "30cdbc2fa6b8a4540e22a7bc881fbfecdad04e0a8cdbaa5fe3389a2599e0f0ee"
+    },
+    "season-spring-foliage": {
+      "x": 0,
+      "y": 0,
+      "width": 96,
+      "height": 96,
+      "nativeWidth": 96,
+      "nativeHeight": 96,
+      "displayScale": 2,
+      "approved": false,
+      "layer": "front",
+      "tileable": false,
+      "role": "tree-canopy",
+      "season": "spring",
+      "composable": false,
+      "description": "spring flowering 3x3 canopy",
+      "anchor": {
+        "x": 48,
+        "y": 95
+      },
+      "pivot": {
+        "x": 48,
+        "y": 95
+      },
+      "footAnchor": {
+        "x": 48,
+        "y": 95
+      },
+      "sha256": "badb0beb77aed72ed3275f70768a9b1466936d1d5f1a8b4b336345f2e96dae30"
+    },
+    "season-summer-foliage": {
+      "x": 96,
+      "y": 0,
+      "width": 96,
+      "height": 96,
+      "nativeWidth": 96,
+      "nativeHeight": 96,
+      "displayScale": 2,
+      "approved": false,
+      "layer": "front",
+      "tileable": false,
+      "role": "tree-canopy",
+      "season": "summer",
+      "composable": false,
+      "description": "summer leafy 3x3 canopy",
+      "anchor": {
+        "x": 48,
+        "y": 95
+      },
+      "pivot": {
+        "x": 48,
+        "y": 95
+      },
+      "footAnchor": {
+        "x": 48,
+        "y": 95
+      },
+      "sha256": "90da24a371da4d249a13e2a306e6c77caab602ec744d4a9a60e9272092cc7d00"
+    },
+    "season-autumn-foliage": {
+      "x": 192,
+      "y": 0,
+      "width": 96,
+      "height": 96,
+      "nativeWidth": 96,
+      "nativeHeight": 96,
+      "displayScale": 2,
+      "approved": false,
+      "layer": "front",
+      "tileable": false,
+      "role": "tree-canopy",
+      "season": "autumn",
+      "composable": false,
+      "description": "autumn copper 3x3 canopy",
+      "anchor": {
+        "x": 48,
+        "y": 95
+      },
+      "pivot": {
+        "x": 48,
+        "y": 95
+      },
+      "footAnchor": {
+        "x": 48,
+        "y": 95
+      },
+      "sha256": "979d8642c939f5faa2dc620c4775331b7ee0c660655a5abedce5f759762a8ddb"
+    },
+    "season-winter-foliage": {
+      "x": 288,
+      "y": 0,
+      "width": 96,
+      "height": 96,
+      "nativeWidth": 96,
+      "nativeHeight": 96,
+      "displayScale": 2,
+      "approved": false,
+      "layer": "front",
+      "tileable": false,
+      "role": "tree-canopy",
+      "season": "winter",
+      "composable": false,
+      "description": "winter snow-dusted evergreen 3x3 canopy",
+      "anchor": {
+        "x": 48,
+        "y": 95
+      },
+      "pivot": {
+        "x": 48,
+        "y": 95
+      },
+      "footAnchor": {
+        "x": 48,
+        "y": 95
+      },
+      "sha256": "0e33f32da6333b96377441542ac6cdf4bcaeefa5efdb92f585dcc19349fbccd3"
+    },
+    "ambience-dawn": {
+      "x": 128,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": null,
+      "approved": false,
+      "layer": "effect",
+      "tileable": false,
+      "role": "ambience-overlay",
+      "season": null,
+      "composable": true,
+      "description": "edge-to-edge low-alpha warm dawn viewport wash",
+      "alphaRange": {
+        "min": 14,
+        "max": 35
+      },
+      "viewportFit": "non-uniform-nearest-neighbor",
+      "sha256": "9d555cb7e012e6cc61228906cdc4ee8f41772d593217a95b6e2af255d8cfbafc"
+    },
+    "ambience-day": {
+      "x": 160,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": null,
+      "approved": false,
+      "layer": "effect",
+      "tileable": false,
+      "role": "ambience-overlay",
+      "season": null,
+      "composable": true,
+      "description": "edge-to-edge low-alpha neutral daylight viewport wash",
+      "alphaRange": {
+        "min": 12,
+        "max": 19
+      },
+      "viewportFit": "non-uniform-nearest-neighbor",
+      "sha256": "79b8ef76c16fcf42c9dc84ca891da8698a744b34eef042839e2954ba8a3113ba"
+    },
+    "ambience-dusk": {
+      "x": 192,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": null,
+      "approved": false,
+      "layer": "effect",
+      "tileable": false,
+      "role": "ambience-overlay",
+      "season": null,
+      "composable": true,
+      "description": "edge-to-edge low-alpha lavender-to-amber dusk viewport wash",
+      "alphaRange": {
+        "min": 20,
+        "max": 42
+      },
+      "viewportFit": "non-uniform-nearest-neighbor",
+      "sha256": "19bd1f533cfbc63d7100f1054321be8752ae948ddbc82a2aac054301688f88ef"
+    },
+    "ambience-rain-night": {
+      "x": 224,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": null,
+      "approved": false,
+      "layer": "effect",
+      "tileable": false,
+      "role": "ambience-overlay",
+      "season": null,
+      "composable": true,
+      "description": "edge-to-edge low-alpha blue night viewport wash with fine rain",
+      "alphaRange": {
+        "min": 54,
+        "max": 112
+      },
+      "viewportFit": "non-uniform-nearest-neighbor",
+      "sha256": "98659ad37f5f0ae07c6fa668540b16db3ef3afb07eeb4ff50cc6ce397f21ce64"
+    }
+  },
+  "usage": {
+    "seasons": [
+      "spring",
+      "summer",
+      "autumn",
+      "winter"
+    ],
+    "ambience": [
+      "dawn",
+      "day",
+      "dusk",
+      "rain-night"
+    ],
+    "composition": "Apply seasonal ground to existing map ground tiles; map season-foliage to existing tree-canopy anchors at 3x3 tiles and keep it in the front occlusion layer. Stretch one full-frame ambience overlay across viewport bounds with Phaser setDisplaySize(viewWidth, viewHeight) and nearest-neighbor sampling; all four corners have nonzero alpha."
+  }
+}

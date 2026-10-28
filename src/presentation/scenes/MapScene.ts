@@ -141,6 +141,14 @@ import {
   indoorSceneCandidateFrameFor,
   indoorSceneCandidateRequested,
 } from '../indoor-scene-candidate';
+import {
+  SEASON_WEATHER_CANDIDATE_ATLAS_KEY,
+  SEASON_WEATHER_CANDIDATE_MANIFEST_KEY,
+  seasonWeatherAmbienceFrameFor,
+  seasonWeatherCandidateRequested,
+  seasonWeatherFoliageFrameFor,
+  seasonWeatherGroundFrameFor,
+} from '../season-weather-candidate';
 import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
 import { advanceMovement, cancelMovement, commitStep, createMovementScheduler, queueMovementTap, rejectStep, requestNextStep, setMovementIntent, type MovementSchedulerState } from '../movement-scheduler/movement-scheduler';
 
@@ -442,6 +450,27 @@ declare global {
         frames: string[];
         layers: Array<{ frame: string; layer: 'ground' | 'object'; x: number; y: number }>;
       };
+      seasonWeatherCandidate(): {
+        enabled: boolean;
+        mapId: string;
+        season: Season;
+        minuteOfDay: number;
+        weather: Weather;
+        ambience: string | null;
+        ambienceSize: { width: number; height: number } | null;
+        nightShadeSize: { width: number; height: number };
+        nightShadeVisible: boolean;
+        nightShadeAlpha: number;
+        viewportSize: { width: number; height: number; zoom: number };
+        pixelViewport: {
+          renderResolution: { width: number; height: number };
+          cssScale: number;
+          devicePixelScale: number;
+          actualCanvasResolution: { width: number; height: number };
+          cameraZoom: number;
+        };
+        frames: string[];
+      };
       /** DEV-only, unapproved pixel32 map overlay fixture. */
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
       /** DEV-only unapproved door/shipbox candidates, isolated from map and interaction state. */
@@ -515,6 +544,7 @@ export class MapScene extends Phaser.Scene {
   private movementStepDurationMs = CONTINUOUS_STEP_DURATION_MS;
   private worldV2SceneCandidate = false;
   private indoorSceneCandidate = false;
+  private seasonWeatherCandidate = false;
   private worldV2CandidateSprites: Phaser.GameObjects.Image[] = [];
   private pixel32CandidateAssets = false;
   private pixel32CandidatePetFollow = false;
@@ -581,6 +611,7 @@ export class MapScene extends Phaser.Scene {
   private nightShade!: Phaser.GameObjects.Rectangle;
   private weatherShade!: Phaser.GameObjects.Rectangle;
   private weatherGfx!: Phaser.GameObjects.Graphics;
+  private seasonWeatherAmbience: Phaser.GameObjects.Image | null = null;
   private terrainByKind = new Map<string, TerrainDef>();
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
@@ -701,7 +732,6 @@ export class MapScene extends Phaser.Scene {
   create(): void {
     this.worldGeneration = ++MapScene.worldGenerationCount;
     this.world = this.add.container(0, 0);
-    this.createSky();
     this.starMeter = this.add.graphics().setScrollFactor(0).setDepth(DEPTH_SKY + 2);
     // 夜市的煙火：每隔一陣子看看要不要放（只有節慶的夜晚、在廣場才放，見 maybeFirework）。
     this.time.addEvent({ delay: FIREWORK_INTERVAL_MS, loop: true, callback: () => this.maybeFirework() });
@@ -731,6 +761,16 @@ export class MapScene extends Phaser.Scene {
       && this.pixel32CandidateRuntime
       && this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
       && this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY);
+    this.seasonWeatherCandidate = this.registry.get('gate1-p6-063-season-weather-candidate') === true
+      && this.worldV2SceneCandidate
+      && this.textures.exists(SEASON_WEATHER_CANDIDATE_ATLAS_KEY)
+      && seasonWeatherCandidateRequested(
+        new URLSearchParams(window.location.search),
+        import.meta.env.DEV,
+        renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), true).id,
+        this.pixel32CandidateRuntime,
+        this.worldV2SceneCandidate,
+      );
     this.indoorSceneCandidate = this.registry.get(INDOOR_SCENE_CANDIDATE_REGISTRY_KEY) === true
       && this.pixel32CandidateRuntime
       && indoorSceneCandidateRequested(
@@ -741,6 +781,7 @@ export class MapScene extends Phaser.Scene {
       )
       && this.textures.exists(INDOOR_FARM_ATLAS_KEY)
       && this.textures.exists(INDOOR_MINE_ATLAS_KEY);
+    this.createSky();
     this.pixel32CandidateAssets = this.registry.get('gate1-pixel32-candidate-assets') === true && this.pixel32CandidateRuntime;
     this.pixel32CandidatePetFollow = pixel32CandidatePetFollowRequested(
       new URLSearchParams(window.location.search),
@@ -831,10 +872,20 @@ export class MapScene extends Phaser.Scene {
   /** 天色與天氣的遮罩與粒子：固定在畫面上（不隨鏡頭移動）。 */
   private createSky(): void {
     const { width, height } = this.scale.gameSize;
+    const candidateViewportScale = this.seasonWeatherCandidate ? 8 : 1;
     // 填色不透明度為 1，明暗只由 setAlpha 控制（填色若為 0 會把 setAlpha 乘成 0，什麼也看不見）。
-    this.nightShade = this.add.rectangle(0, 0, width, height, NIGHT_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
-    this.weatherShade = this.add.rectangle(0, 0, width, height, WEATHER_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
+    this.nightShade = this.add.rectangle(0, 0, width * candidateViewportScale, height * candidateViewportScale, NIGHT_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY).setVisible(!this.seasonWeatherCandidate);
+    this.weatherShade = this.add.rectangle(0, 0, width * candidateViewportScale, height * candidateViewportScale, WEATHER_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
     this.weatherGfx = this.add.graphics().setScrollFactor(0).setDepth(DEPTH_SKY + 1);
+    if (this.seasonWeatherCandidate && this.textures.exists(SEASON_WEATHER_CANDIDATE_ATLAS_KEY)) {
+      const frame = seasonWeatherAmbienceFrameFor(
+        this.deps.session.state.calendar.minuteOfDay,
+        this.deps.session.state.weather,
+      );
+      this.seasonWeatherAmbience = this.add.image(
+        width / 2, height / 2, SEASON_WEATHER_CANDIDATE_ATLAS_KEY, frame,
+      ).setScrollFactor(0).setDisplaySize(width * 8, height * 8).setDepth(DEPTH_SKY + 1.5);
+    }
   }
 
   /** 鏡頭跟隨玩家：中央留一塊死區，玩家走到邊緣才捲動；邊界在換地圖時重設。 */
@@ -865,8 +916,12 @@ export class MapScene extends Phaser.Scene {
         else canvasHost.dataset.pixelProfile = profile.id;
       }
       const designSize = pixelViewport.renderResolution;
-      this.nightShade?.setSize(designSize.width, designSize.height);
-      this.weatherShade?.setSize(designSize.width, designSize.height);
+      const candidateViewportScale = this.seasonWeatherCandidate ? 8 : 1;
+      this.nightShade?.setSize(designSize.width * candidateViewportScale, designSize.height * candidateViewportScale);
+      this.weatherShade?.setSize(designSize.width * candidateViewportScale, designSize.height * candidateViewportScale);
+      this.seasonWeatherAmbience
+        ?.setPosition(designSize.width / 2, designSize.height / 2)
+        .setDisplaySize(designSize.width * 8, designSize.height * 8);
       if (this.pixel32CandidateReviewContainer && (
         previousCamera.x !== camera.x || previousCamera.y !== camera.y || previousCamera.width !== camera.width
         || previousCamera.height !== camera.height || previousCamera.zoom !== camera.zoom
@@ -956,6 +1011,31 @@ export class MapScene extends Phaser.Scene {
           ]).filter(({ sprite }) => sprite.visible
             && (sprite.texture.key === INDOOR_FARM_ATLAS_KEY || sprite.texture.key === INDOOR_MINE_ATLAS_KEY))
             .map(({ sprite, layer, x, y }) => ({ frame: sprite.frame.name, layer, x, y })),
+        }),
+        seasonWeatherCandidate: () => ({
+          enabled: this.seasonWeatherCandidate,
+          mapId: this.deps.session.state.mapId,
+          season: this.deps.session.state.calendar.season,
+          minuteOfDay: this.deps.session.state.calendar.minuteOfDay,
+          weather: this.deps.session.state.weather,
+          ambience: this.seasonWeatherAmbience?.frame.name ?? null,
+          ambienceSize: this.seasonWeatherAmbience
+            ? { width: this.seasonWeatherAmbience.displayWidth, height: this.seasonWeatherAmbience.displayHeight }
+            : null,
+          nightShadeSize: { width: this.nightShade.displayWidth, height: this.nightShade.displayHeight },
+          nightShadeVisible: this.nightShade.visible,
+          nightShadeAlpha: this.nightShade.alpha,
+          viewportSize: { width: this.cameras.main.width, height: this.cameras.main.height, zoom: this.cameras.main.zoom },
+          pixelViewport: this.pixelViewportDebugInfo(),
+          frames: [...new Set([
+            ...this.tileSprites.flatMap((tile) => [tile.groundImage, tile.objectImage]
+              .filter((sprite): sprite is Phaser.GameObjects.Image => Boolean(sprite))
+              .filter((sprite) => sprite.visible && sprite.texture.key === SEASON_WEATHER_CANDIDATE_ATLAS_KEY)
+              .map((sprite) => sprite.frame.name)),
+            ...this.worldV2CandidateSprites
+              .filter((sprite) => sprite.visible && sprite.texture.key === SEASON_WEATHER_CANDIDATE_ATLAS_KEY)
+              .map((sprite) => sprite.frame.name),
+          ])],
         }),
         pose: () => ({ ...this.rig.currentPose() }),
         rig: () => {
@@ -2000,6 +2080,14 @@ export class MapScene extends Phaser.Scene {
     if (this.shownSeason === season) return;
     this.shownSeason = season;
     const tint = seasonGrassTint(season);
+    if (this.seasonWeatherCandidate && this.renderedMapId === 'farm'
+      && this.textures.exists(SEASON_WEATHER_CANDIDATE_ATLAS_KEY)) {
+      const foliageFrame = seasonWeatherFoliageFrameFor('farm', season);
+      const canopy = this.worldV2CandidateSprites.find((sprite) => sprite.getData('p6-063-seasonal-canopy') === true);
+      if (foliageFrame && canopy && this.textures.get(SEASON_WEATHER_CANDIDATE_ATLAS_KEY).has(foliageFrame)) {
+        canopy.setTexture(SEASON_WEATHER_CANDIDATE_ATLAS_KEY, foliageFrame);
+      }
+    }
     for (const sprite of this.tileSprites) {
       if (sprite.groundImage.texture.key === 'tile.grass') sprite.groundImage.setTint(tint);
       else if (this.pixel32CandidateRuntime && sprite.groundImage.texture.key === PIXEL32_MAP_ATLAS_KEY) {
@@ -2216,10 +2304,15 @@ export class MapScene extends Phaser.Scene {
     if (!this.worldV2SceneCandidate) return;
     if (mapId === 'farm') {
       for (const placement of worldV2FarmSceneCandidatePlacements()) {
+        const seasonalCanopy = placement.frame === 'tree-canopy' && this.seasonWeatherCandidate
+          ? seasonWeatherFoliageFrameFor(mapId, this.deps.session.state.calendar.season)
+          : null;
+        const useSeasonalCanopy = Boolean(seasonalCanopy
+          && this.textures.get(SEASON_WEATHER_CANDIDATE_ATLAS_KEY).has(seasonalCanopy));
         this.addWorldV2CandidateSprite(
-          WORLD_V2_FARM_ATLAS_KEY,
-          WORLD_V2_FARM_MANIFEST_KEY,
-          placement.frame,
+          useSeasonalCanopy ? SEASON_WEATHER_CANDIDATE_ATLAS_KEY : WORLD_V2_FARM_ATLAS_KEY,
+          useSeasonalCanopy ? SEASON_WEATHER_CANDIDATE_MANIFEST_KEY : WORLD_V2_FARM_MANIFEST_KEY,
+          useSeasonalCanopy ? seasonalCanopy! : placement.frame,
           placement.anchorTile.x,
           placement.anchorTile.y,
           placement.layer,
@@ -2272,6 +2365,7 @@ export class MapScene extends Phaser.Scene {
     const sprite = this.add.image(footX, footY, textureKey, frameName)
       .setOrigin(originX, originY)
       .setScale(2);
+    if (manifestKey === SEASON_WEATHER_CANDIDATE_MANIFEST_KEY) sprite.setData('p6-063-seasonal-canopy', true);
     if (layer === 'back') {
       this.world.add(sprite);
       sprite.setDepth(1);
@@ -2599,6 +2693,9 @@ export class MapScene extends Phaser.Scene {
     const state = this.deps.session.state;
     this.nightShade.setAlpha(nightAlpha(state.calendar.minuteOfDay));
     this.weatherShade.setAlpha(weatherDim(state.weather));
+    if (this.seasonWeatherCandidate && this.seasonWeatherAmbience) {
+      this.seasonWeatherAmbience.setFrame(seasonWeatherAmbienceFrameFor(state.calendar.minuteOfDay, state.weather));
+    }
     this.drawWeather(state.weather, time);
   }
 
@@ -2843,6 +2940,13 @@ export class MapScene extends Phaser.Scene {
     const candidateFrame = worldV2SceneCandidateFrameFor(map, x, y, layer);
     if (!candidateFrame) return null;
     const textureKey = map.id === 'farm' ? WORLD_V2_FARM_ATLAS_KEY : WORLD_V2_HOUSE_ATLAS_KEY;
+    if (this.seasonWeatherCandidate && textureKey === WORLD_V2_FARM_ATLAS_KEY
+      && (candidateFrame === 'grass-base' || candidateFrame === 'grass-variant')) {
+      const seasonFrame = seasonWeatherGroundFrameFor(map.id, 'grass', this.deps.session.state.calendar.season);
+      if (seasonFrame && this.textures.get(SEASON_WEATHER_CANDIDATE_ATLAS_KEY).has(seasonFrame)) {
+        return { textureKey: SEASON_WEATHER_CANDIDATE_ATLAS_KEY, frame: seasonFrame, object: false };
+      }
+    }
     return this.textures.get(textureKey).has(candidateFrame)
       ? { textureKey, frame: candidateFrame, object: layer === 'object' }
       : null;
