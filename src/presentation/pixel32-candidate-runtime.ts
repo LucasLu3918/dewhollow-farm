@@ -21,7 +21,7 @@ export const PIXEL32_PETS_MANIFEST_KEY = 'gate1-pixel32-pets-manifest';
 export const PIXEL32_CANDIDATE_REVIEW_QUERY = 'gate1AssetPreview';
 export const PIXEL32_CANDIDATE_REVIEW_VALUE = 'pixel32-candidates';
 export const PIXEL32_CANDIDATE_PET_FOLLOW_QUERY = 'gate1CandidatePetFollow';
-export const PIXEL32_CANDIDATE_PET_FOLLOW_VALUE = 'pixel32-cat-follow';
+export const PIXEL32_CANDIDATE_PET_FOLLOW_VALUE = 'pixel32-cat-quokka-follow';
 
 export interface CandidateFrameRect {
   x: number;
@@ -84,7 +84,7 @@ export function pixel32CandidateReviewRequested(search: URLSearchParams, isDev: 
     && search.get(PIXEL32_CANDIDATE_REVIEW_QUERY) === PIXEL32_CANDIDATE_REVIEW_VALUE;
 }
 
-/** Candidate cat motion requires all existing review gates plus a separate exact DEV-only opt-in. */
+/** Candidate cat and quokka motion requires all existing review gates plus a separate exact DEV-only opt-in. */
 export function pixel32CandidatePetFollowRequested(
   search: URLSearchParams,
   isDev: boolean,
@@ -97,11 +97,11 @@ export function pixel32CandidatePetFollowRequested(
     && search.get(PIXEL32_CANDIDATE_PET_FOLLOW_QUERY) === PIXEL32_CANDIDATE_PET_FOLLOW_VALUE;
 }
 
-/** Candidate cat animation frames follow the directional hop sequence in the unapproved atlas contract. */
-export function pixel32CandidateCatFrame(direction: Direction, elapsedMs: number | null): string {
-  if (elapsedMs === null || !Number.isFinite(elapsedMs) || elapsedMs < 0 || elapsedMs >= 390) return `cat-${direction}-idle`;
+/** Candidate pet animation frames follow the species-specific directional hop sequence in the unapproved atlas contract. */
+export function pixel32CandidatePetFrame(art: 'cat' | 'quokka', direction: Direction, elapsedMs: number | null): string {
+  if (elapsedMs === null || !Number.isFinite(elapsedMs) || elapsedMs < 0 || elapsedMs >= 390) return `${art}-${direction}-idle`;
   const phase = elapsedMs < 130 ? 'hop-a' : elapsedMs < 260 ? 'hop-b' : 'land';
-  return `cat-${direction}-${phase}`;
+  return `${art}-${direction}-${phase}`;
 }
 
 /** Overlay review requires the already opt-in pixel32 runtime and a second exact DEV query value. */

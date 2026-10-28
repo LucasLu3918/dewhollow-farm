@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 const runtimeQuery = '?renderProfile=pixel32&gate1Runtime=pixel32-map-animation';
 const candidateQuery = `${runtimeQuery}&gate1AssetPreview=pixel32-candidates`;
-const petQuery = `${candidateQuery}&gate1CandidatePetFollow=pixel32-cat-follow`;
+const petQuery = `${candidateQuery}&gate1CandidatePetFollow=pixel32-cat-quokka-follow`;
 const evidenceDirectory = 'docs/art/candidates/pixel-movement/gate1-readability-10scenarios';
 const nodeProcess = (globalThis as typeof globalThis & {
   process?: { cwd(): string; env?: Record<string, string | undefined> };
