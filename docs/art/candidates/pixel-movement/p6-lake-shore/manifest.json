@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "dewhollow-p6-lake-shore-candidate",
+  "title": "月鏡湖畔 Pixel32 岸線圖塊候選",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "OpenAI imagegen, using the user-approved lake shore concept as a visual direction",
+    "file": "lake-shore-tile-source.png",
+    "sha256": "b5607551e3d8a316077ae5e9a9c1f7ab9a9eb891f53a754fd38e072a3cd9a06d",
+    "dimensions": { "width": 1254, "height": 1254 },
+    "atlasDerivation": "Sixteen 310x310 inner crops, excluding generated grid seams, resized with nearest-neighbor to 32x32 and packed row-major by FFmpeg 9.0.2"
+  },
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "alpha": "RGB; opaque tile pixels"
+  },
+  "atlas": {
+    "file": "atlas.png",
+    "width": 128,
+    "height": 128,
+    "sha256": "d1c958be78fc95b0bec7f478a71c531c49ca3fb166b3aab0a4a4600071fa5d5f"
+  },
+  "frames": {
+    "water-open": { "x": 0, "y": 0, "width": 32, "height": 32, "approved": false, "layer": "ground" },
+    "water-ripple-small": { "x": 32, "y": 0, "width": 32, "height": 32, "approved": false, "layer": "ground" },
+    "water-stone": { "x": 64, "y": 0, "width": 32, "height": 32, "approved": false, "layer": "ground" },
+    "water-lily": { "x": 96, "y": 0, "width": 32, "height": 32, "approved": false, "layer": "ground" },
+    "shore-north": { "x": 0, "y": 32, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "shore-east": { "x": 32, "y": 32, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "shore-south": { "x": 64, "y": 32, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "shore-west": { "x": 96, "y": 32, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "shore-corner-nw": { "x": 0, "y": 64, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "shore-basin": { "x": 32, "y": 64, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "shore-shallow-rocks": { "x": 64, "y": 64, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "shore-corner-ne": { "x": 96, "y": 64, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "shore-reeds": { "x": 0, "y": 96, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "water-pebbles": { "x": 32, "y": 96, "width": 32, "height": 32, "approved": false, "layer": "ground" },
+    "shore-reed-clump": { "x": 64, "y": 96, "width": 32, "height": 32, "approved": false, "layer": "shore" },
+    "fishing-ripple": { "x": 96, "y": 96, "width": 32, "height": 32, "approved": false, "layer": "shore" }
+  },
+  "approval": {
+    "userApprovedDirection": true,
+    "exactAssetApproved": false,
+    "productionIntegrationAllowed": false,
+    "requiresReviewOf": ["atlas.png", "d1c958be78fc95b0bec7f478a71c531c49ca3fb166b3aab0a4a4600071fa5d5f"]
+  }
+}
