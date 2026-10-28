@@ -564,6 +564,89 @@ a:focus-visible {
   display: none;
 }
 
+/* Help、存檔與設定共用同一組面板原語；各面板保留自己的內容與操作順序。 */
+.ui-dialog-panel {
+  border: 1px solid var(--action-border);
+  border-top: 4px solid var(--accent);
+}
+
+.ui-dialog-panel__header {
+  margin: 0 0 12px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.ui-dialog-panel__header > * + * {
+  margin-top: 4px;
+}
+
+.ui-dialog-panel .ui-dialog-panel__title {
+  margin: 0;
+  line-height: 1.25;
+}
+
+.ui-dialog-panel .ui-dialog-panel__intro {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.ui-dialog-panel__content {
+  min-width: 0;
+}
+
+.ui-dialog-panel .ui-dialog-panel__section {
+  margin: 0 0 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--divider);
+}
+
+.ui-dialog-panel .ui-dialog-panel__section-title {
+  margin: 14px 0 8px;
+  padding-inline-start: 8px;
+  border-inline-start: 3px solid var(--accent);
+  color: var(--accent);
+  line-height: 1.35;
+}
+
+.ui-dialog-panel__section > .ui-dialog-panel__section-title:first-child {
+  margin-top: 0;
+}
+
+.ui-dialog-panel .ui-dialog-panel__card {
+  margin: 0;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--divider);
+}
+
+.ui-dialog-panel .ui-dialog-panel__card-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.ui-dialog-panel .ui-dialog-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ui-dialog-panel .ui-dialog-panel__status {
+  min-height: 1.6em;
+  padding: 8px 10px;
+  border-inline-start: 3px solid var(--accent);
+  background: var(--surface-inset);
+  line-height: 1.45;
+}
+
+.ui-dialog-panel .ui-dialog-panel__close {
+  min-height: 44px;
+}
+
+.ui-dialog-panel button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* 背包先提供場景 B 的暖紙面／木框外殼；內容格與物品資料由後續 VF 任務填入。 */
 .inventory-panel {
   position: fixed;

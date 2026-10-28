@@ -42,9 +42,18 @@ export class HelpPanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#help-panel');
+    this.root.classList.add('ui-dialog-panel');
     this.dialog = new PanelDialog(this.root);
     this.body = required(doc, '#help-body');
-    required(doc, '#help-version').textContent = `目前版本：v${version}`;
+    this.body.classList.add('ui-dialog-panel__content');
+    const header = required(doc, '#help-panel > header');
+    header.classList.add('ui-dialog-panel__header');
+    required(doc, '#help-title').classList.add('ui-dialog-panel__title');
+    const versionLabel = required(doc, '#help-version');
+    versionLabel.textContent = `目前版本：v${version}`;
+    versionLabel.classList.add('ui-dialog-panel__intro');
+    required(doc, '#help-close').classList.add('ui-dialog-panel__close');
+    required(doc, '#help-x').classList.add('ui-dialog-panel__close');
     required(doc, '#help-close').addEventListener('click', () => this.close());
     required(doc, '#help-x').addEventListener('click', () => this.close());
     this.render();
@@ -88,8 +97,9 @@ export class HelpPanel {
 
   private section(title: string, content: HTMLElement): HTMLElement {
     const section = this.doc.createElement('section');
-    section.className = 'help-section';
+    section.className = 'help-section ui-dialog-panel__section';
     const heading = this.doc.createElement('h3');
+    heading.className = 'ui-dialog-panel__section-title';
     heading.textContent = title;
     section.append(heading, content);
     return section;
