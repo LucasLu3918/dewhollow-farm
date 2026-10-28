@@ -13,6 +13,16 @@ import {
   lakeShoreFrameFor,
   type LakeShoreCandidateFrame,
 } from '../lake-shore-candidate';
+import {
+  TOWN_SCENE_CANDIDATE_ATLAS_KEY,
+  TOWN_SCENE_CANDIDATE_REGISTRY_KEY,
+  TOWN_SCENE_CANDIDATE_REQUIRED_FRAMES,
+  townSceneCandidateTileFrameFor,
+  townSceneCandidatePlacements,
+  townSceneCandidateReplacesTileObject,
+  townSceneCandidateRequested,
+  townSceneCandidateScale,
+} from '../town-scene-candidate';
 import { actorDepth, foregroundDepth } from '../actor-depth';
 import { legacyMapRenderPlan, plotRenderPlan } from '../map-render-plan';
 import { plotNeighborMask, resolvePlotVisual } from '../plot-visual';
@@ -487,6 +497,7 @@ export class MapScene extends Phaser.Scene {
   private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
   private pixel32CandidateRuntime = false;
   private lakeShoreCandidate = false;
+  private townSceneCandidate = false;
   private movementStepDurationMs = CONTINUOUS_STEP_DURATION_MS;
   private worldV2SceneCandidate = false;
   private worldV2CandidateSprites: Phaser.GameObjects.Image[] = [];
@@ -692,6 +703,15 @@ export class MapScene extends Phaser.Scene {
       )
       && this.textures.exists(LAKE_SHORE_CANDIDATE_ATLAS_KEY)
       && LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES.every((frame) => this.textures.get(LAKE_SHORE_CANDIDATE_ATLAS_KEY).has(frame));
+    this.townSceneCandidate = this.registry.get(TOWN_SCENE_CANDIDATE_REGISTRY_KEY) === true
+      && this.pixel32CandidateRuntime
+      && townSceneCandidateRequested(
+        new URLSearchParams(window.location.search),
+        import.meta.env.DEV,
+        this.pixel32CandidateRuntime,
+      )
+      && this.textures.exists(TOWN_SCENE_CANDIDATE_ATLAS_KEY)
+      && TOWN_SCENE_CANDIDATE_REQUIRED_FRAMES.every((frame) => this.textures.get(TOWN_SCENE_CANDIDATE_ATLAS_KEY).has(frame));
     this.worldV2SceneCandidate = this.registry.get('gate1-world-v2-scene-candidate') === true
       && this.pixel32CandidateRuntime
       && this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
@@ -752,6 +772,7 @@ export class MapScene extends Phaser.Scene {
       // Phaser may already have removed the DisplayList; settle animation promises without drawing shutdown impacts.
       this.rig.shutdown();
       this.clearWorldV2CandidateSprites();
+      this.clearSceneOverlays();
       this.pixel32CandidateSprite?.destroy();
       this.pixel32CandidateSprite = null;
       this.clearPixel32CandidateOverlays();
@@ -2011,11 +2032,14 @@ export class MapScene extends Phaser.Scene {
       const ground = isGroundLayer(kind) ? kind : sprite.ground;
       const map = this.deps.index.map(state.mapId);
       const lakeFrame = ground === 'water' ? this.lakeShoreCandidateFrameFor(map, sprite.x, sprite.y) : null;
+      const townFrame = this.townSceneCandidateTileFrame(map, sprite.x, sprite.y, ground);
       const groundKey = lakeFrame ? LAKE_SHORE_CANDIDATE_ATLAS_KEY
+        : townFrame ? TOWN_SCENE_CANDIDATE_ATLAS_KEY
         : forestSceneAssetFor(state.mapId, ground, sprite.x, sprite.y) ?? `tile.${ground}`;
-      if (lakeFrame) {
-        if (sprite.groundImage.texture.key !== groundKey || sprite.groundImage.frame?.name !== lakeFrame) {
-          sprite.groundImage.setTexture(groundKey, lakeFrame).setOrigin(0).setScale(2);
+      if (lakeFrame || townFrame) {
+        const frame = lakeFrame ?? townFrame!;
+        if (sprite.groundImage.texture.key !== groundKey || sprite.groundImage.frame?.name !== frame) {
+          sprite.groundImage.setTexture(groundKey, frame).setOrigin(0).setScale(2);
         }
       } else if (sprite.groundImage.texture.key !== groundKey) {
         this.applyAsset(sprite.groundImage, groundKey);
@@ -2029,13 +2053,16 @@ export class MapScene extends Phaser.Scene {
         sprite.objectImage?.setVisible(false);
       } else {
         const objectKey = forestSceneAssetFor(state.mapId, kind, sprite.x, sprite.y) ?? `tile.${kind}`;
+        const townFrame = this.townSceneCandidateTileFrame(map, sprite.x, sprite.y, kind);
         if (!sprite.objectImage) {
           sprite.objectImage = this.image(objectKey, sprite.x, sprite.y, 1, undefined, 'object');
+        } else if (townFrame) {
+          sprite.objectImage.setTexture(TOWN_SCENE_CANDIDATE_ATLAS_KEY, townFrame).setOrigin(0).setScale(2);
         } else {
           this.applyAsset(sprite.objectImage, objectKey);
         }
         this.placeObjectImage(sprite.objectImage, kind, sprite.y);
-        sprite.objectImage.setVisible(true);
+        sprite.objectImage.setVisible(!(this.townSceneCandidate && townSceneCandidateReplacesTileObject(map, sprite.x, sprite.y)));
       }
     }
   }
@@ -2067,6 +2094,7 @@ export class MapScene extends Phaser.Scene {
     this.clearActors();
     this.createResidents(map);
     this.drawSceneOverlays(mapId);
+    this.drawTownSceneCandidateOverlays(mapId);
     this.drawWorldV2CandidateOverlays(mapId);
     this.drawPixel32CandidateOverlays(mapId);
     this.drawPixel32CandidateInteractables(mapId);
@@ -2075,6 +2103,12 @@ export class MapScene extends Phaser.Scene {
   private lakeShoreCandidateFrameFor(map: MapDef, x: number, y: number): LakeShoreCandidateFrame | null {
     if (!this.lakeShoreCandidate || !this.textures.exists(LAKE_SHORE_CANDIDATE_ATLAS_KEY)) return null;
     return lakeShoreFrameFor(map, x, y);
+  }
+
+  private townSceneCandidateTileFrame(map: MapDef, x: number, y: number, kind?: TileKind): string | null {
+    if (!this.townSceneCandidate || !this.textures.exists(TOWN_SCENE_CANDIDATE_ATLAS_KEY)) return null;
+    const frame = townSceneCandidateTileFrameFor(map, x, y, kind);
+    return frame && this.textures.get(TOWN_SCENE_CANDIDATE_ATLAS_KEY).has(frame) ? frame : null;
   }
 
   private mapTileImage(mapId: string, map: MapDef, kind: TileKind, x: number, y: number, depth: number): Phaser.GameObjects.Image {
@@ -2096,6 +2130,7 @@ export class MapScene extends Phaser.Scene {
 
   /** Render approved, map-specific large art at tile anchors without changing map or world state. */
   private drawSceneOverlays(mapId: string): void {
+    if (this.townSceneCandidate && (mapId === 'village' || mapId === 'plaza')) return;
     if (this.worldV2SceneCandidate && mapId === 'farm') {
       // The candidate farm scene supplies its own house and tree art below.
       return;
@@ -2108,6 +2143,24 @@ export class MapScene extends Phaser.Scene {
         .setOrigin(0.5, 240 / 256)
         .setFlipX(flipX)
         .setScale(scale)
+        .setDepth(foregroundDepth(footY));
+      this.sceneOverlaySprites.push(image);
+    }
+  }
+
+  /** Draw unapproved town art at validated existing map anchors; interactions stay on MapDef tiles. */
+  private drawTownSceneCandidateOverlays(mapId: string): void {
+    if (!this.townSceneCandidate || !['village', 'plaza'].includes(mapId)
+      || !this.textures.exists(TOWN_SCENE_CANDIDATE_ATLAS_KEY)) return;
+    const texture = this.textures.get(TOWN_SCENE_CANDIDATE_ATLAS_KEY);
+    const map = this.deps.index.map(mapId);
+    for (const placement of townSceneCandidatePlacements(map)) {
+      if (!texture.has(placement.frame)) continue;
+      const footX = (placement.anchorTile.x + 0.5) * TILE_SIZE;
+      const footY = (placement.anchorTile.y + 1) * TILE_SIZE;
+      const image = this.add.image(footX, footY, TOWN_SCENE_CANDIDATE_ATLAS_KEY, placement.frame)
+        .setOrigin(0.5, 1)
+        .setScale(townSceneCandidateScale(placement.frame))
         .setDepth(foregroundDepth(footY));
       this.sceneOverlaySprites.push(image);
     }
@@ -2679,6 +2732,22 @@ export class MapScene extends Phaser.Scene {
         .setData('worldV2CandidateTile', { x, y, layer: mapLayer })
         .setData('worldV2CandidateHiddenObject', true)
         .setDepth(depth);
+    }
+    if (mapLayer) {
+      const map = this.deps.index.map(this.deps.session.state.mapId);
+      if (mapLayer === 'object' && this.townSceneCandidate && townSceneCandidateReplacesTileObject(map, x, y)) {
+        return this.add.image(x * TILE_SIZE, y * TILE_SIZE, TOWN_SCENE_CANDIDATE_ATLAS_KEY, 'grass-base')
+          .setOrigin(0)
+          .setVisible(false)
+          .setDepth(depth);
+      }
+      const townFrame = this.townSceneCandidateTileFrame(map, x, y);
+      if (townFrame) {
+        return this.add.image(x * TILE_SIZE, y * TILE_SIZE, TOWN_SCENE_CANDIDATE_ATLAS_KEY, townFrame)
+          .setOrigin(0)
+          .setScale(2)
+          .setDepth(depth);
+      }
     }
     const pixel32Frame = this.pixel32MapFrame(key, x * TILE_SIZE, y * TILE_SIZE);
     if (pixel32Frame) {

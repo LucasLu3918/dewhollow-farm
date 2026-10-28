@@ -61,6 +61,14 @@ import {
   worldV2CandidateFramesFromManifest,
   worldV2SceneCandidateRequested,
 } from '../world-v2-scene-candidate';
+import {
+  TOWN_SCENE_CANDIDATE_ATLAS_FILE,
+  TOWN_SCENE_CANDIDATE_ATLAS_KEY,
+  TOWN_SCENE_CANDIDATE_MANIFEST_KEY,
+  TOWN_SCENE_CANDIDATE_REGISTRY_KEY,
+  townSceneCandidateFramesFromManifest,
+  townSceneCandidateRequested,
+} from '../town-scene-candidate';
 
 interface CandidateManifest {
   status: string;
@@ -129,6 +137,11 @@ export class BootScene extends Phaser.Scene {
       this.load.json(LAKE_SHORE_CANDIDATE_MANIFEST_KEY, `${root}/manifest.json`);
       this.load.image(LAKE_SHORE_CANDIDATE_ATLAS_KEY, `${root}/${LAKE_SHORE_CANDIDATE_ATLAS_FILE}`);
     }
+    if (this.townSceneCandidateRequested()) {
+      const root = '/docs/art/candidates/pixel-movement/p6-village-plaza';
+      this.load.json(TOWN_SCENE_CANDIDATE_MANIFEST_KEY, `${root}/manifest.json`);
+      this.load.image(TOWN_SCENE_CANDIDATE_ATLAS_KEY, `${root}/${TOWN_SCENE_CANDIDATE_ATLAS_FILE}`);
+    }
     if (this.worldV2SceneCandidateRequested()) {
       const farmRoot = '/docs/art/candidates/pixel-movement/gate1-world-v2-scene/farm';
       const houseRoot = '/docs/art/candidates/pixel-movement/df-v2-030-house-interior';
@@ -159,6 +172,7 @@ export class BootScene extends Phaser.Scene {
     const pixel32InteractablesPreview = this.registerPixel32InteractablesPreviewAtlas();
     const worldV2SceneCandidate = this.registerWorldV2SceneCandidateAtlases();
     const lakeShoreCandidate = this.registerLakeShoreCandidateAtlas();
+    const townSceneCandidate = this.registerTownSceneCandidateAtlas();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
     registerAnimalTextures(this);
     for (const entry of this.deps.assets.assets) {
@@ -204,6 +218,7 @@ export class BootScene extends Phaser.Scene {
     this.registry.set('gate1-pixel32-interactables-preview', pixel32InteractablesPreview);
     this.registry.set('gate1-world-v2-scene-candidate', worldV2SceneCandidate);
     this.registry.set(LAKE_SHORE_CANDIDATE_REGISTRY_KEY, lakeShoreCandidate);
+    this.registry.set(TOWN_SCENE_CANDIDATE_REGISTRY_KEY, townSceneCandidate);
     this.scene.start('map', sceneDeps);
   }
 
@@ -213,6 +228,14 @@ export class BootScene extends Phaser.Scene {
 
   private lakeShoreCandidateRequested(): boolean {
     return lakeShorePreviewRequested(
+      new URLSearchParams(window.location.search),
+      import.meta.env.DEV,
+      this.pixel32RuntimeRequested(),
+    );
+  }
+
+  private townSceneCandidateRequested(): boolean {
+    return townSceneCandidateRequested(
       new URLSearchParams(window.location.search),
       import.meta.env.DEV,
       this.pixel32RuntimeRequested(),
@@ -263,6 +286,14 @@ export class BootScene extends Phaser.Scene {
     );
     if (!frames || LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES.some((frame) => !frames[frame])) return false;
     this.registerFrames(LAKE_SHORE_CANDIDATE_ATLAS_KEY, frames);
+    return true;
+  }
+
+  private registerTownSceneCandidateAtlas(): boolean {
+    if (!this.townSceneCandidateRequested() || !this.textures.exists(TOWN_SCENE_CANDIDATE_ATLAS_KEY)) return false;
+    const frames = townSceneCandidateFramesFromManifest(this.cache.json.get(TOWN_SCENE_CANDIDATE_MANIFEST_KEY));
+    if (!frames) return false;
+    this.registerFrames(TOWN_SCENE_CANDIDATE_ATLAS_KEY, frames);
     return true;
   }
 
