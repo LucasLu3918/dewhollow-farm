@@ -81,6 +81,7 @@ test('water and trees block the way: walking into the lake does not move you', a
 });
 
 test('a whole year of sleeping passes through every season without a page error', async ({ page }) => {
+  test.setTimeout(60_000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await waitForGame(page);

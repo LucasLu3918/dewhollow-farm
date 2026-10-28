@@ -132,8 +132,11 @@ test('pixel32 candidate cat and quokka follow with four-direction hop sequences'
           capture.frames[art].push(frame);
           capture.last[art] = frame;
         }
-        const complete = (art: 'cat' | 'quokka') => capture.frames[art].some((frame) => frame.endsWith('-land'))
-          && capture.frames[art].some((frame) => frame.endsWith('-idle'));
+        const complete = (art: 'cat' | 'quokka') => {
+          const frames = capture.frames[art];
+          const landingIndex = frames.findIndex((frame) => frame.endsWith('-land'));
+          return landingIndex >= 0 && frames.slice(landingIndex + 1).some((frame) => frame.endsWith('-idle'));
+        };
         if (complete('cat') && complete('quokka')) capture.active = false;
         if (capture.active) requestAnimationFrame(sample);
       };
