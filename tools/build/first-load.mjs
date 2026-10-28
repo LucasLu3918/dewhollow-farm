@@ -32,6 +32,53 @@ function stripBase(url, base) {
 }
 
 /**
+ * Extract the exact offline precache URL list generated into sw.js and resolve
+ * each URL to the response file under dist. The root URL is served as index.html
+ * by the built SPA preview and is retained as its own cache entry.
+ */
+export function precacheEntries(serviceWorkerSource, base) {
+  const match = serviceWorkerSource.match(/\bconst\s+PRECACHE_URLS\s*=\s*(\[[\s\S]*?\])\s*;/);
+  if (!match) throw new Error('dist/sw.js is missing PRECACHE_URLS');
+
+  let urls;
+  try {
+    urls = JSON.parse(match[1]);
+  } catch {
+    throw new Error('dist/sw.js PRECACHE_URLS is not valid JSON');
+  }
+  if (!Array.isArray(urls) || urls.some((url) => typeof url !== 'string')) {
+    throw new Error('dist/sw.js PRECACHE_URLS must contain only string URLs');
+  }
+
+  return urls.map((url) => {
+    if (url === base) return { url, path: 'index.html' };
+    if (!url.startsWith(base)) throw new Error(`Precache URL is outside base ${base}: ${url}`);
+    const encodedPath = url.slice(base.length);
+    let path;
+    try {
+      path = decodeURIComponent(encodedPath);
+    } catch {
+      throw new Error(`Precache URL has invalid encoding: ${url}`);
+    }
+    const segments = path.split('/');
+    if (!path || /[?#\\\u0000-\u001f]/.test(path) || segments.some((segment) => segment === '.' || segment === '..')) {
+      throw new Error(`Precache URL contains an unsafe path: ${url}`);
+    }
+    return { url, path };
+  });
+}
+
+/** Sum each cache URL response, including distinct URLs that resolve to one file. */
+export function summarizePrecache(files) {
+  return {
+    urlCount: files.length,
+    uniquePathCount: new Set(files.map((file) => file.path)).size,
+    raw: files.reduce((total, file) => total + file.raw, 0),
+    gzip: files.reduce((total, file) => total + file.gzip, 0),
+  };
+}
+
+/**
  * 一個 JS chunk 靜態匯入的同目錄 chunk（`from"./x.js"` 或 `import"./x.js"`）。
  * 動態 import()、套件匯入（"phaser" 這類）不算，因為前者不是開機必要、後者不在 dist 裡。
  */

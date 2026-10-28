@@ -7,7 +7,7 @@
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { entryPaths, FIRST_LOAD_BUDGET_BYTES, gzipLength, overBudget, staticChunkImports, summarize } from './first-load.mjs';
+import { entryPaths, FIRST_LOAD_BUDGET_BYTES, gzipLength, overBudget, precacheEntries, staticChunkImports, summarize, summarizePrecache } from './first-load.mjs';
 import { normalizeBase } from '../pwa/vite-plugin.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
@@ -74,11 +74,32 @@ const mb = (n) => `${(n / 1_000_000).toFixed(3)} MB`;
 const kb = (n) => `${(n / 1024).toFixed(1)} KiB`;
 console.log('首次載入大小（原始 / gzip）：');
 for (const key of ['html', 'js', 'css', 'asset', 'other', 'total']) {
-  console.log(`  ${key.padEnd(6)} ${kb(report[key].raw).padStart(10)} / ${kb(report[key].gzip).padStart(10)}`);
+  const totals = key === 'total' ? ` (${report[key].raw} / ${report[key].gzip} bytes)` : '';
+  console.log(`  ${key.padEnd(6)} ${kb(report[key].raw).padStart(10)} / ${kb(report[key].gzip).padStart(10)}${totals}`);
 }
-console.log(`預算：${mb(FIRST_LOAD_BUDGET_BYTES)}（原始位元組）；本次總計 ${mb(report.total.raw)}`);
+console.log(`預算：${mb(FIRST_LOAD_BUDGET_BYTES)}（原始位元組）；本次總計 ${mb(report.total.raw)}（${report.total.raw} bytes）`);
 if (overBudget(report.total.raw)) {
   problems.push(`首次載入 ${mb(report.total.raw)} 超過預算 ${mb(FIRST_LOAD_BUDGET_BYTES)}`);
+}
+
+const swBuffer = load('sw.js');
+if (swBuffer) {
+  try {
+    const entries = precacheEntries(swBuffer.toString('utf8'), base);
+    const precacheFiles = entries.map(({ url, path }) => {
+      const buffer = load(path);
+      return buffer ? { url, path, raw: buffer.length, gzip: gzipLength(buffer) } : undefined;
+    }).filter(Boolean);
+    const precacheReport = summarizePrecache(precacheFiles);
+    console.log('完整 PWA 預快取回應大小（以 dist/sw.js URL 清單計算；每個 URL 各計一次）：');
+    console.log(`  URL 數 ${precacheReport.urlCount}／不同 dist 路徑 ${precacheReport.uniquePathCount}；回應原始大小 ${mb(precacheReport.raw)}（${precacheReport.raw} bytes）；逐檔 gzip 估算 ${mb(precacheReport.gzip)}（${precacheReport.gzip} bytes）`);
+    console.log('  最大 10 個預快取回應（URL / 原始 bytes）：');
+    for (const file of [...precacheFiles].sort((a, b) => b.raw - a.raw).slice(0, 10)) {
+      console.log(`    ${file.url} → ${file.path}: ${file.raw}`);
+    }
+  } catch (error) {
+    problems.push(`無法計算完整 PWA 預快取大小：${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 // PWA 產物
@@ -92,7 +113,6 @@ if (manifestBuffer) {
   }
 }
 
-const swBuffer = load('sw.js');
 if (swBuffer) {
   const sw = swBuffer.toString('utf8');
   if (!sw.includes(`const CACHE_NAME = "dewhollow-farm-v${pkg.version}-`)) {
