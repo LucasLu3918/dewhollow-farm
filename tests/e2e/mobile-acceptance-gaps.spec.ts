@@ -71,7 +71,7 @@ test.describe('DF-MOBILE-007 補充驗收', () => {
 
     const selectors = [
       '#game', '#game canvas', '.status', '#hud-tool', '#hud-seed', '#hud-action',
-      '.touch-move', '.touch-act', '.touch-more-toggle', '#hud-log',
+      '.touch-move', '.touch-act', '.touch-more-toggle', '#hud-log-toggle',
     ];
     for (const selector of selectors) {
       const target = page.locator(selector);

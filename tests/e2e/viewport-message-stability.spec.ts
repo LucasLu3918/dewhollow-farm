@@ -245,6 +245,7 @@ test('訊息歷史可用鍵盤捲動而不移動玩家，且新訊息保留閱�
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+  await page.locator('#hud-log-toggle').click();
   for (let i = 0; i < 6; i += 1) await page.keyboard.press('x');
   const log = page.locator('#hud-log');
   await expect.poll(() => log.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
@@ -270,6 +271,7 @@ test('訊息區有焦點時，移動鍵與遊戲快捷鍵不觸發遊戲', async
   await expect(page.locator('#settings-keys li', { hasText: '上移' }).locator('kbd')).toHaveText('U');
   await page.keyboard.press('Escape');
 
+  await page.locator('#hud-log-toggle').click();
   const log = page.locator('#hud-log');
   await log.focus();
   const before = await page.evaluate(() => ({
@@ -288,6 +290,7 @@ test('訊息達上限時淘汰首則，保留閱讀項目的畫面位置', async
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+  await page.locator('#hud-log-toggle').click();
   for (let i = 0; i < 6; i += 1) await page.keyboard.press('m');
   const log = page.locator('#hud-log');
   await expect(log.locator('li')).toHaveCount(6);
@@ -330,6 +333,7 @@ for (const viewport of [
         await page.locator('#settings-font button', { hasText: /^特大$/ }).click();
         await page.keyboard.press('Escape');
       }
+      await page.locator('#hud-log-toggle').click();
       const before = await viewportSnapshot(page);
       const log = page.locator('#hud-log');
       await log.evaluate((element) => {
