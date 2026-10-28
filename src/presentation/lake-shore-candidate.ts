@@ -10,6 +10,10 @@ export const LAKE_SHORE_CANDIDATE_ATLAS_FILE = 'atlas.png';
 
 export const LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES = [
   'water-open',
+  'water-ripple-small',
+  'water-stone',
+  'water-lily',
+  'water-pebbles',
   'shore-north',
   'shore-east',
   'shore-south',
@@ -60,9 +64,21 @@ export function lakeShoreFrameFor(map: MapDef, x: number, y: number): LakeShoreC
 
   // This fixed water cell gives the composition a static ripple sample. It is not fishing metadata.
   if (x === 2 && y === 5) return 'fishing-ripple';
-  return 'water-open';
+  return waterSurfaceVariationAt(x, y);
 }
 
 function isShore(kind: string | undefined): boolean {
   return kind === 'grass' || kind === 'path';
+}
+
+/** Sparse position-only accents (4 of 31 hash buckets); never seeded from or written to game state. */
+function waterSurfaceVariationAt(x: number, y: number): LakeShoreCandidateFrame {
+  const variant = ((x + 1) * 7 + (y + 3) * 11) % 31;
+  switch (variant) {
+    case 0: return 'water-ripple-small';
+    case 1: return 'water-stone';
+    case 2: return 'water-lily';
+    case 3: return 'water-pebbles';
+    default: return 'water-open';
+  }
 }

@@ -28,6 +28,10 @@ describe('lakeShoreFrameFor', () => {
     expect(lakeShoreFrameFor(lakeMap, 1, 6)).toBe('shore-south'); // path shoreline
     expect(lakeShoreFrameFor(lakeMap, 7, 7)).toBe('shore-west'); // grass shoreline
     expect(lakeShoreFrameFor(lakeMap, 2, 5)).toBe('fishing-ripple'); // static decoration only
+    expect(lakeShoreFrameFor(lakeMap, 12, 0)).toBe('water-ripple-small');
+    expect(lakeShoreFrameFor(lakeMap, 15, 1)).toBe('water-stone');
+    expect(lakeShoreFrameFor(lakeMap, 18, 2)).toBe('water-lily');
+    expect(lakeShoreFrameFor(lakeMap, 8, 0)).toBe('water-pebbles');
     expect(lakeShoreFrameFor(lakeMap, 2, 7)).toBeNull(); // never replaces land
   });
 

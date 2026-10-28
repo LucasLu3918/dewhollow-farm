@@ -116,7 +116,10 @@ test('lake shore frames fit phone and desktop viewports without changing map or 
     rng: 2_654_435_761,
   });
 
-  const expectedFrames = ['shore-south', 'shore-west', 'fishing-ripple'];
+  const expectedFrames = [
+    'shore-south', 'shore-west', 'fishing-ripple',
+    'water-ripple-small', 'water-stone', 'water-lily', 'water-pebbles',
+  ];
   const assertCandidateInViewport = async (): Promise<void> => {
     const mapSprites = await sprites(page);
     const candidateSprites = mapSprites.filter(({ key }) => key === LAKE_ATLAS_KEY);
