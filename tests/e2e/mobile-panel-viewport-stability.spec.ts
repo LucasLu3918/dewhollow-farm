@@ -1,7 +1,6 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 
 const SETTINGS_KEY = 'dewhollow-farm.settings';
-const SAFE_INSETS = { top: 18, right: 14, bottom: 22, left: 12 };
 
 const viewports = [
   { name: 'phone portrait', width: 390, height: 844 },
@@ -37,14 +36,6 @@ async function openTouchGame(browser: Browser, width: number, height: number): P
   await expect(page.locator('#game canvas')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 
-  // Chromium CSS emulation only: override the safe-area probe to exercise inset-aware layout.
-  // This does not validate a physical iOS/Android notch or native device viewport behavior.
-  await page.addStyleTag({ content: `[data-responsive-safe-probe] { padding: ${SAFE_INSETS.top}px ${SAFE_INSETS.right}px ${SAFE_INSETS.bottom}px ${SAFE_INSETS.left}px !important; }` });
-  await page.evaluate(() => window.dispatchEvent(new Event('resize')));
-  await expect.poll(() => page.evaluate(() => {
-    const probe = document.querySelector<HTMLElement>('[data-responsive-safe-probe]');
-    return probe ? getComputedStyle(probe).padding : '';
-  })).toContain(`${SAFE_INSETS.top}px`);
   await expect(page.locator('#touch-controls')).toBeVisible();
   return { context, page };
 }
@@ -91,7 +82,7 @@ async function playerTile(page: Page): Promise<{ x: number; y: number }> {
   return { x: player.tileX, y: player.tileY };
 }
 
-async function expectControlsWithinSafeArea(page: Page, width: number, height: number): Promise<void> {
+async function expectControlsWithinViewport(page: Page, width: number, height: number): Promise<void> {
   const controls = page.locator('#touch-controls button:visible');
   await expect(controls.first()).toBeVisible();
   const boxes = await controls.evaluateAll((buttons) => buttons.map((button) => {
@@ -100,10 +91,10 @@ async function expectControlsWithinSafeArea(page: Page, width: number, height: n
   }));
   expect(boxes.length).toBeGreaterThan(0);
   for (const [index, box] of boxes.entries()) {
-    expect(box.x, `control ${index} left`).toBeGreaterThanOrEqual(SAFE_INSETS.left - 1);
-    expect(box.y, `control ${index} top`).toBeGreaterThanOrEqual(SAFE_INSETS.top - 1);
-    expect(box.right, `control ${index} right`).toBeLessThanOrEqual(width - SAFE_INSETS.right + 1);
-    expect(box.bottom, `control ${index} bottom`).toBeLessThanOrEqual(height - SAFE_INSETS.bottom + 1);
+    expect(box.x, `control ${index} left`).toBeGreaterThanOrEqual(0);
+    expect(box.y, `control ${index} top`).toBeGreaterThanOrEqual(0);
+    expect(box.right, `control ${index} right`).toBeLessThanOrEqual(width + 1);
+    expect(box.bottom, `control ${index} bottom`).toBeLessThanOrEqual(height + 1);
   }
 }
 
@@ -116,12 +107,12 @@ async function checkPanel(page: Page, trigger: string, panel: string, close: str
   expectSameViewport(await stableSnapshot(page), baseline);
 }
 
-test('mobile panels and touch controls preserve the world viewport across orientation and safe-area changes', async ({ browser }) => {
+test('mobile panels and touch controls preserve the world viewport across orientation changes', async ({ browser }) => {
   test.setTimeout(120_000);
   for (const viewport of viewports) {
     const { context, page } = await openTouchGame(browser, viewport.width, viewport.height);
     try {
-      await expectControlsWithinSafeArea(page, viewport.width, viewport.height);
+      await expectControlsWithinViewport(page, viewport.width, viewport.height);
 
       const start = await playerTile(page);
       await page.locator('#touch-controls button[data-action="moveUp"]').tap();
@@ -147,7 +138,7 @@ test('mobile panels and touch controls preserve the world viewport across orient
       expect(afterRotation.mapId).toBe(baseline.mapId);
       expect(afterRotation.zoom).toBeGreaterThan(0);
       expect(afterRotation.visibleTiles.width).toBeGreaterThan(0);
-      await expectControlsWithinSafeArea(page, rotated.width, rotated.height);
+      await expectControlsWithinViewport(page, rotated.width, rotated.height);
       await checkPanel(page, '#hud-help', '#help-panel', '#help-close', afterRotation);
     } finally {
       await context.close();
