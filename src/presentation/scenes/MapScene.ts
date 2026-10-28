@@ -5,6 +5,14 @@ import { tileAt } from '../../domain/world';
 import { isGroundLayer } from '../map-layers';
 import { sceneOverlaysFor } from '../scene-overlays';
 import { forestSceneAssetFor } from '../forest-scene-art';
+import {
+  LAKE_SHORE_CANDIDATE_ATLAS_KEY,
+  LAKE_SHORE_CANDIDATE_REGISTRY_KEY,
+  LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES,
+  lakeShoreCandidateRequested,
+  lakeShoreFrameFor,
+  type LakeShoreCandidateFrame,
+} from '../lake-shore-candidate';
 import { actorDepth, foregroundDepth } from '../actor-depth';
 import { legacyMapRenderPlan, plotRenderPlan } from '../map-render-plan';
 import { plotNeighborMask, resolvePlotVisual } from '../plot-visual';
@@ -478,6 +486,7 @@ export class MapScene extends Phaser.Scene {
   private rig!: CharacterRig;
   private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
   private pixel32CandidateRuntime = false;
+  private lakeShoreCandidate = false;
   private movementStepDurationMs = CONTINUOUS_STEP_DURATION_MS;
   private worldV2SceneCandidate = false;
   private worldV2CandidateSprites: Phaser.GameObjects.Image[] = [];
@@ -674,6 +683,15 @@ export class MapScene extends Phaser.Scene {
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
     this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
     this.pixel32CandidateRuntime = this.registry.get('gate1-pixel32-candidate-runtime') === true;
+    this.lakeShoreCandidate = this.registry.get(LAKE_SHORE_CANDIDATE_REGISTRY_KEY) === true
+      && this.pixel32CandidateRuntime
+      && lakeShoreCandidateRequested(
+        new URLSearchParams(window.location.search),
+        import.meta.env.DEV,
+        this.pixel32CandidateRuntime,
+      )
+      && this.textures.exists(LAKE_SHORE_CANDIDATE_ATLAS_KEY)
+      && LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES.every((frame) => this.textures.get(LAKE_SHORE_CANDIDATE_ATLAS_KEY).has(frame));
     this.worldV2SceneCandidate = this.registry.get('gate1-world-v2-scene-candidate') === true
       && this.pixel32CandidateRuntime
       && this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
@@ -1991,8 +2009,17 @@ export class MapScene extends Phaser.Scene {
     for (const sprite of this.tileSprites) {
       const kind = effectiveKind(sprite.base, changeAt(state.worldChanges, state.mapId, sprite.x, sprite.y));
       const ground = isGroundLayer(kind) ? kind : sprite.ground;
-      const groundKey = forestSceneAssetFor(state.mapId, ground, sprite.x, sprite.y) ?? `tile.${ground}`;
-      if (sprite.groundImage.texture.key !== groundKey) this.applyAsset(sprite.groundImage, groundKey);
+      const map = this.deps.index.map(state.mapId);
+      const lakeFrame = ground === 'water' ? this.lakeShoreCandidateFrameFor(map, sprite.x, sprite.y) : null;
+      const groundKey = lakeFrame ? LAKE_SHORE_CANDIDATE_ATLAS_KEY
+        : forestSceneAssetFor(state.mapId, ground, sprite.x, sprite.y) ?? `tile.${ground}`;
+      if (lakeFrame) {
+        if (sprite.groundImage.texture.key !== groundKey || sprite.groundImage.frame?.name !== lakeFrame) {
+          sprite.groundImage.setTexture(groundKey, lakeFrame).setOrigin(0).setScale(2);
+        }
+      } else if (sprite.groundImage.texture.key !== groundKey) {
+        this.applyAsset(sprite.groundImage, groundKey);
+      }
       if (ground === 'grass' && groundKey === 'tile.grass' && this.shownSeason && sprite.groundImage.texture.key !== PIXEL32_MAP_ATLAS_KEY) {
         sprite.groundImage.setTint(seasonGrassTint(this.shownSeason));
       }
@@ -2031,8 +2058,7 @@ export class MapScene extends Phaser.Scene {
     const map = this.deps.index.map(mapId);
     this.tileSprites = renderMapTileLayers(legacyMapRenderPlan(map), {
       image: (kind, x, y, depth) => {
-        const key = forestSceneAssetFor(mapId, kind, x, y) ?? `tile.${kind}`;
-        return this.image(key, x, y, depth, undefined, depth === 0 ? 'ground' : 'object');
+        return this.mapTileImage(mapId, map, kind, x, y, depth);
       },
       addGround: (image) => this.world.add(image),
       placeObject: (image, kind, y) => this.placeObjectImage(image, kind, y),
@@ -2044,6 +2070,23 @@ export class MapScene extends Phaser.Scene {
     this.drawWorldV2CandidateOverlays(mapId);
     this.drawPixel32CandidateOverlays(mapId);
     this.drawPixel32CandidateInteractables(mapId);
+  }
+
+  private lakeShoreCandidateFrameFor(map: MapDef, x: number, y: number): LakeShoreCandidateFrame | null {
+    if (!this.lakeShoreCandidate || !this.textures.exists(LAKE_SHORE_CANDIDATE_ATLAS_KEY)) return null;
+    return lakeShoreFrameFor(map, x, y);
+  }
+
+  private mapTileImage(mapId: string, map: MapDef, kind: TileKind, x: number, y: number, depth: number): Phaser.GameObjects.Image {
+    const candidateFrame = kind === 'water' ? this.lakeShoreCandidateFrameFor(map, x, y) : null;
+    if (candidateFrame) {
+      return this.add.image(x * TILE_SIZE, y * TILE_SIZE, LAKE_SHORE_CANDIDATE_ATLAS_KEY, candidateFrame)
+        .setOrigin(0)
+        .setScale(2)
+        .setDepth(depth);
+    }
+    const key = forestSceneAssetFor(mapId, kind, x, y) ?? `tile.${kind}`;
+    return this.image(key, x, y, depth, undefined, depth === 0 ? 'ground' : 'object');
   }
 
   private clearSceneOverlays(): void {

@@ -27,6 +27,14 @@ import {
 } from '../candidate-art';
 import { renderProfileFor } from '../pixel-viewport/profiles';
 import {
+  LAKE_SHORE_CANDIDATE_ATLAS_FILE,
+  LAKE_SHORE_CANDIDATE_ATLAS_KEY,
+  LAKE_SHORE_CANDIDATE_MANIFEST_KEY,
+  LAKE_SHORE_CANDIDATE_REGISTRY_KEY,
+  LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES,
+  lakeShoreCandidateRequested as lakeShorePreviewRequested,
+} from '../lake-shore-candidate';
+import {
   candidateFramesFromManifest,
   explicitlyUnapprovedCandidateFramesFromManifest,
   PIXEL32_ANIMATION_ATLAS_KEY,
@@ -116,6 +124,11 @@ export class BootScene extends Phaser.Scene {
       this.load.json(PIXEL32_ANIMATION_MANIFEST_KEY, `${root}/pixel32-animation/manifest.json`);
       this.load.image(PIXEL32_ANIMATION_ATLAS_KEY, `${root}/pixel32-animation/player-4dir.png`);
     }
+    if (this.lakeShoreCandidateRequested()) {
+      const root = '/docs/art/candidates/pixel-movement/p6-lake-shore';
+      this.load.json(LAKE_SHORE_CANDIDATE_MANIFEST_KEY, `${root}/manifest.json`);
+      this.load.image(LAKE_SHORE_CANDIDATE_ATLAS_KEY, `${root}/${LAKE_SHORE_CANDIDATE_ATLAS_FILE}`);
+    }
     if (this.worldV2SceneCandidateRequested()) {
       const farmRoot = '/docs/art/candidates/pixel-movement/gate1-world-v2-scene/farm';
       const houseRoot = '/docs/art/candidates/pixel-movement/df-v2-030-house-interior';
@@ -145,6 +158,7 @@ export class BootScene extends Phaser.Scene {
     const pixel32CandidateAssets = this.registerPixel32CandidateReviewAtlases();
     const pixel32InteractablesPreview = this.registerPixel32InteractablesPreviewAtlas();
     const worldV2SceneCandidate = this.registerWorldV2SceneCandidateAtlases();
+    const lakeShoreCandidate = this.registerLakeShoreCandidateAtlas();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
     registerAnimalTextures(this);
     for (const entry of this.deps.assets.assets) {
@@ -189,11 +203,20 @@ export class BootScene extends Phaser.Scene {
     this.registry.set('gate1-pixel32-candidate-assets', pixel32CandidateAssets);
     this.registry.set('gate1-pixel32-interactables-preview', pixel32InteractablesPreview);
     this.registry.set('gate1-world-v2-scene-candidate', worldV2SceneCandidate);
+    this.registry.set(LAKE_SHORE_CANDIDATE_REGISTRY_KEY, lakeShoreCandidate);
     this.scene.start('map', sceneDeps);
   }
 
   private pixel32RuntimeRequested(): boolean {
     return pixel32CandidateRuntimeRequested(new URLSearchParams(window.location.search), import.meta.env.DEV);
+  }
+
+  private lakeShoreCandidateRequested(): boolean {
+    return lakeShorePreviewRequested(
+      new URLSearchParams(window.location.search),
+      import.meta.env.DEV,
+      this.pixel32RuntimeRequested(),
+    );
   }
 
   private worldV2SceneCandidateRequested(): boolean {
@@ -229,6 +252,17 @@ export class BootScene extends Phaser.Scene {
 
     this.registerFrames(PIXEL32_MAP_ATLAS_KEY, mapFrames);
     this.registerFrames(PIXEL32_ANIMATION_ATLAS_KEY, animationFrames);
+    return true;
+  }
+
+  private registerLakeShoreCandidateAtlas(): boolean {
+    if (!this.lakeShoreCandidateRequested() || !this.textures.exists(LAKE_SHORE_CANDIDATE_ATLAS_KEY)) return false;
+    const frames = candidateFramesFromManifest(
+      this.cache.json.get(LAKE_SHORE_CANDIDATE_MANIFEST_KEY),
+      LAKE_SHORE_CANDIDATE_ATLAS_FILE,
+    );
+    if (!frames || LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES.some((frame) => !frames[frame])) return false;
+    this.registerFrames(LAKE_SHORE_CANDIDATE_ATLAS_KEY, frames);
     return true;
   }
 
