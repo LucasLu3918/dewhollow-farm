@@ -5,11 +5,14 @@
   "status": "candidate",
   "approved": false,
   "source": {
-    "method": "OpenAI imagegen, using the user-approved lake shore concept as a visual direction",
+    "method": "OpenAI imagegen edit of the previous candidate sheet, following the user-approved visual direction",
     "file": "lake-shore-tile-source.png",
-    "sha256": "b5607551e3d8a316077ae5e9a9c1f7ab9a9eb891f53a754fd38e072a3cd9a06d",
-    "dimensions": { "width": 1254, "height": 1254 },
-    "atlasDerivation": "Sixteen 310x310 inner crops, excluding generated grid seams, resized with nearest-neighbor to 32x32 and packed row-major by FFmpeg 9.0.2"
+    "sha256": "e24dc1aa559795ec4c746de9b6ba55acf6febcffb5a0a0756f1a3811666c7628",
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "atlasDerivation": "Sixteen 310x310 inner crops from the 4x4 sheet (cell origins 1, 315, 628, 942), resized with nearest-neighbor to 32x32 and packed row-major by FFmpeg; water-open is flattened to solid #1A6E90 to prevent visible repeated waves."
   },
   "pixelContract": {
     "nativeTileSize": 32,
@@ -24,30 +27,145 @@
     "file": "atlas.png",
     "width": 128,
     "height": 128,
-    "sha256": "d1c958be78fc95b0bec7f478a71c531c49ca3fb166b3aab0a4a4600071fa5d5f"
+    "sha256": "d1f8be22051becf7b4307f51694e230cd27dcb081a9e2f619925cb340a74889f"
   },
   "frames": {
-    "water-open": { "x": 0, "y": 0, "width": 32, "height": 32, "approved": false, "layer": "ground" },
-    "water-ripple-small": { "x": 32, "y": 0, "width": 32, "height": 32, "approved": false, "layer": "ground" },
-    "water-stone": { "x": 64, "y": 0, "width": 32, "height": 32, "approved": false, "layer": "ground" },
-    "water-lily": { "x": 96, "y": 0, "width": 32, "height": 32, "approved": false, "layer": "ground" },
-    "shore-north": { "x": 0, "y": 32, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "shore-east": { "x": 32, "y": 32, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "shore-south": { "x": 64, "y": 32, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "shore-west": { "x": 96, "y": 32, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "shore-corner-nw": { "x": 0, "y": 64, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "shore-basin": { "x": 32, "y": 64, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "shore-shallow-rocks": { "x": 64, "y": 64, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "shore-corner-ne": { "x": 96, "y": 64, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "shore-reeds": { "x": 0, "y": 96, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "water-pebbles": { "x": 32, "y": 96, "width": 32, "height": 32, "approved": false, "layer": "ground" },
-    "shore-reed-clump": { "x": 64, "y": 96, "width": 32, "height": 32, "approved": false, "layer": "shore" },
-    "fishing-ripple": { "x": 96, "y": 96, "width": 32, "height": 32, "approved": false, "layer": "shore" }
+    "water-open": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground"
+    },
+    "water-ripple-small": {
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground"
+    },
+    "water-stone": {
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground"
+    },
+    "water-lily": {
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground"
+    },
+    "shore-north": {
+      "x": 0,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "shore-east": {
+      "x": 32,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "shore-south": {
+      "x": 64,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "shore-west": {
+      "x": 96,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "shore-corner-nw": {
+      "x": 0,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "shore-basin": {
+      "x": 32,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "shore-shallow-rocks": {
+      "x": 64,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "shore-corner-ne": {
+      "x": 96,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "shore-reeds": {
+      "x": 0,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "water-pebbles": {
+      "x": 32,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground"
+    },
+    "shore-reed-clump": {
+      "x": 64,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    },
+    "fishing-ripple": {
+      "x": 96,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore"
+    }
   },
   "approval": {
     "userApprovedDirection": true,
     "exactAssetApproved": false,
     "productionIntegrationAllowed": false,
-    "requiresReviewOf": ["atlas.png", "d1c958be78fc95b0bec7f478a71c531c49ca3fb166b3aab0a4a4600071fa5d5f"]
+    "requiresReviewOf": [
+      "atlas.png",
+      "d1f8be22051becf7b4307f51694e230cd27dcb081a9e2f619925cb340a74889f"
+    ]
   }
 }
