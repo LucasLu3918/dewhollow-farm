@@ -44,9 +44,10 @@
 
 ## 發布狀態與 PR 摘要
 
-- AIPS `publish doctor` 已確認 repository/auth 可用，`main` branch protection 有效，Required Checks 為 `typecheck, unit tests, build` 與 `end-to-end (Chromium)`。目前沒有 PR，故 PR checks 尚無實際狀態。
-- 只讀 `publish diagnose` 對一般分支名 push 命令回報 `PUSH_SOURCE_NOT_EXACT_SHA`；安全下一步是先解除測試／Gate 阻擋，再由 `aips publish prepare` 產生綁定完整候選 SHA 的發布指令並重新觀測 PR checks。此診斷不代表已 push；本輪沒有 push、開 PR 或 merge。
+- AIPS `publish doctor` 已確認 repository/auth 可用，`main` branch protection 有效，Required Checks 為 `typecheck, unit tests, build` 與 `end-to-end (Chromium)`。
+- 本機驗證全綠後，`aips publish prepare` 仍在 `content_scan` 階段以 `CONTENT_SCAN_BLOCKED` 拒絕發布；掃描沒有列出 secret findings，但回報候選分支中的 5 個 `.webm` 證據檔超過掃描大小限制或不能以 UTF-8 讀取，且涵蓋候選檔與歷史。讀取此診斷事件時，AIPS governance audit ledger 未設定，故沒有更細的事件頁可查。這是 fail-closed 政策阻擋；不應略過掃描或由 agent 修改 scanner allowlist。
+- 本輪未 push、開 PR 或 merge。安全下一步是由 AIPS 政策擁有者核准媒體檔掃描／儲存方式並重新驗證；完成後再建立 PR、觀察 Required Checks，待素材與裝置 Gate 關閉後才合併。
 - **建議 PR 標題：** `Complete Dewhollow world-art rebuild evidence and P7 acceptance`
 - **PR 摘要：** 增補 DEV-only 世界／地圖／季節候選、12 張地圖覆蓋、載入與 PWA 預快取容量報告、視覺回歸索引、v23 離線恢復 E2E，以及 viewport／觸控等測試穩定性修正。Production art、device performance 與 CI Required Checks 仍需依 Gate 管理。
 
-**解除發布阻擋的建議順序：** (1) 使用者逐張審核上述 exact asset hashes 與來源／權利；(2) 取得 iOS／Android 實機資料；(3) 建立 PR 並等待 Required Checks 全綠；(4) 依既有合併核准流程 merge。
+**解除發布阻擋的建議順序：** (1) 請 AIPS 政策擁有者決定 `.webm` 候選證據的安全掃描或儲存方式；(2) 使用者逐張審核上述 exact asset hashes 與來源／權利；(3) 取得 iOS／Android 實機資料；(4) 通過掃描後建立 PR 並等待 Required Checks 全綠；(5) 依既有合併核准流程 merge。
