@@ -767,10 +767,56 @@ a:focus-visible {
   font-size: 3.5rem;
 }
 
+.inventory-detail-icon--button {
+  width: 100%;
+  padding: 0.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--ui-frame-radius);
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.inventory-detail-icon--button[aria-expanded="true"] {
+  border-color: var(--ui-frame-line);
+  background: var(--ui-paper);
+  cursor: zoom-out;
+}
+
+.inventory-detail-icon--button:focus-visible {
+  outline: 2px solid var(--ui-selection);
+  outline-offset: 2px;
+}
+
+.inventory-detail-icon--button:disabled {
+  cursor: default;
+}
+
 .inventory-detail-icon img {
   display: block;
   width: min(100%, 5rem);
   height: 5rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.inventory-detail-preview {
+  display: grid;
+  justify-items: center;
+  margin: 0 0 var(--ui-space-sm);
+  padding: var(--ui-space-sm);
+  border: 1px solid var(--ui-frame-line);
+  border-radius: var(--ui-frame-radius);
+  background: var(--ui-paper);
+}
+
+.inventory-detail-preview[hidden] {
+  display: none;
+}
+
+.inventory-detail-preview img {
+  display: block;
+  width: min(100%, 14rem);
+  max-height: 10rem;
   object-fit: contain;
   image-rendering: pixelated;
 }
