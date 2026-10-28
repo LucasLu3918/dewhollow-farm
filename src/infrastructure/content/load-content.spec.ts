@@ -95,8 +95,46 @@ describe('loadContent with shipped content', () => {
       'frost-mushroom',
       'ember-onion',
     ]);
+    expect(pack.crops.slice(0, 3).map(({ id, growthDays, visualGrowthStages }) => ({ id, growthDays, visualGrowthStages }))).toEqual([
+      { id: 'dew-grass', growthDays: 1, visualGrowthStages: [{ day: 0, stage: 'seed' }, { day: 1, stage: 'mature' }] },
+      { id: 'moon-bean', growthDays: 2, visualGrowthStages: [{ day: 0, stage: 'seed' }, { day: 1, stage: 'sprout' }, { day: 2, stage: 'mature' }] },
+      { id: 'sweet-radish', growthDays: 3, visualGrowthStages: [{ day: 0, stage: 'seed' }, { day: 1, stage: 'sprout' }, { day: 2, stage: 'growing-1' }, { day: 3, stage: 'mature' }] },
+    ]);
     expect(pack.maps.map((m) => m.id)).toEqual(['farm', 'village', 'plaza', 'forest', 'lake', 'house', 'house-wing', 'house-full', 'mine-entrance', 'coop', 'pasture', 'cowbarn']);
     expect(pack.start.mapId).toBe('farm');
+  });
+
+  it('keeps optional crop visual milestones backward compatible and rejects invalid timelines', () => {
+    const legacyCrops = crops.map((crop) => {
+      const legacyCrop: Record<string, unknown> = { ...crop };
+      delete legacyCrop.visualGrowthStages;
+      return legacyCrop;
+    });
+    const withoutMilestones = loadContent(shipped({ crops: legacyCrops }));
+    expect(withoutMilestones.pack.crops[0]?.visualGrowthStages).toBeUndefined();
+
+    const withMilestones = loadContent(shipped({
+      crops: crops.map((crop, index) => index === 0 ? {
+        ...crop,
+        visualGrowthStages: [
+          { day: 0, stage: 'seed' },
+          { day: 1, stage: 'mature' },
+        ],
+      } : crop),
+    }));
+    expect(withMilestones.pack.crops[0]?.visualGrowthStages).toEqual([
+      { day: 0, stage: 'seed' }, { day: 1, stage: 'mature' },
+    ]);
+
+    expect(() => loadContent(shipped({
+      crops: crops.map((crop, index) => index === 0 ? {
+        ...crop,
+        visualGrowthStages: [
+          { day: 1, stage: 'seed' },
+          { day: 1, stage: 'mature' },
+        ],
+      } : crop),
+    }))).toThrow();
   });
 
   it('preserves optional item icon metadata from JSON into the loaded manifest', () => {

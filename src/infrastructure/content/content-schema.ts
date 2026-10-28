@@ -8,12 +8,32 @@ import { HEART_EMOTES } from '../../domain/heart-events';
 
 const point = z.object({ x: z.number().int().nonnegative(), y: z.number().int().nonnegative() });
 
+const visualGrowthStageSchema = z.object({
+  day: z.number().int().nonnegative(),
+  stage: z.enum(['seed', 'sprout', 'growing-1', 'growing-2', 'flowering', 'mature']),
+});
+
 const cropSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   seedPrice: z.number().int().nonnegative(),
   growthDays: z.number().int().positive(),
   seasons: z.array(z.enum(SEASONS)).min(1, '作物至少要有一個可種植的季節'),
+  visualGrowthStages: z.array(visualGrowthStageSchema).min(2).optional(),
+}).superRefine((crop, context) => {
+  const stages = crop.visualGrowthStages;
+  if (!stages) return;
+  if (stages[0]?.day !== 0 || stages[0]?.stage !== 'seed') {
+    context.addIssue({ code: 'custom', path: ['visualGrowthStages'], message: '視覺階段必須從第 0 天 seed 開始' });
+  }
+  if (stages.at(-1)?.day !== crop.growthDays || stages.at(-1)?.stage !== 'mature') {
+    context.addIssue({ code: 'custom', path: ['visualGrowthStages'], message: '最後階段必須對應作物成熟日 mature' });
+  }
+  for (let index = 1; index < stages.length; index += 1) {
+    if (stages[index]!.day <= stages[index - 1]!.day) {
+      context.addIssue({ code: 'custom', path: ['visualGrowthStages', index, 'day'], message: '視覺里程碑日期必須嚴格遞增' });
+    }
+  }
 });
 
 const npcSchema = z.object({

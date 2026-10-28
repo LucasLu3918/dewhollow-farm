@@ -19,7 +19,7 @@ const saveEvidence = nodeProcess?.env?.SAVE_GATE1_CANDIDATE_ASSETS_EVIDENCE === 
 test('candidate board follows viewport resize and preserves its hidden state', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto(route);
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.candidateAssetReview().items.length ?? 0)).toBe(22);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.candidateAssetReview().items.length ?? 0)).toBe(37);
   await page.evaluate(() => window.__dewhollow?.pauseScene({ preservePose: false }));
   const initialItems = await page.evaluate(() => window.__dewhollow!.candidateAssetReview().items);
   await page.evaluate(() => window.__dewhollow?.setCandidateAssetReviewVisible(false));
@@ -31,7 +31,7 @@ test('candidate board follows viewport resize and preserves its hidden state', a
     const debug = window.__dewhollow!;
     const height = debug.pixelViewport().actualCanvasResolution.height;
     const items = debug.candidateAssetReview().items;
-    return items.length === 22 && items.every((item) => item.y + 16 * item.scale <= height);
+    return items.length === 37 && items.every((item) => item.y + 16 * item.scale <= height);
   })).toBe(true);
   await expect.poll(() => page.evaluate(() => window.__dewhollow!.candidateAssetReview().visible)).toBe(false);
   await page.evaluate(() => window.__dewhollow?.setCandidateAssetReviewVisible(true));
@@ -103,10 +103,15 @@ test('captures DEV-only crop, pet, tool, and object candidates across five viewp
             weather: 'sunny', forecast: 'sunny', energy: { current: 100, max: 100 }, gold: 600,
             mapId: 'farm', player: { x: 5, y: 5, facing: 'down' },
             plots: {
-              '3,6': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 } },
-              '4,6': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 1 } },
-              '5,6': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } },
-              '6,6': { watered: false, dryDays: 0, crop: { cropId: 'moon-bean', growthDays: 2 } },
+              '3,6': { watered: false, dryDays: 0, crop: { cropId: 'dew-grass', growthDays: 0 } },
+              '4,6': { watered: true, dryDays: 0, crop: { cropId: 'dew-grass', growthDays: 1 } },
+              '5,6': { watered: false, dryDays: 0, crop: { cropId: 'moon-bean', growthDays: 0 } },
+              '6,6': { watered: true, dryDays: 0, crop: { cropId: 'moon-bean', growthDays: 1 } },
+              '7,6': { watered: false, dryDays: 0, crop: { cropId: 'moon-bean', growthDays: 2 } },
+              '8,6': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 } },
+              '9,6': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 1 } },
+              '10,6': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 2 } },
+              '11,6': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } },
             },
             inventory: { capacity: 24, stacks: [] }, shipBox: { entries: [] }, flags: {}, rng: 12345,
             tool: 'hoe', toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 },
@@ -122,7 +127,7 @@ test('captures DEV-only crop, pet, tool, and object candidates across five viewp
     await page.reload();
     await expect(page.locator('#game canvas')).toBeVisible();
     await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
-    await expect.poll(() => page.evaluate(() => window.__dewhollow?.candidateAssetReview().items.length ?? 0)).toBe(22);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.candidateAssetReview().items.length ?? 0)).toBe(37);
     await page.evaluate(() => window.__dewhollow?.pauseScene({ preservePose: false }));
 
     const state = await page.evaluate(() => {
@@ -141,7 +146,8 @@ test('captures DEV-only crop, pet, tool, and object candidates across five viewp
     });
 
     const expectedFrames = [
-      'seed', 'sprout', 'mature',
+      ...['dew-grass', 'moon-bean', 'sweet-radish'].flatMap((cropId) =>
+        ['seed', 'sprout', 'growing-1', 'growing-2', 'flowering', 'mature'].map((stage) => `crop.${cropId}.${stage}`)),
       'cat-down-idle', 'cat-up-idle', 'cat-left-idle', 'cat-right-idle',
       'quokka-down-idle', 'quokka-up-idle', 'quokka-left-idle', 'quokka-right-idle',
       'tool-hoe', 'tool-can', 'tool-seedbag', 'tool-axe', 'tool-pick', 'tool-rod', 'tool-sickle',
@@ -158,15 +164,19 @@ test('captures DEV-only crop, pet, tool, and object candidates across five viewp
     expect(state.review.items.every((item) => item.y + 16 * item.scale <= state.viewport.actualCanvasResolution.height),
       `${viewport.id} DPR${dpr}: ${JSON.stringify({ canvas: state.viewport.actualCanvasResolution, items: state.review.items.map(({ frame, y, scale }) => ({ frame, y, scale })) })}`).toBe(true);
     expect(state.review.items.every((item) => item.y - 16 * item.scale >= 8)).toBe(true);
-    expect(state.review.items.every((item) => item.labelY + 20 <= item.y - 16 * item.scale)).toBe(true);
+    expect(state.review.items.every((item) => item.labelX + item.labelWidth <= item.x - 16 * item.scale),
+      `${viewport.id} DPR${dpr}: review label overlaps its first sprite: ${JSON.stringify(state.review.items.filter((item) => item.labelX + item.labelWidth > item.x - 16 * item.scale).map(({ frame, labelWidth, x, scale }) => ({ frame, labelWidth, x, scale })))}`).toBe(true);
     const rowCenters = [...new Set(state.review.items.map((item) => item.y))];
-    expect(rowCenters).toHaveLength(5);
-    expect(rowCenters.slice(1).every((center, index) => center - rowCenters[index]! >= 32)).toBe(true);
+    expect(rowCenters).toHaveLength(7);
+    expect(rowCenters.slice(1).every((center, index) => center - rowCenters[index]! >= 16)).toBe(true);
     expect(state.review.items.every((item) => item.scale > 0 && item.texture.startsWith('gate1-pixel32-'))).toBe(true);
-    expect(state.sprites.filter((sprite) => sprite.key === 'gate1-pixel32-crops-atlas').map((sprite) => sprite.frame))
-      .toEqual(expect.arrayContaining(['seed', 'sprout', 'mature']));
+    const farmCropSprites = state.sprites.filter((sprite) => sprite.key === 'gate1-pixel32-crops-atlas' && sprite.width === 64 && sprite.height === 64);
+    expect(farmCropSprites.map((sprite) => sprite.frame)).toEqual([
+      'crop.dew-grass.seed', 'crop.dew-grass.mature',
+      'crop.moon-bean.seed', 'crop.moon-bean.sprout', 'crop.moon-bean.mature',
+      'crop.sweet-radish.seed', 'crop.sweet-radish.sprout', 'crop.sweet-radish.growing-1', 'crop.sweet-radish.mature',
+    ]);
     expect(state.sprites.some((sprite) => sprite.key === 'gate1-pixel32-crops-atlas' && sprite.frame === 'cropSprout')).toBe(false);
-    expect(state.sprites.some((sprite) => sprite.key === 'crop.moon-bean')).toBe(true);
     expect(state.productionTextures).toEqual([{ width: 96, height: 96 }, { width: 96, height: 96 }]);
     expect(state.canvasCss).toEqual({ x: expect.any(Number), y: expect.any(Number), width: expect.any(Number), height: expect.any(Number) });
     expect(state.review.limitations.join(' ')).toContain('static directional samples');
@@ -200,7 +210,11 @@ test('captures DEV-only crop, pet, tool, and object candidates across five viewp
     const farmCropFrames = await page.evaluate(() => window.__dewhollow?.sprites()
       .filter((sprite) => sprite.key === 'gate1-pixel32-crops-atlas')
       .map((sprite) => sprite.frame) ?? []);
-    expect(farmCropFrames).toEqual(expect.arrayContaining(['seed', 'sprout', 'mature']));
+    expect(farmCropFrames).toEqual(expect.arrayContaining([
+      'crop.dew-grass.seed', 'crop.dew-grass.mature', 'crop.moon-bean.seed', 'crop.moon-bean.sprout',
+      'crop.moon-bean.mature', 'crop.sweet-radish.seed', 'crop.sweet-radish.sprout',
+      'crop.sweet-radish.growing-1', 'crop.sweet-radish.mature',
+    ]));
     const farmScreenshot = await page.screenshot({
       path: saveEvidence ? path.join(root, 'screenshots', `${viewport.id}-dpr-${dpr}-farm-crops.png`) : undefined,
       animations: 'disabled',
@@ -236,7 +250,7 @@ test('captures DEV-only crop, pet, tool, and object candidates across five viewp
       captureProvider: 'Playwright Chromium desktop context',
       baseRevision,
       route,
-      claim: 'DEV-only Pixel32 visual contact sheet for three crop stages, cat/quokka cardinal idle frames, held-preview tools, and static door/shipbox states; sweet-radish candidate is also rendered in the fixed farm save.',
+      claim: 'DEV-only Pixel32 review board shows six candidate growth stages for the first three content crops and the existing pet, tool, and object samples; saved farm plots exercise every reachable configured crop milestone at fixed 64×64 world bounds.',
       candidateState: {
         manifests: [cropManifest, petsManifest, interactablesManifest].map(({ status, approved }) => ({ status, approved })),
         status: 'candidate',
@@ -244,10 +258,13 @@ test('captures DEV-only crop, pet, tool, and object candidates across five viewp
       },
       testedSourceFiles,
       inputs: evidenceInputs,
-      visibleFrames: state.review.items.map((item) => ({
-        ...item,
-        frameSha256: frameHashes[item.group as keyof typeof frameHashes][item.frame]?.sha256 ?? null,
-      })),
+      visibleFrames: state.review.items.map((item) => {
+        const manifestGroup = item.group.startsWith('crop:') ? 'crops' : item.group;
+        return {
+          ...item,
+          frameSha256: frameHashes[manifestGroup as keyof typeof frameHashes]?.[item.frame]?.sha256 ?? null,
+        };
+      }),
       viewport: { id: viewport.id, width: viewport.width, height: viewport.height, dpr, browserDpr: await page.evaluate(() => window.devicePixelRatio), screenshotScale: 'css', canvasCss: state.canvasCss, canvasResolution: state.viewport.actualCanvasResolution, renderResolution: state.viewport.renderResolution, camera: state.camera },
       productionIsolation: { formalPetTextures: state.productionTextures, candidateTextures: [...new Set(state.review.items.map((item) => item.texture))] },
       requests: [...new Set(candidateRequests)],

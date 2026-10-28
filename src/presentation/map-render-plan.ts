@@ -1,4 +1,4 @@
-import type { GroundKind, MapDef, TileKind } from '../domain/content';
+import type { CropDef, CropVisualGrowthStage, GroundKind, MapDef, TileKind } from '../domain/content';
 import type { PlotMap } from '../domain/farm';
 import { tileAt } from '../domain/world';
 import { groundLayerFor, isGroundLayer } from './map-layers';
@@ -21,7 +21,7 @@ export interface MapRenderPlan {
   tiles: MapRenderTile[];
 }
 
-export type PlotRenderStage = 'seed' | 'sprout' | 'mature';
+export type PlotRenderStage = CropVisualGrowthStage;
 
 export interface PlotRenderTile {
   x: number;
@@ -30,8 +30,9 @@ export interface PlotRenderTile {
   crop?: {
     cropId: string;
     stage: PlotRenderStage;
-    scale: number;
-    alpha: number;
+    /** Legacy visual fallback only; configured crop milestones use a fixed native sprite. */
+    scale?: number;
+    alpha?: number;
   };
 }
 
@@ -58,7 +59,7 @@ export function legacyMapRenderPlan(map: MapDef): MapRenderPlan {
 export function plotRenderPlan(
   plots: PlotMap,
   map: Pick<MapDef, 'width' | 'height'>,
-  growthDaysForCrop: (cropId: string) => number,
+  cropForCropId: (cropId: string) => Pick<CropDef, 'id' | 'growthDays' | 'visualGrowthStages'>,
 ): PlotRenderTile[] {
   const result: PlotRenderTile[] = [];
   for (const [key, plot] of Object.entries(plots)) {
@@ -68,14 +69,26 @@ export function plotRenderPlan(
 
     const tile: PlotRenderTile = { x, y, watered: plot.watered };
     if (plot.crop) {
-      const ratio = Math.min(1, plot.crop.growthDays / growthDaysForCrop(plot.crop.cropId));
-      const stage: PlotRenderStage = ratio < 0.25 ? 'seed' : ratio < 0.7 ? 'sprout' : 'mature';
-      tile.crop = {
-        cropId: plot.crop.cropId,
-        stage,
-        scale: 0.5 + 0.5 * ratio,
-        alpha: 0.5 + 0.5 * ratio,
-      };
+      const crop = cropForCropId(plot.crop.cropId);
+      const milestones = crop.visualGrowthStages;
+      if (milestones?.length) {
+        const growthDay = Math.min(crop.growthDays, Math.max(0, plot.crop.growthDays));
+        let milestone = milestones[0]!;
+        for (const candidate of milestones) {
+          if (candidate.day > growthDay) break;
+          milestone = candidate;
+        }
+        tile.crop = { cropId: plot.crop.cropId, stage: milestone.stage };
+      } else {
+        const ratio = Math.min(1, plot.crop.growthDays / crop.growthDays);
+        const stage: PlotRenderStage = ratio < 0.25 ? 'seed' : ratio < 0.7 ? 'sprout' : 'mature';
+        tile.crop = {
+          cropId: plot.crop.cropId,
+          stage,
+          scale: 0.5 + 0.5 * ratio,
+          alpha: 0.5 + 0.5 * ratio,
+        };
+      }
     }
     result.push(tile);
   }

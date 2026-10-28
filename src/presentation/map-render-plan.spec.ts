@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { MapDef } from '../domain/content';
+import type { CropDef, MapDef } from '../domain/content';
 import type { PlotMap } from '../domain/farm';
 import { legacyMapRenderPlan, plotRenderPlan } from './map-render-plan';
 
@@ -51,7 +51,7 @@ describe('legacyMapRenderPlan', () => {
 });
 
 describe('plotRenderPlan', () => {
-  it('keeps map bounds and the legacy seed/sprout/mature growth thresholds', () => {
+  it('uses per-crop visual milestones and keeps candidate sprites at native scale', () => {
     const map: MapDef = {
       id: 'farm',
       name: 'farm',
@@ -63,15 +63,31 @@ describe('plotRenderPlan', () => {
     };
     const plots: PlotMap = {
       '0,0': { watered: false, crop: { cropId: 'radish', growthDays: 1 }, dryDays: 0 },
-      '1,0': { watered: true, crop: { cropId: 'radish', growthDays: 3 }, dryDays: 0 },
+      '1,0': { watered: true, crop: { cropId: 'radish', growthDays: 2 }, dryDays: 0 },
       '2,0': { watered: false, crop: { cropId: 'radish', growthDays: 8 }, dryDays: 0 },
       '3,0': { watered: false, crop: null, dryDays: 0 },
     };
 
-    expect(plotRenderPlan(plots, map, () => 10)).toEqual([
-      { x: 0, y: 0, watered: false, crop: { cropId: 'radish', stage: 'seed', scale: 0.55, alpha: 0.55 } },
-      { x: 1, y: 0, watered: true, crop: { cropId: 'radish', stage: 'sprout', scale: 0.65, alpha: 0.65 } },
-      { x: 2, y: 0, watered: false, crop: { cropId: 'radish', stage: 'mature', scale: 0.9, alpha: 0.9 } },
+    const crops: Record<string, Pick<CropDef, 'id' | 'growthDays' | 'visualGrowthStages'>> = {
+      'dew-grass': { id: 'dew-grass', growthDays: 1, visualGrowthStages: [{ day: 0, stage: 'seed' }, { day: 1, stage: 'mature' }] },
+      'moon-bean': { id: 'moon-bean', growthDays: 2, visualGrowthStages: [{ day: 0, stage: 'seed' }, { day: 1, stage: 'sprout' }, { day: 2, stage: 'mature' }] },
+      radish: { id: 'radish', growthDays: 3, visualGrowthStages: [{ day: 0, stage: 'seed' }, { day: 1, stage: 'sprout' }, { day: 2, stage: 'growing-1' }, { day: 3, stage: 'mature' }] },
+    };
+    expect(plotRenderPlan(plots, map, (cropId) => crops[cropId]!)).toEqual([
+      { x: 0, y: 0, watered: false, crop: { cropId: 'radish', stage: 'sprout' } },
+      { x: 1, y: 0, watered: true, crop: { cropId: 'radish', stage: 'growing-1' } },
+      { x: 2, y: 0, watered: false, crop: { cropId: 'radish', stage: 'mature' } },
     ]);
+  });
+
+  it('keeps the legacy fallback for crops without optional visual milestones', () => {
+    const plots: PlotMap = {
+      '0,0': { watered: false, crop: { cropId: 'legacy', growthDays: 2 }, dryDays: 0 },
+    };
+    const map: MapDef = { id: 'farm', name: 'farm', width: 1, height: 1, rows: ['g'], legend: { g: { kind: 'grass' } }, spawn: { x: 0, y: 0 } };
+
+    expect(plotRenderPlan(plots, map, () => ({ id: 'legacy', growthDays: 4 }))[0]?.crop).toEqual({
+      cropId: 'legacy', stage: 'sprout', scale: 0.75, alpha: 0.75,
+    });
   });
 });

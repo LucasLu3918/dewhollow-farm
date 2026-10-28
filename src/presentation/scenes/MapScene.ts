@@ -1022,8 +1022,9 @@ export class MapScene extends Phaser.Scene {
   }
 
   private resolveCandidateFrame(assetId: string, cropStage?: CandidateCropStage) {
-    if (this.pixel32CandidateAssets && assetId === 'crop.sweet-radish' && this.textures.exists(PIXEL32_CROPS_ATLAS_KEY)) {
-      const frame = cropStage ?? 'mature';
+    if (this.pixel32CandidateAssets && assetId.startsWith('crop.') && this.textures.exists(PIXEL32_CROPS_ATLAS_KEY)) {
+      const cropId = assetId.slice('crop.'.length);
+      const frame = `crop.${cropId}.${cropStage ?? 'mature'}`;
       const texture = this.textures.get(PIXEL32_CROPS_ATLAS_KEY);
       if (texture.has(frame)) return { atlas: PIXEL32_CROPS_ATLAS_KEY, frame, scale: 2, candidate: '16bit' as const };
     }
@@ -1069,18 +1070,20 @@ export class MapScene extends Phaser.Scene {
       color: '#f4d998', fontFamily: 'monospace', fontSize: '16px', fontStyle: 'bold',
     }));
 
-    const rowTopInset = 32;
-    const rowStride = Math.max(32, (boardHeight - rowTopInset - 16) / 5);
-    const rowSpriteScaleCap = Math.min(1.5, Math.max(0.5, (rowStride - 30) / 32));
+    const rowTopInset = 24;
+    const rowStride = Math.max(16, (boardHeight - rowTopInset - 8) / 7);
+    const rowSpriteScaleCap = Math.min(1.5, Math.max(0.2, (rowStride - 8) / 32));
     const addRow = (group: string, label: string, frames: string[], texture: string, rowTop: number): void => {
       const labelY = rowTop;
       const labelText = this.add.text(12, labelY, label, { color: '#edf0d8', fontFamily: 'monospace', fontSize: '13px' });
       board.add(labelText);
-      const firstItemX = Math.min(176, Math.max(72, boardWidth * 0.4));
+      const labelClearance = 16 * rowSpriteScaleCap + 4;
+      const firstItemX = Math.min(boardWidth - 16, Math.max(72, labelText.x + labelText.width + labelClearance));
       const available = Math.max(32, boardWidth - firstItemX - 16);
-      const scale = Math.min(rowSpriteScaleCap, available / (frames.length * 32 + Math.max(0, frames.length - 1) * 8));
-      const step = 32 * scale + 8;
-      const centerY = rowTop + 22 + 16 * scale;
+      const gap = Math.min(8, available / (frames.length * 3));
+      const scale = Math.min(rowSpriteScaleCap, (available - Math.max(0, frames.length - 1) * gap) / (frames.length * 32));
+      const step = 32 * scale + gap;
+      const centerY = rowTop + rowStride / 2;
       frames.forEach((frame, index) => {
         const x = firstItemX + index * step;
         const image = this.add.image(x, centerY, texture, frame).setOrigin(0.5, 0.5).setScale(scale);
@@ -1090,11 +1093,21 @@ export class MapScene extends Phaser.Scene {
     };
 
     const rowY = (index: number) => rowTopInset + index * rowStride;
-    addRow('crops', 'CROPS  ·  radish growth', ['seed', 'sprout', 'mature'], PIXEL32_CROPS_ATLAS_KEY, rowY(0));
-    addRow('cat', 'CAT  ·  directional idle', ['cat-down-idle', 'cat-up-idle', 'cat-left-idle', 'cat-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(1));
-    addRow('quokka', 'QUOKKA  ·  directional idle', ['quokka-down-idle', 'quokka-up-idle', 'quokka-left-idle', 'quokka-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(2));
-    addRow('tools', 'TOOLS  ·  held preview', ['tool-hoe', 'tool-can', 'tool-seedbag', 'tool-axe', 'tool-pick', 'tool-rod', 'tool-sickle'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(3));
-    addRow('objects', 'OBJECTS  ·  static states', ['door-closed', 'door-open', 'shipbox-closed', 'shipbox-open'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(4));
+    const cropStages = ['seed', 'sprout', 'growing-1', 'growing-2', 'flowering', 'mature'] as const;
+    const cropRow = (cropId: string, label: string, rowIndex: number): void => addRow(
+      `crop:${cropId}`,
+      `CROP  ·  ${label}`,
+      cropStages.map((stage) => `crop.${cropId}.${stage}`),
+      PIXEL32_CROPS_ATLAS_KEY,
+      rowY(rowIndex),
+    );
+    cropRow('dew-grass', 'DEW-GRASS', 0);
+    cropRow('moon-bean', 'MOON-BEAN', 1);
+    cropRow('sweet-radish', 'SWEET-RADISH', 2);
+    addRow('cat', 'CAT  ·  directional idle', ['cat-down-idle', 'cat-up-idle', 'cat-left-idle', 'cat-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(3));
+    addRow('quokka', 'QUOKKA  ·  directional idle', ['quokka-down-idle', 'quokka-up-idle', 'quokka-left-idle', 'quokka-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(4));
+    addRow('tools', 'TOOLS  ·  held preview', ['tool-hoe', 'tool-can', 'tool-seedbag', 'tool-axe', 'tool-pick', 'tool-rod', 'tool-sickle'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(5));
+    addRow('objects', 'OBJECTS  ·  static states', ['door-closed', 'door-open', 'shipbox-closed', 'shipbox-open'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(6));
   }
 
   /** 虛擬按鍵直接送出語意動作；按鍵重綁只影響鍵盤 adapter。 */
@@ -2262,7 +2275,12 @@ export class MapScene extends Phaser.Scene {
       else delete shown[key];
     }
 
-    const plans = plotRenderPlan(shown, map, (cropId) => this.deps.index.crop(cropId).growthDays);
+    const plans = plotRenderPlan(shown, map, (cropId) => {
+      const crop = this.deps.index.crop(cropId);
+      // Growth-stage candidates stay behind the exact DEV asset-review opt-in;
+      // legacy and ordinary render profiles retain their existing presentation.
+      return this.pixel32CandidateAssets ? crop : { ...crop, visualGrowthStages: undefined };
+    });
     renderPlotLayer(plans, {
       soil: (plot) => {
         const state = shown[plotKey(plot.x, plot.y)];
@@ -2291,11 +2309,13 @@ export class MapScene extends Phaser.Scene {
       crop: (plot) => {
         const crop = plot.crop!;
         const sprite = this.image(`crop.${crop.cropId}`, plot.x, plot.y, 2, crop.stage);
-        const displayScale = sprite.texture.key === 'gate1-candidate-atlas' || sprite.texture.key === PIXEL32_CROPS_ATLAS_KEY
-          ? sprite.scaleX * crop.scale
-          : crop.scale;
-        sprite.setScale(displayScale);
-        sprite.setAlpha(crop.alpha);
+        if (crop.scale !== undefined) {
+          const displayScale = sprite.texture.key === 'gate1-candidate-atlas' || sprite.texture.key === PIXEL32_CROPS_ATLAS_KEY
+            ? sprite.scaleX * crop.scale
+            : crop.scale;
+          sprite.setScale(displayScale);
+          sprite.setAlpha(crop.alpha ?? 1);
+        }
         sprite.setData('plot', true);
         return sprite;
       },
