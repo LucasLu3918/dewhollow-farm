@@ -90,7 +90,8 @@ import { ContinuousFarmActions, farmActionTarget } from '../continuous-farm-acti
 import { renderProfileFor } from '../pixel-viewport/profiles';
 import { ViewportCoordinator } from '../viewport/viewport-coordinator';
 import { resolveCandidateArt, type CandidateCropStage, type CandidateId } from '../candidate-art';
-import { candidateFrameAt, type CandidateDirection } from '../candidate-sprite-animator';
+import { candidateFrameAtGaitPhase, type CandidateDirection } from '../candidate-sprite-animator';
+import { candidateMovementStepDurationMs } from '../candidate-movement-profile';
 import {
   PIXEL32_ANIMATION_ATLAS_KEY,
   PIXEL32_CROPS_ATLAS_KEY,
@@ -346,7 +347,18 @@ declare global {
         actualCanvasResolution: { width: number; height: number };
         cameraZoom: number;
       };
-      movement(): { heldDirection: Direction | null; blockedDirection: Direction | null; moving: boolean; pending: boolean; queuedTaps: number; tile: { x: number; y: number } };
+      movement(): {
+        heldDirection: Direction | null;
+        blockedDirection: Direction | null;
+        moving: boolean;
+        pending: boolean;
+        queuedTaps: number;
+        tile: { x: number; y: number };
+        stepProgress: number | null;
+        stepElapsedMs: number | null;
+        stepDurationMs: number;
+        gaitPhase: number;
+      };
       worldGeneration(): number;
       responsiveLayout(): ReturnType<ResponsiveLayoutController['get']>;
       interaction(): ReturnType<typeof resolveInteraction>;
@@ -450,6 +462,7 @@ export class MapScene extends Phaser.Scene {
   private rig!: CharacterRig;
   private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
   private pixel32CandidateRuntime = false;
+  private movementStepDurationMs = CONTINUOUS_STEP_DURATION_MS;
   private worldV2SceneCandidate = false;
   private worldV2CandidateSprites: Phaser.GameObjects.Image[] = [];
   private pixel32CandidateAssets = false;
@@ -679,11 +692,16 @@ export class MapScene extends Phaser.Scene {
     } else {
       this.pixel32CandidateRuntime = false;
     }
+    this.movementStepDurationMs = candidateMovementStepDurationMs(
+      import.meta.env.DEV,
+      this.pixel32CandidateRuntime,
+      new URLSearchParams(window.location.search),
+    );
     const initialPlayer = this.deps.session.state.player;
     this.movementScheduler = createMovementScheduler({ x: initialPlayer.x, y: initialPlayer.y }, {
       initialFacing: initialPlayer.facing,
-      stepDurationMs: CONTINUOUS_STEP_DURATION_MS,
-      gaitCycleMs: CONTINUOUS_STEP_DURATION_MS * 2,
+      stepDurationMs: this.movementStepDurationMs,
+      gaitCycleMs: this.movementStepDurationMs * 2,
     });
     this.createFollowers();
     this.setupCamera();
@@ -801,6 +819,10 @@ export class MapScene extends Phaser.Scene {
           pending: Boolean(this.movementScheduler?.pendingRequest),
           queuedTaps: this.movementScheduler?.queuedTaps.length ?? 0,
           tile: { ...this.deps.session.state.player },
+          stepProgress: this.movementScheduler?.step?.progress ?? null,
+          stepElapsedMs: this.movementScheduler?.step?.elapsedMs ?? null,
+          stepDurationMs: this.movementScheduler?.stepDurationMs ?? this.movementStepDurationMs,
+          gaitPhase: this.movementScheduler?.gaitPhase ?? 0,
         }),
         worldGeneration: () => this.worldGeneration,
         responsiveLayout: () => this.deps.responsive.get(),
@@ -1193,8 +1215,8 @@ export class MapScene extends Phaser.Scene {
         // A door can change coordinates while keeping the same map ID (the greenhouse is a farm area).
         this.movementScheduler = createMovementScheduler({ x: player.x, y: player.y }, {
           initialFacing: player.facing,
-          stepDurationMs: CONTINUOUS_STEP_DURATION_MS,
-          gaitCycleMs: CONTINUOUS_STEP_DURATION_MS * 2,
+          stepDurationMs: this.movementStepDurationMs,
+          gaitCycleMs: this.movementStepDurationMs * 2,
         });
         const stand = standOf(player.x, player.y);
         this.rig.root.setPosition(stand.x, stand.y);
@@ -1735,8 +1757,8 @@ export class MapScene extends Phaser.Scene {
       this.cancelMovementInput();
       this.movementScheduler = createMovementScheduler({ x: state.player.x, y: state.player.y }, {
         initialFacing: state.player.facing,
-        stepDurationMs: CONTINUOUS_STEP_DURATION_MS,
-        gaitCycleMs: CONTINUOUS_STEP_DURATION_MS * 2,
+        stepDurationMs: this.movementStepDurationMs,
+        gaitCycleMs: this.movementStepDurationMs * 2,
       });
       this.renderedMapId = map.id;
       this.drawMap(map.id);
@@ -2354,7 +2376,7 @@ export class MapScene extends Phaser.Scene {
     if (this.pixel32CandidateSprite) {
       const direction = (this.movementScheduler?.step?.direction ?? this.movementScheduler?.facing ?? this.shownFacing) as CandidateDirection;
       const motion = this.movementScheduler?.step ? 'walk' : 'idle';
-      const frame = candidateFrameAt(direction, motion, time).frame;
+      const frame = candidateFrameAtGaitPhase(direction, motion, this.movementScheduler?.gaitPhase ?? 0).frame;
       if (this.pixel32CandidateSprite.frame.name !== frame) this.pixel32CandidateSprite.setFrame(frame);
     }
     this.moveWearBadge();

@@ -29,8 +29,6 @@ export function candidateToolImpactCrossed(previousProgress: number, currentProg
   return previousProgress < TOOL_IMPACT_AT && currentProgress >= TOOL_IMPACT_AT;
 }
 
-const WALK_CYCLE_MS = 220;
-const WALK_FRAME_MS = 55;
 const TOOL_IMPACT_AT = 0.55;
 const TAU = Math.PI * 2;
 
@@ -42,20 +40,19 @@ export function nonNegativeElapsedMs(startedAtMs: number, sampledAtMs: number): 
   return Math.max(0, sampledAtMs - startedAtMs);
 }
 
-/** 取得候選 sheet 的影格；四方向各有 idle、兩個接地姿勢與 passing 姿勢。 */
-export function candidateFrameAt(
+/** 依 movement scheduler 的標準化步態相位選候選影格，不另開固定毫秒計時器。 */
+export function candidateFrameAtGaitPhase(
   direction: CandidateDirection,
   motion: CandidateMotion,
-  elapsedMs: number,
+  gaitPhase: number,
 ): CandidateFrame {
-  if (!Number.isFinite(elapsedMs) || elapsedMs < 0) {
-    throw new RangeError(`候選動畫時間必須是非負有限數：${elapsedMs}`);
+  if (!Number.isFinite(gaitPhase) || gaitPhase < 0 || gaitPhase >= 1) {
+    throw new RangeError(`候選步態相位必須在 0 到 1 之間（不含 1）：${gaitPhase}`);
   }
 
   if (motion === 'idle') return { frame: `${direction}-idle`, index: 0 };
 
-  const phase = elapsedMs % WALK_CYCLE_MS;
-  const index = Math.floor(phase / WALK_FRAME_MS) as CandidateFrame['index'];
+  const index = Math.floor(gaitPhase * 4) as CandidateFrame['index'];
   const names = ['contact-a', 'passing', 'contact-b', 'passing'] as const;
   return { frame: `${direction}-${names[index]}`, index };
 }
