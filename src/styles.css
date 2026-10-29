@@ -1665,6 +1665,14 @@ a:focus-visible {
   }
 }
 
+/* 手機橫向時 viewport 寬度可能超過 600px；背包觸控目標仍維持 48px。 */
+@media (max-width: 900px) {
+  .inventory-panel button {
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+}
+
 /*
  * 觸控裝置：操作提示（#hud-hint）是給鍵盤看的，改用虛擬按鍵時隱藏；說明頁仍有完整按鍵說明。
  */
