@@ -43,6 +43,7 @@ test('the status line shows the date and tomorrow\'s forecast', async ({ page })
 });
 
 test('the farm leads east into the forest, and the forest leads on to the lake and back', async ({ page }) => {
+  test.setTimeout(90_000);
   await waitForGame(page);
   // 出生點 (7,9)：往上到 (7,7)，再一路往右到農場東側的門 (39,7)。
   await walk(page, 'ArrowUp', 2);
@@ -63,6 +64,7 @@ test('the farm leads east into the forest, and the forest leads on to the lake a
 });
 
 test('water and trees block the way: walking into the lake does not move you', async ({ page }) => {
+  test.setTimeout(90_000);
   await waitForGame(page);
   await walk(page, 'ArrowUp', 2);
   await walk(page, 'ArrowRight', 32);

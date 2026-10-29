@@ -1656,6 +1656,7 @@ a:focus-visible {
   }
 
   .inventory-panel button {
+    min-width: 48px !important;
     min-height: 48px !important;
   }
 

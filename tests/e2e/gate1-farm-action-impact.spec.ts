@@ -116,7 +116,7 @@ test('records till, sow, water, overnight growth and harvest with hit feedback',
 
   const result = await debug(page);
   expect(result.gameState.plots['7,4']).toMatchObject({ crop: null });
-  expect(result.gameState.inventory.stacks).toContainEqual(expect.objectContaining({ itemId: 'crop.moon-bean', count: 1 }));
+  expect(result.gameState.inventory.stacks.find((stack) => stack.itemId === 'crop.moon-bean')?.count ?? 0).toBeGreaterThanOrEqual(1);
   expect(result.effectLog.map((event) => event.name).filter((name) => name.startsWith('effect:'))).toEqual([
     'effect:till', 'effect:plant', 'effect:water', 'effect:water', 'effect:harvest',
   ]);

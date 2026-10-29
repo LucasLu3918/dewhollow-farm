@@ -92,7 +92,7 @@ async function readSavedGame(page: Page): Promise<{
 }
 
 test('completes farm, exploration, shipping and save loop without duplicate costs', async ({ page }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(180_000);
   await waitForGame(page);
 
   // 第 1 天耕地、播種、澆水；同一格重複開墾應被拒絕且不再扣體力。

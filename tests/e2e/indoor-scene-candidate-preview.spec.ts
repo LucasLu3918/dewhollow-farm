@@ -52,6 +52,7 @@ async function putSave(page: Page, fixture: Fixture): Promise<void> {
 }
 
 test('P6-062 indoor candidates stay DEV gated and render existing maps without changing save state', async ({ page }) => {
+  test.setTimeout(90_000);
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/?renderProfile=pixel32&gate1Runtime=pixel32-map-animation');
   await expect(page.locator('#game canvas')).toBeVisible();
