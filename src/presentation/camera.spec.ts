@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PORTRAIT_TOUCH_ZOOM, cameraBounds, deadzoneOf, mapZoomFor } from './camera';
+import { PORTRAIT_TOUCH_ZOOM, cameraBounds, deadzoneOf, mapZoomFor, sceneZoomFor } from './camera';
 
 const view = { width: 1024, height: 768 };
 
@@ -47,5 +47,19 @@ describe('mapZoomFor', () => {
 
   it('keeps the desktop pointer camera at 1x', () => {
     expect(mapZoomFor({ cameraWidth: 1024, coarse: false, portrait: false })).toBe(1);
+  });
+});
+
+describe('sceneZoomFor', () => {
+  it('adds only the zoom needed to cover a small map', () => {
+    expect(sceneZoomFor(1, { width: 640, height: 448 }, view)).toBeCloseTo(768 / 448);
+  });
+
+  it('preserves the existing base zoom on a large map', () => {
+    expect(sceneZoomFor(1.4, { width: 2560, height: 1920 }, view)).toBe(1.4);
+  });
+
+  it('never exceeds the configured cap', () => {
+    expect(sceneZoomFor(1, { width: 512, height: 384 }, { width: 1400, height: 1000 }, 2)).toBe(2);
   });
 });

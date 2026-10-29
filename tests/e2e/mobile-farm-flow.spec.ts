@@ -99,21 +99,22 @@ async function enterHouseAndSleep(page: Page): Promise<void> {
   await move(page, 'Left', 5); // farm (7,5) -> door side (2,5)
   await move(page, 'Up'); // farmhouse
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
-  await move(page, 'Up', 3);
-  await move(page, 'Left', 2);
+  await move(page, 'Up', 9);
+  await move(page, 'Left', 6);
   await move(page, 'Up');
-  await turnTowardBlockedTile(page, 'Left'); // face the bed at (1,1)
+  await turnTowardBlockedTile(page, 'Up'); // face the bed at (4,7)
   await interact(page);
   await expect(page.locator('#hud-log')).toContainText('你睡了一覺');
 }
 
 async function bedToPlot(page: Page): Promise<void> {
-  await move(page, 'Right');
-  await move(page, 'Down', 4);
-  await move(page, 'Right');
-  await move(page, 'Down', 2);
+  await move(page, 'Right', 6);
+  await move(page, 'Down');
+  await move(page, 'Down', 9);
+  await move(page, 'Down'); // house exit to farm (2,5)
   await move(page, 'Right', 5);
-  await move(page, 'Up'); // the house door returns at farm (2,5); finish beside the plot at (7,5)
+  await move(page, 'Down', 2);
+  await move(page, 'Up', 2); // return to (7,5), facing the crop at (7,4)
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
   await expect.poll(() => tile(page)).toEqual({ x: 7, y: 5 });
 }

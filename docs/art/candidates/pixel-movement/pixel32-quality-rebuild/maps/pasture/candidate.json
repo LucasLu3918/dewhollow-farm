@@ -1,0 +1,203 @@
+{
+  "id": "pasture",
+  "status": "candidate",
+  "approved": false,
+  "scene": "dynamic-base.png",
+  "dimensions_px": {
+    "width": 1572,
+    "height": 1001
+  },
+  "sha256": "9844c10c3b126084834ff7c99ee6f0c5970c56d3fe51ad7be0aec213fc6d088f",
+  "tool": "built-in image_gen",
+  "source": {
+    "type": "generated_original_art",
+    "style_reference_files": [
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-6feede6e-0747-40b0-9e52-1ddf7a0b2fce.png",
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-ceb8c9ad-a6c9-48ca-a4fb-f268cf68a636.png"
+    ],
+    "style_reference_role": "shared pixel-art quality, texture, lighting and rendering style only; scene/subjects not copied",
+    "user_uploaded_images_used": false,
+    "generated_file": "/Users/lucas/.codex/generated_images/01a18748-8bd8-72c1-b300-b7b1fe35525a/exec-010bb9f9-9f9e-4939-af8b-536c1cb1ef97.png",
+    "sha256": "9844c10c3b126084834ff7c99ee6f0c5970c56d3fe51ad7be0aec213fc6d088f"
+  },
+  "prompt": "Edit the exact pasture candidate as a clean DEV background layer. Preserve the 1572x1001 canvas, fence and gate positions, barn, portals, troughs, hay, rocks, trees, shrubs, paths, lighting and overall alignment. Remove the scattered small tuft / low flower clumps from inside the paddocks and fill with natural grass so the mutable tufts can be rendered by the existing runtime layer. Keep candidate status unapproved; do not modify collision or production assets.",
+  "anchors_normalized_0_to_1": {
+    "coordinate_origin": "top-left; x and y are normalized to scene width and height",
+    "confidence": "rough visual estimates only; all anchors are approximate and must be aligned to the target logical map grid before gameplay use",
+    "walkable_paths": [
+      {
+        "label": "central crossing lane / farm portal approach",
+        "from": [
+          0.01,
+          0.49
+        ],
+        "via": [
+          [
+            0.22,
+            0.5
+          ],
+          [
+            0.44,
+            0.52
+          ],
+          [
+            0.68,
+            0.52
+          ]
+        ],
+        "to": [
+          0.84,
+          0.45
+        ]
+      },
+      {
+        "label": "barn doorway approach",
+        "from": [
+          0.69,
+          0.51
+        ],
+        "via": [
+          [
+            0.77,
+            0.42
+          ]
+        ],
+        "to": [
+          0.83,
+          0.29
+        ]
+      }
+    ],
+    "blocking_landmarks": [
+      {
+        "label": "northwest paddock fence and gates",
+        "approximate_bbox": [
+          0.09,
+          0.04,
+          0.61,
+          0.33
+        ]
+      },
+      {
+        "label": "south paddock fence and gates",
+        "approximate_bbox": [
+          0.07,
+          0.57,
+          0.95,
+          0.98
+        ]
+      },
+      {
+        "label": "barn exterior walls",
+        "approximate_bbox": [
+          0.69,
+          0,
+          1,
+          0.32
+        ]
+      },
+      {
+        "label": "tree / shrub / rock clusters",
+        "approximate_centers": [
+          [
+            0.16,
+            0.11
+          ],
+          [
+            0.09,
+            0.76
+          ],
+          [
+            0.36,
+            0.8
+          ],
+          [
+            0.94,
+            0.76
+          ]
+        ]
+      }
+    ],
+    "interaction_landmarks": [
+      {
+        "label": "water trough",
+        "center": [
+          0.2,
+          0.77
+        ]
+      },
+      {
+        "label": "hay feeder",
+        "center": [
+          0.29,
+          0.77
+        ]
+      },
+      {
+        "label": "barn entry / door interaction",
+        "center": [
+          0.84,
+          0.24
+        ]
+      },
+      {
+        "label": "paddock gate latch",
+        "approximate_centers": [
+          [
+            0.31,
+            0.29
+          ],
+          [
+            0.71,
+            0.59
+          ],
+          [
+            0.56,
+            0.91
+          ]
+        ]
+      }
+    ],
+    "portal_openings": [
+      {
+        "label": "farm entrance",
+        "edge": "west",
+        "center": [
+          0,
+          0.49
+        ]
+      },
+      {
+        "label": "barn doorway",
+        "edge": "east",
+        "center": [
+          0.84,
+          0.27
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "Scene artwork is a DEV candidate only; approved is false.",
+    "Image generator output is a painted scene background, not a tile atlas or collision/interaction data.",
+    "Generated openings and landmarks are approximate visual anchors; map-specific collision, portal placement, and interaction rules remain to be wired and validated separately."
+  ],
+  "composite_reference": {
+    "file": "scene.png",
+    "sha256": "72592c50819ce1abd08d71261e0403a8dc768d509921b24b2ec11a89fc193784",
+    "role": "original visual reference; not rendered for mutable pasture tufts in this DEV mode",
+    "prompt": "Use case: game asset. Asset type: DEV scene background under an orthogonal tile grid, cozy farming adventure. Input images: Image 1 and Image 2 are style references only for their shared high-detail pixel-art surfaces, warm natural lighting, rich controlled color and polished crafted quality; do not recreate their scenes or subjects. Original working pasture outside a small rural farm, strict orthogonal top-down view directly overhead, no isometric or perspective angle, wide landscape aspect about 11:7. A broad clearly passable horizontal dirt lane crosses from an open portal gap at the west edge around mid-height toward a timber livestock barn entrance on the east side. Reserve a clear opening at the west edge and an unobstructed approach to the barn. Two or three distinct fenced green paddocks with grass tufts, feeding trough, water basin, stacked hay, small shade tree, wildflowers and shrubs; fencing and barn walls are clearly solid blocking features with visible gates. Make paddock gates usable and the lane wide and clean for movement. One clear interaction landmark is a trough near lower-left paddock; another is a gate latch/notice board outside the barn. High-detail pixel art with crisp intentional pixel clusters, tactile worn wood fences, lush grass, hay and stone, warm afternoon sun and grounded shadows. Scene background only behind separate gameplay collision/interaction tiles; not an atlas. No people, animals, UI, text, labels, signs with lettering, logos, border, photorealism, blur, or copied assets."
+  },
+  "dynamic_layer": {
+    "source_of_truth": "candidate-layout.json + GameState.worldChanges",
+    "kinds": [
+      "tuft"
+    ],
+    "asset_source": "existing transparent tuft tile art",
+    "state_transitions": {
+      "tuft": "visible until cut, then hidden over the clean pasture ground"
+    },
+    "livestock": "not baked in either scene; existing runtime animal slots remain state-driven",
+    "status": "unapproved DEV candidate"
+  }
+}

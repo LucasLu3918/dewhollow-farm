@@ -2,9 +2,37 @@ import Phaser from 'phaser';
 import type { ContentPack, Direction, MapDef, Point } from '../../domain/content';
 import { plotKey, type PlotMap, type PlotState } from '../../domain/farm';
 import { tileAt } from '../../domain/world';
-import { groundLayerFor, isGroundLayer } from '../map-layers';
+import { isGroundLayer } from '../map-layers';
 import { sceneOverlaysFor } from '../scene-overlays';
 import { forestSceneAssetFor } from '../forest-scene-art';
+import {
+  LAKE_SHORE_CANDIDATE_ATLAS_KEY,
+  LAKE_SHORE_CANDIDATE_REGISTRY_KEY,
+  LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES,
+  lakeShoreCandidateRequested,
+  lakeShoreFrameFor,
+  type LakeShoreCandidateFrame,
+} from '../lake-shore-candidate';
+import {
+  TOWN_SCENE_CANDIDATE_ATLAS_KEY,
+  TOWN_SCENE_CANDIDATE_REGISTRY_KEY,
+  TOWN_SCENE_CANDIDATE_REQUIRED_FRAMES,
+  townSceneCandidateTileFrameFor,
+  townSceneCandidatePlacements,
+  townSceneCandidateReplacesTileObject,
+  townSceneCandidateRequested,
+  townSceneCandidateScale,
+} from '../town-scene-candidate';
+import { actorDepth, foregroundDepth } from '../actor-depth';
+import { legacyMapRenderPlan, plotRenderPlan } from '../map-render-plan';
+import { plotNeighborMask, resolvePlotVisual } from '../plot-visual';
+import {
+  clearMapTileLayers,
+  placeDepthSortedMapObject,
+  renderMapTileLayers,
+  renderPlotLayer,
+  type MapTileSprite,
+} from '../map-scene-renderer';
 import { resolveAsset, type AssetManifest } from '../../infrastructure/assets/asset-manifest';
 import type { GameSession } from '../../application/game-session';
 import { resolveInteraction, type InteractionLabelKey } from '../../application/interaction';
@@ -17,7 +45,7 @@ import type { TerrainDef } from '../../infrastructure/content/content-schema';
 import type { HeldPointerStart, Hud } from '../hud';
 import type { HelpPanel } from '../help-panel';
 import type { SavePanel } from '../save-panel';
-import { cameraBounds, deadzoneOf, mapZoomFor } from '../camera';
+import { cameraBounds } from '../camera';
 import { TILE_SIZE } from '../constants';
 import { nightAlpha, particleKind, particlePosition, seasonGrassTint, weatherDim } from '../atmosphere';
 import type { Season } from '../../domain/calendar';
@@ -73,15 +101,16 @@ import { reducedEffects } from '../accessibility';
 import { topmostOpenDialog, type OpenablePanel } from '../panel-dialog';
 import type { InventoryPanel } from '../inventory-panel';
 import { gateAction, type ActionGateAction } from '../action-gate';
-import { cameraViewportFor } from '../responsive/layout';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
 import { ToolSeedSelector } from '../tool-seed-selector';
 import { Hotbar } from '../hotbar';
 import { ContinuousFarmActions, farmActionTarget } from '../continuous-farm-actions';
-import { calculatePixelViewportPolicy } from '../pixel-viewport/policy';
 import { renderProfileFor } from '../pixel-viewport/profiles';
+import { ViewportCoordinator } from '../viewport/viewport-coordinator';
 import { resolveCandidateArt, type CandidateCropStage, type CandidateId } from '../candidate-art';
-import { candidateFrameAt, type CandidateDirection } from '../candidate-sprite-animator';
+import { candidateFrameAtGaitPhase, type CandidateDirection } from '../candidate-sprite-animator';
+import { candidateMovementStepDurationMs } from '../candidate-movement-profile';
+import { pixel32QualitySceneFit, type Pixel32QualitySceneAsset } from '../pixel32-quality-scene-candidate';
 import {
   PIXEL32_ANIMATION_ATLAS_KEY,
   PIXEL32_CROPS_ATLAS_KEY,
@@ -92,14 +121,39 @@ import {
   PIXEL32_CANDIDATE_INTERACTABLES,
   PIXEL32_MAP_ATLAS_KEY,
   PIXEL32_PETS_MANIFEST_KEY,
-  pixel32CandidateCatFrame,
+  pixel32CandidatePetFrame,
   pixel32InteractablesPreviewRequested,
   pixel32CandidatePetFollowRequested,
   pixel32MapFrameFor,
   pixel32OverlayPreviewRequested,
 } from '../pixel32-candidate-runtime';
+import {
+  WORLD_V2_FARM_ATLAS_KEY,
+  WORLD_V2_FARM_MANIFEST_KEY,
+  WORLD_V2_HOUSE_ATLAS_KEY,
+  WORLD_V2_HOUSE_MANIFEST_KEY,
+  worldV2FarmSceneCandidatePlacements,
+  worldV2SceneCandidateFrameFor,
+} from '../world-v2-scene-candidate';
+import {
+  INDOOR_FARM_ATLAS_KEY,
+  INDOOR_MINE_ATLAS_KEY,
+  INDOOR_SCENE_CANDIDATE_REGISTRY_KEY,
+  indoorSceneCandidateFrameFor,
+  indoorSceneCandidateRequested,
+} from '../indoor-scene-candidate';
+import {
+  SEASON_WEATHER_CANDIDATE_ATLAS_KEY,
+  SEASON_WEATHER_CANDIDATE_MANIFEST_KEY,
+  seasonWeatherAmbienceFrameFor,
+  seasonWeatherCandidateRequested,
+  seasonWeatherFoliageFrameFor,
+  seasonWeatherGroundFrameFor,
+} from '../season-weather-candidate';
 import { activeDirection, cancelUnifiedInput, createUnifiedInputState, holdDirection, releaseDirection, type UnifiedInputState } from '../unified-input-state/unified-input-state';
 import { advanceMovement, cancelMovement, commitStep, createMovementScheduler, queueMovementTap, rejectStep, requestNextStep, setMovementIntent, type MovementSchedulerState } from '../movement-scheduler/movement-scheduler';
+
+const INTERIOR_MAP_IDS = new Set(['house', 'coop', 'cowbarn', 'house-full', 'house-wing']);
 
 /** 鍵盤事件與虛擬按鍵共用的形狀：只需要按鍵名稱與 preventDefault。 */
 type KeyLike = Pick<KeyboardEvent, 'key' | 'preventDefault'>;
@@ -108,6 +162,25 @@ interface DeferredPlayerAction {
   command: Command;
   waitForFarmAnimation: boolean;
   resolve: (outcome: CommandOutcome | null) => void;
+}
+
+interface WorldV2CandidateFrameMetadata {
+  width: number;
+  height: number;
+  footAnchor?: { x: number; y: number };
+  layer?: string;
+}
+
+interface WorldV2CandidateManifestMetadata {
+  frames?: Record<string, WorldV2CandidateFrameMetadata> | Array<{
+    id: string;
+    rect: { width: number; height: number };
+    footAnchor?: { x: number; y: number };
+    layer?: string;
+  }>;
+  composition?: {
+    placements?: Array<{ frame: string; anchorTile: { x: number; y: number } }>;
+  };
 }
 
 export interface MapSceneDeps {
@@ -139,6 +212,8 @@ export interface MapSceneDeps {
   responsive: ResponsiveLayoutController;
   /** 鍵盤監聽與畫面都接好後呼叫一次（見 create 結尾與 main.ts 的 markStageReady）。 */
   onReady: () => void;
+  /** Exact DEV-only high-detail candidate backgrounds; absent in normal and production sessions. */
+  qualitySceneCandidates: Pixel32QualitySceneAsset[];
   /** 操作說明的文字（設定面板的動作名稱、虛擬按鍵的文字），來自 content/controls.json。 */
   controls: {
     settingsLabels: SettingsLabels;
@@ -200,9 +275,6 @@ const REACT_DURATION_MS = 320;
 
 /** 居民在地圖角色下方；玩家與跟隨寵物共用深度帶，再依腳底位置決定前後。 */
 const DEPTH_RESIDENT = 5;
-const DEPTH_ACTOR_BASE = 10;
-const DEPTH_PLAYER_TIE_BREAK = 0.001;
-const DEPTH_TREE_TIE_BREAK = 0.001;
 /** 擺在地板上的裝飾：在地板之上、動物之下。 */
 const DEPTH_DECOR = 3;
 /** 天色與天氣的遮罩、粒子，在世界之上、HUD（DOM）之下。 */
@@ -231,6 +303,21 @@ interface SpriteDebugInfo {
   height: number;
   flipX: boolean;
   depth: number;
+  visible: boolean;
+}
+
+type CandidatePetArt = 'cat' | 'quokka';
+
+interface CandidatePetDebugInfo {
+  direction: Direction;
+  frame: string | null;
+  visible: boolean;
+  busy: boolean;
+  tile: Point | null;
+  rootX: number;
+  rootY: number;
+  depth: number;
+  bounds: { left: number; top: number; width: number; height: number };
 }
 
 interface Pixel32OverlayDebugInfo {
@@ -291,6 +378,7 @@ interface CompanionState {
   tile: Point | null;
   /** DEV-only unapproved pixel32 cat visual, attached to the existing follower root. */
   candidatePetSprite?: Phaser.GameObjects.Image;
+  candidatePetArt?: CandidatePetArt;
   candidatePetDirection?: Direction;
   candidatePetMoveStartedAt?: number | null;
 }
@@ -311,7 +399,18 @@ declare global {
         actualCanvasResolution: { width: number; height: number };
         cameraZoom: number;
       };
-      movement(): { heldDirection: Direction | null; blockedDirection: Direction | null; moving: boolean; pending: boolean; queuedTaps: number; tile: { x: number; y: number } };
+      movement(): {
+        heldDirection: Direction | null;
+        blockedDirection: Direction | null;
+        moving: boolean;
+        pending: boolean;
+        queuedTaps: number;
+        tile: { x: number; y: number };
+        stepProgress: number | null;
+        stepElapsedMs: number | null;
+        stepDurationMs: number;
+        gaitPhase: number;
+      };
       worldGeneration(): number;
       responsiveLayout(): ReturnType<ResponsiveLayoutController['get']>;
       interaction(): ReturnType<typeof resolveInteraction>;
@@ -322,6 +421,16 @@ declare global {
       mapId(): string;
       /** 玩家與地圖上所有圖片的貼圖名稱與畫面範圍（世界座標）。 */
       sprites(): SpriteDebugInfo[];
+      /** DEV-only state-driven map object layer anchors and visible frames. */
+      qualityDynamicObjects(): Array<{
+        x: number;
+        y: number;
+        kind: TileKind;
+        texture: string;
+        frame: string | null;
+        visible: boolean;
+      }>;
+      qualityPlots(): Array<{ x: number; y: number; texture: string; frame: string | null; visible: boolean }>;
       /** 開發用候選貼圖啟用狀態、實際覆蓋 key 與 fallback 清單。 */
       candidateArt(): {
         profile: string;
@@ -340,18 +449,55 @@ declare global {
         playerFrame: string | null;
         playerVisible: boolean;
       };
+      /** DEV-only world-v2 farm/house scene sample, including exact visible candidate frames. */
+      worldV2SceneCandidate(): {
+        enabled: boolean;
+        mapId: string;
+        frames: string[];
+        layers: Array<{ frame: string; layer: 'ground' | 'object'; x: number; y: number }>;
+        placements: Array<{ frame: string; x: number; y: number; depth: number }>;
+      };
+      /** DEV-only P6-062 indoor candidate frame coverage for the current authoritative map. */
+      indoorSceneCandidate(): {
+        enabled: boolean;
+        mapId: string;
+        frames: string[];
+        layers: Array<{ frame: string; layer: 'ground' | 'object'; x: number; y: number }>;
+      };
+      seasonWeatherCandidate(): {
+        enabled: boolean;
+        mapId: string;
+        season: Season;
+        minuteOfDay: number;
+        weather: Weather;
+        ambience: string | null;
+        ambienceSize: { width: number; height: number } | null;
+        nightShadeSize: { width: number; height: number };
+        nightShadeVisible: boolean;
+        nightShadeAlpha: number;
+        viewportSize: { width: number; height: number; zoom: number };
+        pixelViewport: {
+          renderResolution: { width: number; height: number };
+          cssScale: number;
+          devicePixelScale: number;
+          actualCanvasResolution: { width: number; height: number };
+          cameraZoom: number;
+        };
+        frames: string[];
+      };
       /** DEV-only, unapproved pixel32 map overlay fixture. */
       pixel32CandidateOverlays(): { enabled: boolean; overlays: Pixel32OverlayDebugInfo[] };
       /** DEV-only unapproved door/shipbox candidates, isolated from map and interaction state. */
       pixel32CandidateInteractables(): { enabled: boolean; status: string | null; approved: boolean | null; items: Pixel32InteractableDebugInfo[] };
       setCandidateInteractableFrame(id: string, frame: string): boolean;
       /** DEV-only contact sheet for unapproved crops, pet directions, held tools, and object states. */
-      candidateAssetReview(): { enabled: boolean; items: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }>; limitations: string[] };
-      /** DEV-only candidate cat follower visual; existing follow path and depth remain authoritative. */
+      candidateAssetReview(): { enabled: boolean; visible: boolean; items: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }>; limitations: string[] };
+      /** DEV-only unapproved cat/quokka follower visuals; existing follower path and depth remain authoritative. */
       candidatePetFollow(): {
         enabled: boolean;
         manifest: { status: string | null; approved: boolean | null };
-        cat: null | { direction: Direction; frame: string | null; visible: boolean; busy: boolean; tile: Point | null; rootX: number; rootY: number; depth: number; bounds: { left: number; top: number; width: number; height: number } };
+        cat: CandidatePetDebugInfo | null;
+        quokka: CandidatePetDebugInfo | null;
       };
       setCandidateAssetReviewVisible(visible: boolean): void;
       /** 玩家目前的走路姿勢（見 walk-pose.ts）。 */
@@ -398,13 +544,25 @@ export class MapScene extends Phaser.Scene {
   private static worldGenerationCount = 0;
   private worldGeneration = 0;
   private deps!: MapSceneDeps;
+  private readonly viewportCoordinator = new ViewportCoordinator();
+  private applyResponsiveLayout?: (layout: ReturnType<ResponsiveLayoutController['get']>) => void;
   private world!: Phaser.GameObjects.Container;
+  private qualitySceneSprite: Phaser.GameObjects.Image | null = null;
+  private qualitySceneLoadMapId: string | null = null;
+  private qualitySceneImage: HTMLImageElement | null = null;
   /** Non-interactive one-tile outline for the current authoritative interaction target. */
   private interactionTargetGfx: Phaser.GameObjects.Graphics | null = null;
   private interactionTargetCell: Point | null = null;
   private rig!: CharacterRig;
   private pixel32CandidateSprite: Phaser.GameObjects.Image | null = null;
   private pixel32CandidateRuntime = false;
+  private lakeShoreCandidate = false;
+  private townSceneCandidate = false;
+  private movementStepDurationMs = CONTINUOUS_STEP_DURATION_MS;
+  private worldV2SceneCandidate = false;
+  private indoorSceneCandidate = false;
+  private seasonWeatherCandidate = false;
+  private worldV2CandidateSprites: Phaser.GameObjects.Image[] = [];
   private pixel32CandidateAssets = false;
   private pixel32CandidatePetFollow = false;
   private pixel32CandidateReviewItems: Array<{ group: string; frame: string; texture: string; x: number; y: number; labelX: number; labelY: number; labelWidth: number; scale: number }> = [];
@@ -430,14 +588,7 @@ export class MapScene extends Phaser.Scene {
    */
   private heldPlots = new Map<string, PlotState | null>();
   /** 每格的地面底層與透明物件層：地圖變化（砍樹、採野薄荷）即時更新對應圖層。 */
-  private tileSprites: {
-    x: number;
-    y: number;
-    base: TileKind;
-    ground: TileKind;
-    groundImage: Phaser.GameObjects.Image;
-    objectImage?: Phaser.GameObjects.Image;
-  }[] = [];
+  private tileSprites: MapTileSprite<Phaser.GameObjects.Image>[] = [];
   /** Map-specific static art overlays; they are render-only and carry no world or collision state. */
   private sceneOverlaySprites: Phaser.GameObjects.Image[] = [];
   private shopPanel!: ShopPanel;
@@ -477,6 +628,7 @@ export class MapScene extends Phaser.Scene {
   private nightShade!: Phaser.GameObjects.Rectangle;
   private weatherShade!: Phaser.GameObjects.Rectangle;
   private weatherGfx!: Phaser.GameObjects.Graphics;
+  private seasonWeatherAmbience: Phaser.GameObjects.Image | null = null;
   private terrainByKind = new Map<string, TerrainDef>();
   private renderedMapId: string | null = null;
   private shownFacing: Direction = 'down';
@@ -597,7 +749,6 @@ export class MapScene extends Phaser.Scene {
   create(): void {
     this.worldGeneration = ++MapScene.worldGenerationCount;
     this.world = this.add.container(0, 0);
-    this.createSky();
     this.starMeter = this.add.graphics().setScrollFactor(0).setDepth(DEPTH_SKY + 2);
     // 夜市的煙火：每隔一陣子看看要不要放（只有節慶的夜晚、在廣場才放，見 maybeFirework）。
     this.time.addEvent({ delay: FIREWORK_INTERVAL_MS, loop: true, callback: () => this.maybeFirework() });
@@ -605,6 +756,49 @@ export class MapScene extends Phaser.Scene {
     this.rig = new CharacterRig(this, this.rigDef('player'), this.deps.assets);
     this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
     this.pixel32CandidateRuntime = this.registry.get('gate1-pixel32-candidate-runtime') === true;
+    this.lakeShoreCandidate = this.registry.get(LAKE_SHORE_CANDIDATE_REGISTRY_KEY) === true
+      && this.pixel32CandidateRuntime
+      && lakeShoreCandidateRequested(
+        new URLSearchParams(window.location.search),
+        import.meta.env.DEV,
+        this.pixel32CandidateRuntime,
+      )
+      && this.textures.exists(LAKE_SHORE_CANDIDATE_ATLAS_KEY)
+      && LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES.every((frame) => this.textures.get(LAKE_SHORE_CANDIDATE_ATLAS_KEY).has(frame));
+    this.townSceneCandidate = this.registry.get(TOWN_SCENE_CANDIDATE_REGISTRY_KEY) === true
+      && this.pixel32CandidateRuntime
+      && townSceneCandidateRequested(
+        new URLSearchParams(window.location.search),
+        import.meta.env.DEV,
+        this.pixel32CandidateRuntime,
+      )
+      && this.textures.exists(TOWN_SCENE_CANDIDATE_ATLAS_KEY)
+      && TOWN_SCENE_CANDIDATE_REQUIRED_FRAMES.every((frame) => this.textures.get(TOWN_SCENE_CANDIDATE_ATLAS_KEY).has(frame));
+    this.worldV2SceneCandidate = this.registry.get('gate1-world-v2-scene-candidate') === true
+      && this.pixel32CandidateRuntime
+      && this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
+      && this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY);
+    this.seasonWeatherCandidate = this.registry.get('gate1-p6-063-season-weather-candidate') === true
+      && this.worldV2SceneCandidate
+      && this.textures.exists(SEASON_WEATHER_CANDIDATE_ATLAS_KEY)
+      && seasonWeatherCandidateRequested(
+        new URLSearchParams(window.location.search),
+        import.meta.env.DEV,
+        renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), true).id,
+        this.pixel32CandidateRuntime,
+        this.worldV2SceneCandidate,
+      );
+    this.indoorSceneCandidate = this.registry.get(INDOOR_SCENE_CANDIDATE_REGISTRY_KEY) === true
+      && this.pixel32CandidateRuntime
+      && indoorSceneCandidateRequested(
+        new URLSearchParams(window.location.search),
+        import.meta.env.DEV,
+        renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), true).id,
+        this.pixel32CandidateRuntime,
+      )
+      && this.textures.exists(INDOOR_FARM_ATLAS_KEY)
+      && this.textures.exists(INDOOR_MINE_ATLAS_KEY);
+    this.createSky();
     this.pixel32CandidateAssets = this.registry.get('gate1-pixel32-candidate-assets') === true && this.pixel32CandidateRuntime;
     this.pixel32CandidatePetFollow = pixel32CandidatePetFollowRequested(
       new URLSearchParams(window.location.search),
@@ -635,11 +829,16 @@ export class MapScene extends Phaser.Scene {
     } else {
       this.pixel32CandidateRuntime = false;
     }
+    this.movementStepDurationMs = candidateMovementStepDurationMs(
+      import.meta.env.DEV,
+      this.pixel32CandidateRuntime,
+      new URLSearchParams(window.location.search),
+    );
     const initialPlayer = this.deps.session.state.player;
     this.movementScheduler = createMovementScheduler({ x: initialPlayer.x, y: initialPlayer.y }, {
       initialFacing: initialPlayer.facing,
-      stepDurationMs: CONTINUOUS_STEP_DURATION_MS,
-      gaitCycleMs: CONTINUOUS_STEP_DURATION_MS * 2,
+      stepDurationMs: this.movementStepDurationMs,
+      gaitCycleMs: this.movementStepDurationMs * 2,
     });
     this.createFollowers();
     this.setupCamera();
@@ -655,6 +854,9 @@ export class MapScene extends Phaser.Scene {
       this.continuousFarmActions.stop('scene-shutdown');
       // Phaser may already have removed the DisplayList; settle animation promises without drawing shutdown impacts.
       this.rig.shutdown();
+      this.clearQualitySceneBackground();
+      this.clearWorldV2CandidateSprites();
+      this.clearSceneOverlays();
       this.pixel32CandidateSprite?.destroy();
       this.pixel32CandidateSprite = null;
       this.clearPixel32CandidateOverlays();
@@ -688,51 +890,74 @@ export class MapScene extends Phaser.Scene {
   /** 天色與天氣的遮罩與粒子：固定在畫面上（不隨鏡頭移動）。 */
   private createSky(): void {
     const { width, height } = this.scale.gameSize;
+    const candidateViewportScale = this.seasonWeatherCandidate ? 8 : 1;
     // 填色不透明度為 1，明暗只由 setAlpha 控制（填色若為 0 會把 setAlpha 乘成 0，什麼也看不見）。
-    this.nightShade = this.add.rectangle(0, 0, width, height, NIGHT_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
-    this.weatherShade = this.add.rectangle(0, 0, width, height, WEATHER_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
+    this.nightShade = this.add.rectangle(0, 0, width * candidateViewportScale, height * candidateViewportScale, NIGHT_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY).setVisible(!this.seasonWeatherCandidate);
+    this.weatherShade = this.add.rectangle(0, 0, width * candidateViewportScale, height * candidateViewportScale, WEATHER_COLOR, 1).setOrigin(0).setScrollFactor(0).setDepth(DEPTH_SKY);
     this.weatherGfx = this.add.graphics().setScrollFactor(0).setDepth(DEPTH_SKY + 1);
+    if (this.seasonWeatherCandidate && this.textures.exists(SEASON_WEATHER_CANDIDATE_ATLAS_KEY)) {
+      const frame = seasonWeatherAmbienceFrameFor(
+        this.deps.session.state.calendar.minuteOfDay,
+        this.deps.session.state.weather,
+      );
+      this.seasonWeatherAmbience = this.add.image(
+        width / 2, height / 2, SEASON_WEATHER_CANDIDATE_ATLAS_KEY, frame,
+      ).setScrollFactor(0).setDisplaySize(width * 8, height * 8).setDepth(DEPTH_SKY + 1.5);
+    }
   }
 
   /** 鏡頭跟隨玩家：中央留一塊死區，玩家走到邊緣才捲動；邊界在換地圖時重設。 */
   private setupCamera(): void {
     const camera = this.cameras.main;
     const applyLayout = (layout: ReturnType<ResponsiveLayoutController['get']>): void => {
+      const previousCamera = { x: camera.x, y: camera.y, width: camera.width, height: camera.height, zoom: camera.zoom };
+      const state = this.deps.session.state;
+      const map = this.deps.index.map(state.mapId);
       const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
-      const touchInput = layout.pointer.coarse || layout.pointer.touchPoints > 0;
-      const pixelViewport = calculatePixelViewportPolicy({
-        container: layout.worldRect,
-        safeArea: layout.safeRect,
-        dpr: window.devicePixelRatio || 1,
-        orientation: layout.orientation,
+      const viewportPlan = this.viewportCoordinator.apply({
+        layout,
         profile: profile.id,
-        input: touchInput ? 'touch' : 'pointer',
+        dpr: window.devicePixelRatio || 1,
+        mapWorldSize: { width: map.width * TILE_SIZE, height: map.height * TILE_SIZE },
+        sceneKind: INTERIOR_MAP_IDS.has(map.id) ? 'interior' : 'exterior',
+      }, {
+        gameSize: () => this.scale.gameSize,
+        setGameSize: (size) => this.scale.setGameSize(size.width, size.height),
+        setCameraViewport: (viewport) => camera.setViewport(viewport.x, viewport.y, viewport.width, viewport.height),
+        setCameraZoom: (zoom) => camera.setZoom(zoom),
+        setCameraDeadzone: (deadzone) => camera.setDeadzone(deadzone.width, deadzone.height),
       });
+      const { pixelViewport, cameraViewport: viewport, touchInput } = viewportPlan;
       const canvasHost = this.game.canvas.parentElement;
       if (canvasHost) {
         if (profile.id === 'legacy' && !touchInput) delete canvasHost.dataset.pixelProfile;
         else canvasHost.dataset.pixelProfile = profile.id;
       }
-      if (this.scale.gameSize.width !== pixelViewport.renderResolution.width
-        || this.scale.gameSize.height !== pixelViewport.renderResolution.height) {
-        this.scale.setGameSize(pixelViewport.renderResolution.width, pixelViewport.renderResolution.height);
-      }
       const designSize = pixelViewport.renderResolution;
-      const viewport = cameraViewportFor(layout, designSize);
-      camera.setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
-      this.nightShade?.setSize(designSize.width, designSize.height);
-      this.weatherShade?.setSize(designSize.width, designSize.height);
-      const zoom = profile.id === 'legacy'
-        ? mapZoomFor({ cameraWidth: camera.width, coarse: touchInput, portrait: layout.orientation === 'portrait' })
-        : camera.width / (pixelViewport.worldTilesVisible.width * TILE_SIZE);
-      camera.setZoom(zoom);
-      const zone = deadzoneOf({ width: camera.width / camera.zoom, height: camera.height / camera.zoom });
-      camera.setDeadzone(zone.width, zone.height);
-      const state = this.deps.session.state;
-      this.frameCamera(this.deps.index.map(state.mapId), state.player);
+      const candidateViewportScale = this.seasonWeatherCandidate ? 8 : 1;
+      this.nightShade?.setSize(designSize.width * candidateViewportScale, designSize.height * candidateViewportScale);
+      this.weatherShade?.setSize(designSize.width * candidateViewportScale, designSize.height * candidateViewportScale);
+      this.seasonWeatherAmbience
+        ?.setPosition(designSize.width / 2, designSize.height / 2)
+        .setDisplaySize(designSize.width * 8, designSize.height * 8);
+      if (this.pixel32CandidateReviewContainer && (
+        previousCamera.x !== camera.x || previousCamera.y !== camera.y || previousCamera.width !== camera.width
+        || previousCamera.height !== camera.height || previousCamera.zoom !== camera.zoom
+      )) {
+        const visible = this.pixel32CandidateReviewContainer.visible;
+        this.pixel32CandidateReviewContainer.destroy(true);
+        this.pixel32CandidateReviewItems = [];
+        this.createPixel32CandidateReview();
+        this.pixel32CandidateReviewContainer?.setVisible(visible);
+      }
+      this.frameCamera(map, state.player);
     };
+    this.applyResponsiveLayout = applyLayout;
     const unsubscribeLayout = this.deps.responsive.subscribe(applyLayout);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, unsubscribeLayout);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      unsubscribeLayout();
+      this.applyResponsiveLayout = undefined;
+    });
     // 跟隨骨架的軸心（腳底中心，不含身體起伏，鏡頭才不會跟著抖）；位移量把跟隨點移到格子中心。
     camera.startFollow(this.rig.root, true, FOLLOW_LERP, FOLLOW_LERP, 0, TILE_SIZE / 2);
     if (import.meta.env.DEV) {
@@ -747,6 +972,10 @@ export class MapScene extends Phaser.Scene {
           pending: Boolean(this.movementScheduler?.pendingRequest),
           queuedTaps: this.movementScheduler?.queuedTaps.length ?? 0,
           tile: { ...this.deps.session.state.player },
+          stepProgress: this.movementScheduler?.step?.progress ?? null,
+          stepElapsedMs: this.movementScheduler?.step?.elapsedMs ?? null,
+          stepDurationMs: this.movementScheduler?.stepDurationMs ?? this.movementStepDurationMs,
+          gaitPhase: this.movementScheduler?.gaitPhase ?? 0,
         }),
         worldGeneration: () => this.worldGeneration,
         responsiveLayout: () => this.deps.responsive.get(),
@@ -762,7 +991,88 @@ export class MapScene extends Phaser.Scene {
         cameraView: () => ({ x: camera.x, y: camera.y, width: camera.width / camera.zoom, height: camera.height / camera.zoom, zoom: camera.zoom, bounds: { ...camera.getBounds() } }),
         mapId: () => this.deps.session.state.mapId,
         sprites: () => this.debugSprites(),
+        qualityDynamicObjects: () => this.tileSprites.flatMap((tile) => tile.objectImage ? [{
+          x: tile.x,
+          y: tile.y,
+          kind: tile.base,
+          texture: tile.objectImage.texture.key,
+          frame: tile.objectImage.frame?.name ?? null,
+          visible: tile.objectImage.visible,
+        }] : []),
+        qualityPlots: () => this.world.getAll().flatMap((child) => {
+          if (child.getData('plot') !== true || !(child instanceof Phaser.GameObjects.Image)) return [];
+          return [{
+            x: Math.round(child.x / TILE_SIZE),
+            y: Math.round(child.y / TILE_SIZE),
+            texture: child.texture.key,
+            frame: child.frame?.name ?? null,
+            visible: child.visible,
+          }];
+        }),
         candidateArt: () => this.candidateArtDebugInfo(),
+        worldV2SceneCandidate: () => ({
+          enabled: this.worldV2SceneCandidate,
+          mapId: this.deps.session.state.mapId,
+          frames: [...new Set([
+            ...this.worldV2CandidateSprites.map((sprite) => `${sprite.texture.key}:${sprite.frame.name}`),
+            ...this.tileSprites.flatMap((tile) => [tile.groundImage, tile.objectImage]
+              .filter((sprite): sprite is Phaser.GameObjects.Image => Boolean(sprite))
+              .filter((sprite) => sprite.visible && (sprite.texture.key === WORLD_V2_FARM_ATLAS_KEY || sprite.texture.key === WORLD_V2_HOUSE_ATLAS_KEY))
+              .map((sprite) => `${sprite.texture.key}:${sprite.frame.name}`)),
+          ])],
+          layers: this.tileSprites.flatMap((tile) => [
+            { sprite: tile.groundImage, layer: 'ground' as const, x: tile.x, y: tile.y },
+            ...(tile.objectImage ? [{ sprite: tile.objectImage, layer: 'object' as const, x: tile.x, y: tile.y }] : []),
+          ]).filter(({ sprite }) => sprite.visible
+            && (sprite.texture.key === WORLD_V2_FARM_ATLAS_KEY || sprite.texture.key === WORLD_V2_HOUSE_ATLAS_KEY))
+            .map(({ sprite, layer, x, y }) => ({ frame: sprite.frame.name, layer, x, y })),
+          placements: this.worldV2CandidateSprites.map((sprite) => ({
+            frame: sprite.frame.name,
+            x: sprite.x,
+            y: sprite.y,
+            depth: sprite.depth,
+          })),
+        }),
+        indoorSceneCandidate: () => ({
+          enabled: this.indoorSceneCandidate,
+          mapId: this.deps.session.state.mapId,
+          frames: [...new Set(this.tileSprites.flatMap((tile) => [tile.groundImage, tile.objectImage]
+            .filter((sprite): sprite is Phaser.GameObjects.Image => Boolean(sprite))
+            .filter((sprite) => sprite.visible
+              && (sprite.texture.key === INDOOR_FARM_ATLAS_KEY || sprite.texture.key === INDOOR_MINE_ATLAS_KEY))
+            .map((sprite) => `${sprite.texture.key}:${sprite.frame.name}`)))],
+          layers: this.tileSprites.flatMap((tile) => [
+            { sprite: tile.groundImage, layer: 'ground' as const, x: tile.x, y: tile.y },
+            ...(tile.objectImage ? [{ sprite: tile.objectImage, layer: 'object' as const, x: tile.x, y: tile.y }] : []),
+          ]).filter(({ sprite }) => sprite.visible
+            && (sprite.texture.key === INDOOR_FARM_ATLAS_KEY || sprite.texture.key === INDOOR_MINE_ATLAS_KEY))
+            .map(({ sprite, layer, x, y }) => ({ frame: sprite.frame.name, layer, x, y })),
+        }),
+        seasonWeatherCandidate: () => ({
+          enabled: this.seasonWeatherCandidate,
+          mapId: this.deps.session.state.mapId,
+          season: this.deps.session.state.calendar.season,
+          minuteOfDay: this.deps.session.state.calendar.minuteOfDay,
+          weather: this.deps.session.state.weather,
+          ambience: this.seasonWeatherAmbience?.frame.name ?? null,
+          ambienceSize: this.seasonWeatherAmbience
+            ? { width: this.seasonWeatherAmbience.displayWidth, height: this.seasonWeatherAmbience.displayHeight }
+            : null,
+          nightShadeSize: { width: this.nightShade.displayWidth, height: this.nightShade.displayHeight },
+          nightShadeVisible: this.nightShade.visible,
+          nightShadeAlpha: this.nightShade.alpha,
+          viewportSize: { width: this.cameras.main.width, height: this.cameras.main.height, zoom: this.cameras.main.zoom },
+          pixelViewport: this.pixelViewportDebugInfo(),
+          frames: [...new Set([
+            ...this.tileSprites.flatMap((tile) => [tile.groundImage, tile.objectImage]
+              .filter((sprite): sprite is Phaser.GameObjects.Image => Boolean(sprite))
+              .filter((sprite) => sprite.visible && sprite.texture.key === SEASON_WEATHER_CANDIDATE_ATLAS_KEY)
+              .map((sprite) => sprite.frame.name)),
+            ...this.worldV2CandidateSprites
+              .filter((sprite) => sprite.visible && sprite.texture.key === SEASON_WEATHER_CANDIDATE_ATLAS_KEY)
+              .map((sprite) => sprite.frame.name),
+          ])],
+        }),
         pose: () => ({ ...this.rig.currentPose() }),
         rig: () => {
           const { view, mode, visible } = this.rig.debugInfo();
@@ -866,30 +1176,24 @@ export class MapScene extends Phaser.Scene {
         },
         candidateAssetReview: () => ({
           enabled: this.pixel32CandidateAssets && this.pixel32CandidateReviewContainer?.active === true,
+          visible: this.pixel32CandidateReviewContainer?.visible === true,
           items: this.pixel32CandidateReviewItems.map((item) => ({ ...item })),
           limitations: [
             'Sprites are candidate-only review samples; the board does not change tools, collisions, companion AI, or save data.',
             this.pixel32CandidatePetFollow
-              ? 'Only the cat visual uses candidate hop frames on the existing follower path; quokka and gameplay integration remain unchanged.'
+              ? 'Cat and quokka visuals use candidate hop frames on the existing trail only in this DEV opt-in; production roles and gameplay remain unchanged.'
               : 'Pet frames are static directional samples; movement and follow animation remain production behavior.',
             'Tool frames are held-preview art only; no grip, swing, or gameplay integration is implied.',
           ],
         }),
         setCandidateAssetReviewVisible: (visible) => this.pixel32CandidateReviewContainer?.setVisible(visible),
         candidatePetFollow: () => {
-          const state = this.companions.get('cat');
-          const manifest = this.pixel32CandidatePetFollow
-            ? this.cache.json.get(PIXEL32_PETS_MANIFEST_KEY) as { status?: unknown; approved?: unknown } | undefined
-            : undefined;
-          const sprite = state?.candidatePetSprite;
-          const bounds = sprite?.getBounds();
-          return {
-            enabled: this.pixel32CandidatePetFollow && Boolean(sprite),
-            manifest: {
-              status: typeof manifest?.status === 'string' ? manifest.status : null,
-              approved: typeof manifest?.approved === 'boolean' ? manifest.approved : null,
-            },
-            cat: state && sprite && bounds ? {
+          const stateFor = (id: 'cat' | 'marsupial'): CandidatePetDebugInfo | null => {
+            const state = this.companions.get(id);
+            const sprite = state?.candidatePetSprite;
+            const bounds = sprite?.getBounds();
+            if (!state || !sprite || !bounds) return null;
+            return {
               direction: state.candidatePetDirection ?? this.deps.session.state.player.facing,
               frame: sprite.frame.name,
               visible: sprite.visible && state.rig.root.visible,
@@ -899,7 +1203,21 @@ export class MapScene extends Phaser.Scene {
               rootY: state.rig.root.y,
               depth: state.rig.root.depth,
               bounds: { left: bounds.left, top: bounds.top, width: bounds.width, height: bounds.height },
-            } : null,
+            };
+          };
+          const manifest = this.pixel32CandidatePetFollow
+            ? this.cache.json.get(PIXEL32_PETS_MANIFEST_KEY) as { status?: unknown; approved?: unknown } | undefined
+            : undefined;
+          const cat = stateFor('cat');
+          const quokka = stateFor('marsupial');
+          return {
+            enabled: this.pixel32CandidatePetFollow && Boolean(cat || quokka),
+            manifest: {
+              status: typeof manifest?.status === 'string' ? manifest.status : null,
+              approved: typeof manifest?.approved === 'boolean' ? manifest.approved : null,
+            },
+            cat,
+            quokka,
           };
         },
       };
@@ -922,14 +1240,10 @@ export class MapScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const layout = this.deps.responsive.get();
     const profile = renderProfileFor(new URLSearchParams(window.location.search).get('renderProfile'), import.meta.env.DEV);
-    const touchInput = layout.pointer.coarse || layout.pointer.touchPoints > 0;
-    const pixelViewport = calculatePixelViewportPolicy({
-      container: layout.worldRect,
-      safeArea: layout.safeRect,
-      dpr: window.devicePixelRatio || 1,
-      orientation: layout.orientation,
+    const { pixelViewport } = this.viewportCoordinator.calculate({
+      layout,
       profile: profile.id,
-      input: touchInput ? 'touch' : 'pointer',
+      dpr: window.devicePixelRatio || 1,
     });
     return {
       profile: profile.id,
@@ -948,8 +1262,9 @@ export class MapScene extends Phaser.Scene {
   }
 
   private resolveCandidateFrame(assetId: string, cropStage?: CandidateCropStage) {
-    if (this.pixel32CandidateAssets && assetId === 'crop.sweet-radish' && this.textures.exists(PIXEL32_CROPS_ATLAS_KEY)) {
-      const frame = cropStage ?? 'mature';
+    if (this.pixel32CandidateAssets && assetId.startsWith('crop.') && this.textures.exists(PIXEL32_CROPS_ATLAS_KEY)) {
+      const cropId = assetId.slice('crop.'.length);
+      const frame = `crop.${cropId}.${cropStage ?? 'mature'}`;
       const texture = this.textures.get(PIXEL32_CROPS_ATLAS_KEY);
       if (texture.has(frame)) return { atlas: PIXEL32_CROPS_ATLAS_KEY, frame, scale: 2, candidate: '16bit' as const };
     }
@@ -995,18 +1310,20 @@ export class MapScene extends Phaser.Scene {
       color: '#f4d998', fontFamily: 'monospace', fontSize: '16px', fontStyle: 'bold',
     }));
 
-    const rowTopInset = 32;
-    const rowStride = Math.max(32, (boardHeight - rowTopInset - 16) / 5);
-    const rowSpriteScaleCap = Math.min(1.5, Math.max(0.5, (rowStride - 30) / 32));
+    const rowTopInset = 24;
+    const rowStride = Math.max(16, (boardHeight - rowTopInset - 8) / 7);
+    const rowSpriteScaleCap = Math.min(1.5, Math.max(0.2, (rowStride - 8) / 32));
     const addRow = (group: string, label: string, frames: string[], texture: string, rowTop: number): void => {
       const labelY = rowTop;
       const labelText = this.add.text(12, labelY, label, { color: '#edf0d8', fontFamily: 'monospace', fontSize: '13px' });
       board.add(labelText);
-      const firstItemX = Math.min(176, Math.max(72, boardWidth * 0.4));
+      const labelClearance = 16 * rowSpriteScaleCap + 4;
+      const firstItemX = Math.min(boardWidth - 16, Math.max(72, labelText.x + labelText.width + labelClearance));
       const available = Math.max(32, boardWidth - firstItemX - 16);
-      const scale = Math.min(rowSpriteScaleCap, available / (frames.length * 32 + Math.max(0, frames.length - 1) * 8));
-      const step = 32 * scale + 8;
-      const centerY = rowTop + 22 + 16 * scale;
+      const gap = Math.min(8, available / (frames.length * 3));
+      const scale = Math.min(rowSpriteScaleCap, (available - Math.max(0, frames.length - 1) * gap) / (frames.length * 32));
+      const step = 32 * scale + gap;
+      const centerY = rowTop + rowStride / 2;
       frames.forEach((frame, index) => {
         const x = firstItemX + index * step;
         const image = this.add.image(x, centerY, texture, frame).setOrigin(0.5, 0.5).setScale(scale);
@@ -1016,11 +1333,21 @@ export class MapScene extends Phaser.Scene {
     };
 
     const rowY = (index: number) => rowTopInset + index * rowStride;
-    addRow('crops', 'CROPS  ·  radish growth', ['seed', 'sprout', 'mature'], PIXEL32_CROPS_ATLAS_KEY, rowY(0));
-    addRow('cat', 'CAT  ·  directional idle', ['cat-down-idle', 'cat-up-idle', 'cat-left-idle', 'cat-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(1));
-    addRow('quokka', 'QUOKKA  ·  directional idle', ['quokka-down-idle', 'quokka-up-idle', 'quokka-left-idle', 'quokka-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(2));
-    addRow('tools', 'TOOLS  ·  held preview', ['tool-hoe', 'tool-can', 'tool-seedbag', 'tool-axe', 'tool-pick', 'tool-rod', 'tool-sickle'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(3));
-    addRow('objects', 'OBJECTS  ·  static states', ['door-closed', 'door-open', 'shipbox-closed', 'shipbox-open'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(4));
+    const cropStages = ['seed', 'sprout', 'growing-1', 'growing-2', 'flowering', 'mature'] as const;
+    const cropRow = (cropId: string, label: string, rowIndex: number): void => addRow(
+      `crop:${cropId}`,
+      `CROP  ·  ${label}`,
+      cropStages.map((stage) => `crop.${cropId}.${stage}`),
+      PIXEL32_CROPS_ATLAS_KEY,
+      rowY(rowIndex),
+    );
+    cropRow('dew-grass', 'DEW-GRASS', 0);
+    cropRow('moon-bean', 'MOON-BEAN', 1);
+    cropRow('sweet-radish', 'SWEET-RADISH', 2);
+    addRow('cat', 'CAT  ·  directional idle', ['cat-down-idle', 'cat-up-idle', 'cat-left-idle', 'cat-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(3));
+    addRow('quokka', 'QUOKKA  ·  directional idle', ['quokka-down-idle', 'quokka-up-idle', 'quokka-left-idle', 'quokka-right-idle'], PIXEL32_PETS_ATLAS_KEY, rowY(4));
+    addRow('tools', 'TOOLS  ·  held preview', ['tool-hoe', 'tool-can', 'tool-seedbag', 'tool-axe', 'tool-pick', 'tool-rod', 'tool-sickle'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(5));
+    addRow('objects', 'OBJECTS  ·  static states', ['door-closed', 'door-open', 'shipbox-closed', 'shipbox-open'], PIXEL32_INTERACTABLES_ATLAS_KEY, rowY(6));
   }
 
   /** 虛擬按鍵直接送出語意動作；按鍵重綁只影響鍵盤 adapter。 */
@@ -1106,8 +1433,8 @@ export class MapScene extends Phaser.Scene {
         // A door can change coordinates while keeping the same map ID (the greenhouse is a farm area).
         this.movementScheduler = createMovementScheduler({ x: player.x, y: player.y }, {
           initialFacing: player.facing,
-          stepDurationMs: CONTINUOUS_STEP_DURATION_MS,
-          gaitCycleMs: CONTINUOUS_STEP_DURATION_MS * 2,
+          stepDurationMs: this.movementStepDurationMs,
+          gaitCycleMs: this.movementStepDurationMs * 2,
         });
         const stand = standOf(player.x, player.y);
         this.rig.root.setPosition(stand.x, stand.y);
@@ -1648,14 +1975,15 @@ export class MapScene extends Phaser.Scene {
       this.cancelMovementInput();
       this.movementScheduler = createMovementScheduler({ x: state.player.x, y: state.player.y }, {
         initialFacing: state.player.facing,
-        stepDurationMs: CONTINUOUS_STEP_DURATION_MS,
-        gaitCycleMs: CONTINUOUS_STEP_DURATION_MS * 2,
+        stepDurationMs: this.movementStepDurationMs,
+        gaitCycleMs: this.movementStepDurationMs * 2,
       });
       this.renderedMapId = map.id;
       this.drawMap(map.id);
       const stand = standOf(state.player.x, state.player.y);
       this.rig.teleport(stand.x, stand.y);
-      this.frameCamera(map, state.player);
+      this.applyResponsiveLayout?.(this.deps.responsive.get());
+      if (!this.applyResponsiveLayout) this.frameCamera(map, state.player);
     }
 
     this.showFacing(state.player.facing);
@@ -1788,6 +2116,14 @@ export class MapScene extends Phaser.Scene {
     if (this.shownSeason === season) return;
     this.shownSeason = season;
     const tint = seasonGrassTint(season);
+    if (this.seasonWeatherCandidate && this.renderedMapId === 'farm'
+      && this.textures.exists(SEASON_WEATHER_CANDIDATE_ATLAS_KEY)) {
+      const foliageFrame = seasonWeatherFoliageFrameFor('farm', season);
+      const canopy = this.worldV2CandidateSprites.find((sprite) => sprite.getData('p6-063-seasonal-canopy') === true);
+      if (foliageFrame && canopy && this.textures.get(SEASON_WEATHER_CANDIDATE_ATLAS_KEY).has(foliageFrame)) {
+        canopy.setTexture(SEASON_WEATHER_CANDIDATE_ATLAS_KEY, foliageFrame);
+      }
+    }
     for (const sprite of this.tileSprites) {
       if (sprite.groundImage.texture.key === 'tile.grass') sprite.groundImage.setTint(tint);
       else if (this.pixel32CandidateRuntime && sprite.groundImage.texture.key === PIXEL32_MAP_ATLAS_KEY) {
@@ -1858,8 +2194,20 @@ export class MapScene extends Phaser.Scene {
     for (const sprite of this.tileSprites) {
       const kind = effectiveKind(sprite.base, changeAt(state.worldChanges, state.mapId, sprite.x, sprite.y));
       const ground = isGroundLayer(kind) ? kind : sprite.ground;
-      const groundKey = forestSceneAssetFor(state.mapId, ground, sprite.x, sprite.y) ?? `tile.${ground}`;
-      if (sprite.groundImage.texture.key !== groundKey) this.applyAsset(sprite.groundImage, groundKey);
+      const map = this.deps.index.map(state.mapId);
+      const lakeFrame = ground === 'water' ? this.lakeShoreCandidateFrameFor(map, sprite.x, sprite.y) : null;
+      const townFrame = this.townSceneCandidateTileFrame(map, sprite.x, sprite.y, ground);
+      const groundKey = lakeFrame ? LAKE_SHORE_CANDIDATE_ATLAS_KEY
+        : townFrame ? TOWN_SCENE_CANDIDATE_ATLAS_KEY
+        : forestSceneAssetFor(state.mapId, ground, sprite.x, sprite.y) ?? `tile.${ground}`;
+      if (lakeFrame || townFrame) {
+        const frame = lakeFrame ?? townFrame!;
+        if (sprite.groundImage.texture.key !== groundKey || sprite.groundImage.frame?.name !== frame) {
+          sprite.groundImage.setTexture(groundKey, frame).setOrigin(0).setScale(2);
+        }
+      } else if (sprite.groundImage.texture.key !== groundKey) {
+        this.applyAsset(sprite.groundImage, groundKey);
+      }
       if (ground === 'grass' && groundKey === 'tile.grass' && this.shownSeason && sprite.groundImage.texture.key !== PIXEL32_MAP_ATLAS_KEY) {
         sprite.groundImage.setTint(seasonGrassTint(this.shownSeason));
       }
@@ -1869,13 +2217,16 @@ export class MapScene extends Phaser.Scene {
         sprite.objectImage?.setVisible(false);
       } else {
         const objectKey = forestSceneAssetFor(state.mapId, kind, sprite.x, sprite.y) ?? `tile.${kind}`;
+        const townFrame = this.townSceneCandidateTileFrame(map, sprite.x, sprite.y, kind);
         if (!sprite.objectImage) {
-          sprite.objectImage = this.image(objectKey, sprite.x, sprite.y, 1);
+          sprite.objectImage = this.image(objectKey, sprite.x, sprite.y, 1, undefined, 'object');
+        } else if (townFrame) {
+          sprite.objectImage.setTexture(TOWN_SCENE_CANDIDATE_ATLAS_KEY, townFrame).setOrigin(0).setScale(2);
         } else {
           this.applyAsset(sprite.objectImage, objectKey);
         }
         this.placeObjectImage(sprite.objectImage, kind, sprite.y);
-        sprite.objectImage.setVisible(true);
+        sprite.objectImage.setVisible(!(this.townSceneCandidate && townSceneCandidateReplacesTileObject(map, sprite.x, sprite.y)));
       }
     }
   }
@@ -1888,39 +2239,134 @@ export class MapScene extends Phaser.Scene {
   }
 
   private drawMap(mapId: string): void {
+    this.clearQualitySceneBackground();
+    this.clearWorldV2CandidateSprites();
     this.clearPixel32CandidateOverlays();
     this.clearPixel32CandidateInteractables();
     this.clearSceneOverlays();
-    // Tree overlays live on the scene display list so their foot depth can sort
-    // against actor roots. Destroy those roots explicitly before clearing the tile container.
-    for (const sprite of this.tileSprites) {
-      if (sprite.objectImage && sprite.objectImage.parentContainer !== this.world) sprite.objectImage.destroy();
-    }
-    this.world.removeAll(true);
+    clearMapTileLayers(this.tileSprites, this.world);
     this.heldPlots.clear();
     this.tileSprites = [];
     const map = this.deps.index.map(mapId);
-
-    for (let y = 0; y < map.height; y += 1) {
-      for (let x = 0; x < map.width; x += 1) {
-        const tile = tileAt(map, x, y);
-        if (!tile) continue;
-        const ground = groundLayerFor(map, x, y);
-        const groundKey = forestSceneAssetFor(mapId, ground, x, y) ?? `tile.${ground}`;
-        const groundImage = this.image(groundKey, x, y, 0);
-        const objectKey = forestSceneAssetFor(mapId, tile.kind, x, y) ?? `tile.${tile.kind}`;
-        const objectImage = isGroundLayer(tile.kind) ? undefined : this.image(objectKey, x, y, 1);
-        this.tileSprites.push({ x, y, base: tile.kind, ground, groundImage, objectImage });
-        this.world.add(groundImage);
-        if (objectImage) this.placeObjectImage(objectImage, tile.kind, y);
+    const qualityCandidate = this.deps.qualitySceneCandidates.find((candidate) => candidate.mapId === mapId);
+    if (qualityCandidate) {
+      this.loadQualitySceneBackground(map, qualityCandidate);
+      if (qualityCandidate.dynamicLayerKinds?.length) {
+        const plan = legacyMapRenderPlan(map);
+        const dynamicPlan = {
+          ...plan,
+          tiles: plan.tiles.filter((tile) => tile.object !== null && qualityCandidate.dynamicLayerKinds?.includes(tile.object)),
+        };
+        this.tileSprites = renderMapTileLayers(dynamicPlan, {
+          image: (kind, x, y, depth) => this.mapTileImage(mapId, map, kind, x, y, depth),
+          addGround: (image) => this.world.add(image.setVisible(false)),
+          placeObject: (image, kind, y) => this.placeObjectImage(image, kind, y),
+        });
       }
+    } else {
+      this.tileSprites = renderMapTileLayers(legacyMapRenderPlan(map), {
+        image: (kind, x, y, depth) => this.mapTileImage(mapId, map, kind, x, y, depth),
+        addGround: (image) => this.world.add(image),
+        placeObject: (image, kind, y) => this.placeObjectImage(image, kind, y),
+      });
     }
 
     this.clearActors();
     this.createResidents(map);
     this.drawSceneOverlays(mapId);
+    this.drawTownSceneCandidateOverlays(mapId);
+    this.drawWorldV2CandidateOverlays(mapId);
     this.drawPixel32CandidateOverlays(mapId);
     this.drawPixel32CandidateInteractables(mapId);
+  }
+
+  private clearQualitySceneBackground(): void {
+    const loadingImage = this.qualitySceneImage;
+    this.qualitySceneImage = null;
+    if (loadingImage) {
+      loadingImage.onload = null;
+      loadingImage.onerror = null;
+      loadingImage.src = '';
+    }
+    const previous = this.qualitySceneSprite;
+    this.qualitySceneSprite = null;
+    this.qualitySceneLoadMapId = null;
+    if (!previous) return;
+    const textureKey = previous.texture.key;
+    previous.destroy();
+    if (textureKey.startsWith('pixel32-quality-scene-') && this.textures.exists(textureKey)) {
+      this.textures.remove(textureKey);
+    }
+  }
+
+  private loadQualitySceneBackground(map: MapDef, candidate: Pixel32QualitySceneAsset): void {
+    const show = (imageWidth: number, imageHeight: number): void => {
+      if (this.deps.session.state.mapId !== map.id || !this.world || this.qualitySceneSprite) return;
+      const fit = pixel32QualitySceneFit(imageWidth, imageHeight, map.width * TILE_SIZE, map.height * TILE_SIZE);
+      this.qualitySceneSprite = this.add.image(fit.x, fit.y, candidate.textureKey)
+        .setOrigin(0).setScale(fit.scale).setDepth(0);
+      this.world.add(this.qualitySceneSprite);
+      this.world.sendToBack(this.qualitySceneSprite);
+    };
+    if (this.textures.exists(candidate.textureKey)) {
+      const texture = this.textures.get(candidate.textureKey);
+      if (!texture) return;
+      texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+      const source = texture.getSourceImage();
+      show(source.width, source.height);
+      return;
+    }
+    if (this.qualitySceneLoadMapId === map.id) return;
+    this.qualitySceneLoadMapId = map.id;
+    const image = new Image();
+    this.qualitySceneImage = image;
+    image.onload = () => {
+      if (this.qualitySceneImage !== image) return;
+      this.qualitySceneImage = null;
+      if (!this.scene.isActive() || this.deps.session.state.mapId !== map.id || !image.naturalWidth || !image.naturalHeight) return;
+      const texture = this.textures.addImage(candidate.textureKey, image);
+      if (!texture) return;
+      texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+      this.qualitySceneLoadMapId = null;
+      show(image.naturalWidth, image.naturalHeight);
+    };
+    image.onerror = () => {
+      if (this.qualitySceneImage !== image) return;
+      this.qualitySceneImage = null;
+      this.qualitySceneLoadMapId = null;
+      if (this.deps.session.state.mapId === map.id) this.deps.hud.error(`候選場景載入失敗：${map.id}`);
+    };
+    image.src = candidate.imageUrl;
+  }
+
+  private lakeShoreCandidateFrameFor(map: MapDef, x: number, y: number): LakeShoreCandidateFrame | null {
+    if (!this.lakeShoreCandidate || !this.textures.exists(LAKE_SHORE_CANDIDATE_ATLAS_KEY)) return null;
+    return lakeShoreFrameFor(map, x, y);
+  }
+
+  private townSceneCandidateTileFrame(map: MapDef, x: number, y: number, kind?: TileKind): string | null {
+    if (!this.townSceneCandidate || !this.textures.exists(TOWN_SCENE_CANDIDATE_ATLAS_KEY)) return null;
+    const frame = townSceneCandidateTileFrameFor(map, x, y, kind);
+    return frame && this.textures.get(TOWN_SCENE_CANDIDATE_ATLAS_KEY).has(frame) ? frame : null;
+  }
+
+  private mapTileImage(mapId: string, map: MapDef, kind: TileKind, x: number, y: number, depth: number): Phaser.GameObjects.Image {
+    const candidateFrame = kind === 'water' ? this.lakeShoreCandidateFrameFor(map, x, y) : null;
+    if (candidateFrame) {
+      return this.add.image(x * TILE_SIZE, y * TILE_SIZE, LAKE_SHORE_CANDIDATE_ATLAS_KEY, candidateFrame)
+        .setOrigin(0)
+        .setScale(2)
+        .setDepth(depth);
+    }
+    const key = forestSceneAssetFor(mapId, kind, x, y) ?? `tile.${kind}`;
+    const image = this.image(key, x, y, depth, undefined, depth === 0 ? 'ground' : 'object');
+    if (mapId === 'forest' && kind === 'tree'
+      && this.deps.qualitySceneCandidates.find((candidate) => candidate.mapId === 'forest')?.dynamicLayerKinds?.includes('tree')) {
+      const baseScale = image.getData('baseScale') as number | undefined;
+      image.setData('pixel32QualityDynamicTree', true);
+      if (baseScale) image.setScale(baseScale * 1.5).setData('baseScale', baseScale * 1.5);
+    }
+    return image;
   }
 
   private clearSceneOverlays(): void {
@@ -1930,6 +2376,11 @@ export class MapScene extends Phaser.Scene {
 
   /** Render approved, map-specific large art at tile anchors without changing map or world state. */
   private drawSceneOverlays(mapId: string): void {
+    if (this.townSceneCandidate && (mapId === 'village' || mapId === 'plaza')) return;
+    if (this.worldV2SceneCandidate && mapId === 'farm') {
+      // The candidate farm scene supplies its own house and tree art below.
+      return;
+    }
     for (const overlay of sceneOverlaysFor(mapId)) {
       const { textureId, flipX, scale } = resolveAsset(this.deps.assets, overlay.assetId);
       const footX = (overlay.anchorTile.x + 0.5) * TILE_SIZE;
@@ -1938,9 +2389,108 @@ export class MapScene extends Phaser.Scene {
         .setOrigin(0.5, 240 / 256)
         .setFlipX(flipX)
         .setScale(scale)
-        .setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
+        .setDepth(foregroundDepth(footY));
       this.sceneOverlaySprites.push(image);
     }
+  }
+
+  /** Draw unapproved town art at validated existing map anchors; interactions stay on MapDef tiles. */
+  private drawTownSceneCandidateOverlays(mapId: string): void {
+    if (!this.townSceneCandidate || !['village', 'plaza'].includes(mapId)
+      || !this.textures.exists(TOWN_SCENE_CANDIDATE_ATLAS_KEY)) return;
+    const texture = this.textures.get(TOWN_SCENE_CANDIDATE_ATLAS_KEY);
+    const map = this.deps.index.map(mapId);
+    for (const placement of townSceneCandidatePlacements(map)) {
+      if (!texture.has(placement.frame)) continue;
+      const footX = (placement.anchorTile.x + 0.5) * TILE_SIZE;
+      const footY = (placement.anchorTile.y + 1) * TILE_SIZE;
+      const image = this.add.image(footX, footY, TOWN_SCENE_CANDIDATE_ATLAS_KEY, placement.frame)
+        .setOrigin(0.5, 1)
+        .setScale(townSceneCandidateScale(placement.frame))
+        .setDepth(foregroundDepth(footY));
+      this.sceneOverlaySprites.push(image);
+    }
+  }
+
+  private clearWorldV2CandidateSprites(): void {
+    for (const sprite of this.worldV2CandidateSprites) sprite.destroy();
+    this.worldV2CandidateSprites = [];
+  }
+
+  /** DEV-only art composition; map data, collisions, interactions and save state remain authoritative. */
+  private drawWorldV2CandidateOverlays(mapId: string): void {
+    if (!this.worldV2SceneCandidate) return;
+    if (mapId === 'farm') {
+      for (const placement of worldV2FarmSceneCandidatePlacements()) {
+        const seasonalCanopy = placement.frame === 'tree-canopy' && this.seasonWeatherCandidate
+          ? seasonWeatherFoliageFrameFor(mapId, this.deps.session.state.calendar.season)
+          : null;
+        const useSeasonalCanopy = Boolean(seasonalCanopy
+          && this.textures.get(SEASON_WEATHER_CANDIDATE_ATLAS_KEY).has(seasonalCanopy));
+        this.addWorldV2CandidateSprite(
+          useSeasonalCanopy ? SEASON_WEATHER_CANDIDATE_ATLAS_KEY : WORLD_V2_FARM_ATLAS_KEY,
+          useSeasonalCanopy ? SEASON_WEATHER_CANDIDATE_MANIFEST_KEY : WORLD_V2_FARM_MANIFEST_KEY,
+          useSeasonalCanopy ? seasonalCanopy! : placement.frame,
+          placement.anchorTile.x,
+          placement.anchorTile.y,
+          placement.layer,
+        );
+      }
+    } else if (mapId === 'house' || mapId === 'house-wing' || mapId === 'house-full') {
+      const manifest = this.cache.json.get(WORLD_V2_HOUSE_MANIFEST_KEY) as WorldV2CandidateManifestMetadata | undefined;
+      const frames = manifest?.frames;
+      for (const placement of manifest?.composition?.placements ?? []) {
+        const metadata = Array.isArray(frames)
+          ? frames.find((frame) => frame.id === placement.frame)
+          : frames?.[placement.frame];
+        const authoredLayer = metadata?.layer;
+        const backLayer = authoredLayer === 'back-wall' || authoredLayer === 'back-wall-object' || authoredLayer === 'ground-detail';
+        this.addWorldV2CandidateSprite(
+          WORLD_V2_HOUSE_ATLAS_KEY,
+          WORLD_V2_HOUSE_MANIFEST_KEY,
+          placement.frame,
+          placement.anchorTile.x,
+          placement.anchorTile.y,
+          backLayer ? 'back' : 'front',
+        );
+      }
+    }
+  }
+
+  private addWorldV2CandidateSprite(
+    textureKey: string,
+    manifestKey: string,
+    frameName: string,
+    tileX: number,
+    tileY: number,
+    layer: 'back' | 'front',
+  ): void {
+    const texture = this.textures.get(textureKey);
+    if (!texture?.has(frameName)) return;
+    const manifest = this.cache.json.get(manifestKey) as WorldV2CandidateManifestMetadata | undefined;
+    const frames = manifest?.frames;
+    const metadata = Array.isArray(frames)
+      ? frames.find((frame) => frame.id === frameName)
+      : frames?.[frameName];
+    const frameMetadata = metadata as (WorldV2CandidateFrameMetadata & { rect?: { width: number; height: number } }) | undefined;
+    const nativeWidth = frameMetadata?.rect?.width ?? frameMetadata?.width;
+    const nativeHeight = frameMetadata?.rect?.height ?? frameMetadata?.height;
+    const footAnchor = frameMetadata?.footAnchor;
+    const originX = footAnchor && nativeWidth ? footAnchor.x / nativeWidth : 0.5;
+    const originY = footAnchor && nativeHeight ? footAnchor.y / nativeHeight : 1;
+    const footX = tileX * TILE_SIZE + TILE_SIZE / 2;
+    const footY = (tileY + 1) * TILE_SIZE;
+    const sprite = this.add.image(footX, footY, textureKey, frameName)
+      .setOrigin(originX, originY)
+      .setScale(2);
+    if (manifestKey === SEASON_WEATHER_CANDIDATE_MANIFEST_KEY) sprite.setData('p6-063-seasonal-canopy', true);
+    if (layer === 'back') {
+      this.world.add(sprite);
+      sprite.setDepth(1);
+    } else {
+      sprite.setDepth(foregroundDepth(footY));
+    }
+    this.worldV2CandidateSprites.push(sprite);
   }
 
   private clearPixel32CandidateOverlays(): void {
@@ -1964,7 +2514,7 @@ export class MapScene extends Phaser.Scene {
         this.world.add(image);
         image.setDepth(1);
       } else {
-        image.setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
+        image.setDepth(foregroundDepth(footY));
       }
       this.pixel32CandidateOverlaySprites.push({ descriptor, image });
     }
@@ -2005,7 +2555,7 @@ export class MapScene extends Phaser.Scene {
     this.npcRigs.clear();
     this.residentWalks.clear();
     for (const [id, state] of this.companions) {
-      if (!state.def.home) continue;
+      if (!state.def.home || this.followsInCandidate(state.def)) continue;
       state.rig.destroy();
       this.companions.delete(id);
     }
@@ -2014,14 +2564,15 @@ export class MapScene extends Phaser.Scene {
   /** 跟隨玩家的寵物：整個遊戲只建立一次；位置在每次畫面更新時決定。 */
   private createFollowers(): void {
     for (const def of this.deps.companions.companions) {
-      if (!def.follows) continue;
+      if (!this.followsInCandidate(def)) continue;
       const rig = new CharacterRig(this, this.rigDef(def.rig), this.deps.assets);
       rig.root.setDepth(this.actorDepth(rig.footPosition().y, false)).setVisible(false);
       const state: CompanionState = { def, rig, tile: null };
-      if (def.id === 'cat' && this.pixel32CandidatePetFollow
+      const candidatePetArt = def.id === 'cat' ? 'cat' : def.id === 'marsupial' ? 'quokka' : null;
+      if (candidatePetArt && this.pixel32CandidatePetFollow
         && this.textures.exists(PIXEL32_PETS_ATLAS_KEY)) {
         const direction = this.deps.session.state.player.facing;
-        const frameName = `cat-${direction}-idle`;
+        const frameName = `${candidatePetArt}-${direction}-idle`;
         const frame = this.textures.get(PIXEL32_PETS_ATLAS_KEY).get(frameName);
         if (frame) {
           const manifest = this.cache.json.get(PIXEL32_PETS_MANIFEST_KEY) as {
@@ -2033,6 +2584,7 @@ export class MapScene extends Phaser.Scene {
             .setOrigin(anchor.x / frame.width, anchor.y / frame.height)
             .setScale(2);
           rig.root.add(state.candidatePetSprite);
+          state.candidatePetArt = candidatePetArt;
           state.candidatePetDirection = direction;
           state.candidatePetMoveStartedAt = null;
         }
@@ -2045,6 +2597,7 @@ export class MapScene extends Phaser.Scene {
   private createResidents(map: MapDef): void {
     for (const def of this.deps.companions.companions) {
       if (!def.home || def.home.mapId !== map.id) continue;
+      if (this.pixel32CandidatePetFollow && def.id === 'marsupial') continue;
       const rig = new CharacterRig(this, this.rigDef(def.rig), this.deps.assets);
       const stand = standOf(def.home.x, def.home.y);
       rig.root.setDepth(DEPTH_RESIDENT);
@@ -2062,22 +2615,23 @@ export class MapScene extends Phaser.Scene {
     // 居民站的格子（依行程）與住在這裡的夥伴的格子，寵物都不能站。
     for (const placement of residentsOn(this.deps.session.state, this.deps.index)) taken.add(`${placement.x},${placement.y}`);
     for (const state of this.companions.values()) {
-      if (state.def.home && state.tile) taken.add(`${state.tile.x},${state.tile.y}`);
+      if (state.def.home && state.tile && !this.followsInCandidate(state.def)) taken.add(`${state.tile.x},${state.tile.y}`);
     }
     for (const state of this.companions.values()) {
-      if (!state.def.follows) continue;
+      if (!this.followsInCandidate(state.def)) continue;
       if (mapChanged || state.tile === null) {
         const spot = placeBeside(map, player, player.facing, taken);
         state.tile = spot;
         state.rig.root.setVisible(spot !== null);
         if (spot) {
+          taken.add(`${spot.x},${spot.y}`);
           const stand = standOf(spot.x, spot.y);
           state.rig.teleport(stand.x, stand.y);
         }
         if (state.candidatePetSprite) {
           state.candidatePetDirection = player.facing;
           state.candidatePetMoveStartedAt = null;
-          state.candidatePetSprite.setFrame(`cat-${player.facing}-idle`);
+          state.candidatePetSprite.setFrame(`${state.candidatePetArt ?? 'cat'}-${player.facing}-idle`);
         }
       } else if (this.playerTile) {
         const next = nextPetTile(this.playerTile, player, state.tile);
@@ -2118,31 +2672,52 @@ export class MapScene extends Phaser.Scene {
       else delete shown[key];
     }
 
-    for (const [key, plot] of Object.entries(shown)) {
-      const [x, y] = key.split(',').map(Number);
-      if (x === undefined || y === undefined) continue;
-      if (x < 0 || y < 0 || x >= map.width || y >= map.height) continue;
-
-      const soil = this.image('tile.soil', x, y, 1);
-      soil.setData('plot', true);
-      if (plot.watered) soil.setTint(0x6fa8dc);
-      this.world.add(soil);
-
-      if (plot.crop) {
-        const crop = this.deps.index.crop(plot.crop.cropId);
-        const ratio = Math.min(1, plot.crop.growthDays / crop.growthDays);
-        const stage: CandidateCropStage = ratio < 0.25 ? 'seed' : ratio < 0.7 ? 'sprout' : 'mature';
-        const sprite = this.image(`crop.${crop.id}`, x, y, 2, stage);
-        const growthScale = 0.5 + 0.5 * ratio;
-        const displayScale = sprite.texture.key === 'gate1-candidate-atlas' || sprite.texture.key === PIXEL32_CROPS_ATLAS_KEY
-          ? sprite.scaleX * growthScale
-          : growthScale;
-        sprite.setScale(displayScale);
-        sprite.setAlpha(0.5 + 0.5 * ratio);
+    const plans = plotRenderPlan(shown, map, (cropId) => {
+      const crop = this.deps.index.crop(cropId);
+      // Growth-stage candidates stay behind the exact DEV asset-review opt-in;
+      // legacy and ordinary render profiles retain their existing presentation.
+      return this.pixel32CandidateAssets ? crop : { ...crop, visualGrowthStages: undefined };
+    });
+    renderPlotLayer(plans, {
+      soil: (plot) => {
+        const state = shown[plotKey(plot.x, plot.y)];
+        const visual = state
+          ? resolvePlotVisual(
+            state,
+            null,
+            plotNeighborMask(plot.x, plot.y, shown, state.watered),
+            this.deps.session.state.calendar.season,
+          )
+          : null;
+        const candidateFrame = visual?.soilFrame;
+        const useCandidateFrame = this.pixel32CandidateRuntime
+          && this.textures.exists(PIXEL32_MAP_ATLAS_KEY)
+          && candidateFrame !== undefined
+          && this.textures.get(PIXEL32_MAP_ATLAS_KEY).has(candidateFrame);
+        const soil = useCandidateFrame
+          ? this.add.image(plot.x * TILE_SIZE, plot.y * TILE_SIZE, PIXEL32_MAP_ATLAS_KEY, candidateFrame)
+            .setOrigin(0).setScale(2).setDepth(1).setData('baseScale', 2)
+          : this.image('tile.soil', plot.x, plot.y, 1);
+        soil.setData('plot', true);
+        if (visual) soil.setData('plotVisual', visual);
+        if (plot.watered && !useCandidateFrame) soil.setTint(0x6fa8dc);
+        return soil;
+      },
+      crop: (plot) => {
+        const crop = plot.crop!;
+        const sprite = this.image(`crop.${crop.cropId}`, plot.x, plot.y, 2, crop.stage);
+        if (crop.scale !== undefined) {
+          const displayScale = sprite.texture.key === 'gate1-candidate-atlas' || sprite.texture.key === PIXEL32_CROPS_ATLAS_KEY
+            ? sprite.scaleX * crop.scale
+            : crop.scale;
+          sprite.setScale(displayScale);
+          sprite.setAlpha(crop.alpha ?? 1);
+        }
         sprite.setData('plot', true);
-        this.world.add(sprite);
-      }
-    }
+        return sprite;
+      },
+      add: (image) => this.world.add(image),
+    });
   }
 
   private movePlayer(x: number, y: number): void {
@@ -2176,7 +2751,7 @@ export class MapScene extends Phaser.Scene {
     if (this.pixel32CandidateSprite) {
       const direction = (this.movementScheduler?.step?.direction ?? this.movementScheduler?.facing ?? this.shownFacing) as CandidateDirection;
       const motion = this.movementScheduler?.step ? 'walk' : 'idle';
-      const frame = candidateFrameAt(direction, motion, time).frame;
+      const frame = candidateFrameAtGaitPhase(direction, motion, this.movementScheduler?.gaitPhase ?? 0).frame;
       if (this.pixel32CandidateSprite.frame.name !== frame) this.pixel32CandidateSprite.setFrame(frame);
     }
     this.moveWearBadge();
@@ -2195,7 +2770,7 @@ export class MapScene extends Phaser.Scene {
       const elapsed = state.candidatePetMoveStartedAt === null || state.candidatePetMoveStartedAt === undefined
         ? null
         : performance.now() - state.candidatePetMoveStartedAt;
-      const frame = pixel32CandidateCatFrame(state.candidatePetDirection, elapsed);
+      const frame = pixel32CandidatePetFrame(state.candidatePetArt ?? 'cat', state.candidatePetDirection, elapsed);
       if (state.candidatePetSprite.frame.name !== frame
         && this.textures.get(PIXEL32_PETS_ATLAS_KEY).has(frame)) state.candidatePetSprite.setFrame(frame);
     }
@@ -2205,29 +2780,30 @@ export class MapScene extends Phaser.Scene {
   private updateFollowerDepths(): void {
     this.rig.root.setDepth(this.actorDepth(this.rig.footPosition().y, true));
     for (const state of this.companions.values()) {
-      if (!state.def.follows) continue;
+      if (!this.followsInCandidate(state.def)) continue;
       state.rig.root.setDepth(this.actorDepth(state.rig.footPosition().y, false));
     }
   }
 
   private actorDepth(footY: number, player: boolean): number {
-    return DEPTH_ACTOR_BASE + footY / TILE_SIZE + (player ? DEPTH_PLAYER_TIE_BREAK : 0);
+    return actorDepth(footY, player ? 'player' : 'resident');
+  }
+
+  /** The quokka is a village resident in production; only the exact candidate mode previews it as a follower. */
+  private followsInCandidate(def: CompanionDef): boolean {
+    return def.follows === 'player' || (this.pixel32CandidatePetFollow && def.id === 'marsupial');
   }
 
   /** Tree overlays share the scene display list with actor roots, using the image bottom as their foot anchor. */
   private placeObjectImage(image: Phaser.GameObjects.Image, kind: TileKind, tileY: number): void {
-    if (kind !== 'tree') {
-      if (image.parentContainer !== this.world) this.world.add(image);
-      image.setDepth(1);
-      return;
-    }
-
-    if (image.parentContainer === this.world) this.world.remove(image);
-    // A tree at the same foot Y renders just ahead of the player; lower actors
-    // still win naturally because their per-tile depth step is much larger.
-    const footY = image.getBounds().bottom || (tileY + 1) * TILE_SIZE;
-    image.setDepth(this.actorDepth(footY, true) + DEPTH_TREE_TIE_BREAK);
-    this.children.bringToTop(image);
+    placeDepthSortedMapObject(
+      image,
+      kind,
+      tileY,
+      this.world,
+      { add: (object) => this.world.add(object), remove: (object) => this.world.remove(object) },
+      (tree) => this.children.bringToTop(tree),
+    );
   }
 
   /** 每一畫面更新：夜色依時間、變暗依天氣、粒子依天氣與時間。 */
@@ -2235,6 +2811,9 @@ export class MapScene extends Phaser.Scene {
     const state = this.deps.session.state;
     this.nightShade.setAlpha(nightAlpha(state.calendar.minuteOfDay));
     this.weatherShade.setAlpha(weatherDim(state.weather));
+    if (this.seasonWeatherCandidate && this.seasonWeatherAmbience) {
+      this.seasonWeatherAmbience.setFrame(seasonWeatherAmbienceFrameFor(state.calendar.minuteOfDay, state.weather));
+    }
     this.drawWeather(state.weather, time);
   }
 
@@ -2262,6 +2841,21 @@ export class MapScene extends Phaser.Scene {
    * 並記下基準縮放，讓壓扁伸展等效果以它為準。
    */
   private applyAsset(image: Phaser.GameObjects.Image, assetId: string): void {
+    if (image.getData('worldV2CandidateHiddenObject') === true) {
+      image.setVisible(false);
+      return;
+    }
+    const candidateTile = image.getData('worldV2CandidateTile') as { x: number; y: number; layer?: 'ground' | 'object' } | undefined;
+    const candidateSceneFrame = candidateTile
+      ? this.worldV2SceneCandidateFrame(assetId, candidateTile.x, candidateTile.y, candidateTile.layer ?? 'ground')
+      : null;
+    if (candidateSceneFrame) {
+      image.setTexture(candidateSceneFrame.textureKey, candidateSceneFrame.frame);
+      image.setFlipX(false);
+      image.setScale(2);
+      image.setData('baseScale', 2);
+      return;
+    }
     const pixel32Frame = this.pixel32MapFrame(assetId, image.x, image.y);
     if (pixel32Frame) {
       image.setTexture(PIXEL32_MAP_ATLAS_KEY, pixel32Frame);
@@ -2281,8 +2875,9 @@ export class MapScene extends Phaser.Scene {
     const { textureId, flipX, scale } = resolveAsset(this.deps.assets, assetId);
     image.setTexture(textureId);
     image.setFlipX(flipX);
-    image.setScale(scale);
-    image.setData('baseScale', scale);
+    const candidateTreeScale = image.getData('pixel32QualityDynamicTree') === true ? 1.5 : 1;
+    image.setScale(scale * candidateTreeScale);
+    image.setData('baseScale', scale * candidateTreeScale);
   }
 
   private debugSprites(): SpriteDebugInfo[] {
@@ -2306,6 +2901,7 @@ export class MapScene extends Phaser.Scene {
         height: Math.round(bounds.height),
         flipX: image.flipX,
         depth: image.depth,
+        visible: image.visible,
       };
     });
     const asSprite = (info: RigDebugInfo, depth: number): SpriteDebugInfo => ({
@@ -2317,6 +2913,7 @@ export class MapScene extends Phaser.Scene {
       height: info.height,
       flipX: info.flipX,
       depth,
+      visible: true,
     });
     const actors = this.visibleRigs().map(({ rig }) => asSprite(rig.debugInfo(), rig.root.depth));
     return [asSprite(player, this.rig.root.depth), ...actors, ...others];
@@ -2366,7 +2963,50 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 格子的圖：2x 母版以 0.5 倍顯示，仍是 64 px 的格子（占位圖的縮放是 1）。 */
-  private image(key: string, x: number, y: number, depth: number, cropStage?: CandidateCropStage): Phaser.GameObjects.Image {
+  private image(
+    key: string,
+    x: number,
+    y: number,
+    depth: number,
+    cropStage?: CandidateCropStage,
+    mapLayer?: 'ground' | 'object',
+  ): Phaser.GameObjects.Image {
+    const candidateSceneFrame = mapLayer ? this.worldV2SceneCandidateFrame(key, x, y, mapLayer) : null;
+    if (candidateSceneFrame) {
+      const { textureKey, frame, object } = candidateSceneFrame;
+      const imageX = object ? (x + 0.5) * TILE_SIZE : x * TILE_SIZE;
+      const imageY = object ? (y + 1) * TILE_SIZE : y * TILE_SIZE;
+      return this.add.image(imageX, imageY, textureKey, frame)
+        .setOrigin(object ? 0.5 : 0, object ? 1 : 0)
+        .setScale(2)
+        .setData('worldV2CandidateTile', { x, y, layer: mapLayer })
+        .setDepth(depth);
+    }
+    if (this.worldV2SceneCandidate && mapLayer === 'object'
+      && ['house', 'house-wing', 'house-full'].includes(this.deps.session.state.mapId)
+      && this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) {
+      return this.add.image(x * TILE_SIZE, y * TILE_SIZE, WORLD_V2_HOUSE_ATLAS_KEY, 'floor-a')
+        .setVisible(false)
+        .setData('worldV2CandidateTile', { x, y, layer: mapLayer })
+        .setData('worldV2CandidateHiddenObject', true)
+        .setDepth(depth);
+    }
+    if (mapLayer) {
+      const map = this.deps.index.map(this.deps.session.state.mapId);
+      if (mapLayer === 'object' && this.townSceneCandidate && townSceneCandidateReplacesTileObject(map, x, y)) {
+        return this.add.image(x * TILE_SIZE, y * TILE_SIZE, TOWN_SCENE_CANDIDATE_ATLAS_KEY, 'grass-base')
+          .setOrigin(0)
+          .setVisible(false)
+          .setDepth(depth);
+      }
+      const townFrame = this.townSceneCandidateTileFrame(map, x, y);
+      if (townFrame) {
+        return this.add.image(x * TILE_SIZE, y * TILE_SIZE, TOWN_SCENE_CANDIDATE_ATLAS_KEY, townFrame)
+          .setOrigin(0)
+          .setScale(2)
+          .setDepth(depth);
+      }
+    }
     const pixel32Frame = this.pixel32MapFrame(key, x * TILE_SIZE, y * TILE_SIZE);
     if (pixel32Frame) {
       return this.add
@@ -2389,6 +3029,48 @@ export class MapScene extends Phaser.Scene {
       .setOrigin(0)
       .setScale(scale)
       .setDepth(depth);
+  }
+
+  private worldV2SceneCandidateFrame(
+    key: string,
+    x: number,
+    y: number,
+    layer: 'ground' | 'object',
+  ): { textureKey: string; frame: string; object: boolean } | null {
+    if (this.indoorSceneCandidate) {
+      const map = this.deps.index.map(this.deps.session.state.mapId);
+      const candidate = indoorSceneCandidateFrameFor(
+        map,
+        x,
+        y,
+        layer,
+        this.deps.session.state.flags.greenhouse === true,
+      );
+      const textureKey = candidate?.atlas === 'farm' ? INDOOR_FARM_ATLAS_KEY
+        : candidate?.atlas === 'mine' ? INDOOR_MINE_ATLAS_KEY : null;
+      if (candidate && textureKey && this.textures.exists(textureKey)
+        && this.textures.get(textureKey).has(candidate.frame)) {
+        return { textureKey, frame: candidate.frame, object: layer === 'object' };
+      }
+    }
+    if (!this.worldV2SceneCandidate || !this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
+      || !this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) return null;
+    const map = this.deps.index.map(this.deps.session.state.mapId);
+    const tile = tileAt(map, x, y);
+    if (!tile || (!['house', 'house-wing', 'house-full'].includes(map.id) && map.id !== 'farm')) return null;
+    const candidateFrame = worldV2SceneCandidateFrameFor(map, x, y, layer);
+    if (!candidateFrame) return null;
+    const textureKey = map.id === 'farm' ? WORLD_V2_FARM_ATLAS_KEY : WORLD_V2_HOUSE_ATLAS_KEY;
+    if (this.seasonWeatherCandidate && textureKey === WORLD_V2_FARM_ATLAS_KEY
+      && (candidateFrame === 'grass-base' || candidateFrame === 'grass-variant')) {
+      const seasonFrame = seasonWeatherGroundFrameFor(map.id, 'grass', this.deps.session.state.calendar.season);
+      if (seasonFrame && this.textures.get(SEASON_WEATHER_CANDIDATE_ATLAS_KEY).has(seasonFrame)) {
+        return { textureKey: SEASON_WEATHER_CANDIDATE_ATLAS_KEY, frame: seasonFrame, object: false };
+      }
+    }
+    return this.textures.get(textureKey).has(candidateFrame)
+      ? { textureKey, frame: candidateFrame, object: layer === 'object' }
+      : null;
   }
 
   private pixel32MapFrame(assetId: string, worldX: number, worldY: number): string | null {

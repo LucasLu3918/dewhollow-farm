@@ -3,37 +3,35 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>甜蘿蔔 Pixel32 三階候選</title>
+    <title>Pixel32 作物六階候選</title>
     <style>
       :root { color-scheme: light; font-family: ui-rounded, system-ui, sans-serif; color: #2d382d; background: #f3efe4; }
-      body { margin: 0; padding: 28px; }
-      main { max-width: 760px; margin: auto; }
+      body { margin: 0; padding: 24px; }
+      main { max-width: 1020px; margin: auto; }
       h1 { margin: 0 0 8px; font-size: 1.45rem; }
       p { margin: 0; color: #626b5d; line-height: 1.55; }
-      .status { display: inline-block; margin: 14px 0 20px; padding: 5px 9px; border: 1px solid #b77d5c; border-radius: 999px; color: #804a31; font-size: .82rem; }
-      .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-      figure { margin: 0; padding: 14px; border: 1px solid #d7cfb9; border-radius: 12px; background: #faf8f0; text-align: center; }
-      .sprite { width: 64px; height: 64px; margin: 8px auto 12px; image-rendering: pixelated; background: url('./sweet-radish-stages.png') no-repeat; background-size: 192px 64px; }
-      .seed { background-position: 0 0; }
-      .sprout { background-position: -64px 0; }
-      .mature { background-position: -128px 0; }
-      figcaption { font-weight: 650; }
-      small { display: block; margin-top: 4px; color: #777d70; }
-      footer { margin-top: 18px; padding-top: 14px; border-top: 1px solid #d7cfb9; font-size: .82rem; }
-      @media (max-width: 520px) { body { padding: 18px; } .stages { gap: 7px; } figure { padding: 8px 4px; } }
+      .status { display: inline-block; margin: 14px 0 18px; padding: 5px 9px; border: 1px solid #b77d5c; border-radius: 999px; color: #804a31; font-size: .82rem; }
+      .crop { display: grid; grid-template-columns: 105px repeat(6, minmax(0, 1fr)); gap: 8px; margin-bottom: 8px; align-items: stretch; }
+      .crop-name, figure { margin: 0; padding: 9px 5px; border: 1px solid #d7cfb9; border-radius: 10px; background: #faf8f0; text-align: center; }
+      .crop-name { display: grid; place-content: center; font-weight: 700; }
+      .sprite { width: 64px; height: 64px; margin: 0 auto 5px; image-rendering: pixelated; background-image: url('./sweet-radish-stages.png'); background-size: 384px 192px; background-repeat: no-repeat; }
+      figcaption { font-size: .75rem; font-weight: 650; overflow-wrap: anywhere; }
+      footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #d7cfb9; font-size: .82rem; }
+      @media (max-width: 780px) { body { padding: 14px; } .crop { grid-template-columns: 72px repeat(6, minmax(55px, 1fr)); gap: 4px; overflow-x: auto; } .sprite { width: 48px; height: 48px; background-size: 288px 144px; } }
     </style>
   </head>
   <body>
     <main>
-      <h1>甜蘿蔔・原生 32×32</h1>
-      <p>保留紅色塊根與綠葉特徵的手繪像素候選；既有甜蘿蔔圖只作特徵參考，不取樣或複製像素。</p>
+      <h1>內容優先作物・原生 32×32</h1>
+      <p>三種原創作物，各含六個成長里程碑候選畫格；甜蘿蔔像素仍保留舊候選前三格。</p>
       <span class="status">候選稿・尚未核准</span>
-      <section class="stages" aria-label="作物生長三階">
-        <figure><div class="sprite seed" role="img" aria-label="甜蘿蔔種子"></div><figcaption>種子</figcaption><small>seed</small></figure>
-        <figure><div class="sprite sprout" role="img" aria-label="甜蘿蔔幼苗"></div><figcaption>幼苗</figcaption><small>sprout</small></figure>
-        <figure><div class="sprite mature" role="img" aria-label="成熟甜蘿蔔"></div><figcaption>成熟</figcaption><small>mature</small></figure>
-      </section>
+      <div id="sheet" aria-label="三種作物的六階候選畫格"></div>
       <footer>靜態 candidate 預覽，不是遊戲執行畫面，也不代表 Gate 1 通過。</footer>
     </main>
+    <script>
+      const crops = [['dew-grass', '晨露草', 1], ['moon-bean', '月光豆', 2], ['sweet-radish', '甜蘿蔔', 0]];
+      const stages = [['seed', '種子'], ['sprout', '幼苗'], ['growing-1', '生長一'], ['growing-2', '生長二'], ['flowering', '開花'], ['mature', '成熟']];
+      document.querySelector('#sheet').innerHTML = crops.map(([id, title, row]) => `<section class="crop" aria-label="${title}"><div class="crop-name">${title}</div>${stages.map(([stage, label], column) => `<figure><div class="sprite" role="img" aria-label="${title}${label}" style="background-position:-${column * 64}px -${row * 64}px"></div><figcaption>${label}<br><small>crop.${id}.${stage}</small></figcaption></figure>`).join('')}</section>`).join('');
+    </script>
   </body>
 </html>

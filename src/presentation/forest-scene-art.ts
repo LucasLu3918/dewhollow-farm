@@ -33,6 +33,8 @@ export function forestSceneAssetFor(mapId: string, kind: TileKind, x: number, y:
   if (mapId !== 'forest') return null;
   if (kind === 'grass') return mossTiles.has(`${x},${y}`) ? 'scene.forest.moss' : 'scene.forest.grass';
   if (kind === 'path') return 'scene.forest.path';
+  // Unbreakable map boundaries use canopy art so the blocked edge reads as forest instead of a dark placeholder tile.
+  if (kind === 'wall') return 'scene.forest.tree';
   if (kind === 'tree') return rockTiles.has(`${x},${y}`) ? 'scene.forest.rock' : 'scene.forest.tree';
   return null;
 }

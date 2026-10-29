@@ -9,7 +9,7 @@ const screenshotsDirectory = `${evidenceDirectory}/screenshots`;
 const saveEvidence = nodeProcess?.env?.SAVE_TILING_CONTINUITY_EVIDENCE === '1';
 const seasonNames: Record<string, string> = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
 
-test('captures four-season repeated tiles and all field autotile masks', async ({ page, request }, testInfo) => {
+test('captures four-season surface seams, wall corners, ground shadow alpha and all field autotile masks', async ({ page, request }, testInfo) => {
   test.setTimeout(120_000);
   const fs = await import('node:' + 'fs/promises');
   const path = await import('node:' + 'path');
@@ -34,7 +34,7 @@ test('captures four-season repeated tiles and all field autotile masks', async (
     source: { generator: string; generatorSha256: string };
     atlas: { file: string; sha256: string; width: number; height: number };
     seasons: string[];
-    frames: Record<string, { approved?: boolean; season?: string; surface?: string; autotileMask?: number }>;
+    frames: Record<string, { approved?: boolean; season?: string; surface?: string; tileable?: boolean; kind?: string; corner?: string; autotileMask?: number }>;
   };
   const atlasBytes = await fs.readFile(path.join(repoRoot, candidateDirectory, manifest.atlas.file));
   const generatorPath = path.join(repoRoot, manifest.source.generator);
@@ -50,11 +50,16 @@ test('captures four-season repeated tiles and all field autotile masks', async (
   expect(sourceHashes.generatorSha256).toBe(manifest.source.generatorSha256);
   expect(manifest.seasons).toEqual(['spring', 'summer', 'autumn', 'winter']);
 
+  const seasonalSurfaces = ['grass', 'field', 'path', 'water', 'dry-soil', 'wet-soil'];
   const expectedIds = manifest.seasons.flatMap((season) => [
-    ...['grass', 'field', 'path', 'water'].map((surface) => `${season}-${surface}`),
+    ...seasonalSurfaces.map((surface) => `${season}-${surface}`),
     ...Array.from({ length: 16 }, (_, mask) => `${season}-field-edge-${mask.toString(16)}`),
   ]);
+  const sharedIds = ['wood-floor', 'wall-corner-nw', 'wall-corner-ne', 'wall-corner-sw', 'wall-corner-se', 'ground-shadow'];
   expect(expectedIds.every((id) => manifest.frames[id]?.approved === false)).toBe(true);
+  expect(sharedIds.every((id) => manifest.frames[id]?.approved === false)).toBe(true);
+  expect(seasonalSurfaces.every((surface) => manifest.seasons.every((season) => manifest.frames[`${season}-${surface}`]?.tileable === true))).toBe(true);
+  expect(manifest.frames['wood-floor']?.tileable).toBe(true);
   const previewUrl = `/docs/art/candidates/pixel-movement/gate1-assets/pixel32-map/continuity.html`;
   const previewResponse = await request.get(previewUrl);
   expect(previewResponse.ok()).toBe(true);
@@ -73,9 +78,10 @@ test('captures four-season repeated tiles and all field autotile masks', async (
       baseSurfaces: Array<{ surface: string; sourceFrameCount: number; displayedTileCount: number }>;
       fieldEdge: { sourceFrameCount: number; displayedTileCount: number };
       mixedBoundary: { uniqueSourceFrameCount: number; displayedTileCount: number };
+      details: { wallCornerIds: string[]; shadowId: string; shadowAlpha: { transparentPixels: number; partialAlphaPixels: number; opaquePixels: number; transparentBorderPixels: number } };
       uniqueSourceFramesLoaded: number;
     };
-    metrics: Array<{ surface: string; exactMatchCount: number; meanRgbDelta: number; maxRgbDelta: number; sampleCount: number; sourceFrameCount?: number; displayedTileCount?: number }>;
+    metrics: Array<{ surface: string; exactMatchCount: number; meanRgbaDelta: number; maxRgbaDelta: number; sampleCount: number; passed: boolean; sourceFrameCount?: number; displayedTileCount?: number }>;
     hashes: typeof sourceHashes;
   }> = [];
   if (saveEvidence) await fs.mkdir(path.resolve(repoRoot, screenshotsDirectory), { recursive: true });
@@ -99,22 +105,48 @@ test('captures four-season repeated tiles and all field autotile masks', async (
           baseSurfaces: Array<{ surface: string; sourceFrameCount: number; displayedTileCount: number }>;
           fieldEdge: { sourceFrameCount: number; displayedTileCount: number };
           mixedBoundary: { uniqueSourceFrameCount: number; displayedTileCount: number };
+          details: { wallCornerIds: string[]; shadowId: string; shadowAlpha: { transparentPixels: number; partialAlphaPixels: number; opaquePixels: number; transparentBorderPixels: number } };
           uniqueSourceFramesLoaded: number;
         },
-        metrics: JSON.parse(element.dataset.metrics ?? '[]') as Array<{ surface: string; exactMatchCount: number; meanRgbDelta: number; maxRgbDelta: number; sampleCount: number }>,
+        metrics: JSON.parse(element.dataset.metrics ?? '[]') as Array<{ surface: string; exactMatchCount: number; meanRgbaDelta: number; maxRgbaDelta: number; sampleCount: number; passed: boolean }>,
         mixedCellFrames: (element.dataset.mixedCellFrames ?? '').split(',').filter(Boolean),
         mixedMaskIds: (element.dataset.mixedMaskIds ?? '').split(',').filter(Boolean),
         mixedBoundaryAssumption: element.dataset.mixedBoundaryAssumption,
+        tileableSurfaceIds: (element.dataset.tileableSurfaceIds ?? '').split(',').filter(Boolean),
+        seamPassed: element.dataset.seamPassed,
       };
     });
-    expect(observed.loadedFrameIds.sort()).toEqual(expectedIds.filter((id) => id.startsWith(`${season}-`)).sort());
+    const details = await page.locator('#details-preview').evaluate((canvas) => {
+      const element = canvas as HTMLCanvasElement & { dataset: DOMStringMap };
+      return {
+        wallCornerIds: (element.dataset.wallCornerIds ?? '').split(',').filter(Boolean),
+        shadowId: element.dataset.shadowId,
+        shadowAlpha: JSON.parse(element.dataset.shadowAlpha ?? '{}') as { transparentPixels: number; partialAlphaPixels: number; opaquePixels: number; transparentBorderPixels: number },
+        candidateStatus: element.dataset.candidateStatus,
+        approved: element.dataset.approved,
+      };
+    });
+    observed.loadedFrameIds.sort();
+    expect(observed.loadedFrameIds).toEqual([...expectedIds.filter((id) => id.startsWith(`${season}-`)), ...sharedIds].sort());
     expect(observed.maskIds).toEqual(Array.from({ length: 16 }, (_, mask) => `${season}-field-edge-${mask.toString(16)}`));
-    expect(observed.frameCounts.baseSurfaces).toEqual(['grass', 'field', 'path', 'water'].map((surface) => ({ surface, sourceFrameCount: 1, displayedTileCount: 9 })));
+    expect(observed.tileableSurfaceIds).toEqual([...seasonalSurfaces.map((surface) => `${season}-${surface}`), 'wood-floor']);
+    expect(observed.seamPassed).toBe('true');
+    expect(observed.frameCounts.baseSurfaces).toEqual([...seasonalSurfaces, 'wood-floor'].map((surface) => ({ surface, sourceFrameCount: 1, displayedTileCount: 9 })));
     expect(observed.frameCounts.fieldEdge).toEqual({ sourceFrameCount: 16, displayedTileCount: 16 });
     expect(observed.frameCounts.mixedBoundary.displayedTileCount).toBe(9);
     expect(observed.frameCounts.mixedBoundary.uniqueSourceFrameCount).toBe(new Set(observed.mixedCellFrames).size);
     expect(observed.frameCounts.uniqueSourceFramesLoaded).toBe(observed.loadedFrameIds.length);
-    expect(observed.frameCounts.uniqueSourceFramesLoaded).toBe(20);
+    expect(observed.frameCounts.uniqueSourceFramesLoaded).toBe(28);
+    expect(observed.frameCounts.details.wallCornerIds).toEqual(sharedIds.filter((id) => id.startsWith('wall-corner-')));
+    expect(observed.frameCounts.details.shadowId).toBe('ground-shadow');
+    expect(observed.frameCounts.details.shadowAlpha).toEqual(details.shadowAlpha);
+    expect(details.candidateStatus).toBe('candidate');
+    expect(details.approved).toBe('false');
+    expect(details.shadowAlpha.transparentPixels).toBeGreaterThan(0);
+    expect(details.shadowAlpha.partialAlphaPixels).toBeGreaterThan(0);
+    expect(details.shadowAlpha.transparentBorderPixels).toBe(2 * 32 + 2 * (12 - 2));
+    await expect(page.locator('#details-title')).toContainText('牆角與地面陰影');
+    await expect(page.locator('#corner-labels [data-frame-id^="wall-corner-"]')).toHaveCount(4);
     expect(observed.mixedCellFrames).toEqual([
       `${season}-grass`, `${season}-grass`, `${season}-grass`,
       `${season}-field-edge-9`, `${season}-field-edge-1`, `${season}-field-edge-3`,
@@ -131,13 +163,14 @@ test('captures four-season repeated tiles and all field autotile masks', async (
     for (let mask = 0; mask < 16; mask += 1) {
       await expect(page.locator(`#mask-labels [data-mask-id="${season}-field-edge-${mask.toString(16)}"]`)).toHaveCount(1);
     }
-    expect(observed.metrics.map((metric) => metric.surface)).toEqual(['grass', 'field', 'path', 'water']);
+    expect(observed.metrics.map((metric) => metric.surface)).toEqual([...seasonalSurfaces, 'wood-floor']);
     for (const metric of observed.metrics) {
       expect(metric.sampleCount).toBe(64);
       expect(metric.exactMatchCount).toBeGreaterThanOrEqual(0);
       expect(metric.exactMatchCount).toBeLessThanOrEqual(metric.sampleCount);
-      expect(metric.meanRgbDelta).toBeGreaterThanOrEqual(0);
-      expect(metric.maxRgbDelta).toBeGreaterThanOrEqual(metric.meanRgbDelta);
+      expect(metric.meanRgbaDelta).toBeGreaterThanOrEqual(0);
+      expect(metric.maxRgbaDelta).toBe(0);
+      expect(metric.passed).toBe(true);
     }
     const metrics = observed.metrics.map((metric) => ({
       ...metric,
@@ -174,8 +207,8 @@ test('captures four-season repeated tiles and all field autotile masks', async (
         fieldEdgeDisplayedTiles: results.reduce((total, result) => total + result.frameCounts.fieldEdge.displayedTileCount, 0),
         mixedBoundaryDisplayedTiles: results.reduce((total, result) => total + result.frameCounts.mixedBoundary.displayedTileCount, 0),
       },
-      metricMethod: 'For each repeated 3x3 surface sample, compare RGB values of corresponding pixels across each tile left/right and top/bottom edge; 64 comparisons per surface. Alpha is not included. Measurements are observations, not a seamlessness quality gate.',
-      limitations: ['Automated edge RGB measurements do not establish human-perceived seamlessness.', 'RGB measurements do not compare alpha-channel continuity.', 'Mixed-boundary preview treats out-of-grid neighbors as grass and is not a production map-rule test.', 'Candidate frames remain unapproved; no production assets or runtime were changed.'],
+      metricMethod: 'For each tileable 32x32 frame, compare RGBA bytes of corresponding pixels across right/left and bottom/top wrap edges; 64 pixel pairs per surface. All per-channel deltas must be zero. Ground shadow alpha is counted from decoded atlas RGBA pixels and its full border must be transparent.',
+      limitations: ['Exact repeated-edge matching does not establish human-perceived material quality or suitability across different surfaces.', 'Wall-corner art is reviewed as layered examples and is not auto-tiled by this candidate page.', 'Mixed-boundary preview treats out-of-grid neighbors as grass and is not a production map-rule test.', 'Candidate frames remain unapproved; no production assets or runtime were changed.'],
       pageErrors,
       requestFailures,
       badResponses,

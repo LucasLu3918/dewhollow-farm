@@ -227,8 +227,12 @@
         <ul id="heart-event-options" class="shop-list"></ul>
         <button id="heart-event-next" type="button">下一頁</button>
       </section>
-      <section class="panel" aria-label="訊息">
-        <ul id="hud-log" class="log" aria-live="polite"></ul>
+      <section class="panel hud-messages" aria-label="訊息">
+        <div id="hud-toast" class="hud-toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+        <button id="hud-log-toggle" class="hud-log-toggle" type="button" aria-controls="hud-log" aria-expanded="false" aria-label="展開最近 0 則訊息">
+          <span>訊息</span><span id="hud-log-count" aria-hidden="true">0</span>
+        </button>
+        <ul id="hud-log" class="log" aria-live="off" hidden></ul>
         <p id="hud-hint" class="help">按 ? 看操作說明</p>
       </section>
     </main>

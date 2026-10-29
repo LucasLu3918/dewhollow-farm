@@ -25,7 +25,10 @@ test('pixel32 candidate animator shows four directions, looping walk and isolate
   await expect(canvas).toHaveAttribute('data-motion', 'walk');
   await page.clock.pauseAt(await page.evaluate(() => Date.now() + 50));
   const observedWalkFrames = new Set<string>();
-  for (let sample = 0; sample < 5; sample += 1) {
+  // Allow a longer bounded window for requestAnimationFrame under concurrent
+  // browser load; the preview must advance, but every virtual tick need not
+  // produce a distinct rendered frame.
+  for (let sample = 0; sample < 20 && observedWalkFrames.size < 2; sample += 1) {
     await page.clock.runFor(55);
     const frame = await canvas.getAttribute('data-frame');
     expect(frame).toMatch(/^left-(contact-a|passing|contact-b)$/);

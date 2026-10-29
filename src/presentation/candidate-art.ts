@@ -1,10 +1,11 @@
 import type { RenderProfileId } from './pixel-viewport/profiles';
+import type { CropVisualGrowthStage } from '../domain/content';
 
 export const CANDIDATE_ATLAS_TEXTURE = 'gate1-candidate-atlas';
 export const CANDIDATE_MANIFEST_CACHE_KEY = 'gate1-candidate-manifest';
 
 export type CandidateId = '8bit' | '16bit';
-export type CandidateCropStage = 'seed' | 'sprout' | 'mature';
+export type CandidateCropStage = CropVisualGrowthStage;
 
 export interface CandidateArtFrame {
   atlas: typeof CANDIDATE_ATLAS_TEXTURE;
@@ -22,7 +23,7 @@ const CANDIDATE_FRAME_BY_ASSET: Readonly<Record<string, string>> = {
   'tile.fence': 'fence',
 };
 
-const CROP_FRAME_BY_STAGE: Readonly<Record<CandidateCropStage, string>> = {
+const CROP_FRAME_BY_STAGE: Readonly<Partial<Record<CandidateCropStage, string>>> = {
   seed: 'cropSeed',
   sprout: 'cropSprout',
   mature: 'cropMature',

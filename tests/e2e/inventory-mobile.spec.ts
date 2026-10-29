@@ -43,6 +43,11 @@ async function assertPanelFits(page: Page, width: number, height: number): Promi
   const targets = page.locator('#inventory-close, #inventory-panel .inventory-filters button, #inventory-grid button, #inventory-detail button');
   for (let index = 0; index < await targets.count(); index += 1) {
     const target = targets.nth(index);
+    await expect.poll(async () => {
+      const bounds = await target.boundingBox();
+      return bounds === null ? 0 : Math.min(bounds.width, bounds.height);
+    }, { message: `${width}×${height}: touch target ${index} reaches its 44px minimum after layout settles` })
+      .toBeGreaterThanOrEqual(44);
     const bounds = await target.boundingBox();
     expect(bounds, `${width}×${height}: touch target ${index} bounds`).not.toBeNull();
     expect(bounds!.width, `${width}×${height}: touch target ${index} width`).toBeGreaterThanOrEqual(44);
@@ -53,7 +58,35 @@ async function assertPanelFits(page: Page, width: number, height: number): Promi
 test.describe('VF-10 mobile inventory', () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 375, height: 812 } });
 
+  test('opens the enlarged item image by touch without overflowing the phone panel', async ({ page }) => {
+    await start(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.locator('#hud-inventory').tap();
+    await page.locator('#inventory-grid [data-item-id="seed.sweet-radish"]').tap();
+
+    const detail = page.locator('#inventory-detail');
+    const toggle = detail.locator('.inventory-detail-icon');
+    await toggle.scrollIntoViewIfNeeded();
+    await toggle.tap();
+
+    const preview = detail.locator('.inventory-detail-preview');
+    await expect(preview).toBeVisible();
+    await expect(preview.locator('img')).toHaveAttribute('alt', '甜蘿蔔種子放大預覽');
+    await preview.scrollIntoViewIfNeeded();
+    await expect(preview).toBeInViewport();
+    await assertPanelFits(page, 390, 844);
+
+    const dimensions = await preview.locator('img').evaluate((image) => {
+      const rect = image.getBoundingClientRect();
+      const card = image.closest('#inventory-detail')!.getBoundingClientRect();
+      return { imageWidth: rect.width, imageRight: rect.right, cardRight: card.right };
+    });
+    expect(dimensions.imageWidth).toBeLessThanOrEqual(224);
+    expect(dimensions.imageRight).toBeLessThanOrEqual(dimensions.cardRight + 1);
+  });
+
   test('fits safe bounds, scrolls to details, and supports touch at portrait and landscape sizes', async ({ page }) => {
+    test.setTimeout(120_000);
     await start(page);
     await page.locator('#hud-inventory').tap();
     await expect(page.locator('#inventory-panel')).toBeVisible();

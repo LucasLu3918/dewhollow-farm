@@ -1,10 +1,16 @@
 # Pixel32 黑貓與矮袋鼠候選
 
-**狀態：`candidate`／`approved: false`。** 這是隔離的原創寵物像素稿，尚未取得使用者對新圖、方向或動畫的核准，也沒有接入遊戲 runtime。
+**狀態：`candidate`／`approved: false`。** 這是隔離的原創寵物像素稿，尚未取得使用者對新圖、方向或動畫的核准。僅 DEV 的 Pixel32 候選審查路徑會用它取代黑貓 follower 和矮袋鼠居民的可見 sprite，並讓兩者跟隨玩家以檢查四方向跳步；不改正式版夥伴角色、矮袋鼠居民位置、碰撞、存檔或遊戲規則。
 
 ## 預覽
 
 啟動 `npm run dev`，再開啟 `http://localhost:5173/docs/art/candidates/pixel-movement/gate1-pets-pixel32/preview.html`，可切換物種、朝向與姿勢。圖集以 2× 最近鄰顯示；請以 100% 放大像素畫面，再參照下方 checklist 檢查。輸出圖集為 [`pets-pixel32.png`](./pets-pixel32.png)，逐幀座標、錨點、SHA-256 和來源在 [`manifest.json`](./manifest.json)。
+
+遊戲內 DEV 候選跟隨驗收需使用精確路徑：
+
+```text
+?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates&gate1CandidatePetFollow=pixel32-cat-quokka-follow
+```
 
 ![黑貓與矮袋鼠 Pixel32 候選圖集](./pets-pixel32.png)
 
@@ -25,7 +31,7 @@
 - [ ] 四方向身份、動作連續性、四足接地、透明邊緣及 64×64 遊戲世界顯示尺寸清楚。
 - [ ] 記錄每個需核准版本的 atlas SHA-256、逐幀 SHA、預覽、例外與明確決定。
 
-既有靜態圖的核准邊界和物種細節以 [`docs/art/pet-anatomy-checklist.md`](../../../pet-anatomy-checklist.md)、[`docs/art/character-briefs.md`](../../../character-briefs.md) 與 [`docs/art/asset-review.md`](../../../asset-review.md) 為準。每個確切新版本仍須獨立審查；不可修改 `public/`、`content/assets.json`、`content/rigs.json` 或夥伴 runtime 來繞過素材審核。
+既有靜態圖的核准邊界和物種細節以 [`docs/art/pet-anatomy-checklist.md`](../../../pet-anatomy-checklist.md)、[`docs/art/character-briefs.md`](../../../character-briefs.md) 與 [`docs/art/asset-review.md`](../../../asset-review.md) 為準。每個確切新版本仍須獨立審查；此 DEV 候選 runtime 不代表新素材已簽核或正式整合，也不可藉此修改 `public/`、`content/assets.json`、`content/rigs.json` 或正式夥伴行為來繞過素材審核。
 
 ## 重現與檢查
 

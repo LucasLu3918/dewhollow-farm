@@ -1,0 +1,175 @@
+{
+  "slot": "slot-1",
+  "savedAt": "2026-01-01T00:00:00.000Z",
+  "state": {
+    "schemaVersion": 24,
+    "calendar": {
+      "year": 1,
+      "season": "spring",
+      "day": 4,
+      "minuteOfDay": 400
+    },
+    "energy": {
+      "current": 60,
+      "max": 100
+    },
+    "gold": 1250,
+    "mapId": "house-wing",
+    "player": {
+      "x": 4,
+      "y": 5,
+      "facing": "up"
+    },
+    "plots": {
+      "4,3": {
+        "watered": true,
+        "crop": {
+          "cropId": "moon-bean",
+          "growthDays": 1
+        },
+        "dryDays": 0
+      },
+      "5,3": {
+        "watered": false,
+        "crop": null,
+        "dryDays": 0
+      }
+    },
+    "flags": {
+      "house-wing": true
+    },
+    "tool": "hoe",
+    "selectedSeed": "moon-bean",
+    "rng": 12345,
+    "inventory": {
+      "capacity": 24,
+      "stacks": [
+        {
+          "itemId": "seed.moon-bean",
+          "quality": "normal",
+          "count": 2
+        },
+        {
+          "itemId": "seed.sweet-radish",
+          "quality": "normal",
+          "count": 5
+        },
+        {
+          "itemId": "crop.sweet-radish",
+          "quality": "normal",
+          "count": 3
+        }
+      ]
+    },
+    "shipBox": {
+      "entries": [
+        {
+          "itemId": "crop.sweet-radish",
+          "quality": "normal",
+          "count": 2
+        }
+      ]
+    },
+    "playtimeSeconds": 0,
+    "weather": "sunny",
+    "forecast": "sunny",
+    "toolTiers": {
+      "hoe": 0,
+      "can": 0,
+      "seedbag": 0,
+      "axe": 0,
+      "pick": 0,
+      "rod": 0,
+      "sickle": 0
+    },
+    "worldChanges": {},
+    "mineSeed": 87628868,
+    "mineCheckpoint": 1,
+    "skills": {
+      "farming": 0,
+      "foraging": 0,
+      "fishing": 0,
+      "mining": 0,
+      "cooking": 0
+    },
+    "fishing": null,
+    "animals": [],
+    "processing": [],
+    "talents": {},
+    "cows": [],
+    "friendship": {},
+    "heartEvents": [],
+    "pendingHeartEvent": null,
+    "quests": {},
+    "board": {
+      "day": 0,
+      "daily": [],
+      "weekly": null
+    },
+    "mail": {},
+    "dexFragments": 0,
+    "story": {
+      "chapter": 1
+    },
+    "festival": {
+      "done": {},
+      "contest": {
+        "year": 0,
+        "caught": 0
+      },
+      "sold": {
+        "year": 0,
+        "counts": {}
+      },
+      "exchanged": {
+        "year": 0,
+        "counts": {}
+      },
+      "harvest": {
+        "year": 0,
+        "count": 0
+      }
+    },
+    "starLine": false,
+    "repairs": {},
+    "dailyEvent": {
+      "day": 0,
+      "id": null
+    },
+    "collection": {
+      "found": [],
+      "claimed": []
+    },
+    "achievements": {
+      "unlocked": [],
+      "counters": {},
+      "titles": []
+    },
+    "sheep": [],
+    "decor": {
+      "house-wing": [
+        {
+          "itemId": "night-canvas",
+          "x": 11,
+          "y": 4
+        }
+      ]
+    },
+    "wearing": {},
+    "merchant": {
+      "week": 0,
+      "bought": {}
+    },
+    "yearlyIncome": 0,
+    "previousYearIncome": 0,
+    "resetBonus": 0,
+    "playerName": "小涵",
+    "generation": 1,
+    "hotbar": [
+      null,
+      null,
+      null,
+      null
+    ]
+  }
+}

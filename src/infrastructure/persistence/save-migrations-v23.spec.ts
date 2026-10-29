@@ -5,15 +5,15 @@ import { migrateState, type MigrationContext } from './save-migrations';
 
 const context: MigrationContext = { inventoryCapacity: 24, daysPerSeason: 20, wakeMinute: 360, playerName: '小涵' };
 
-describe('存檔 v22 → v24（農場評級、傳承與快捷欄）', () => {
-  it('目前的存檔版本是 24', () => {
-    expect(SAVE_SCHEMA_VERSION).toBe(24);
+describe('存檔 v22 → v25（農場評級、傳承與快捷欄）', () => {
+  it('目前的存檔版本是 25', () => {
+    expect(SAVE_SCHEMA_VERSION).toBe(25);
   });
 
   it('舊存檔的本年收入、上一年收入與豐收加成都從 0 開始，代數為 1，名字沿用預設', () => {
     const migrated = migrateState({ schemaVersion: 22, gold: 10 }, context) as Record<string, unknown>;
     expect(migrated).toMatchObject({
-      schemaVersion: 24,
+      schemaVersion: 25,
       gold: 10,
       yearlyIncome: 0,
       previousYearIncome: 0,
@@ -26,12 +26,12 @@ describe('存檔 v22 → v24（農場評級、傳承與快捷欄）', () => {
   it('v23 存檔會升級並初始化四個空快捷欄位', () => {
     const current = { schemaVersion: 23, yearlyIncome: 7, playerName: '小禾' };
     expect(migrateState(current, context)).toEqual({
-      schemaVersion: 24, yearlyIncome: 7, playerName: '小禾', hotbar: [null, null, null, null],
+      schemaVersion: 25, yearlyIncome: 7, playerName: '小禾', hotbar: [null, null, null, null],
     });
   });
 
-  it('比目前更新的版本（v25）會被拒絕，並提示更新遊戲', () => {
-    expect(() => migrateState({ schemaVersion: 25 }, context)).toThrow(SaveFormatError);
-    expect(() => migrateState({ schemaVersion: 25 }, context)).toThrow(/更新版本/);
+  it('比目前更新的版本（v26）會被拒絕，並提示更新遊戲', () => {
+    expect(() => migrateState({ schemaVersion: 26 }, context)).toThrow(SaveFormatError);
+    expect(() => migrateState({ schemaVersion: 26 }, context)).toThrow(/更新版本/);
   });
 });

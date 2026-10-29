@@ -1,5 +1,5 @@
 import {
-  candidateFrameAt,
+  candidateFrameAtGaitPhase,
   candidateToolFeedback,
   candidateToolImpactCrossed,
   nonNegativeElapsedMs,
@@ -74,7 +74,8 @@ function drawMap() {
 function drawActor(time) {
   const walking = time < state.walkingUntil;
   const elapsed = walking ? nonNegativeElapsedMs(state.walkingUntil - WALK_CYCLE_MS, time) : 0;
-  const frameKey = candidateFrameAt(state.direction, walking ? 'walk' : 'idle', elapsed).frame;
+  const gaitPhase = walking ? (elapsed % WALK_CYCLE_MS) / WALK_CYCLE_MS : 0;
+  const frameKey = candidateFrameAtGaitPhase(state.direction, walking ? 'walk' : 'idle', gaitPhase).frame;
   const frame = animationManifest.frames[frameKey];
   const actorX = state.tileX * TILE + TILE / 2;
   const footY = state.tileY * TILE + TILE - 1;

@@ -6,7 +6,7 @@
   "source": {
     "method": "hand-authored integer pixel primitives; fixed stored-DEFLATE PNG encoding",
     "generator": "tools/art/generate_gate1_map.mjs",
-    "generatorSha256": "333c7866a22c33a46bf403ac3ff5036011a447db6f55c6bd1104d71fd92837b5"
+    "generatorSha256": "0d5457b7e76b5181235233dd70bf6104f2c64978556a9ce9ba46318854ee5063"
   },
   "pixelContract": {
     "nativeTileSize": 32,
@@ -20,8 +20,8 @@
   "atlas": {
     "file": "map-atlas.png",
     "width": 512,
-    "height": 512,
-    "sha256": "64418c1bb8099a821ff32fd520bf3680e7416b4d99e8a50f84f1da05125a2184"
+    "height": 576,
+    "sha256": "6c86f2494e8a11f178a203d0d8758e9fc5ef51776f8188216d38e8eb7f5c36e3"
   },
   "seasons": [
     "spring",
@@ -38,7 +38,15 @@
       "south": 4,
       "west": 8
     },
-    "variantsPerSeason": 16
+    "variantsPerSeason": 16,
+    "soilMaskBits": {
+      "north": 1,
+      "east": 2,
+      "south": 4,
+      "west": 8
+    },
+    "soilVariantsPerSeasonAndMoisture": 16,
+    "soilMaskMeaning": "A set bit means an adjacent plot shares the same moisture; accented edges mark missing same-moisture neighbors."
   },
   "frames": {
     "spring-grass": {
@@ -51,6 +59,7 @@
       "kind": "tile",
       "season": "spring",
       "surface": "grass",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -71,6 +80,7 @@
       "kind": "tile",
       "season": "spring",
       "surface": "field",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -91,6 +101,7 @@
       "kind": "tile",
       "season": "spring",
       "surface": "path",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -111,6 +122,49 @@
       "kind": "tile",
       "season": "spring",
       "surface": "water",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil": {
+      "x": 128,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil": {
+      "x": 160,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -122,7 +176,7 @@
       "approved": false
     },
     "spring-field-edge-0": {
-      "x": 128,
+      "x": 192,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -143,7 +197,7 @@
       "approved": false
     },
     "spring-field-edge-1": {
-      "x": 160,
+      "x": 224,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -164,7 +218,7 @@
       "approved": false
     },
     "spring-field-edge-2": {
-      "x": 192,
+      "x": 256,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -185,7 +239,7 @@
       "approved": false
     },
     "spring-field-edge-3": {
-      "x": 224,
+      "x": 288,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -206,7 +260,7 @@
       "approved": false
     },
     "spring-field-edge-4": {
-      "x": 256,
+      "x": 320,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -227,7 +281,7 @@
       "approved": false
     },
     "spring-field-edge-5": {
-      "x": 288,
+      "x": 352,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -248,7 +302,7 @@
       "approved": false
     },
     "spring-field-edge-6": {
-      "x": 320,
+      "x": 384,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -269,7 +323,7 @@
       "approved": false
     },
     "spring-field-edge-7": {
-      "x": 352,
+      "x": 416,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -290,7 +344,7 @@
       "approved": false
     },
     "spring-field-edge-8": {
-      "x": 384,
+      "x": 448,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -311,7 +365,7 @@
       "approved": false
     },
     "spring-field-edge-9": {
-      "x": 416,
+      "x": 480,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -332,8 +386,8 @@
       "approved": false
     },
     "spring-field-edge-a": {
-      "x": 448,
-      "y": 0,
+      "x": 0,
+      "y": 32,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -353,8 +407,8 @@
       "approved": false
     },
     "spring-field-edge-b": {
-      "x": 480,
-      "y": 0,
+      "x": 32,
+      "y": 32,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -374,7 +428,7 @@
       "approved": false
     },
     "spring-field-edge-c": {
-      "x": 0,
+      "x": 64,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -395,7 +449,7 @@
       "approved": false
     },
     "spring-field-edge-d": {
-      "x": 32,
+      "x": 96,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -416,7 +470,7 @@
       "approved": false
     },
     "spring-field-edge-e": {
-      "x": 64,
+      "x": 128,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -437,7 +491,7 @@
       "approved": false
     },
     "spring-field-edge-f": {
-      "x": 96,
+      "x": 160,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -458,7 +512,7 @@
       "approved": false
     },
     "summer-grass": {
-      "x": 128,
+      "x": 192,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -467,6 +521,7 @@
       "kind": "tile",
       "season": "summer",
       "surface": "grass",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -478,7 +533,7 @@
       "approved": false
     },
     "summer-field": {
-      "x": 160,
+      "x": 224,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -487,6 +542,7 @@
       "kind": "tile",
       "season": "summer",
       "surface": "field",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -498,7 +554,7 @@
       "approved": false
     },
     "summer-path": {
-      "x": 192,
+      "x": 256,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -507,6 +563,7 @@
       "kind": "tile",
       "season": "summer",
       "surface": "path",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -518,7 +575,7 @@
       "approved": false
     },
     "summer-water": {
-      "x": 224,
+      "x": 288,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -527,6 +584,49 @@
       "kind": "tile",
       "season": "summer",
       "surface": "water",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil": {
+      "x": 320,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil": {
+      "x": 352,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -538,7 +638,7 @@
       "approved": false
     },
     "summer-field-edge-0": {
-      "x": 256,
+      "x": 384,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -559,7 +659,7 @@
       "approved": false
     },
     "summer-field-edge-1": {
-      "x": 288,
+      "x": 416,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -580,7 +680,7 @@
       "approved": false
     },
     "summer-field-edge-2": {
-      "x": 320,
+      "x": 448,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -601,7 +701,7 @@
       "approved": false
     },
     "summer-field-edge-3": {
-      "x": 352,
+      "x": 480,
       "y": 32,
       "width": 32,
       "height": 32,
@@ -622,8 +722,8 @@
       "approved": false
     },
     "summer-field-edge-4": {
-      "x": 384,
-      "y": 32,
+      "x": 0,
+      "y": 64,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -643,8 +743,8 @@
       "approved": false
     },
     "summer-field-edge-5": {
-      "x": 416,
-      "y": 32,
+      "x": 32,
+      "y": 64,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -664,8 +764,8 @@
       "approved": false
     },
     "summer-field-edge-6": {
-      "x": 448,
-      "y": 32,
+      "x": 64,
+      "y": 64,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -685,8 +785,8 @@
       "approved": false
     },
     "summer-field-edge-7": {
-      "x": 480,
-      "y": 32,
+      "x": 96,
+      "y": 64,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -706,7 +806,7 @@
       "approved": false
     },
     "summer-field-edge-8": {
-      "x": 0,
+      "x": 128,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -727,7 +827,7 @@
       "approved": false
     },
     "summer-field-edge-9": {
-      "x": 32,
+      "x": 160,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -748,7 +848,7 @@
       "approved": false
     },
     "summer-field-edge-a": {
-      "x": 64,
+      "x": 192,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -769,7 +869,7 @@
       "approved": false
     },
     "summer-field-edge-b": {
-      "x": 96,
+      "x": 224,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -790,7 +890,7 @@
       "approved": false
     },
     "summer-field-edge-c": {
-      "x": 128,
+      "x": 256,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -811,7 +911,7 @@
       "approved": false
     },
     "summer-field-edge-d": {
-      "x": 160,
+      "x": 288,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -832,7 +932,7 @@
       "approved": false
     },
     "summer-field-edge-e": {
-      "x": 192,
+      "x": 320,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -853,7 +953,7 @@
       "approved": false
     },
     "summer-field-edge-f": {
-      "x": 224,
+      "x": 352,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -874,7 +974,7 @@
       "approved": false
     },
     "autumn-grass": {
-      "x": 256,
+      "x": 384,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -883,6 +983,7 @@
       "kind": "tile",
       "season": "autumn",
       "surface": "grass",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -894,7 +995,7 @@
       "approved": false
     },
     "autumn-field": {
-      "x": 288,
+      "x": 416,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -903,6 +1004,7 @@
       "kind": "tile",
       "season": "autumn",
       "surface": "field",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -914,7 +1016,7 @@
       "approved": false
     },
     "autumn-path": {
-      "x": 320,
+      "x": 448,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -923,6 +1025,7 @@
       "kind": "tile",
       "season": "autumn",
       "surface": "path",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -934,7 +1037,7 @@
       "approved": false
     },
     "autumn-water": {
-      "x": 352,
+      "x": 480,
       "y": 64,
       "width": 32,
       "height": 32,
@@ -943,6 +1046,49 @@
       "kind": "tile",
       "season": "autumn",
       "surface": "water",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil": {
+      "x": 0,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil": {
+      "x": 32,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -954,8 +1100,8 @@
       "approved": false
     },
     "autumn-field-edge-0": {
-      "x": 384,
-      "y": 64,
+      "x": 64,
+      "y": 96,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -975,8 +1121,8 @@
       "approved": false
     },
     "autumn-field-edge-1": {
-      "x": 416,
-      "y": 64,
+      "x": 96,
+      "y": 96,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -996,8 +1142,8 @@
       "approved": false
     },
     "autumn-field-edge-2": {
-      "x": 448,
-      "y": 64,
+      "x": 128,
+      "y": 96,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1017,8 +1163,8 @@
       "approved": false
     },
     "autumn-field-edge-3": {
-      "x": 480,
-      "y": 64,
+      "x": 160,
+      "y": 96,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1038,7 +1184,7 @@
       "approved": false
     },
     "autumn-field-edge-4": {
-      "x": 0,
+      "x": 192,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1059,7 +1205,7 @@
       "approved": false
     },
     "autumn-field-edge-5": {
-      "x": 32,
+      "x": 224,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1080,7 +1226,7 @@
       "approved": false
     },
     "autumn-field-edge-6": {
-      "x": 64,
+      "x": 256,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1101,7 +1247,7 @@
       "approved": false
     },
     "autumn-field-edge-7": {
-      "x": 96,
+      "x": 288,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1122,7 +1268,7 @@
       "approved": false
     },
     "autumn-field-edge-8": {
-      "x": 128,
+      "x": 320,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1143,7 +1289,7 @@
       "approved": false
     },
     "autumn-field-edge-9": {
-      "x": 160,
+      "x": 352,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1164,7 +1310,7 @@
       "approved": false
     },
     "autumn-field-edge-a": {
-      "x": 192,
+      "x": 384,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1185,7 +1331,7 @@
       "approved": false
     },
     "autumn-field-edge-b": {
-      "x": 224,
+      "x": 416,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1206,7 +1352,7 @@
       "approved": false
     },
     "autumn-field-edge-c": {
-      "x": 256,
+      "x": 448,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1227,7 +1373,7 @@
       "approved": false
     },
     "autumn-field-edge-d": {
-      "x": 288,
+      "x": 480,
       "y": 96,
       "width": 32,
       "height": 32,
@@ -1248,8 +1394,8 @@
       "approved": false
     },
     "autumn-field-edge-e": {
-      "x": 320,
-      "y": 96,
+      "x": 0,
+      "y": 128,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1269,8 +1415,8 @@
       "approved": false
     },
     "autumn-field-edge-f": {
-      "x": 352,
-      "y": 96,
+      "x": 32,
+      "y": 128,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1290,8 +1436,8 @@
       "approved": false
     },
     "winter-grass": {
-      "x": 384,
-      "y": 96,
+      "x": 64,
+      "y": 128,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1299,6 +1445,7 @@
       "kind": "tile",
       "season": "winter",
       "surface": "grass",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -1310,8 +1457,8 @@
       "approved": false
     },
     "winter-field": {
-      "x": 416,
-      "y": 96,
+      "x": 96,
+      "y": 128,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1319,6 +1466,7 @@
       "kind": "tile",
       "season": "winter",
       "surface": "field",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -1330,8 +1478,8 @@
       "approved": false
     },
     "winter-path": {
-      "x": 448,
-      "y": 96,
+      "x": 128,
+      "y": 128,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1339,6 +1487,7 @@
       "kind": "tile",
       "season": "winter",
       "surface": "path",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -1350,8 +1499,8 @@
       "approved": false
     },
     "winter-water": {
-      "x": 480,
-      "y": 96,
+      "x": 160,
+      "y": 128,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1359,6 +1508,49 @@
       "kind": "tile",
       "season": "winter",
       "surface": "water",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil": {
+      "x": 192,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil": {
+      "x": 224,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "tileable": true,
       "footAnchor": {
         "x": 16,
         "y": 31
@@ -1370,7 +1562,7 @@
       "approved": false
     },
     "winter-field-edge-0": {
-      "x": 0,
+      "x": 256,
       "y": 128,
       "width": 32,
       "height": 32,
@@ -1391,7 +1583,7 @@
       "approved": false
     },
     "winter-field-edge-1": {
-      "x": 32,
+      "x": 288,
       "y": 128,
       "width": 32,
       "height": 32,
@@ -1412,7 +1604,7 @@
       "approved": false
     },
     "winter-field-edge-2": {
-      "x": 64,
+      "x": 320,
       "y": 128,
       "width": 32,
       "height": 32,
@@ -1433,7 +1625,7 @@
       "approved": false
     },
     "winter-field-edge-3": {
-      "x": 96,
+      "x": 352,
       "y": 128,
       "width": 32,
       "height": 32,
@@ -1454,7 +1646,7 @@
       "approved": false
     },
     "winter-field-edge-4": {
-      "x": 128,
+      "x": 384,
       "y": 128,
       "width": 32,
       "height": 32,
@@ -1475,7 +1667,7 @@
       "approved": false
     },
     "winter-field-edge-5": {
-      "x": 160,
+      "x": 416,
       "y": 128,
       "width": 32,
       "height": 32,
@@ -1496,7 +1688,7 @@
       "approved": false
     },
     "winter-field-edge-6": {
-      "x": 192,
+      "x": 448,
       "y": 128,
       "width": 32,
       "height": 32,
@@ -1517,7 +1709,7 @@
       "approved": false
     },
     "winter-field-edge-7": {
-      "x": 224,
+      "x": 480,
       "y": 128,
       "width": 32,
       "height": 32,
@@ -1538,8 +1730,8 @@
       "approved": false
     },
     "winter-field-edge-8": {
-      "x": 256,
-      "y": 128,
+      "x": 0,
+      "y": 160,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1559,8 +1751,8 @@
       "approved": false
     },
     "winter-field-edge-9": {
-      "x": 288,
-      "y": 128,
+      "x": 32,
+      "y": 160,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1580,8 +1772,8 @@
       "approved": false
     },
     "winter-field-edge-a": {
-      "x": 320,
-      "y": 128,
+      "x": 64,
+      "y": 160,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1601,8 +1793,8 @@
       "approved": false
     },
     "winter-field-edge-b": {
-      "x": 352,
-      "y": 128,
+      "x": 96,
+      "y": 160,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1622,8 +1814,8 @@
       "approved": false
     },
     "winter-field-edge-c": {
-      "x": 384,
-      "y": 128,
+      "x": 128,
+      "y": 160,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1643,8 +1835,8 @@
       "approved": false
     },
     "winter-field-edge-d": {
-      "x": 416,
-      "y": 128,
+      "x": 160,
+      "y": 160,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1664,8 +1856,8 @@
       "approved": false
     },
     "winter-field-edge-e": {
-      "x": 448,
-      "y": 128,
+      "x": 192,
+      "y": 160,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1685,8 +1877,8 @@
       "approved": false
     },
     "winter-field-edge-f": {
-      "x": 480,
-      "y": 128,
+      "x": 224,
+      "y": 160,
       "width": 32,
       "height": 32,
       "nativeWidth": 32,
@@ -1703,6 +1895,132 @@
         "x": 16,
         "y": 31
       },
+      "approved": false
+    },
+    "wood-floor": {
+      "x": 256,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "surface": "wood-floor",
+      "tileable": true,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "wall-corner-nw": {
+      "x": 288,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "wall-corner",
+      "surface": "wall",
+      "corner": "nw",
+      "layer": "back",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "wall-corner-ne": {
+      "x": 320,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "wall-corner",
+      "surface": "wall",
+      "corner": "ne",
+      "layer": "back",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "wall-corner-sw": {
+      "x": 352,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "wall-corner",
+      "surface": "wall",
+      "corner": "sw",
+      "layer": "back",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "wall-corner-se": {
+      "x": 384,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "wall-corner",
+      "surface": "wall",
+      "corner": "se",
+      "layer": "back",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "ground-shadow": {
+      "x": 416,
+      "y": 160,
+      "width": 32,
+      "height": 12,
+      "nativeWidth": 32,
+      "nativeHeight": 12,
+      "kind": "shadow",
+      "surface": "shadow",
+      "anchor": "bottom-center",
+      "footAnchor": {
+        "x": 16,
+        "y": 11
+      },
+      "pivot": {
+        "x": 16,
+        "y": 11
+      },
+      "hasTransparency": true,
+      "containsPartialAlpha": true,
       "approved": false
     },
     "house-back": {
@@ -1767,12 +2085,2957 @@
       },
       "layer": "front",
       "approved": false
+    },
+    "spring-dry-soil-edge-0": {
+      "x": 0,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 0,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-1": {
+      "x": 32,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 1,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-2": {
+      "x": 64,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 2,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-3": {
+      "x": 96,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 3,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-4": {
+      "x": 128,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 4,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-5": {
+      "x": 160,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 5,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-6": {
+      "x": 192,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 6,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-7": {
+      "x": 224,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 7,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-8": {
+      "x": 256,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 8,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-9": {
+      "x": 288,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 9,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-a": {
+      "x": 320,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 10,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-b": {
+      "x": 352,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 11,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-c": {
+      "x": 384,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 12,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-d": {
+      "x": 416,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 13,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-e": {
+      "x": 448,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 14,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-dry-soil-edge-f": {
+      "x": 480,
+      "y": 320,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 15,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-0": {
+      "x": 0,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 0,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-1": {
+      "x": 32,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 1,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-2": {
+      "x": 64,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 2,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-3": {
+      "x": 96,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 3,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-4": {
+      "x": 128,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 4,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-5": {
+      "x": 160,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 5,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-6": {
+      "x": 192,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 6,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-7": {
+      "x": 224,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 7,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-8": {
+      "x": 256,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 8,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-9": {
+      "x": 288,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 9,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-a": {
+      "x": 320,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 10,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-b": {
+      "x": 352,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 11,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-c": {
+      "x": 384,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 12,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-d": {
+      "x": 416,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 13,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-e": {
+      "x": 448,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 14,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "spring-wet-soil-edge-f": {
+      "x": 480,
+      "y": 352,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "spring",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 15,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-0": {
+      "x": 0,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 0,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-1": {
+      "x": 32,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 1,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-2": {
+      "x": 64,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 2,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-3": {
+      "x": 96,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 3,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-4": {
+      "x": 128,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 4,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-5": {
+      "x": 160,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 5,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-6": {
+      "x": 192,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 6,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-7": {
+      "x": 224,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 7,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-8": {
+      "x": 256,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 8,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-9": {
+      "x": 288,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 9,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-a": {
+      "x": 320,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 10,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-b": {
+      "x": 352,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 11,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-c": {
+      "x": 384,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 12,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-d": {
+      "x": 416,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 13,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-e": {
+      "x": 448,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 14,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-dry-soil-edge-f": {
+      "x": 480,
+      "y": 384,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 15,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-0": {
+      "x": 0,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 0,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-1": {
+      "x": 32,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 1,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-2": {
+      "x": 64,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 2,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-3": {
+      "x": 96,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 3,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-4": {
+      "x": 128,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 4,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-5": {
+      "x": 160,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 5,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-6": {
+      "x": 192,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 6,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-7": {
+      "x": 224,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 7,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-8": {
+      "x": 256,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 8,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-9": {
+      "x": 288,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 9,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-a": {
+      "x": 320,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 10,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-b": {
+      "x": 352,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 11,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-c": {
+      "x": 384,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 12,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-d": {
+      "x": 416,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 13,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-e": {
+      "x": 448,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 14,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "summer-wet-soil-edge-f": {
+      "x": 480,
+      "y": 416,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "summer",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 15,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-0": {
+      "x": 0,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 0,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-1": {
+      "x": 32,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 1,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-2": {
+      "x": 64,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 2,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-3": {
+      "x": 96,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 3,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-4": {
+      "x": 128,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 4,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-5": {
+      "x": 160,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 5,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-6": {
+      "x": 192,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 6,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-7": {
+      "x": 224,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 7,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-8": {
+      "x": 256,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 8,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-9": {
+      "x": 288,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 9,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-a": {
+      "x": 320,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 10,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-b": {
+      "x": 352,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 11,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-c": {
+      "x": 384,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 12,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-d": {
+      "x": 416,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 13,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-e": {
+      "x": 448,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 14,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-dry-soil-edge-f": {
+      "x": 480,
+      "y": 448,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 15,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-0": {
+      "x": 0,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 0,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-1": {
+      "x": 32,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 1,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-2": {
+      "x": 64,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 2,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-3": {
+      "x": 96,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 3,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-4": {
+      "x": 128,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 4,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-5": {
+      "x": 160,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 5,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-6": {
+      "x": 192,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 6,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-7": {
+      "x": 224,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 7,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-8": {
+      "x": 256,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 8,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-9": {
+      "x": 288,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 9,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-a": {
+      "x": 320,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 10,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-b": {
+      "x": 352,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 11,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-c": {
+      "x": 384,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 12,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-d": {
+      "x": 416,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 13,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-e": {
+      "x": 448,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 14,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "autumn-wet-soil-edge-f": {
+      "x": 480,
+      "y": 480,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "autumn",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 15,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-0": {
+      "x": 0,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 0,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-1": {
+      "x": 32,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 1,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-2": {
+      "x": 64,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 2,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-3": {
+      "x": 96,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 3,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-4": {
+      "x": 128,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 4,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-5": {
+      "x": 160,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 5,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-6": {
+      "x": 192,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 6,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-7": {
+      "x": 224,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 7,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-8": {
+      "x": 256,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 8,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-9": {
+      "x": 288,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 9,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-a": {
+      "x": 320,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 10,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-b": {
+      "x": 352,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 11,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-c": {
+      "x": 384,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 12,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-d": {
+      "x": 416,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 13,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-e": {
+      "x": 448,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 14,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-dry-soil-edge-f": {
+      "x": 480,
+      "y": 512,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "dry-soil",
+      "moisture": "dry",
+      "autotileMask": 15,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-0": {
+      "x": 0,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 0,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-1": {
+      "x": 32,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 1,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-2": {
+      "x": 64,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 2,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-3": {
+      "x": 96,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 3,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-4": {
+      "x": 128,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 4,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-5": {
+      "x": 160,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 5,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-6": {
+      "x": 192,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 6,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-7": {
+      "x": 224,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 7,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-8": {
+      "x": 256,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 8,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-9": {
+      "x": 288,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 9,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-a": {
+      "x": 320,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 10,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-b": {
+      "x": 352,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 11,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-c": {
+      "x": 384,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 12,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-d": {
+      "x": 416,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 13,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-e": {
+      "x": 448,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 14,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
+    },
+    "winter-wet-soil-edge-f": {
+      "x": 480,
+      "y": 544,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "kind": "tile",
+      "season": "winter",
+      "surface": "wet-soil",
+      "moisture": "wet",
+      "autotileMask": 15,
+      "maskMeaning": "same-moisture-soil-neighbors; edge accents mark exposed sides",
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "approved": false
     }
   },
   "limitations": [
     "Candidate preview only; not approved or registered as production assets.",
     "Seasonal variants and autotile masks are hand-authored visual studies, not production game map rules.",
-    "Building and canopy demonstrate layer ordering and do not alter collision or map data.",
+    "Building, wall-corner, shadow, and canopy frames demonstrate layer ordering and do not alter collision or map data.",
+    "Seam checker validates exact RGBA wrap edges for frames explicitly marked tileable; it cannot establish perceived suitability or cross-surface art quality.",
     "Final colors, tile readability, seamless edges, building silhouette, and mobile readability require Gate 1 human review."
   ]
 }

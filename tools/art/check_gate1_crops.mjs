@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Fail-closed validator for the isolated Pixel32 sweet-radish crop candidate. */
+/** Fail-closed validator for the isolated Pixel32 content-first crop candidates. */
 import { createHash } from 'node:crypto';
 import { mkdtemp, open, readFile, rm, lstat } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
@@ -20,6 +20,8 @@ const COLORS = {
   rootOutline: '#702b3c', rootShadow: '#ac3449', rootMid: '#d94752', rootLight: '#f16a68', rootGlint: '#ff9a83',
   leafDeep: '#285b3e', leafShadow: '#347346', leafMid: '#4d9657', leafLight: '#79bd67', leafGlint: '#b3dc78',
   seedLight: '#f3bd83', seedShade: '#8a4a45',
+  grassDeep: '#315f3d', grassMid: '#5f9b51', grassLight: '#a5cb65', grassFlower: '#f5e7a0',
+  beanDeep: '#385e3f', beanMid: '#57935a', beanLight: '#8fc875', beanPod: '#6ea64d', beanSeed: '#e6c878',
 };
 const ROOT_COLORS = [COLORS.rootOutline, COLORS.rootShadow, COLORS.rootMid, COLORS.rootLight, COLORS.rootGlint].map(toRgbaKey);
 const LEAF_COLORS = [COLORS.leafDeep, COLORS.leafShadow, COLORS.leafMid, COLORS.leafLight, COLORS.leafGlint].map(toRgbaKey);
@@ -93,7 +95,7 @@ function decodeRgbaPng(bytes, label) {
     offset = end;
   }
   if (!header || !ended || offset !== bytes.length) fail(`${label} has an incomplete PNG chunk sequence`);
-  if (header.width !== 96 || header.height !== 32) fail(`${label} dimensions must be 96x32`);
+  if (header.width !== 192 || header.height !== 96) fail(`${label} dimensions must be 192x96`);
   if (header.bitDepth !== 8 || header.colorType !== 6 || header.compression !== 0 || header.filter !== 0 || header.interlace !== 0) fail(`${label} must be non-interlaced 8-bit RGBA PNG`);
   const stride = header.width * 4; const expectedLength = (stride + 1) * header.height;
   const inflated = inflateSync(Buffer.concat(compressed), { maxOutputLength: expectedLength });
@@ -133,11 +135,11 @@ async function check(manifestPath) {
   const manifestBytes = await readRegular(manifestPath, 'manifest.json', MAX_MANIFEST_BYTES);
   let manifest;
   try { manifest = JSON.parse(manifestBytes.toString('utf8')); } catch (error) { fail(`manifest.json is invalid JSON: ${error instanceof Error ? error.message : String(error)}`); }
-  exactKeys(manifest, ['schemaVersion', 'id', 'title', 'assetKey', 'status', 'approved', 'source', 'pixelContract', 'atlas', 'palette', 'frames', 'limitations'], 'manifest');
-  if (manifest.schemaVersion !== 1 || manifest.id !== 'gate1-pixel32-sweet-radish-growth-stages' || manifest.assetKey !== 'crop.sweet-radish') fail('manifest identity or schema version is unsupported');
+  exactKeys(manifest, ['schemaVersion', 'id', 'title', 'assetKey', 'status', 'approved', 'source', 'pixelContract', 'atlas', 'palette', 'crops', 'frames', 'limitations'], 'manifest');
+  if (manifest.schemaVersion !== 1 || manifest.id !== 'gate1-pixel32-content-first-crop-growth-stages' || manifest.assetKey !== 'crop.content-first-three') fail('manifest identity or schema version is unsupported');
   if (manifest.status !== 'candidate' || manifest.approved !== false) fail('manifest must remain status=candidate and approved=false');
 
-  exactKeys(manifest.source, ['method', 'generator', 'generatorSha256', 'reference'], 'manifest.source');
+  exactKeys(manifest.source, ['method', 'generator', 'generatorSha256', 'reference', 'crops'], 'manifest.source');
   if (manifest.source.generator !== 'tools/art/generate_gate1_crops.mjs') fail('source.generator must bind tools/art/generate_gate1_crops.mjs');
   exactKeys(manifest.source.reference, ['file', 'sha256', 'role'], 'manifest.source.reference');
   if (manifest.source.reference?.file !== REFERENCE.file || manifest.source.reference?.sha256 !== REFERENCE.sha256
@@ -147,6 +149,8 @@ async function check(manifestPath) {
   if (!/^[a-f0-9]{64}$/.test(manifest.source.generatorSha256 ?? '')) fail('source.generatorSha256 must be a lowercase SHA-256 digest');
   const generatorBytes = await readRegular(GENERATOR, 'bound generator', MAX_GENERATOR_BYTES);
   if (sha256(generatorBytes) !== manifest.source.generatorSha256) fail('bound generator SHA-256 does not match manifest');
+  if (!Array.isArray(manifest.source.crops) || JSON.stringify(manifest.source.crops.map(({ id }) => id)) !== JSON.stringify(['dew-grass', 'moon-bean', 'sweet-radish'])
+    || manifest.source.crops.some((crop) => crop.method !== 'original hand-authored integer-pixel primitives; no external pixels sampled')) fail('source crop provenance must record original hand-authored pixels for all three crops');
 
   exactKeys(manifest.pixelContract, ['nativeTileSize', 'worldTileSize', 'displayScale', 'sampling', 'origin', 'rectConvention', 'anchorConvention'], 'manifest.pixelContract');
   if (manifest.pixelContract.nativeTileSize !== 32 || manifest.pixelContract.worldTileSize !== 64 || manifest.pixelContract.displayScale !== 2
@@ -154,9 +158,9 @@ async function check(manifestPath) {
     || manifest.pixelContract.rectConvention !== 'half-open' || manifest.pixelContract.anchorConvention !== 'integer-pixel-index') fail('pixelContract must follow the Pixel32 candidate contract');
   if (JSON.stringify(manifest.palette) !== JSON.stringify(COLORS)) fail('manifest.palette does not match the generator palette');
   exactKeys(manifest.atlas, ['file', 'width', 'height', 'colorType', 'sha256'], 'manifest.atlas');
-  if (manifest.atlas.file !== 'sweet-radish-stages.png' || manifest.atlas.width !== 96 || manifest.atlas.height !== 32 || manifest.atlas.colorType !== 'RGBA8888') fail('atlas metadata must specify the 96x32 RGBA8888 sweet-radish atlas');
+  if (manifest.atlas.file !== 'sweet-radish-stages.png' || manifest.atlas.width !== 192 || manifest.atlas.height !== 96 || manifest.atlas.colorType !== 'RGBA8888') fail('atlas metadata must specify the 192x96 RGBA8888 three-crop atlas');
   if (!/^[a-f0-9]{64}$/.test(manifest.atlas.sha256 ?? '')) fail('atlas.sha256 must be a lowercase SHA-256 digest');
-  if (!Array.isArray(manifest.limitations) || manifest.limitations.length !== 3 || manifest.limitations.some((entry) => typeof entry !== 'string')) fail('manifest.limitations must retain the three candidate limitations');
+  if (!Array.isArray(manifest.limitations) || manifest.limitations.length !== 4 || manifest.limitations.some((entry) => typeof entry !== 'string')) fail('manifest.limitations must retain the four candidate limitations');
 
   const pngBytes = await readRegular(join(directory, manifest.atlas.file), 'candidate atlas', MAX_ATLAS_BYTES);
   if (sha256(pngBytes) !== manifest.atlas.sha256) fail('atlas SHA-256 does not match manifest');
@@ -171,14 +175,22 @@ async function check(manifestPath) {
     if (!Object.values(COLORS).some((hex) => toRgbaKey(hex) === key)) fail('candidate atlas contains a pixel outside the recorded palette');
   }
   if (!transparent || !opaque) fail('candidate atlas must contain both transparent and opaque pixels');
-  const expectedStages = ['seed', 'sprout', 'mature'];
-  exactKeys(manifest.frames, expectedStages, 'manifest.frames');
+  const crops = ['dew-grass', 'moon-bean', 'sweet-radish'];
+  const atlasRows = { 'sweet-radish': 0, 'dew-grass': 32, 'moon-bean': 64 };
+  const expectedStages = ['seed', 'sprout', 'growing-1', 'growing-2', 'flowering', 'mature'];
+  const canonicalKeys = crops.flatMap((crop) => expectedStages.map((stage) => `crop.${crop}.${stage}`));
+  exactKeys(manifest.frames, [...canonicalKeys, 'seed', 'sprout', 'mature'], 'manifest.frames');
+  if (!Array.isArray(manifest.crops) || JSON.stringify(manifest.crops.map(({ id }) => id)) !== JSON.stringify(crops)) fail('manifest.crops must preserve the content-first crop order');
+  for (const crop of manifest.crops) {
+    exactKeys(crop, ['id', 'title', 'assetKey', 'frameKeys'], `crops.${crop.id}`);
+    if (crop.assetKey !== `crop.${crop.id}` || JSON.stringify(crop.frameKeys) !== JSON.stringify(expectedStages.map((stage) => `crop.${crop.id}.${stage}`))) fail(`crops.${crop.id} frame contract is invalid`);
+  }
   const seenCells = new Set(); const frameDigests = new Set();
-  for (let index = 0; index < expectedStages.length; index += 1) {
-    const stage = expectedStages[index]; const frame = manifest.frames[stage];
-    exactKeys(frame, ['x', 'y', 'width', 'height', 'nativeWidth', 'nativeHeight', 'footAnchor', 'pivot', 'kind', 'stage', 'tags', 'sha256'], `frames.${stage}`);
-    const expectedX = index * 32;
-    if (frame.x !== expectedX || frame.y !== 0 || frame.width !== 32 || frame.height !== 32 || frame.nativeWidth !== 32 || frame.nativeHeight !== 32) fail(`frames.${stage} must occupy its aligned 32x32 native cell`);
+  for (let cropIndex = 0; cropIndex < crops.length; cropIndex += 1) for (let index = 0; index < expectedStages.length; index += 1) {
+    const cropId = crops[cropIndex]; const stage = expectedStages[index]; const key = `crop.${cropId}.${stage}`; const frame = manifest.frames[key];
+    exactKeys(frame, ['x', 'y', 'width', 'height', 'nativeWidth', 'nativeHeight', 'footAnchor', 'pivot', 'kind', 'stage', 'tags', 'sha256'], `frames.${key}`);
+    const expectedX = index * 32; const expectedY = atlasRows[cropId];
+    if (frame.x !== expectedX || frame.y !== expectedY || frame.width !== 32 || frame.height !== 32 || frame.nativeWidth !== 32 || frame.nativeHeight !== 32) fail(`frames.${key} must occupy its aligned 32x32 native cell`);
     if (!integer(frame.x) || !integer(frame.y) || frame.x < 0 || frame.y < 0 || frame.x + frame.width > image.width || frame.y + frame.height > image.height) fail(`frames.${stage} is out of atlas bounds`);
     const cell = `${frame.x},${frame.y}`;
     if (seenCells.has(cell)) fail(`frames.${stage} overlaps another frame`);
@@ -186,18 +198,24 @@ async function check(manifestPath) {
     exactKeys(frame.footAnchor, ['x', 'y'], `frames.${stage}.footAnchor`);
     exactKeys(frame.pivot, ['x', 'y'], `frames.${stage}.pivot`);
     if (frame.footAnchor.x !== 16 || frame.footAnchor.y !== 31 || frame.pivot.x !== 16 || frame.pivot.y !== 31) fail(`frames.${stage} footAnchor and pivot must be (16,31)`);
-    if (frame.kind !== 'cropOverlay' || frame.stage !== stage || JSON.stringify(frame.tags) !== JSON.stringify(['crop', 'sweet-radish', stage, 'candidate'])) fail(`frames.${stage} must retain its candidate crop stage metadata`);
-    if (!/^[a-f0-9]{64}$/.test(frame.sha256 ?? '')) fail(`frames.${stage}.sha256 must be a lowercase SHA-256 digest`);
+    if (frame.kind !== 'cropOverlay' || frame.stage !== stage || JSON.stringify(frame.tags) !== JSON.stringify(['crop', cropId, stage, 'candidate'])) fail(`frames.${key} must retain its candidate crop stage metadata`);
+    if (!/^[a-f0-9]{64}$/.test(frame.sha256 ?? '')) fail(`frames.${key}.sha256 must be a lowercase SHA-256 digest`);
     const frameHash = digestFrame(image, frame);
-    if (frameHash !== frame.sha256) fail(`frames.${stage}.sha256 does not match canonical RGBA pixels`);
-    if (frameDigests.has(frameHash)) fail('seed, sprout, and mature frames must be visually distinct');
-    frameDigests.add(frameHash);
+    if (frameHash !== frame.sha256) fail(`frames.${key}.sha256 does not match canonical RGBA pixels`);
+    const cropDigestKey = `${cropId}:${frameHash}`;
+    if (frameDigests.has(cropDigestKey)) fail(`${cropId} stage frames must be visually distinct`);
+    frameDigests.add(cropDigestKey);
     const counts = colorCounts(image, frame);
-    const rootPixels = ROOT_COLORS.reduce((sum, key) => sum + (counts.get(key) ?? 0), 0);
-    const leafPixels = LEAF_COLORS.reduce((sum, key) => sum + (counts.get(key) ?? 0), 0);
-    if (rootPixels === 0) fail(`frames.${stage} must show a red sweet-radish root/seed`);
-    if (stage !== 'seed' && leafPixels === 0) fail(`frames.${stage} must show green sweet-radish leaves`);
-    if (stage === 'mature' && rootPixels < 40) fail('frames.mature must show a visibly developed red root');
+    if (cropId === 'sweet-radish') {
+      const rootPixels = ROOT_COLORS.reduce((sum, color) => sum + (counts.get(color) ?? 0), 0);
+      const leafPixels = LEAF_COLORS.reduce((sum, color) => sum + (counts.get(color) ?? 0), 0);
+      if (rootPixels === 0) fail(`${key} must show a red sweet-radish root/seed`);
+      if (stage !== 'seed' && leafPixels === 0) fail(`${key} must show green sweet-radish leaves`);
+      if (stage === 'mature' && rootPixels < 40) fail('crop.sweet-radish.mature must show a visibly developed red root');
+    }
+  }
+  for (const stage of ['seed', 'sprout', 'mature']) {
+    if (JSON.stringify(manifest.frames[stage]) !== JSON.stringify(manifest.frames[`crop.sweet-radish.${stage}`])) fail(`legacy ${stage} alias metadata (including footAnchor) must exactly match the canonical sweet-radish frame`);
   }
 
   const generated = await mkdtemp(join(tmpdir(), 'dewhollow-crop-repro-'));
@@ -212,7 +230,7 @@ async function check(manifestPath) {
   } finally {
     await rm(generated, { recursive: true, force: true });
   }
-  return 'PASS: 3 Pixel32 sweet-radish crop frames; source, RGBA pixels, hashes, candidate state, and generator reproduction verified';
+  return 'PASS: 18 Pixel32 crop frames across dew-grass, moon-bean, and sweet-radish; source, RGBA pixels, hashes, candidate state, and generator reproduction verified';
 }
 
 function parseArgs(args) {

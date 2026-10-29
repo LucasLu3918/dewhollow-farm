@@ -22,8 +22,8 @@ node tools/art/check_gate1_animation.mjs
 
 ## 動畫與工具回饋
 
-`src/presentation/candidate-sprite-animator.ts` 以 55 ms 固定影格循環走路序列，左右朝向使用鏡像影格；工具預覽僅示範位置、旋轉與命中時序，減少動態時採用 0.4 倍幅度。這些只供候選預覽，不會接到 `CharacterRig` 或遊戲玩法。
+`src/presentation/candidate-sprite-animator.ts` 以 55 ms 固定影格循環走路序列，左右朝向使用鏡像影格；工具預覽僅示範位置、旋轉與命中時序，減少動態時採用 0.4 倍幅度。DEV `MapScene` 只在明確的 Pixel32 動畫候選開關下保留 `CharacterRig` 根節點與腳錨，將候選圖集接到根節點並替換角色外觀；輸入、移動和 domain 規則不變。正式執行仍使用既有角色外觀，候選圖集不載入 production。可參考 [動畫預覽 E2E](../../../../../../tests/e2e/gate1-candidate-animation.spec.ts) 與 [MapScene runtime E2E](../../../../../../tests/e2e/gate1-mapscene-pixel32-runtime.spec.ts)。
 
 ## Gate 1 限制
 
-此圖集以原創像素圖元製作，並非正式角色素材。checker 能驗證方向／影格完整性、矩形、腳錨、雜湊及生成器重現結果；無法判斷角色跨方向是否像同一個人、腳底是否視覺接地、動作是否自然或工具是否遮到角色。請在 [獨立預覽](./preview.html) 逐格檢視後再決定是否通過 Gate 1。不得登記到 `content/assets.json`、`content/rigs.json` 或正式 `public/`。
+此圖集以原創像素圖元製作，並非正式角色素材，`manifest.json` 的 `approved` 保持 `false`。checker 能驗證方向／影格完整性、矩形、腳錨、雜湊及生成器重現結果；E2E 驗證候選動畫時序及 DEV-only runtime，但無法判斷角色跨方向是否像同一個人、腳底是否視覺接地、動作是否自然或工具是否遮到角色。這些仍待人工 Gate 1 審核；請在 [獨立預覽](./preview.html) 逐格檢視。不得登記到 `content/assets.json`、`content/rigs.json` 或正式 `public/`。

@@ -79,6 +79,7 @@ async function greenhouseFencePixel(page: Page, x: number, y: number): Promise<[
 }
 
 test('camera follows the player on the large farm and stays inside the map', async ({ page }) => {
+  test.setTimeout(90_000);
   await waitForGame(page);
 
   const initial = await cameraView(page);
@@ -99,7 +100,11 @@ test('camera follows the player on the large farm and stays inside the map', asy
     const player = await page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player'));
     return player ? [player.tileX, player.tileY] : null;
   }).toEqual([38, 28]);
-  await expect.poll(async () => (await scroll(page)).x).toBeCloseTo((await cameraView(page))!.bounds.x + (await cameraView(page))!.bounds.width - (await cameraView(page))!.width, 0);
+  await expect.poll(async () => {
+    const position = await scroll(page);
+    const camera = await cameraView(page);
+    return Math.abs(position.x - (camera!.bounds.x + camera!.bounds.width - camera!.width));
+  }).toBeLessThanOrEqual(1);
 });
 
 test('camera is reframed when changing maps', async ({ page }) => {

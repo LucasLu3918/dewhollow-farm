@@ -1,0 +1,224 @@
+{
+  "id": "forest",
+  "status": "candidate",
+  "approved": false,
+  "scene": "dynamic-base.png",
+  "render_mode": "map-tiles",
+  "dimensions_px": {
+    "width": 1536,
+    "height": 1024
+  },
+  "sha256": "23669d6cc1f80041776e5bc26189b6cf22dc2a1977b95c28768a5d5a3a60f5bc",
+  "tool": "built-in image_gen",
+  "source": {
+    "type": "generated_original_art",
+    "style_reference_files": [
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-6feede6e-0747-40b0-9e52-1ddf7a0b2fce.png",
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-ceb8c9ad-a6c9-48ca-a4fb-f268cf68a636.png"
+    ],
+    "style_reference_role": "shared pixel-art quality, texture, lighting and rendering style only; scene/subjects not copied",
+    "user_uploaded_images_used": false
+  },
+  "composite_reference": {
+    "file": "scene.png",
+    "sha256": "25d8875b95e05bff3d62975d2e3ed0a348f707bbe65e6b92e6511eedcdee298f",
+    "role": "visual reference only; not rendered when the state-driven object layer is enabled",
+    "prompt": "Use case: game asset. Asset type: DEV scene background behind an orthogonal tile grid in a cozy farming adventure. Input images: Image 1 and Image 2 are style references only for shared high-detail pixel-art material work, polished crafted texture, warm natural lighting, rich controlled palette. Do not reproduce either composition or their subjects. Create an ORIGINAL forest map as strict orthogonal top-down 2D, camera directly overhead with no isometric angle, perspective convergence, or tilted objects. Landscape 3:2. A broad readable packed-earth path winds from a clear portal opening at the lower-left edge, crosses a small stream over a footbridge, and reaches a clear portal opening at the upper-right edge. Preserve open path width for tile movement. Large tree trunks and canopy masses, mossy boulders, deep water, and dense thorny shrubs should read as solid blocking landmarks; ferns, grass, wildflowers, berry shrubs and a small herb-gathering patch provide detailed non-blocking scenery and interaction landmarks. Keep at least two obvious walkable route branches. High-detail pixel art with crisp intentional pixel clusters, layered forest canopy, individually textured bark, moss, stones, plants and water, warm dappled sunlight and grounded shadows. Suitable to be used as a scene background under separate game grid/collision layers, not a tileset. No characters, animals, UI, text, labels, logos, border, photorealism, blur, isometric perspective, or copied assets."
+  },
+  "dynamic_object_layer": {
+    "source_of_truth": "candidate-layout.json + GameState.worldChanges",
+    "kinds": [
+      "tree",
+      "forage",
+      "tuft"
+    ],
+    "asset_source": "existing transparent forest/map tile assets",
+    "state_transitions": {
+      "tree": "visible until chopped, then hidden over the clean background",
+      "forage": "visible until picked, then hidden; existing daily world-change clearing restores it",
+      "tuft": "visible until cut, then hidden"
+    },
+    "status": "unapproved DEV candidate"
+  },
+  "prompt": "Edit the exact high-detail forest candidate as a DEV base layer. Preserve 1536x1024 dimensions, orthogonal camera, creek, waterfalls, bridge, paths, lighting and palette. Remove trees, chop-able trunks, forage bushes, flowers, ferns, tufts and mushrooms, continuing natural grass/path/water textures. Keep rocks bordering the creek as static scenery; the DEV candidate map layout must provide matching collision where rocks block movement. The remaining interactive props are rendered from existing transparent game assets and MapDef/worldChanges. Not approved for production.",
+  "anchors_normalized_0_to_1": {
+    "coordinate_origin": "top-left; x and y are normalized to scene width and height",
+    "confidence": "rough visual estimates only; all anchors are approximate and must be aligned to the target logical map grid before gameplay use",
+    "walkable_paths": [
+      {
+        "label": "west/lower entry trail",
+        "from": [
+          0.02,
+          0.76
+        ],
+        "via": [
+          [
+            0.12,
+            0.79
+          ],
+          [
+            0.21,
+            0.72
+          ]
+        ],
+        "to": [
+          0.32,
+          0.62
+        ]
+      },
+      {
+        "label": "bridge crossing",
+        "from": [
+          0.36,
+          0.58
+        ],
+        "via": [
+          [
+            0.43,
+            0.53
+          ]
+        ],
+        "to": [
+          0.51,
+          0.48
+        ]
+      },
+      {
+        "label": "northeast exit trail",
+        "from": [
+          0.53,
+          0.45
+        ],
+        "via": [
+          [
+            0.67,
+            0.34
+          ],
+          [
+            0.81,
+            0.24
+          ]
+        ],
+        "to": [
+          0.98,
+          0.08
+        ]
+      }
+    ],
+    "blocking_landmarks": [
+      {
+        "label": "stream and deep-water corridor (not walkable except bridge)",
+        "approximate_bbox": [
+          0.34,
+          0,
+          0.83,
+          0.74
+        ]
+      },
+      {
+        "label": "large tree trunks and canopy groups",
+        "approximate_centers": [
+          [
+            0.06,
+            0.08
+          ],
+          [
+            0.34,
+            0.14
+          ],
+          [
+            0.74,
+            0.18
+          ],
+          [
+            0.95,
+            0.54
+          ],
+          [
+            0.49,
+            0.91
+          ]
+        ]
+      },
+      {
+        "label": "mossy boulder clusters",
+        "approximate_centers": [
+          [
+            0.29,
+            0.24
+          ],
+          [
+            0.55,
+            0.2
+          ],
+          [
+            0.76,
+            0.58
+          ],
+          [
+            0.89,
+            0.76
+          ],
+          [
+            0.64,
+            0.87
+          ]
+        ]
+      }
+    ],
+    "interaction_landmarks": [
+      {
+        "label": "bridge crossing",
+        "center": [
+          0.46,
+          0.52
+        ]
+      },
+      {
+        "label": "herb / flower-gathering patch",
+        "approximate_bbox": [
+          0.16,
+          0.3,
+          0.29,
+          0.42
+        ]
+      },
+      {
+        "label": "berry shrubs",
+        "approximate_centers": [
+          [
+            0.25,
+            0.42
+          ],
+          [
+            0.83,
+            0.28
+          ]
+        ]
+      }
+    ],
+    "portal_openings": [
+      {
+        "label": "west/lower entrance",
+        "edge": "west-southwest",
+        "center": [
+          0,
+          0.76
+        ]
+      },
+      {
+        "label": "northeast exit",
+        "edge": "east-northeast",
+        "center": [
+          1,
+          0.08
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "Scene artwork is a DEV candidate only; approved is false.",
+    "The generated scene composite remains a visual reference; DEV runtime renders the validated candidate-layout with existing transparent forest art so visible obstacles, collision, chopping, and gathering share one MapDef.",
+    "The candidate layout and its art are unapproved and remain isolated behind the DEV Pixel32 preview query."
+  ]
+}

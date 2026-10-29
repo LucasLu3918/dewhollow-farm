@@ -1,0 +1,136 @@
+{
+  "id": "forest",
+  "name": "山腳森林",
+  "width": 24,
+  "height": 16,
+  "rows": [
+    "######TTT###NTTT##TTTTT#",
+    "####TT....#M=BFTTTHHTGJT",
+    "####T.TTT.T#===J====C==L",
+    "###TT.TTT.TT=TTTTTQTTTET",
+    "#TTTT..TT.TT=#..T..TTTTT",
+    "TTT..T.TT.TT=.#..T.....T",
+    "T...T.......=..#...T...T",
+    "T.........##=##.......T#",
+    "T..........#==##....TT.T",
+    "T.TT.V.======...#......T",
+    "T...T.M=F.BH..P..#....T#",
+    "T..R...=========V.#....T",
+    "W====V==.G........T#..T#",
+    "T.......TT...........T##",
+    "T.TTT.........TTT...T###",
+    "#T###TTTTTTTTT##TTTTTTTT"
+  ],
+  "legend": {
+    ".": {
+      "kind": "grass"
+    },
+    "=": {
+      "kind": "path"
+    },
+    "T": {
+      "kind": "tree"
+    },
+    "V": {
+      "kind": "tuft"
+    },
+    "W": {
+      "kind": "door",
+      "to": "farm",
+      "spawn": {
+        "x": 30,
+        "y": 7
+      }
+    },
+    "L": {
+      "kind": "door",
+      "to": "lake",
+      "spawn": {
+        "x": 1,
+        "y": 7
+      }
+    },
+    "N": {
+      "kind": "door",
+      "to": "mine-entrance",
+      "spawn": {
+        "x": 8,
+        "y": 8
+      }
+    },
+    "R": {
+      "kind": "forage",
+      "item": "fern-shoot",
+      "seasons": [
+        "spring"
+      ]
+    },
+    "M": {
+      "kind": "forage",
+      "item": "mushroom",
+      "seasons": [
+        "spring"
+      ]
+    },
+    "B": {
+      "kind": "forage",
+      "item": "berry",
+      "seasons": [
+        "summer"
+      ]
+    },
+    "F": {
+      "kind": "forage",
+      "item": "flower-spring",
+      "seasons": [
+        "spring"
+      ]
+    },
+    "G": {
+      "kind": "forage",
+      "item": "flower-summer",
+      "seasons": [
+        "summer"
+      ]
+    },
+    "J": {
+      "kind": "forage",
+      "item": "herb"
+    },
+    "Q": {
+      "kind": "forage",
+      "item": "flower-bell",
+      "seasons": [
+        "spring"
+      ]
+    },
+    "C": {
+      "kind": "forage",
+      "item": "creek-celery",
+      "seasons": [
+        "summer"
+      ]
+    },
+    "E": {
+      "kind": "forage",
+      "item": "flower-night",
+      "seasons": [
+        "summer"
+      ]
+    },
+    "P": {
+      "kind": "forage",
+      "item": "pine-nut"
+    },
+    "H": {
+      "kind": "forage"
+    },
+    "#": {
+      "kind": "wall"
+    }
+  },
+  "spawn": {
+    "x": 2,
+    "y": 7
+  }
+}

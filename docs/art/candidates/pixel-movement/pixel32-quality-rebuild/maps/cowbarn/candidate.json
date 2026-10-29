@@ -1,0 +1,164 @@
+{
+  "id": "cowbarn",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "tool": "image_gen.imagegen",
+    "style_reference_only": "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-ceb8c9ad-a6c9-48ca-a4fb-f268cf68a636.png",
+    "generated_file": "/Users/lucas/.codex/generated_images/01a18670-eac3-7101-a3c3-9bd779ee3517/exec-f2464fb7-7550-440c-a1a9-0d1b217d16a9.png",
+    "sha256": "28d7bc79b194ee6bdd512431b17e673f4d30de11573342481fc0b57e86aba5a9"
+  },
+  "prompt": "Original premium high-detail pixel art game BACKGROUND. Strict orthographic direct overhead top-down, grid-aligned geometry, no isometric/perspective/foreshortening. Crisp clusters, warm amber lights, cool blue window shadows, rich oak and textile detail. Room completely contained in image and unobstructed central walkable floor. Show physical wall/furniture footprints clearly for later collision mapping. No people, animals, UI, typography, labels, watermark. Reference only for quality and light/material treatment, invent new room. Play-area canvas aspect ratio 1.20:1 (6x5 grid), compact. Wide open double-door portal centered on bottom edge and clear central aisle. Stall pen on right/upper half behind low rail with gate in lower-right. Long trough along upper wall, distinct water basin near right-middle, hay stacks at upper-right. Timber and stone perimeter, straw-floor areas, warm lanterns; no animals.",
+  "landmark_coordinates": {
+    "coordinate_system": "normalized 0..1 pixel/image coordinates; origin top-left; boxes are [x1,y1,x2,y2]",
+    "approximate": true,
+    "map_logical_reference": {
+      "size_tiles": [
+        6,
+        5
+      ],
+      "existing_portal": {
+        "edge": "south",
+        "tile_center_norm": [
+          0.4167,
+          0.9
+        ],
+        "tile": [
+          2,
+          4
+        ]
+      },
+      "spawn_tile": [
+        2,
+        3
+      ]
+    },
+    "walkable_paths": [
+      {
+        "name": "central aisle",
+        "points": [
+          [
+            0.5,
+            0.8
+          ],
+          [
+            0.5,
+            0.62
+          ],
+          [
+            0.6,
+            0.56
+          ],
+          [
+            0.77,
+            0.56
+          ]
+        ],
+        "width_norm": 0.18
+      },
+      {
+        "name": "stall access",
+        "points": [
+          [
+            0.77,
+            0.56
+          ],
+          [
+            0.77,
+            0.38
+          ],
+          [
+            0.62,
+            0.25
+          ]
+        ],
+        "width_norm": 0.13
+      }
+    ],
+    "blocking_furniture_and_barriers": [
+      {
+        "name": "stall rail",
+        "bbox_norm": [
+          0.57,
+          0.26,
+          0.98,
+          0.64
+        ]
+      },
+      {
+        "name": "hay stacks",
+        "bbox_norm": [
+          0.83,
+          0.08,
+          0.97,
+          0.25
+        ]
+      },
+      {
+        "name": "storage shelves",
+        "bbox_norm": [
+          0.03,
+          0.16,
+          0.19,
+          0.67
+        ]
+      }
+    ],
+    "interaction_landmarks": [
+      {
+        "name": "feeding trough",
+        "anchor_norm": [
+          0.5,
+          0.18
+        ]
+      },
+      {
+        "name": "water basin",
+        "anchor_norm": [
+          0.68,
+          0.2
+        ]
+      },
+      {
+        "name": "stall gate",
+        "anchor_norm": [
+          0.82,
+          0.58
+        ]
+      },
+      {
+        "name": "hay storage",
+        "anchor_norm": [
+          0.9,
+          0.17
+        ]
+      }
+    ],
+    "portals_and_exits": [
+      {
+        "name": "pasture exit",
+        "edge": "south",
+        "scene_anchor_norm": [
+          0.5,
+          0.84
+        ],
+        "map_anchor_norm": [
+          0.4167,
+          0.9
+        ],
+        "approximate": true,
+        "note": "Double-door threshold is near center but artwork opening is centered; existing D tile is left of center. Stone apron continues below the door."
+      }
+    ]
+  },
+  "limitations": [
+    "Generated art is a visual background candidate, not a collision mask or tile map.",
+    "Coordinates are rough visual anchors and must be reconciled against map grid during layout authoring.",
+    "The rendered exit openings and existing logical door tiles differ slightly; some images include a stone apron outside the room footprint.",
+    "No gameplay interaction or movement behavior is implemented by these assets."
+  ],
+  "dimensions_px": {
+    "width": 1374,
+    "height": 1145
+  }
+}

@@ -29,14 +29,14 @@ afterEach(() => {
   for (const directory of temporaryDirectories.splice(0)) rmSync(directory, { recursive: true, force: true });
 });
 
-describe('Gate 1 Pixel32 sweet-radish crop candidate checker', () => {
+describe('Gate 1 Pixel32 content-first crop candidate checker', () => {
   it('accepts the reproducible candidate atlas and verifies all three RGBA stages', () => {
     const current = fixture();
     const result = current.run();
 
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('PASS');
-    expect(result.stdout).toContain('3 Pixel32 sweet-radish crop frames');
+    expect(result.stdout).toContain('18 Pixel32 crop frames across dew-grass, moon-bean, and sweet-radish');
   });
 
   it('rejects a candidate promoted to approved', () => {

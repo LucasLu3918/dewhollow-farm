@@ -81,15 +81,14 @@ async function sleepAtHome(page: Page, firstNight: boolean, expectedDay: number)
     await walk(page, 'ArrowUp', 1);
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
 
-    // House spawn (4,5) → stand right of the bed at (1,1), facing west.
-    await walk(page, 'ArrowUp', 3);
-    await walk(page, 'ArrowLeft', 2);
+    // House spawn (10,18) → stand below the bed at (4,7), facing north.
+    await walk(page, 'ArrowUp', 9);
+    await walk(page, 'ArrowLeft', 6);
     await walk(page, 'ArrowUp', 1);
-    await page.keyboard.press('ArrowLeft');
     await expect.poll(async () => {
       const player = await actor(page, 'player');
       return { x: player.tileX, y: player.tileY, busy: player.busy };
-    }).toEqual({ x: 2, y: 1, busy: false });
+    }).toEqual({ x: 4, y: 8, busy: false });
   }
 
   await page.keyboard.press('x');
@@ -124,16 +123,15 @@ test('accepting and completing the day-four forest bulletin is visible and saved
   expect(accepted.state.calendar).toMatchObject({ year: 1, season: 'spring', day: 4 });
   expect(accepted.state.quests['daily-forest']).toMatchObject({ status: 'active' });
 
-  // Leave the house (farm spawn x=2,y=5), then follow the east field edge to the forest door.
-  await walk(page, 'ArrowDown', 2);
-  await walk(page, 'ArrowLeft', 1);
-  await walk(page, 'ArrowDown', 2);
-  await walk(page, 'ArrowRight', 3);
+  // Leave the house from the bed route through the south door to farm spawn (2,5).
+  await walk(page, 'ArrowRight', 6);
+  await walk(page, 'ArrowDown', 1);
+  await walk(page, 'ArrowDown', 9);
   await walk(page, 'ArrowDown', 1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
   await walk(page, 'ArrowRight', 1);
   await walk(page, 'ArrowDown', 2);
-  await walk(page, 'ArrowRight', 35); // x=3 → x=38 on the open row y=7.
+  await walk(page, 'ArrowRight', 36); // x=3 → x=39 on the open row y=7.
   await walk(page, 'ArrowRight', 1); // Enter the forest through E at (39,7).
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('forest');
   await expect(page.locator('#hud-log')).toContainText('委託完成：森林入口巡視');

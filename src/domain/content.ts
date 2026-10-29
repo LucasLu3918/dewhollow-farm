@@ -27,6 +27,15 @@ export interface CropDef {
   growthDays: number;
   /** 可以在哪些季節種植；換季時不在名單內的作物會枯死。 */
   seasons: Season[];
+  /** Optional presentation-only sprite milestones; crop simulation and save data remain day-based. */
+  visualGrowthStages?: CropVisualGrowthMilestone[];
+}
+
+export type CropVisualGrowthStage = 'seed' | 'sprout' | 'growing-1' | 'growing-2' | 'flowering' | 'mature';
+
+export interface CropVisualGrowthMilestone {
+  day: number;
+  stage: CropVisualGrowthStage;
 }
 
 export interface NpcDef {

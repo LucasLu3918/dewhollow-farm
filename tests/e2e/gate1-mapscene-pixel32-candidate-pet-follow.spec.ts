@@ -1,8 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 
+test.use({ video: 'on' });
+
 const candidateRoot = '/docs/art/candidates/pixel-movement/gate1-pets-pixel32';
 const reviewQuery = '?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates';
-const followQuery = `${reviewQuery}&gate1CandidatePetFollow=pixel32-cat-follow`;
+const followQuery = `${reviewQuery}&gate1CandidatePetFollow=pixel32-cat-quokka-follow`;
 const evidenceRoot = 'docs/art/candidates/pixel-movement/gate1-mapscene-pixel32-pet-follow';
 const nodeProcess = (globalThis as typeof globalThis & {
   process?: { cwd(): string; env?: Record<string, string | undefined> };
@@ -45,7 +47,7 @@ async function waitForPlayerIdle(page: Page): Promise<void> {
   })).toBe(true);
 }
 
-test('pixel32 candidate cat follows the production trail with four directional hop sequences', async ({ page }, testInfo) => {
+test('pixel32 candidate cat and quokka follow with four-direction hop sequences', async ({ page }, testInfo) => {
   test.setTimeout(90_000);
   const fs = await import('node:' + 'fs/promises');
   const path = await import('node:' + 'path');
@@ -88,6 +90,9 @@ test('pixel32 candidate cat follows the production trail with four directional h
   });
   expect(initial.pet.manifest).toEqual({ status: 'candidate', approved: false });
   expect(initial.pet.cat).toMatchObject({ direction: 'up', frame: 'cat-up-idle', visible: true, tile: { x: 5, y: 6 } });
+  expect(initial.pet.quokka).toMatchObject({ frame: expect.stringMatching(/^quokka-.*-idle$/), visible: true });
+  expect(initial.pet.quokka?.tile).not.toBeNull();
+  expect(initial.pet.quokka?.tile).not.toEqual(initial.pet.cat?.tile);
 
   const directions: Array<{ key: string; direction: 'up' | 'right' | 'down' | 'left'; target: { x: number; y: number } }> = [
     { key: 'ArrowRight', direction: 'up', target: { x: 5, y: 5 } },
@@ -99,51 +104,86 @@ test('pixel32 candidate cat follows the production trail with four directional h
   const screenshots: Array<{ direction: string; file: string; sha256: string }> = [];
   for (const [index, step] of directions.entries()) {
     await waitForPlayerIdle(page);
-    const playerBefore = await page.evaluate(() => window.__dewhollow!.movement().tile);
+    const before = await page.evaluate(() => ({
+      player: window.__dewhollow!.movement().tile,
+      cat: window.__dewhollow!.candidatePetFollow().cat!.tile!,
+      quokka: window.__dewhollow!.candidatePetFollow().quokka!.tile!,
+    }));
     await page.evaluate(() => {
       const captureWindow = window as typeof window & {
-        __candidatePetFrameCapture?: { active: boolean; frames: string[]; last: string | null };
+        __candidatePetFrameCapture?: {
+          active: boolean;
+          frames: { cat: string[]; quokka: string[] };
+          last: { cat: string | null; quokka: string | null };
+        };
       };
-      const capture = { active: true, frames: [] as string[], last: null as string | null };
+      const capture = {
+        active: true,
+        frames: { cat: [] as string[], quokka: [] as string[] },
+        last: { cat: null as string | null, quokka: null as string | null },
+      };
       captureWindow.__candidatePetFrameCapture = capture;
       const sample = (): void => {
         if (!capture.active) return;
-        const frame = window.__dewhollow?.candidatePetFollow().cat?.frame ?? null;
-        if (frame && frame !== capture.last) {
-          capture.frames.push(frame);
-          capture.last = frame;
-          if (capture.frames.includes(frame.replace(/-(?:hop-a|hop-b|land|idle)$/, '-land'))
-            && frame.endsWith('-idle')) capture.active = false;
+        const pets = window.__dewhollow?.candidatePetFollow();
+        for (const art of ['cat', 'quokka'] as const) {
+          const frame = pets?.[art]?.frame ?? null;
+          if (!frame || frame === capture.last[art]) continue;
+          capture.frames[art].push(frame);
+          capture.last[art] = frame;
         }
+        const complete = (art: 'cat' | 'quokka') => {
+          const frames = capture.frames[art];
+          const landingIndex = frames.findIndex((frame) => frame.endsWith('-land'));
+          return landingIndex >= 0 && frames.slice(landingIndex + 1).some((frame) => frame.endsWith('-idle'));
+        };
+        if (complete('cat') && complete('quokka')) capture.active = false;
         if (capture.active) requestAnimationFrame(sample);
       };
       requestAnimationFrame(sample);
     });
     await page.keyboard.press(step.key);
-    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile)).not.toEqual(playerBefore);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile)).not.toEqual(before.player);
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.candidatePetFollow().cat?.tile ?? null)).toEqual(step.target);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.candidatePetFollow().quokka?.tile ?? null)).not.toEqual(before.quokka);
     await expect.poll(() => page.evaluate(() => {
-      const capture = (window as typeof window & { __candidatePetFrameCapture?: { active: boolean; frames: string[] } }).__candidatePetFrameCapture;
-      return capture?.active === false && capture.frames.some((frame) => frame.endsWith('-land'));
+      const capture = (window as typeof window & {
+        __candidatePetFrameCapture?: { active: boolean; frames: { cat: string[]; quokka: string[] } };
+      }).__candidatePetFrameCapture;
+      return capture?.active === false
+        && capture.frames.cat.some((frame) => frame.endsWith('-land'))
+        && capture.frames.quokka.some((frame) => frame.endsWith('-land'));
     }), { timeout: 5_000 }).toBe(true);
     const capture = await page.evaluate(() => {
-      const pet = window.__dewhollow!.candidatePetFollow().cat!;
-      const frames = (window as typeof window & { __candidatePetFrameCapture?: { frames: string[] } }).__candidatePetFrameCapture?.frames ?? [];
-      return { pet, frames };
+      const pets = window.__dewhollow!.candidatePetFollow();
+      const frames = (window as typeof window & {
+        __candidatePetFrameCapture?: { frames: { cat: string[]; quokka: string[] } };
+      }).__candidatePetFrameCapture?.frames;
+      return { cat: pets.cat!, quokka: pets.quokka!, frames };
     });
     const expectedFrames = [`cat-${step.direction}-hop-a`, `cat-${step.direction}-hop-b`, `cat-${step.direction}-land`, `cat-${step.direction}-idle`];
-    expect(capture.frames.slice(-4)).toEqual(expectedFrames);
-    expect(capture.pet.visible).toBe(true);
-    expect(capture.pet.bounds.width).toBe(64);
-    expect(capture.pet.bounds.height).toBe(64);
-    expect(capture.pet.depth).toBeGreaterThan(10);
+    expect(capture.frames?.cat.slice(-4)).toEqual(expectedFrames);
+    const quokkaDelta = { x: capture.quokka.tile!.x - before.quokka.x, y: capture.quokka.tile!.y - before.quokka.y };
+    const quokkaDirection = quokkaDelta.x > 0 ? 'right' : quokkaDelta.x < 0 ? 'left' : quokkaDelta.y > 0 ? 'down' : 'up';
+    expect(capture.frames?.quokka.slice(-4)).toEqual([
+      `quokka-${quokkaDirection}-hop-a`, `quokka-${quokkaDirection}-hop-b`, `quokka-${quokkaDirection}-land`, `quokka-${quokkaDirection}-idle`,
+    ]);
+    expect(Math.abs(quokkaDelta.x) + Math.abs(quokkaDelta.y)).toBe(1);
+    expect(capture.cat.visible).toBe(true);
+    expect(capture.cat.bounds.width).toBe(64);
+    expect(capture.cat.bounds.height).toBe(64);
+    expect(capture.cat.depth).toBeGreaterThan(10);
+    expect(capture.quokka.visible).toBe(true);
+    expect(capture.quokka.bounds.width).toBe(64);
+    expect(capture.quokka.bounds.height).toBe(64);
+    expect(capture.quokka.depth).toBeGreaterThan(10);
     const screenshotPath = path.join(root, 'screenshots', `${String(index + 1).padStart(2, '0')}-${step.direction}-follow.png`);
     const screenshot = await page.screenshot({ path: saveEvidence ? screenshotPath : undefined, animations: 'disabled' });
-    await testInfo.attach(`${step.direction}-hop-b`, { body: screenshot, contentType: 'image/png' });
+    await testInfo.attach(`${step.direction}-pet-hops`, { body: screenshot, contentType: 'image/png' });
     screenshots.push({ direction: step.direction, file: path.relative(root, screenshotPath), sha256: crypto.createHash('sha256').update(screenshot).digest('hex') });
     await waitForPlayerIdle(page);
-    const pet = await page.evaluate(() => window.__dewhollow!.candidatePetFollow().cat!);
-    records.push({ playerBefore, playerAfter: await page.evaluate(() => window.__dewhollow!.movement().tile), pet, frames: capture.frames });
+    const pets = await page.evaluate(() => window.__dewhollow!.candidatePetFollow());
+    records.push({ before, playerAfter: await page.evaluate(() => window.__dewhollow!.movement().tile), pets, frames: capture.frames });
   }
 
   expect(candidateRequests).toEqual(expect.arrayContaining(candidatePaths));
@@ -163,7 +203,7 @@ test('pixel32 candidate cat follows the production trail with four directional h
     route: followQuery,
     baseRevision: (await (await import('node:' + 'child_process')).execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' })).trim(),
     sourceHashes,
-    candidate: { status: manifest.status, approved: manifest.approved, manifestSha256: sha256(manifestBytes), atlasSha256: sha256(await fs.readFile(atlasPath)), frameHashes: Object.fromEntries(Object.entries(manifest.frames).filter(([name]) => name.startsWith('cat-')).map(([name, frame]) => [name, frame.sha256 ?? null])) },
+    candidate: { status: manifest.status, approved: manifest.approved, manifestSha256: sha256(manifestBytes), atlasSha256: sha256(await fs.readFile(atlasPath)), frameHashes: Object.fromEntries(Object.entries(manifest.frames).filter(([name]) => name.startsWith('cat-') || name.startsWith('quokka-')).map(([name, frame]) => [name, frame.sha256 ?? null])) },
     initial,
     movements: records,
     screenshots,
@@ -171,13 +211,13 @@ test('pixel32 candidate cat follows the production trail with four directional h
     candidateFailures,
     candidateHttpFailures,
     pageErrors,
-    limitations: ['The cat visual alone uses candidate frames; movement targets, 110 ms root motion, trail occupancy, depth ordering, and save behavior remain existing production behavior.', 'The manifest and asset remain candidate and unapproved.', 'Evidence covers desktop Chromium only; no device performance or art approval is implied.'],
+    limitations: ['Both candidate visuals use the existing cat follower trail; the quokka only assumes that role in this exact DEV mode. Production keeps the quokka resident.', 'Movement targets, 110 ms root motion, trail occupancy, depth ordering, and save behavior remain existing production behavior.', 'The manifest and asset remain candidate and unapproved.', 'Evidence covers desktop Chromium only; no device performance or art approval is implied.'],
   };
   if (saveEvidence) await fs.writeFile(path.join(root, 'evidence.json'), `${JSON.stringify(evidence, null, 2)}\n`);
   expect(manifest).toMatchObject({ status: 'candidate', approved: false, atlas: { file: 'pets-pixel32.png' } });
 });
 
-test('candidate cat visual stays disabled without the exact pet-follow opt-in', async ({ page }) => {
+test('candidate pet visuals stay disabled and quokka remains a resident without the exact opt-in', async ({ page }) => {
   await page.goto(reviewQuery);
   await expect(page.locator('#game canvas')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.candidateAssetReview().enabled ?? false)).toBe(true);
@@ -189,4 +229,15 @@ test('candidate cat visual stays disabled without the exact pet-follow opt-in', 
   expect(state.pet).toMatchObject({ enabled: false, manifest: { status: null, approved: null }, cat: null });
   expect(state.actor).toBeDefined();
   expect(state.limitations).toContain('Pet frames are static directional samples; movement and follow animation remain production behavior.');
+  for (let step = 0; step < 20; step += 1) {
+    await page.keyboard.press('ArrowDown');
+    await waitForPlayerIdle(page);
+  }
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
+  const resident = await page.evaluate(() => ({
+    quokkaCandidate: window.__dewhollow!.candidatePetFollow().quokka,
+    actor: window.__dewhollow!.actors().find((entry) => entry.id === 'marsupial'),
+  }));
+  expect(resident.quokkaCandidate).toBeNull();
+  expect(resident.actor).toMatchObject({ tileX: 11, tileY: 5 });
 });

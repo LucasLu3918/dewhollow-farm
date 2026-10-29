@@ -56,6 +56,7 @@ export class SettingsPanel {
     private readonly labels: SettingsLabels,
   ) {
     this.root = required(doc, '#settings-panel');
+    this.root.classList.add('ui-dialog-panel');
     this.dialog = new PanelDialog(this.root);
     this.keyList = required(doc, '#settings-keys');
     this.message = required(doc, '#settings-message');
@@ -73,6 +74,15 @@ export class SettingsPanel {
     this.handedness = required<HTMLSelectElement>(doc, '#settings-handedness');
     this.continuousActions = required<HTMLInputElement>(doc, '#settings-continuous-actions');
 
+    const header = required(doc, '#settings-panel > header');
+    header.classList.add('ui-dialog-panel__header');
+    required(doc, '#settings-title').classList.add('ui-dialog-panel__title');
+    required(doc, '#settings-note').classList.add('ui-dialog-panel__intro');
+    this.message.classList.add('ui-dialog-panel__status');
+    for (const heading of Array.from(this.root.querySelectorAll<HTMLElement>('.settings-heading'))) {
+      heading.classList.add('ui-dialog-panel__section-title');
+    }
+    required(doc, '#settings-close').classList.add('ui-dialog-panel__close');
     required(doc, '#settings-close').addEventListener('click', () => this.close());
     required(doc, '#settings-reset').addEventListener('click', () => this.restoreDefaults());
     required(doc, '#settings-swap').addEventListener('click', () => this.swap());

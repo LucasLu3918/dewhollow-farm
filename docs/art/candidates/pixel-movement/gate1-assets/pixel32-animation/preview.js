@@ -1,4 +1,4 @@
-import { candidateFrameAt, candidateToolFeedback, candidateToolImpactCrossed, nonNegativeElapsedMs } from '../../../../../../src/presentation/candidate-sprite-animator.ts';
+import { candidateFrameAtGaitPhase, candidateToolFeedback, candidateToolImpactCrossed, nonNegativeElapsedMs } from '../../../../../../src/presentation/candidate-sprite-animator.ts';
 
 const SHEET_URL = './player-4dir.png';
 const TOOL_ATLAS_URL = '../16bit.png';
@@ -62,7 +62,8 @@ function draw(time) {
   const elapsed = nonNegativeElapsedMs(motionStartedAt, time);
   const moving = state.motion === 'walk' || state.motion === 'tool';
   const walkMotion = moving && !(state.reducedMotion && state.motion === 'walk');
-  const frame = candidateFrameAt(state.direction, walkMotion ? 'walk' : 'idle', walkMotion ? elapsed % CYCLE_MS : 0);
+  const gaitPhase = walkMotion ? (elapsed % CYCLE_MS) / CYCLE_MS : 0;
+  const frame = candidateFrameAtGaitPhase(state.direction, walkMotion ? 'walk' : 'idle', gaitPhase);
   const match = frame.frame.match(/^(down|up|left|right)-(.+)$/);
   const row = ['down', 'up', 'left', 'right'].indexOf(match?.[1] ?? 'down');
   const column = ['idle', 'contact-a', 'passing', 'contact-b'].indexOf(match?.[2] ?? 'idle');

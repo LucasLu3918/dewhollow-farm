@@ -170,7 +170,7 @@ test('importing a newer version is refused and the empty slot stays empty', asyn
   await openSlots(page);
 
   await row(page, 3).getByRole('button', { name: '匯入' }).click();
-  await chooseImportFile(page, 'newer.json', JSON.stringify({ slot: 'slot-3', savedAt: '2026-10-22T00:00:00.000Z', state: { ...V1_STATE, schemaVersion: 25 } }));
+  await chooseImportFile(page, 'newer.json', JSON.stringify({ slot: 'slot-3', savedAt: '2026-10-22T00:00:00.000Z', state: { ...V1_STATE, schemaVersion: 26 } }));
   await expect(page.locator('#save-message')).toContainText('更新版本');
   await expect(page.locator('#save-message')).toContainText('沒有被改動');
   await expect(row(page, 3).locator('.save-detail')).toContainText('空白');
@@ -201,13 +201,13 @@ test('importing a version 1 save migrates it and it loads', async ({ page }) => 
   await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 4 天');
   await expect(page.locator('#hud-gold')).toHaveText('250 金');
   const saved = await readRecord(page, 'slot-3');
-  expect((saved?.state as { schemaVersion: number }).schemaVersion).toBe(24);
+  expect((saved?.state as { schemaVersion: number }).schemaVersion).toBe(25);
 });
 
-test('saves and reloads a current v24 game without losing inventory, tools, clothing, map, or skills', async ({ page }) => {
+test('saves and reloads a current v25 game without losing inventory, tools, clothing, map, or skills', async ({ page }) => {
   await startGame(page);
   const state = await page.evaluate(() => window.__dewhollow!.gameState());
-  expect(state.schemaVersion).toBe(24);
+  expect(state.schemaVersion).toBe(25);
   state.mapId = 'village';
   state.player = { ...state.player, x: 7, y: 9, facing: 'down' };
   state.inventory = {
@@ -222,7 +222,7 @@ test('saves and reloads a current v24 game without losing inventory, tools, clot
   await page.reload();
   await waitForScene(page);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().schemaVersion ?? 0)).toBe(24);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().schemaVersion ?? 0)).toBe(25);
   await press(page, 's');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
 
@@ -230,7 +230,7 @@ test('saves and reloads a current v24 game without losing inventory, tools, clot
   await waitForScene(page);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
   const reloaded = await page.evaluate(() => window.__dewhollow!.gameState());
-  expect(reloaded.schemaVersion).toBe(24);
+  expect(reloaded.schemaVersion).toBe(25);
   expect(reloaded.inventory).toEqual({
     capacity: 24,
     stacks: [{ itemId: 'crop.moon-bean', quality: 'good', count: 3 }],

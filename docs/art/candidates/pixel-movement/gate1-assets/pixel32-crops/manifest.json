@@ -1,19 +1,33 @@
 {
   "schemaVersion": 1,
-  "id": "gate1-pixel32-sweet-radish-growth-stages",
-  "title": "甜蘿蔔 Pixel32 三階作物候選",
-  "assetKey": "crop.sweet-radish",
+  "id": "gate1-pixel32-content-first-crop-growth-stages",
+  "title": "內容優先 Pixel32 作物六階候選",
+  "assetKey": "crop.content-first-three",
   "status": "candidate",
   "approved": false,
   "source": {
-    "method": "以 generator 中原創整數像素圖元手工繪製；參考圖只供甜蘿蔔紅色塊根與綠葉特徵，不取樣、不縮放、不複製其像素。",
+    "method": "以 generator 中原創整數像素圖元手工繪製三種作物；甜蘿蔔參考圖只供紅色塊根與綠葉特徵，不取樣、不縮放、不複製像素。",
     "generator": "tools/art/generate_gate1_crops.mjs",
-    "generatorSha256": "608958d3b347d3c948d5845c5eb0581a51e8669ba70f8e7a008397ebaf147741",
+    "generatorSha256": "ec140ef54a224070469b6a68025974b1549d2e75738f2ed31a0a32c7b92a6ae5",
     "reference": {
       "file": "public/assets/crops/sweet-radish-2x.png",
       "sha256": "e7cb6a3631de28f28cda03e9ced2725a1bf30c6f8634975e0a53964f47e8fbe7",
       "role": "feature-reference-only; source pixels are not reused"
-    }
+    },
+    "crops": [
+      {
+        "id": "dew-grass",
+        "method": "original hand-authored integer-pixel primitives; no external pixels sampled"
+      },
+      {
+        "id": "moon-bean",
+        "method": "original hand-authored integer-pixel primitives; no external pixels sampled"
+      },
+      {
+        "id": "sweet-radish",
+        "method": "original hand-authored integer-pixel primitives; no external pixels sampled"
+      }
+    ]
   },
   "pixelContract": {
     "nativeTileSize": 32,
@@ -26,10 +40,10 @@
   },
   "atlas": {
     "file": "sweet-radish-stages.png",
-    "width": 96,
-    "height": 32,
+    "width": 192,
+    "height": 96,
     "colorType": "RGBA8888",
-    "sha256": "6fa85cde285fa70538f932f4ebeabcdcdb709ae2e65b43298ce232fcdb78ba40"
+    "sha256": "27f9972873f974d30951b61fed35a6371bf837a16cd46d0c8f0711030f7c40ab"
   },
   "palette": {
     "rootOutline": "#702b3c",
@@ -43,9 +57,509 @@
     "leafLight": "#79bd67",
     "leafGlint": "#b3dc78",
     "seedLight": "#f3bd83",
-    "seedShade": "#8a4a45"
+    "seedShade": "#8a4a45",
+    "grassDeep": "#315f3d",
+    "grassMid": "#5f9b51",
+    "grassLight": "#a5cb65",
+    "grassFlower": "#f5e7a0",
+    "beanDeep": "#385e3f",
+    "beanMid": "#57935a",
+    "beanLight": "#8fc875",
+    "beanPod": "#6ea64d",
+    "beanSeed": "#e6c878"
   },
+  "crops": [
+    {
+      "id": "dew-grass",
+      "title": "晨露草",
+      "assetKey": "crop.dew-grass",
+      "frameKeys": [
+        "crop.dew-grass.seed",
+        "crop.dew-grass.sprout",
+        "crop.dew-grass.growing-1",
+        "crop.dew-grass.growing-2",
+        "crop.dew-grass.flowering",
+        "crop.dew-grass.mature"
+      ]
+    },
+    {
+      "id": "moon-bean",
+      "title": "月光豆",
+      "assetKey": "crop.moon-bean",
+      "frameKeys": [
+        "crop.moon-bean.seed",
+        "crop.moon-bean.sprout",
+        "crop.moon-bean.growing-1",
+        "crop.moon-bean.growing-2",
+        "crop.moon-bean.flowering",
+        "crop.moon-bean.mature"
+      ]
+    },
+    {
+      "id": "sweet-radish",
+      "title": "甜蘿蔔",
+      "assetKey": "crop.sweet-radish",
+      "frameKeys": [
+        "crop.sweet-radish.seed",
+        "crop.sweet-radish.sprout",
+        "crop.sweet-radish.growing-1",
+        "crop.sweet-radish.growing-2",
+        "crop.sweet-radish.flowering",
+        "crop.sweet-radish.mature"
+      ]
+    }
+  ],
   "frames": {
+    "crop.dew-grass.seed": {
+      "x": 0,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "seed",
+      "tags": [
+        "crop",
+        "dew-grass",
+        "seed",
+        "candidate"
+      ],
+      "sha256": "3050cbdd61bdbb2bc810c5e01c1f9f775e29c604c8ea90d9535752bfd90f7360"
+    },
+    "crop.dew-grass.sprout": {
+      "x": 32,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "sprout",
+      "tags": [
+        "crop",
+        "dew-grass",
+        "sprout",
+        "candidate"
+      ],
+      "sha256": "26835287e3fa4be7aed95d1787ec72e73feebc79fd499bdc072a5e05563d7941"
+    },
+    "crop.dew-grass.growing-1": {
+      "x": 64,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "growing-1",
+      "tags": [
+        "crop",
+        "dew-grass",
+        "growing-1",
+        "candidate"
+      ],
+      "sha256": "98f53d6b8dd61eb1f47153bdb2829f079ec428a44096759a890154ce856b2610"
+    },
+    "crop.dew-grass.growing-2": {
+      "x": 96,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "growing-2",
+      "tags": [
+        "crop",
+        "dew-grass",
+        "growing-2",
+        "candidate"
+      ],
+      "sha256": "165995ff09f56e7c55d519057065005dd0d0cf7a81b634232618c0c4a5d36254"
+    },
+    "crop.dew-grass.flowering": {
+      "x": 128,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "flowering",
+      "tags": [
+        "crop",
+        "dew-grass",
+        "flowering",
+        "candidate"
+      ],
+      "sha256": "5d5f150241afa8e66a40b25fa7da7681b869225486607905c43fe6099cce3c5b"
+    },
+    "crop.dew-grass.mature": {
+      "x": 160,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "mature",
+      "tags": [
+        "crop",
+        "dew-grass",
+        "mature",
+        "candidate"
+      ],
+      "sha256": "750839cbdfb4bc050b96290a46cdc7dc874eab4270bcac6c46e86b22406b1d65"
+    },
+    "crop.moon-bean.seed": {
+      "x": 0,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "seed",
+      "tags": [
+        "crop",
+        "moon-bean",
+        "seed",
+        "candidate"
+      ],
+      "sha256": "2cb8b0aeb685bf9ee81a7a8b06e812e62b7d4cb77e639c7080d89d2c1362940b"
+    },
+    "crop.moon-bean.sprout": {
+      "x": 32,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "sprout",
+      "tags": [
+        "crop",
+        "moon-bean",
+        "sprout",
+        "candidate"
+      ],
+      "sha256": "74d33d55ebc0b5d60e082712be703ff012c343ed36a3ab37e2b4ff1dc9d73309"
+    },
+    "crop.moon-bean.growing-1": {
+      "x": 64,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "growing-1",
+      "tags": [
+        "crop",
+        "moon-bean",
+        "growing-1",
+        "candidate"
+      ],
+      "sha256": "dd2b0a027f130cb951c4d3f14a34bc4a97c4b04e8f5bba223537ca3f06a6023b"
+    },
+    "crop.moon-bean.growing-2": {
+      "x": 96,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "growing-2",
+      "tags": [
+        "crop",
+        "moon-bean",
+        "growing-2",
+        "candidate"
+      ],
+      "sha256": "b099aa9bb99550a83554bc26d428440a08c1c2fece57ed3cad020161f3ab3c4a"
+    },
+    "crop.moon-bean.flowering": {
+      "x": 128,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "flowering",
+      "tags": [
+        "crop",
+        "moon-bean",
+        "flowering",
+        "candidate"
+      ],
+      "sha256": "b53af6706cad438394af12e1d9603060c9d994be279575c870d3772f51522472"
+    },
+    "crop.moon-bean.mature": {
+      "x": 160,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "mature",
+      "tags": [
+        "crop",
+        "moon-bean",
+        "mature",
+        "candidate"
+      ],
+      "sha256": "fc5b95d9da67e25634cb854c9d1086be6ccdfd3a355d935a2a6d8cbbd905eed4"
+    },
+    "crop.sweet-radish.seed": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "seed",
+      "tags": [
+        "crop",
+        "sweet-radish",
+        "seed",
+        "candidate"
+      ],
+      "sha256": "ec1d77968ae959c1249d65b7880a0a9587f8991b03655ba6012b6eb342cffe5e"
+    },
+    "crop.sweet-radish.sprout": {
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "sprout",
+      "tags": [
+        "crop",
+        "sweet-radish",
+        "sprout",
+        "candidate"
+      ],
+      "sha256": "80180381dda78aeb99b901d173398cbc436d0e665a79cda75a2461ea2910ea18"
+    },
+    "crop.sweet-radish.growing-1": {
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "growing-1",
+      "tags": [
+        "crop",
+        "sweet-radish",
+        "growing-1",
+        "candidate"
+      ],
+      "sha256": "e65648084002392fb793dc5cb48538432054b0a10430bda8c1157ca41ca49d88"
+    },
+    "crop.sweet-radish.growing-2": {
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "growing-2",
+      "tags": [
+        "crop",
+        "sweet-radish",
+        "growing-2",
+        "candidate"
+      ],
+      "sha256": "c9e2a88aeba92c0eb6778814b004a0763665fa4ddb7e984b44c9e8512464663f"
+    },
+    "crop.sweet-radish.flowering": {
+      "x": 128,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "flowering",
+      "tags": [
+        "crop",
+        "sweet-radish",
+        "flowering",
+        "candidate"
+      ],
+      "sha256": "865fe9eda73986936e3aadd1180144347ab90c44348d11526dcc78bf3a8e42d9"
+    },
+    "crop.sweet-radish.mature": {
+      "x": 160,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "kind": "cropOverlay",
+      "stage": "mature",
+      "tags": [
+        "crop",
+        "sweet-radish",
+        "mature",
+        "candidate"
+      ],
+      "sha256": "cad4faea12942ef8fbdefb2089f989731c5154b2e28e8baeabc8faca1df32734"
+    },
     "seed": {
       "x": 0,
       "y": 0,
@@ -97,7 +611,7 @@
       "sha256": "80180381dda78aeb99b901d173398cbc436d0e665a79cda75a2461ea2910ea18"
     },
     "mature": {
-      "x": 64,
+      "x": 160,
       "y": 0,
       "width": 32,
       "height": 32,
@@ -125,6 +639,7 @@
   "limitations": [
     "Candidate only: this exact version is not reviewed, approved, integrated, or registered in production assets.",
     "The existing sweet-radish PNG is a feature reference only; candidate pixels are hand-authored in the bound generator.",
-    "The checker verifies structure and reproducibility, not visual quality, in-game readability, device display, or Gate 1 acceptance."
+    "The checker verifies structure and reproducibility, not visual quality, in-game readability, device display, or Gate 1 acceptance.",
+    "Legacy sweet-radish seed/sprout/mature aliases remain for compatibility; canonical frames use crop.<cropId>.<stage>."
   ]
 }

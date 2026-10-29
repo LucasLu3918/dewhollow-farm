@@ -18,6 +18,7 @@ import { registerEmoteTextures } from '../emote';
 import { registerAnimalTextures } from '../animal-art';
 import { MapScene, type MapSceneDeps } from './MapScene';
 import { TILE_SIZE, UNIT } from '../constants';
+import type { Pixel32QualitySceneAsset } from '../pixel32-quality-scene-candidate';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
 import {
   CANDIDATE_ATLAS_TEXTURE,
@@ -26,6 +27,14 @@ import {
   type CandidateId,
 } from '../candidate-art';
 import { renderProfileFor } from '../pixel-viewport/profiles';
+import {
+  LAKE_SHORE_CANDIDATE_ATLAS_FILE,
+  LAKE_SHORE_CANDIDATE_ATLAS_KEY,
+  LAKE_SHORE_CANDIDATE_MANIFEST_KEY,
+  LAKE_SHORE_CANDIDATE_REGISTRY_KEY,
+  LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES,
+  lakeShoreCandidateRequested as lakeShorePreviewRequested,
+} from '../lake-shore-candidate';
 import {
   candidateFramesFromManifest,
   explicitlyUnapprovedCandidateFramesFromManifest,
@@ -43,6 +52,41 @@ import {
   pixel32InteractablesPreviewRequested,
   pixel32CandidateRuntimeRequested,
 } from '../pixel32-candidate-runtime';
+import {
+  WORLD_V2_FARM_ATLAS_KEY,
+  WORLD_V2_FARM_MANIFEST_KEY,
+  WORLD_V2_FARM_REQUIRED_FRAMES,
+  WORLD_V2_HOUSE_ATLAS_KEY,
+  WORLD_V2_HOUSE_MANIFEST_KEY,
+  WORLD_V2_HOUSE_REQUIRED_FRAMES,
+  worldV2CandidateFramesFromManifest,
+  worldV2SceneCandidateRequested,
+} from '../world-v2-scene-candidate';
+import {
+  INDOOR_FARM_ATLAS_KEY,
+  INDOOR_FARM_MANIFEST_KEY,
+  INDOOR_FARM_REQUIRED_FRAMES,
+  INDOOR_MINE_ATLAS_KEY,
+  INDOOR_MINE_MANIFEST_KEY,
+  INDOOR_MINE_REQUIRED_FRAMES,
+  INDOOR_SCENE_CANDIDATE_REGISTRY_KEY,
+  indoorSceneCandidateFramesFromManifest,
+  indoorSceneCandidateRequested,
+} from '../indoor-scene-candidate';
+import {
+  SEASON_WEATHER_CANDIDATE_ATLAS_KEY,
+  SEASON_WEATHER_CANDIDATE_MANIFEST_KEY,
+  seasonWeatherCandidateFramesFromManifest,
+  seasonWeatherCandidateRequested,
+} from '../season-weather-candidate';
+import {
+  TOWN_SCENE_CANDIDATE_ATLAS_FILE,
+  TOWN_SCENE_CANDIDATE_ATLAS_KEY,
+  TOWN_SCENE_CANDIDATE_MANIFEST_KEY,
+  TOWN_SCENE_CANDIDATE_REGISTRY_KEY,
+  townSceneCandidateFramesFromManifest,
+  townSceneCandidateRequested,
+} from '../town-scene-candidate';
 
 interface CandidateManifest {
   status: string;
@@ -76,6 +120,7 @@ export interface BootDeps {
   responsive: ResponsiveLayoutController;
   /** 地圖場景的鍵盤與畫面都接好時呼叫一次（移除開機載入提示，見 main.ts）。 */
   onReady: () => void;
+  qualitySceneCandidates: Pixel32QualitySceneAsset[];
   controls: MapSceneDeps['controls'];
 }
 
@@ -106,6 +151,36 @@ export class BootScene extends Phaser.Scene {
       this.load.json(PIXEL32_ANIMATION_MANIFEST_KEY, `${root}/pixel32-animation/manifest.json`);
       this.load.image(PIXEL32_ANIMATION_ATLAS_KEY, `${root}/pixel32-animation/player-4dir.png`);
     }
+    if (this.lakeShoreCandidateRequested()) {
+      const root = '/docs/art/candidates/pixel-movement/p6-lake-shore';
+      this.load.json(LAKE_SHORE_CANDIDATE_MANIFEST_KEY, `${root}/manifest.json`);
+      this.load.image(LAKE_SHORE_CANDIDATE_ATLAS_KEY, `${root}/${LAKE_SHORE_CANDIDATE_ATLAS_FILE}`);
+    }
+    if (this.townSceneCandidateRequested()) {
+      const root = '/docs/art/candidates/pixel-movement/p6-village-plaza';
+      this.load.json(TOWN_SCENE_CANDIDATE_MANIFEST_KEY, `${root}/manifest.json`);
+      this.load.image(TOWN_SCENE_CANDIDATE_ATLAS_KEY, `${root}/${TOWN_SCENE_CANDIDATE_ATLAS_FILE}`);
+    }
+    if (this.worldV2SceneCandidateRequested()) {
+      const farmRoot = '/docs/art/candidates/pixel-movement/gate1-world-v2-scene/farm';
+      const houseRoot = '/docs/art/candidates/pixel-movement/df-v2-030-house-interior';
+      this.load.json(WORLD_V2_FARM_MANIFEST_KEY, `${farmRoot}/manifest.json`);
+      this.load.image(WORLD_V2_FARM_ATLAS_KEY, `${farmRoot}/atlas.png`);
+      this.load.json(WORLD_V2_HOUSE_MANIFEST_KEY, `${houseRoot}/manifest.json`);
+      this.load.image(WORLD_V2_HOUSE_ATLAS_KEY, `${houseRoot}/atlas.png`);
+    }
+    if (this.indoorSceneCandidateRequested()) {
+      const root = '/docs/art/candidates/pixel-movement';
+      this.load.json(INDOOR_FARM_MANIFEST_KEY, `${root}/p6-062-farm-interiors/manifest.json`);
+      this.load.image(INDOOR_FARM_ATLAS_KEY, `${root}/p6-062-farm-interiors/atlas.png`);
+      this.load.json(INDOOR_MINE_MANIFEST_KEY, `${root}/p6-062-mine/manifest.json`);
+      this.load.image(INDOOR_MINE_ATLAS_KEY, `${root}/p6-062-mine/atlas.png`);
+    }
+    if (this.seasonWeatherCandidateRequested()) {
+      const root = '/docs/art/candidates/pixel-movement/p6-063-season-weather';
+      this.load.json(SEASON_WEATHER_CANDIDATE_MANIFEST_KEY, `${root}/manifest.json`);
+      this.load.image(SEASON_WEATHER_CANDIDATE_ATLAS_KEY, `${root}/atlas.png`);
+    }
     if (this.pixel32CandidateReviewRequested()) {
       const root = '/docs/art/candidates/pixel-movement';
       this.load.json(PIXEL32_CROPS_MANIFEST_KEY, `${root}/gate1-assets/pixel32-crops/manifest.json`);
@@ -126,6 +201,11 @@ export class BootScene extends Phaser.Scene {
     const pixel32CandidateRuntime = this.registerPixel32CandidateAtlases();
     const pixel32CandidateAssets = this.registerPixel32CandidateReviewAtlases();
     const pixel32InteractablesPreview = this.registerPixel32InteractablesPreviewAtlas();
+    const worldV2SceneCandidate = this.registerWorldV2SceneCandidateAtlases();
+    const indoorSceneCandidate = this.registerIndoorSceneCandidateAtlases();
+    const seasonWeatherCandidate = this.registerSeasonWeatherCandidateAtlas();
+    const lakeShoreCandidate = this.registerLakeShoreCandidateAtlas();
+    const townSceneCandidate = this.registerTownSceneCandidateAtlas();
     // 動物的圖由程式畫（見 animal-art.ts）；先畫好，下面的占位產圖就會略過同名的素材。
     registerAnimalTextures(this);
     for (const entry of this.deps.assets.assets) {
@@ -163,17 +243,51 @@ export class BootScene extends Phaser.Scene {
       settings: this.deps.settings,
       responsive: this.deps.responsive,
       onReady: this.deps.onReady,
+      qualitySceneCandidates: this.deps.qualitySceneCandidates,
       controls: this.deps.controls,
     };
     this.registry.set('gate1-candidate-id', candidateId);
     this.registry.set('gate1-pixel32-candidate-runtime', pixel32CandidateRuntime);
     this.registry.set('gate1-pixel32-candidate-assets', pixel32CandidateAssets);
     this.registry.set('gate1-pixel32-interactables-preview', pixel32InteractablesPreview);
+    this.registry.set('gate1-world-v2-scene-candidate', worldV2SceneCandidate);
+    this.registry.set(INDOOR_SCENE_CANDIDATE_REGISTRY_KEY, indoorSceneCandidate);
+    this.registry.set('gate1-p6-063-season-weather-candidate', seasonWeatherCandidate);
+    this.registry.set(LAKE_SHORE_CANDIDATE_REGISTRY_KEY, lakeShoreCandidate);
+    this.registry.set(TOWN_SCENE_CANDIDATE_REGISTRY_KEY, townSceneCandidate);
     this.scene.start('map', sceneDeps);
   }
 
   private pixel32RuntimeRequested(): boolean {
     return pixel32CandidateRuntimeRequested(new URLSearchParams(window.location.search), import.meta.env.DEV);
+  }
+
+  private lakeShoreCandidateRequested(): boolean {
+    return lakeShorePreviewRequested(
+      new URLSearchParams(window.location.search),
+      import.meta.env.DEV,
+      this.pixel32RuntimeRequested(),
+    );
+  }
+
+  private townSceneCandidateRequested(): boolean {
+    return townSceneCandidateRequested(
+      new URLSearchParams(window.location.search),
+      import.meta.env.DEV,
+      this.pixel32RuntimeRequested(),
+    );
+  }
+
+  private worldV2SceneCandidateRequested(): boolean {
+    const search = new URLSearchParams(window.location.search);
+    const profile = renderProfileFor(search.get('renderProfile'), true);
+    return worldV2SceneCandidateRequested(search, import.meta.env.DEV, profile.id, this.pixel32RuntimeRequested());
+  }
+
+  private indoorSceneCandidateRequested(): boolean {
+    const search = new URLSearchParams(window.location.search);
+    const profile = renderProfileFor(search.get('renderProfile'), true);
+    return indoorSceneCandidateRequested(search, import.meta.env.DEV, profile.id, this.pixel32RuntimeRequested());
   }
 
   private pixel32CandidateReviewRequested(): boolean {
@@ -204,6 +318,85 @@ export class BootScene extends Phaser.Scene {
     this.registerFrames(PIXEL32_MAP_ATLAS_KEY, mapFrames);
     this.registerFrames(PIXEL32_ANIMATION_ATLAS_KEY, animationFrames);
     return true;
+  }
+
+  private registerLakeShoreCandidateAtlas(): boolean {
+    if (!this.lakeShoreCandidateRequested() || !this.textures.exists(LAKE_SHORE_CANDIDATE_ATLAS_KEY)) return false;
+    const frames = candidateFramesFromManifest(
+      this.cache.json.get(LAKE_SHORE_CANDIDATE_MANIFEST_KEY),
+      LAKE_SHORE_CANDIDATE_ATLAS_FILE,
+    );
+    if (!frames || LAKE_SHORE_CANDIDATE_REQUIRED_FRAMES.some((frame) => !frames[frame])) return false;
+    this.registerFrames(LAKE_SHORE_CANDIDATE_ATLAS_KEY, frames);
+    return true;
+  }
+
+  private registerTownSceneCandidateAtlas(): boolean {
+    if (!this.townSceneCandidateRequested() || !this.textures.exists(TOWN_SCENE_CANDIDATE_ATLAS_KEY)) return false;
+    const frames = townSceneCandidateFramesFromManifest(this.cache.json.get(TOWN_SCENE_CANDIDATE_MANIFEST_KEY));
+    if (!frames) return false;
+    this.registerFrames(TOWN_SCENE_CANDIDATE_ATLAS_KEY, frames);
+    return true;
+  }
+
+  private registerWorldV2SceneCandidateAtlases(): boolean {
+    if (!this.worldV2SceneCandidateRequested()
+      || !this.textures.exists(WORLD_V2_FARM_ATLAS_KEY)
+      || !this.textures.exists(WORLD_V2_HOUSE_ATLAS_KEY)) return false;
+
+    const farmFrames = worldV2CandidateFramesFromManifest(
+      this.cache.json.get(WORLD_V2_FARM_MANIFEST_KEY),
+      'atlas.png',
+      WORLD_V2_FARM_REQUIRED_FRAMES,
+    );
+    const houseFrames = worldV2CandidateFramesFromManifest(
+      this.cache.json.get(WORLD_V2_HOUSE_MANIFEST_KEY),
+      'atlas.png',
+      WORLD_V2_HOUSE_REQUIRED_FRAMES,
+    );
+    if (!farmFrames || !houseFrames) return false;
+
+    this.registerFrames(WORLD_V2_FARM_ATLAS_KEY, farmFrames);
+    this.registerFrames(WORLD_V2_HOUSE_ATLAS_KEY, houseFrames);
+    return true;
+  }
+
+  private registerIndoorSceneCandidateAtlases(): boolean {
+    if (!this.indoorSceneCandidateRequested()
+      || !this.textures.exists(INDOOR_FARM_ATLAS_KEY)
+      || !this.textures.exists(INDOOR_MINE_ATLAS_KEY)) return false;
+
+    const farmFrames = indoorSceneCandidateFramesFromManifest(
+      this.cache.json.get(INDOOR_FARM_MANIFEST_KEY), 'atlas.png', INDOOR_FARM_REQUIRED_FRAMES,
+    );
+    const mineFrames = indoorSceneCandidateFramesFromManifest(
+      this.cache.json.get(INDOOR_MINE_MANIFEST_KEY), 'atlas.png', INDOOR_MINE_REQUIRED_FRAMES,
+    );
+    if (!farmFrames || !mineFrames) return false;
+
+    this.registerFrames(INDOOR_FARM_ATLAS_KEY, farmFrames);
+    this.registerFrames(INDOOR_MINE_ATLAS_KEY, mineFrames);
+    return true;
+  }
+
+  private registerSeasonWeatherCandidateAtlas(): boolean {
+    if (!this.seasonWeatherCandidateRequested() || !this.textures.exists(SEASON_WEATHER_CANDIDATE_ATLAS_KEY)) return false;
+    const frames = seasonWeatherCandidateFramesFromManifest(this.cache.json.get(SEASON_WEATHER_CANDIDATE_MANIFEST_KEY));
+    if (!frames) return false;
+    this.registerFrames(SEASON_WEATHER_CANDIDATE_ATLAS_KEY, frames);
+    return true;
+  }
+
+  private seasonWeatherCandidateRequested(): boolean {
+    const search = new URLSearchParams(window.location.search);
+    const dev = import.meta.env.DEV;
+    return seasonWeatherCandidateRequested(
+      search,
+      dev,
+      renderProfileFor(search.get('renderProfile'), dev).id,
+      this.pixel32RuntimeRequested(),
+      this.worldV2SceneCandidateRequested(),
+    );
   }
 
   private registerPixel32CandidateReviewAtlases(): boolean {

@@ -1,0 +1,186 @@
+{
+  "id": "house-full",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "tool": "OpenAI built-in image generation tool; lossless bottom-row crop for exact map dimensions",
+    "style_reference_only": "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-ceb8c9ad-a6c9-48ca-a4fb-f268cf68a636.png",
+    "generated_file": "/Users/lucas/.codex/generated_images/01a18748-b691-7c62-b1a2-d205697c939b/exec-509bc703-afbf-4160-b3f9-3671a7b35c0b.png",
+    "sha256": "f8381158e90f3b7d3f8b1ad5e86b93a9afc41adafbf93ffc818408843a902ebb",
+    "description": "Derived DEV dynamic base from the original map candidate; movable decor removed; exact map-canvas dimensions restored by a one-row lossless crop."
+  },
+  "prompt": "Edit the original high-detail orthogonal house interior as a DEV base layer. Preserve the room geometry, fixed bed, kitchen, fireplace, work areas, permanent cabinets and table/chairs, windows, doors, floor, lighting and shadows. Remove movable potted plants, loose flowers/vases, tabletop ornaments, rugs/carpets/mats and small standalone decor, continuing the original floor beneath them. Do not add props or change the room layout. The runtime decor layer owns movable objects. This remains an unapproved DEV candidate.",
+  "landmark_coordinates": {
+    "coordinate_system": "normalized 0..1 pixel/image coordinates; origin top-left; boxes are [x1,y1,x2,y2]",
+    "approximate": true,
+    "map_logical_reference": {
+      "size_tiles": [
+        22,
+        20
+      ],
+      "existing_portal": {
+        "edge": "south",
+        "tile_center_norm": [
+          0.4773,
+          0.975
+        ],
+        "tile": [
+          10,
+          19
+        ]
+      },
+      "spawn_tile": [
+        10,
+        18
+      ]
+    },
+    "walkable_paths": [
+      {
+        "name": "main aisle",
+        "points": [
+          [
+            0.5,
+            0.84
+          ],
+          [
+            0.5,
+            0.65
+          ],
+          [
+            0.5,
+            0.47
+          ]
+        ],
+        "width_norm": 0.17
+      }
+    ],
+    "blocking_furniture_and_barriers": [
+      {
+        "name": "kitchen and hearth",
+        "bbox_norm": [
+          0.07,
+          0.1,
+          0.47,
+          0.33
+        ]
+      },
+      {
+        "name": "bed alcove",
+        "bbox_norm": [
+          0.66,
+          0.1,
+          0.95,
+          0.41
+        ]
+      },
+      {
+        "name": "crafting cabinets",
+        "bbox_norm": [
+          0.04,
+          0.38,
+          0.24,
+          0.77
+        ]
+      },
+      {
+        "name": "dining table",
+        "bbox_norm": [
+          0.72,
+          0.45,
+          0.94,
+          0.77
+        ]
+      }
+    ],
+    "interaction_landmarks": [
+      {
+        "name": "kitchen",
+        "anchor_norm": [
+          0.36,
+          0.23
+        ]
+      },
+      {
+        "name": "hearth",
+        "anchor_norm": [
+          0.19,
+          0.25
+        ]
+      },
+      {
+        "name": "bed",
+        "anchor_norm": [
+          0.81,
+          0.26
+        ]
+      },
+      {
+        "name": "craft workbench",
+        "anchor_norm": [
+          0.15,
+          0.59
+        ]
+      },
+      {
+        "name": "dining table",
+        "anchor_norm": [
+          0.82,
+          0.62
+        ]
+      }
+    ],
+    "portals_and_exits": [
+      {
+        "name": "farm exit",
+        "edge": "south",
+        "scene_anchor_norm": [
+          0.5,
+          0.85
+        ],
+        "map_anchor_norm": [
+          0.4773,
+          0.975
+        ],
+        "approximate": true,
+        "note": "A stone apron extends below the visible doorway; align/crop against existing south-edge door tile during layout pass."
+      }
+    ]
+  },
+  "limitations": [
+    "Generated art is a visual background candidate, not a collision mask or tile map.",
+    "Coordinates are rough visual anchors and must be reconciled against map grid during layout authoring.",
+    "The rendered exit openings and existing logical door tiles differ slightly; some images include a stone apron outside the room footprint.",
+    "No gameplay interaction or movement behavior is implemented by these assets.",
+    "Dynamic base is a generated edit and one-row lossless bottom crop of the original; exact hash is recorded; visual fit must be checked in DEV before use."
+  ],
+  "dimensions_px": {
+    "width": 1315,
+    "height": 1196
+  },
+  "composite_reference": {
+    "file": "scene.png",
+    "sha256": "ccfd41d9dee01bf48400e0954d718a2b919a22ffd9ce3f79ee69baeaaf7786dd",
+    "prompt": "Original premium high-detail pixel art game BACKGROUND. Strict orthographic direct overhead top-down, grid-aligned geometry, no isometric/perspective/foreshortening. Crisp clusters, warm amber lights, cool blue window shadows, rich oak and textile detail. Room completely contained in image and unobstructed central walkable floor. Show physical wall/furniture footprints clearly for later collision mapping. No people, animals, UI, typography, labels, watermark. Reference only for quality and light/material treatment, invent new room. Play-area canvas aspect ratio 1.10:1 (22x20 grid). Spacious upgraded farmhouse: clearly open bottom-center entrance portal, broad route from entrance through open center to the rest of the room. Kitchen and hearth upper-left, bed alcove upper-right, long dining table on right perimeter, crafting cabinets left perimeter, centered rug outside main aisle. More refined trim and extra lamps than starter room; perimeter furniture only.",
+    "role": "original composite visual reference; no longer used as the DEV base when dynamic decor is enabled"
+  },
+  "scene": "dynamic-base.png",
+  "dynamic_object_layer": {
+    "source_of_truth": "runtime GameState.decor placements",
+    "removed_from_base": [
+      "potted plants",
+      "loose flowers and vases",
+      "tabletop ornaments",
+      "rugs and mats",
+      "small standalone decor"
+    ],
+    "fixed_fixtures_preserved": [
+      "bed",
+      "kitchen and fireplace",
+      "work areas",
+      "permanent cabinets",
+      "fixed tables and chairs",
+      "doors and windows"
+    ],
+    "status": "unapproved DEV candidate; runtime integration and visual review required"
+  }
+}

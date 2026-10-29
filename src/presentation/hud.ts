@@ -11,6 +11,7 @@ import { mineStatusLabel } from './mine-status';
 import { levelMarker } from './accessibility';
 
 const LOG_LIMIT = 6;
+const TOAST_DURATION_MS = 4_000;
 
 export interface HeldPointerStart {
   pointerId: number;
@@ -35,8 +36,12 @@ export class Hud {
   private readonly mine: HTMLElement;
   private readonly version: HTMLElement;
   private readonly log: HTMLElement;
+  private readonly toast: HTMLElement;
+  private readonly logToggle: HTMLButtonElement;
+  private readonly logCount: HTMLElement;
   private readonly hint: HTMLElement;
   private readonly mainAction: HTMLButtonElement;
+  private toastTimer: number | null = null;
 
   constructor(doc: Document) {
     this.doc = doc;
@@ -53,6 +58,16 @@ export class Hud {
     this.mine = required(doc, '#hud-mine');
     this.version = required(doc, '#hud-version');
     this.log = required(doc, '#hud-log');
+    this.toast = required(doc, '#hud-toast');
+    this.logToggle = required<HTMLButtonElement>(doc, '#hud-log-toggle');
+    this.logCount = required(doc, '#hud-log-count');
+    this.log.tabIndex = 0;
+    // Keep browser scrolling and Tab navigation while preventing game shortcuts.
+    this.log.addEventListener('keydown', (event) => event.stopPropagation());
+    this.logToggle.addEventListener('click', () => {
+      const expanded = this.logToggle.getAttribute('aria-expanded') === 'true';
+      this.setLogExpanded(!expanded);
+    });
     this.hint = required(doc, '#hud-hint');
     this.mainAction = required(doc, '#hud-action');
   }
@@ -294,11 +309,47 @@ export class Hud {
   }
 
   private append(text: string, level: 'info' | 'error'): void {
-    const item = document.createElement('li');
+    const following = this.log.scrollHeight - this.log.clientHeight - this.log.scrollTop <= 1;
+    const oldestWillBeRemoved = this.log.children.length >= LOG_LIMIT;
+    const logTop = this.log.getBoundingClientRect().top;
+    const anchor = Array.from(this.log.children).find((child, index) =>
+      (!oldestWillBeRemoved || index > 0) && child.getBoundingClientRect().bottom > logTop,
+    );
+    const anchorTop = anchor?.getBoundingClientRect().top;
+    const item = this.doc.createElement('li');
     item.textContent = levelMarker(level, this.colorblind) + text;
     item.className = level;
     this.log.append(item);
     while (this.log.children.length > LOG_LIMIT) this.log.firstElementChild?.remove();
+    if (following) this.log.scrollTop = this.log.scrollHeight;
+    else if (anchor && anchorTop !== undefined) this.log.scrollTop += anchor.getBoundingClientRect().top - anchorTop;
+    this.updateLogCount();
+    this.showToast(item.textContent ?? text);
+  }
+
+  private updateLogCount(): void {
+    this.logCount.textContent = String(this.log.children.length);
+    const expanded = this.logToggle.getAttribute('aria-expanded') === 'true';
+    this.logToggle.setAttribute('aria-label', `${expanded ? '收合' : '展開'}最近 ${this.log.children.length} 則訊息`);
+  }
+
+  private setLogExpanded(expanded: boolean): void {
+    this.logToggle.setAttribute('aria-expanded', String(expanded));
+    this.log.hidden = !expanded;
+    this.logToggle.setAttribute('aria-label', `${expanded ? '收合' : '展開'}最近 ${this.log.children.length} 則訊息`);
+    if (expanded) this.log.scrollTop = this.log.scrollHeight;
+  }
+
+  private showToast(text: string): void {
+    const view = this.doc.defaultView;
+    if (!view) return;
+    if (this.toastTimer !== null) view.clearTimeout(this.toastTimer);
+    this.toast.textContent = text;
+    this.toast.hidden = false;
+    this.toastTimer = view.setTimeout(() => {
+      this.toast.hidden = true;
+      this.toastTimer = null;
+    }, TOAST_DURATION_MS);
   }
 }
 

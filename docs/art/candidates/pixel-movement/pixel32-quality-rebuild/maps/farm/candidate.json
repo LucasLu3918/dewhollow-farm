@@ -1,0 +1,110 @@
+{
+  "mapId": "farm",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "tool": "built-in image_gen",
+    "description": "DEV-only dynamic background derived from the original farm candidate; the enclosed plot beds are cleared to natural grass for runtime-owned soil and crops.",
+    "file": "dynamic-base.png",
+    "sha256": "68da63355b5367bff23f80b4f4aab20cb56ae7221c6595678a36112da4c8e643"
+  },
+  "dimensions": {
+    "width": 1448,
+    "height": 1086,
+    "aspectRatio": "1448:1086"
+  },
+  "intendedUse": "DEV visual direction candidate only. Do not register in production asset manifests or treat as a collision-aligned playable map.",
+  "supersededStudies": [
+    {
+      "file": "scene-initial-study.png",
+      "sha256": "ec0993f6ef018cd32187740d8a79f6522ae853cf44865a39a0b615dea334f0df",
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "reason": "Initial three-quarter 3:2 composition was superseded because it did not match the map's 4:3 aspect ratio or orthogonal grid preview needs."
+    }
+  ],
+  "composition": {
+    "projection": "high-detail orthogonal top-down pixel-art scene",
+    "landmarks": [
+      "farmhouse in the upper-right area",
+      "coop in the upper-right corner",
+      "greenhouse in the upper-left area",
+      "enclosed empty tilled beds in the lower-left area",
+      "connected paths to all four map edges and around each building and field",
+      "stream and dock along the southeast edge",
+      "dense foliage and rock borders around the perimeter"
+    ],
+    "approximateAnchorsNormalized": {
+      "farmhouseDoor": {
+        "x": 0.7,
+        "y": 0.32
+      },
+      "coopDoor": {
+        "x": 0.89,
+        "y": 0.14
+      },
+      "greenhouseDoor": {
+        "x": 0.22,
+        "y": 0.24
+      },
+      "cropPlotBounds": {
+        "left": 0.1,
+        "top": 0.52,
+        "right": 0.44,
+        "bottom": 0.85
+      },
+      "shippingBox": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "northPath": {
+        "x": 0.5,
+        "y": 0.02
+      },
+      "westPath": {
+        "x": 0.02,
+        "y": 0.45
+      },
+      "eastPath": {
+        "x": 0.98,
+        "y": 0.45
+      },
+      "southPath": {
+        "x": 0.51,
+        "y": 0.98
+      }
+    },
+    "gameplayAlignment": "Image aspect matches the farm 4:3 world. Layout includes collision-backed water scenery, reachable greenhouse entry and return door, and aligned crop/shipping areas. Candidate remains DEV-only and awaits per-tile visual gameplay verification."
+  },
+  "mapGrid": {
+    "columns": 40,
+    "rows": 30
+  },
+  "layout": {
+    "file": "candidate-layout.json",
+    "sha256": "a375c50ac4b482ac48cfdbc58925e266d9567f5ba7dd160ab6574a840adc6067"
+  },
+  "composite_reference": {
+    "file": "scene-grid-study.png",
+    "sha256": "fa2a3d95edb8c12132ce8019b2bf36d95f41c73f4738c8e2ff663562c8457eda",
+    "role": "visual reference only; runtime plots replace the former tilled beds"
+  },
+  "dynamic_layers": {
+    "source_of_truth": "candidate-layout.json + GameState.plots",
+    "runtime_renderer": "MapScene.drawPlots()",
+    "removed_from_background": [
+      "tilled field beds",
+      "crop visuals"
+    ],
+    "retained_static_features": [
+      "buildings",
+      "fences",
+      "paths",
+      "shoreline",
+      "dock"
+    ],
+    "status": "unapproved DEV candidate"
+  }
+}

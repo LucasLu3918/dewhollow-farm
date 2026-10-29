@@ -1,0 +1,202 @@
+{
+  "id": "plaza",
+  "status": "candidate",
+  "approved": false,
+  "image": "scene.png",
+  "image_size_bytes": 4002923,
+  "sha256": "131826f6e28bb47f7896fd4d0567d77fe6b99312c15834462e470b67a6725b36",
+  "dimensions_px": {
+    "width": 1448,
+    "height": 1086
+  },
+  "aspect_target": "16:12",
+  "prompt": "Original 4:3 landscape background plate for an inviting small-town festival plaza in a cozy farming RPG, strict orthographic straight-down top-down view, no isometric perspective and all major ground edges aligned to a regular square orthogonal grid. Use attached farm and interior concepts solely for high-detail pixel craftsmanship, warm light, materials and finish quality; invent a different plaza composition. Map footprint is 16 by 12 tiles. Reserve a clear unobstructed exit opening on the left edge centered at y=.54, connected to a broad clean cobblestone avenue that runs horizontally to a central plaza and then turns toward upper center and lower center. A small central circular stone fountain with shallow blue water and floating lights is an interactable landmark near (.50,.48); place a wooden bulletin board near (.31,.80), a festival lantern kiosk near (.72,.80), a night market stall near (.83,.80), and a traveling goods stall near (.86,.55). A pair of modest rectangular flower gardens on the north side with low fences, potted flowers and lantern posts frame the central route; keep path clear around them. Use paving and grass to clearly distinguish walkable lane from solid fenced planters, benches, trees, stall counters and fountain walls. Carefully leave clear passable paths around the fountain and to every exit. Rich cobblestone variation, flower details, timber booths, lantern glow, leafy planters, detailed pixel clusters, gentle golden afternoon lighting and soft shadows, polished premium indie pixel-game art. Orthographic overhead game scene. No characters, no animals, no readable text, no UI, no labels, no borders, no grid lines.",
+  "source": {
+    "tool": "OpenAI image_gen",
+    "type": "generated original raster scene background",
+    "generation_id": "scene",
+    "style_reference_images": [
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-6feede6e-0747-40b0-9e52-1ddf7a0b2fce.png",
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-ceb8c9ad-a6c9-48ca-a4fb-f268cf68a636.png"
+    ],
+    "note": "Style references were used only for pixel-art craft, material detail, lighting, and finish quality; no user-uploaded reference images were provided to the generator."
+  },
+  "map_grid": {
+    "columns": 16,
+    "rows": 12
+  },
+  "anchors_note": "All normalized coordinates and extents are rough visual estimates in image space (origin top-left, x/y in 0–1). They are guidance for later map-grid authoring, not collision or interaction data; verify against the image and map runtime. Artwork is a DEV-only unapproved candidate.",
+  "anchors": {
+    "walkable_path_anchors_approx": [
+      {
+        "name": "west portal cross-lane",
+        "polyline": [
+          [
+            0,
+            0.54
+          ],
+          [
+            0.28,
+            0.54
+          ],
+          [
+            0.42,
+            0.54
+          ],
+          [
+            0.58,
+            0.54
+          ],
+          [
+            0.82,
+            0.54
+          ]
+        ]
+      },
+      {
+        "name": "north-south plaza lane",
+        "polyline": [
+          [
+            0.48,
+            0
+          ],
+          [
+            0.48,
+            0.32
+          ],
+          [
+            0.5,
+            0.48
+          ],
+          [
+            0.5,
+            0.72
+          ],
+          [
+            0.5,
+            1
+          ]
+        ]
+      },
+      {
+        "name": "fountain circulation ring",
+        "ellipse_center": [
+          0.5,
+          0.53
+        ],
+        "radii": [
+          0.19,
+          0.17
+        ]
+      }
+    ],
+    "solid_obstacle_anchors_approx": [
+      {
+        "name": "northwest raised garden and cottage edge",
+        "rect": [
+          0,
+          0,
+          0.31,
+          0.3
+        ]
+      },
+      {
+        "name": "northeast raised garden and cottage edge",
+        "rect": [
+          0.68,
+          0,
+          1,
+          0.3
+        ]
+      },
+      {
+        "name": "fountain basin/wall",
+        "ellipse_center": [
+          0.5,
+          0.51
+        ],
+        "radii": [
+          0.11,
+          0.12
+        ]
+      },
+      {
+        "name": "southwest board garden furnishings",
+        "rect": [
+          0.22,
+          0.69,
+          0.4,
+          0.88
+        ]
+      },
+      {
+        "name": "market stalls/counters",
+        "rects": [
+          [
+            0.68,
+            0.7,
+            0.84,
+            0.91
+          ],
+          [
+            0.82,
+            0.68,
+            1,
+            0.92
+          ]
+        ]
+      }
+    ],
+    "interactable_landmark_anchors_approx": [
+      {
+        "name": "fountain interactable edge",
+        "point": [
+          0.5,
+          0.39
+        ]
+      },
+      {
+        "name": "bulletin board",
+        "point": [
+          0.31,
+          0.78
+        ]
+      },
+      {
+        "name": "festival lantern kiosk",
+        "point": [
+          0.74,
+          0.8
+        ]
+      },
+      {
+        "name": "night market stall",
+        "point": [
+          0.88,
+          0.81
+        ]
+      },
+      {
+        "name": "traveling merchant stall",
+        "point": [
+          0.87,
+          0.54
+        ]
+      }
+    ],
+    "portal_opening_anchors_approx": [
+      {
+        "name": "village exit",
+        "edge": "left",
+        "center": [
+          0,
+          0.54
+        ],
+        "clear_span": [
+          0.48,
+          0.62
+        ]
+      }
+    ]
+  }
+}

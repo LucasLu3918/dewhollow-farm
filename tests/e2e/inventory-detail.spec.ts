@@ -51,6 +51,59 @@ test.describe('背包物品詳情', () => {
     await expect(seed).toBeFocused();
   });
 
+  test('enlarges the selected image inline by pointer and keyboard without opening another dialog', async ({ page }) => {
+    await start(page);
+    await replaceSessionState(page, (state) => {
+      state.inventory = {
+        capacity: 24,
+        stacks: [
+          { itemId: 'seed.sweet-radish', quality: 'normal', count: 5 },
+          { itemId: 'seed.sweet-radish', quality: 'good', count: 1 },
+        ],
+      };
+    });
+    await page.locator('#hud-inventory').click();
+    await page.locator('#inventory-grid [data-item-id="seed.sweet-radish"]').nth(0).click();
+
+    const detail = page.locator('#inventory-detail');
+    const previewToggle = detail.locator('.inventory-detail-icon');
+    await expect(previewToggle).toHaveRole('button');
+    await expect(previewToggle).toHaveAttribute('aria-label', '放大查看甜蘿蔔種子圖片');
+    await expect(previewToggle).toHaveAttribute('aria-expanded', 'false');
+
+    await previewToggle.click();
+    await expect(previewToggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(detail.locator('.inventory-detail-preview img')).toHaveAttribute('alt', '甜蘿蔔種子放大預覽');
+    await expect(detail.locator('.inventory-detail-preview')).toBeVisible();
+    await expect(page.locator('#inventory-panel [role="dialog"]')).toHaveCount(0);
+
+    await previewToggle.focus();
+    await previewToggle.press('Enter');
+    await expect(previewToggle).toHaveAttribute('aria-expanded', 'false');
+    await previewToggle.press('Space');
+    await expect(previewToggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(previewToggle).toBeFocused();
+
+    await page.locator('#inventory-grid [data-item-id="seed.sweet-radish"]').nth(1).click();
+    await expect(detail).toHaveAttribute('data-quality', 'good');
+    await expect(detail.locator('.inventory-detail-preview')).toBeHidden();
+    await expect(detail.locator('.inventory-detail-icon')).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('disables image preview when the selected icon fails to load', async ({ page }) => {
+    await start(page);
+    await page.locator('#hud-inventory').click();
+    await page.locator('#inventory-grid [data-item-id="seed.sweet-radish"]').click();
+
+    const icon = page.locator('#inventory-detail .inventory-detail-icon');
+    await expect(icon).toHaveAttribute('data-icon-state', 'available');
+    await icon.locator('img').evaluate((image) => image.dispatchEvent(new Event('error')));
+
+    await expect(icon).toBeDisabled();
+    await expect(icon).toHaveAttribute('data-icon-state', 'fallback');
+    await expect(icon).not.toHaveAttribute('aria-expanded', 'false');
+  });
+
   test('selects a held seed through GameSession and refreshes the HUD', async ({ page }) => {
     await start(page);
     await page.locator('#hud-inventory').click();

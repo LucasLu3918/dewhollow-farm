@@ -1,0 +1,215 @@
+{
+  "id": "mine-entrance",
+  "status": "candidate",
+  "approved": false,
+  "image": "dynamic-base.png",
+  "image_size_bytes": 3820383,
+  "sha256": "81690b11612e4e88d0d148d44b6ff9796313d22ea3f2aa3b02d5529c0d879078",
+  "dimensions_px": {
+    "width": 1585,
+    "height": 992
+  },
+  "aspect_target": "16:10",
+  "prompt": "Edit the exact high-detail mine entrance candidate as an unapproved DEV base layer. Preserve the mine opening, timber supports, rails, lanterns, warning bell, tools, minecart station, fences, vegetation, broad gravel path, composition and warm pixel-art lighting. Remove all loose boulders, rock clusters, cliff rock faces, and visible ore veins because these are mutable rock/ore gameplay objects rendered from existing transparent MapDef tile art. Preserve the original scene as composite reference only. This candidate is not approved for production.",
+  "source": {
+    "tool": "built-in image_gen",
+    "type": "generated original raster scene background",
+    "generation_id": "mine-entrance-dynamic-base",
+    "edited_from": "scene.png",
+    "user_uploaded_images_used": false,
+    "note": "DEV-only clean base; all loose rocks and ore veins were removed so the existing state-driven rock layer can represent mineable objects."
+  },
+  "map_grid": {
+    "columns": 16,
+    "rows": 10
+  },
+  "anchors_note": "All normalized coordinates and extents are rough visual estimates in image space (origin top-left, x/y in 0–1). They are guidance for later map-grid authoring, not collision or interaction data; verify against the image and map runtime. Artwork is a DEV-only unapproved candidate.",
+  "anchors": {
+    "walkable_path_anchors_approx": [
+      {
+        "name": "cave approach trail",
+        "polyline": [
+          [
+            0.5,
+            1
+          ],
+          [
+            0.5,
+            0.77
+          ],
+          [
+            0.5,
+            0.55
+          ],
+          [
+            0.5,
+            0.35
+          ],
+          [
+            0.5,
+            0.23
+          ]
+        ]
+      },
+      {
+        "name": "workstation approach spur",
+        "polyline": [
+          [
+            0.5,
+            0.6
+          ],
+          [
+            0.69,
+            0.6
+          ]
+        ]
+      },
+      {
+        "name": "tool rack approach spur",
+        "polyline": [
+          [
+            0.5,
+            0.61
+          ],
+          [
+            0.31,
+            0.61
+          ]
+        ]
+      }
+    ],
+    "solid_obstacle_anchors_approx": [
+      {
+        "name": "left cliff and rock perimeter",
+        "rects": [
+          [
+            0,
+            0,
+            0.25,
+            0.2
+          ],
+          [
+            0,
+            0.24,
+            0.12,
+            0.9
+          ]
+        ]
+      },
+      {
+        "name": "right cliff and rock perimeter",
+        "rects": [
+          [
+            0.76,
+            0,
+            1,
+            0.22
+          ],
+          [
+            0.88,
+            0.25,
+            1,
+            0.88
+          ]
+        ]
+      },
+      {
+        "name": "lower boulder clusters",
+        "rects": [
+          [
+            0.1,
+            0.74,
+            0.29,
+            0.92
+          ],
+          [
+            0.71,
+            0.75,
+            0.91,
+            0.94
+          ]
+        ]
+      }
+    ],
+    "interactable_landmark_anchors_approx": [
+      {
+        "name": "mine cave entrance",
+        "point": [
+          0.5,
+          0.12
+        ]
+      },
+      {
+        "name": "mine cart and ore sorting station",
+        "point": [
+          0.7,
+          0.61
+        ]
+      },
+      {
+        "name": "warning bell/tool rack",
+        "point": [
+          0.31,
+          0.62
+        ]
+      },
+      {
+        "name": "ore veins on cliff face",
+        "points": [
+          [
+            0.22,
+            0.18
+          ],
+          [
+            0.75,
+            0.16
+          ]
+        ]
+      }
+    ],
+    "portal_opening_anchors_approx": [
+      {
+        "name": "forest exit",
+        "edge": "bottom",
+        "center": [
+          0.5,
+          1
+        ],
+        "clear_span": [
+          0.43,
+          0.57
+        ]
+      },
+      {
+        "name": "mine descent",
+        "edge": "top",
+        "center": [
+          0.5,
+          0.12
+        ],
+        "clear_span": [
+          0.42,
+          0.58
+        ]
+      }
+    ]
+  },
+  "composite_reference": {
+    "file": "scene.png",
+    "sha256": "447fb3129df6dbfc2740ac26e9d2c50bd968dc9ef3b9801c95bea2867d3c63b6",
+    "role": "original visual reference only; not rendered when the state-driven rock layer is enabled"
+  },
+  "dynamic_object_layer": {
+    "source_of_truth": "MapDef + GameState.worldChanges",
+    "kinds": [
+      "rock",
+      "ore"
+    ],
+    "asset_source": "existing transparent mine-entrance rock/ore tile art",
+    "state_transitions": {
+      "rock": "visible until mined, then hidden over the clean background",
+      "ore": "visible until mined, then hidden over the clean background"
+    },
+    "status": "unapproved DEV candidate"
+  }
+}

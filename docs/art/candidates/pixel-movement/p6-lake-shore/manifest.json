@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "id": "dewhollow-p6-lake-shore-candidate",
+  "title": "月鏡湖畔 Pixel32 岸線圖塊候選",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "deterministic nearest-neighbor crops from the user-approved visual-direction candidate, with flat quiet water with manually authored low-contrast ripples",
+    "file": "lake-shore-tile-source.png",
+    "sha256": "e24dc1aa559795ec4c746de9b6ba55acf6febcffb5a0a0756f1a3811666c7628",
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "generator": "generate.mjs",
+    "generatorSha256": "9eb5e61106e628ce9c6e0574eaf11fb40f6222ef3bc335b5a52e63a47087cf33",
+    "atlasDerivation": "Sixteen 310x310 source cells (origins 1,315,628,942) are sampled at pixel centers to 32x32 and packed row-major. Water-only pixels normalize to a shared calm base blue; small low-contrast ripples are added only to the ripple frames. Shoreline geometry, reeds, stones, lily and ripple details are retained from the candidate source."
+  },
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "alpha": "RGB; opaque tile pixels"
+  },
+  "atlas": {
+    "file": "atlas.png",
+    "width": 128,
+    "height": 128,
+    "sha256": "7d33b58230b73611df76be70aae39c719377240a1897316c9354c414cdd92035"
+  },
+  "frames": {
+    "water-open": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "sha256": "2a759421eb8af4b3e9265d2a073bb83e3a88381a811f8fe358a6e3e2ecfe3b3f"
+    },
+    "water-ripple-small": {
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "sha256": "72a084eccde988b1a095eed6fbc87139f6c723c3dfebdca60cf2a041186b9b51"
+    },
+    "water-stone": {
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "sha256": "08401199a361247562df61b4bb9b55c8be04d8d50aa4da2164f44b72da310a2c"
+    },
+    "water-lily": {
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "sha256": "08c3f5b0a3b53e7090c9187b9be4ee091b039316d2c08ce2e58376a1758348e4"
+    },
+    "shore-north": {
+      "x": 0,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore",
+      "tileable": false,
+      "sha256": "92105cb677871da430ad6d42751fe2fa769e6b18110301df1e56c85f59c7e42c"
+    },
+    "shore-east": {
+      "x": 32,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore",
+      "tileable": false,
+      "sha256": "399cba3a9be0d1ae2c5bf87dae8162b47c9c953a6c869994ffad5b85aea516f5"
+    },
+    "shore-south": {
+      "x": 64,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore",
+      "tileable": false,
+      "sha256": "6b64daea03ce4e86ba5e5ef3b2adf940cab7d72cc27598879ec965dc0ded34f6"
+    },
+    "shore-west": {
+      "x": 96,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore",
+      "tileable": false,
+      "sha256": "44f8c26bcfce982f4d2ec580e1d4545d760b77a615b8a7ccd6379dc0e961ecb3"
+    },
+    "shore-corner-nw": {
+      "x": 0,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore",
+      "tileable": false,
+      "sha256": "fcaae33eef97be93c91697592753bc1de9fb4b055b3b0c5dfac7e11c45069c4a"
+    },
+    "shore-basin": {
+      "x": 32,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore",
+      "tileable": false,
+      "sha256": "ba9dcfbc5d7cdefd4e6c4bb4f7b643d303a0d4f74b31182b40ba29cc8f199631"
+    },
+    "shore-shallow-rocks": {
+      "x": 64,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore",
+      "tileable": false,
+      "sha256": "e0d4050f4515e762b095b5e620491357375a8628f6ac1618a50bef437e51a85e"
+    },
+    "shore-corner-ne": {
+      "x": 96,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "shore",
+      "tileable": false,
+      "sha256": "62862d79ba9cef8a912431e7c75cdb205cd031043ca1907ae0f9951ddb10f008"
+    },
+    "shore-reeds": {
+      "x": 0,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "sha256": "689d111cca912d9579e51b0a71b6ee644a8e0bd40674bf4ff6bead45f6930beb"
+    },
+    "water-pebbles": {
+      "x": 32,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "sha256": "448665f62d5f909685128bf14cdba05958227bd4cfd00241922c7160f14e04e3"
+    },
+    "shore-reed-clump": {
+      "x": 64,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "sha256": "00d35ec81fb520d1e685b02a0aca8bd81225444c18bdbf913ed8049be8abeb9b"
+    },
+    "fishing-ripple": {
+      "x": 96,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "approved": false,
+      "layer": "ground",
+      "tileable": true,
+      "sha256": "d98a2814fd23a62fa0c0fddd6388ef85c305745d9adb63aec5dc21ea43bb997c"
+    }
+  },
+  "notes": [
+    "All source water colors normalize to the same quiet blue base; only the dedicated ripple frames add a few low-contrast authored marks, eliminating cyan texture squares in repeated map cells.",
+    "Cardinal shoreline and corner tile frames are retained; their visible water area is normalized to the same calm palette while the original shore silhouette, stones and plants remain.",
+    "The lake map itself remains rectangular. No tile-only candidate can extend shoreline beyond the existing map boundary; the atlas makes that boundary read as a continuous bank without changing topology."
+  ]
+}

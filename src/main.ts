@@ -86,6 +86,17 @@ import { registerServiceWorker } from './presentation/service-worker';
 import { parsePerfFlag } from './presentation/frame-stats';
 import { startPerfOverlay } from './presentation/perf-overlay';
 import { ResponsiveLayoutController } from './presentation/responsive/responsive-layout';
+import type { MapDef } from './domain/content';
+import {
+  pixel32QualityMapProblems,
+  pixel32QualityPortalProblems,
+  pixel32QualitySceneAsset,
+  pixel32QualitySceneCandidateRequested,
+  pixel32QualitySceneManifestFor,
+  PIXEL32_QUALITY_MAP_IDS,
+  type Pixel32QualitySceneAsset,
+} from './presentation/pixel32-quality-scene-candidate';
+import { pixel32CandidateRuntimeRequested } from './presentation/pixel32-candidate-runtime';
 
 /** 移除開機載入提示（index.html 的 #game 內）；啟動失敗或讀不開存檔時也用它，免得一直顯示「載入中」。 */
 function hideLoader(): void {
@@ -108,7 +119,15 @@ function markStageReady(): void {
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
   const inventory = new InventoryPanel(document);
-  const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, merchant, decor, rating, legacy, maps: [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+  const originalMaps = [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn] as unknown as MapDef[];
+  const pixel32Runtime = pixel32CandidateRuntimeRequested(new URLSearchParams(window.location.search), import.meta.env.DEV);
+  const qualityCandidates = pixel32QualitySceneCandidateRequested(
+    new URLSearchParams(window.location.search), import.meta.env.DEV, pixel32Runtime,
+  ) ? await loadPixel32QualityMapCandidates(originalMaps) : null;
+  const candidateMaps = qualityCandidates
+    ? originalMaps.map((original) => qualityCandidates.maps.find((candidate) => candidate.id === original.id) ?? original)
+    : originalMaps;
+  const loaded = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, collection, achievements, merchant, decor, rating, legacy, maps: candidateMaps, start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
   // 操作說明的文字（狀態列提示、設定面板的動作名稱、虛擬按鍵）來自 content/controls.json，缺漏會在這裡報錯。
   const controls = parseControlsContent(controlsContent);
   const index = createContentIndex(loaded.pack);
@@ -146,13 +165,15 @@ async function bootstrap(): Promise<void> {
     wakeMinute: loaded.pack.tuning.time.wakeMinute,
     playerName: (loaded.pack.legacy ?? NO_LEGACY).defaultPlayerName,
   };
-  const persistent = hasIndexedDb();
+  const persistent = !qualityCandidates && hasIndexedDb();
   let repository: SaveRepository;
   if (persistent) {
     repository = new IndexedDbSaveRepository(migration);
   } else {
     repository = new MemorySaveRepository();
-    hud.error('這個瀏覽器無法使用 IndexedDB，存檔只會保留在本頁面，重新整理後會遺失。');
+    hud.error(qualityCandidates
+      ? 'Pixel32 候選預覽使用隔離的暫存存檔，重新整理後會重設。'
+      : '這個瀏覽器無法使用 IndexedDB，存檔只會保留在本頁面，重新整理後會遺失。');
   }
 
   // 存檔槽由網址決定（?slot=slot-2），沒有或不合法就是第一格；換格就是重新載入頁面。
@@ -235,6 +256,7 @@ async function bootstrap(): Promise<void> {
         settings,
         responsive,
         onReady: markStageReady,
+        qualitySceneCandidates: qualityCandidates?.assets ?? [],
         controls: {
           settingsLabels: controls.settingsLabels,
           touchButtons: controls.touchButtons,
@@ -259,6 +281,36 @@ async function bootstrap(): Promise<void> {
       hud.error(`離線功能無法啟用：${error instanceof Error ? error.message : String(error)}`);
     });
   }
+}
+
+async function loadPixel32QualityMapCandidates(originalMaps: MapDef[]): Promise<{ maps: MapDef[]; assets: Pixel32QualitySceneAsset[] }> {
+  const originalById = new Map(originalMaps.map((map) => [map.id, map]));
+  const maps: MapDef[] = [];
+  const assets: Pixel32QualitySceneAsset[] = [];
+  for (const mapId of PIXEL32_QUALITY_MAP_IDS) {
+    const original = originalById.get(mapId);
+    if (!original) throw new Error(`Pixel32 候選缺少原始地圖：${mapId}`);
+    const root = `${import.meta.env.BASE_URL}docs/art/candidates/pixel-movement/pixel32-quality-rebuild/maps/${mapId}`;
+    const [metadataResponse, layoutResponse] = await Promise.all([
+      fetch(`${root}/candidate.json`),
+      fetch(`${root}/candidate-layout.json`),
+    ]);
+    if (!metadataResponse.ok || !layoutResponse.ok) throw new Error(`Pixel32 候選檔案載入失敗：${mapId}`);
+    const [metadata, layoutValue] = await Promise.all([metadataResponse.json(), layoutResponse.json()]);
+    const manifest = pixel32QualitySceneManifestFor(mapId, metadata);
+    if (!manifest) throw new Error(`Pixel32 候選素材未通過候選／SHA／尺寸中繼資料檢查：${mapId}`);
+    if (!layoutValue || typeof layoutValue !== 'object' || (layoutValue as { id?: unknown }).id !== mapId) {
+      throw new Error(`Pixel32 候選地圖 ID 不符：${mapId}`);
+    }
+    const candidate = layoutValue as MapDef;
+    const problems = pixel32QualityMapProblems(original, candidate);
+    if (problems.length) throw new Error(`Pixel32 候選地圖驗證失敗（${mapId}）：${problems.join('；')}`);
+    maps.push(candidate);
+    if (manifest.renderMode === 'scene') assets.push(pixel32QualitySceneAsset(manifest, import.meta.env.BASE_URL));
+  }
+  const portalProblems = pixel32QualityPortalProblems(maps);
+  if (portalProblems.length) throw new Error(`Pixel32 候選入口驗證失敗：${portalProblems.join('；')}`);
+  return { maps, assets };
 }
 
 // 實機量測（網址加 ?perf=1）：顯示幀時間覆蓋層，見 docs/DEVICE_PERF.md。

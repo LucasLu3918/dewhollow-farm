@@ -13,6 +13,8 @@ export interface Rect extends Size {
 
 /** 玩家在視窗中央這個比例的範圍內移動時，鏡頭不動。 */
 const DEADZONE_RATIO = 0.25;
+export const DEFAULT_SCENE_ZOOM_CAP = 2;
+export const INTERIOR_TOUCH_SCENE_ZOOM_CAP = 3.25;
 
 /** 以 1024px 設計視窗計算的直式 9 格倍率；實際倍率會依 camera viewport 寬度調整。 */
 export const PORTRAIT_TOUCH_ZOOM = 1024 / (9 * TILE_SIZE);
@@ -25,6 +27,18 @@ export function mapZoomFor(view: { cameraWidth: number; coarse: boolean; portrai
     ? view.cameraWidth
     : targetTiles * TILE_SIZE;
   return cameraWidth / (targetTiles * TILE_SIZE);
+}
+
+/** Adds only the zoom needed to cover a small scene, capped to avoid oversized presentation scale. */
+export function sceneZoomFor(
+  baseZoom: number,
+  map: Size,
+  viewport: Size,
+  maxZoom = DEFAULT_SCENE_ZOOM_CAP,
+): number {
+  if (map.width <= 0 || map.height <= 0 || viewport.width <= 0 || viewport.height <= 0) return baseZoom;
+  const coverZoom = Math.max(viewport.width / map.width, viewport.height / map.height);
+  return Math.min(maxZoom, Math.max(baseZoom, coverZoom));
 }
 
 /**

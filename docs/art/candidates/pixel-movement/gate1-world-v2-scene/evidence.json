@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "status": "candidate",
+  "approved": false,
+  "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1SceneVisual=world-v2-cozy",
+  "capture": {
+    "provider": "Playwright Chromium local DEV server",
+    "capturedAt": "2026-10-27T19:07:43Z",
+    "sourceRevision": "752be39cc452596dfcda3c3638cc7a199b96c740 + working tree",
+    "test": "SAVE_WORLD_V2_FARM_EVIDENCE=1 npm run test:e2e -- tests/e2e/world-v2-candidate-scene.spec.ts --workers=1",
+    "testResult": "passed",
+    "browserViewport": {
+      "farmDesktop": {
+        "width": 1280,
+        "height": 720
+      },
+      "houseDesktop": {
+        "width": 1280,
+        "height": 896
+      },
+      "mobile": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  },
+  "atlases": {
+    "farm": {
+      "path": "farm/atlas.png",
+      "sha256": "cf4688263b8ebcf665aa59d52115d31057aea798740941f1a2c6e0fc3ce90ccc",
+      "manifestSha256": "d041ef88fc2250ccf4346f3229ec5bcd433f4cab760fa46fbfb05d39a3ea7cd9",
+      "generatorSha256": "5f13569ae24d0faf66c735ff99415e8c0415fcc7f47d71de895abe1036d03043",
+      "frameCount": 50,
+      "approved": false
+    },
+    "house": {
+      "path": "house/atlas.png",
+      "sha256": "cbf374f7df1f3adc9af03878188ee78d397ce86da127300e12447cefd0a583c2",
+      "manifestSha256": "5c0d0f4c46a3ff2e792adc003728d5fc87c545fca230c45c9d3df297d12edeee",
+      "generatorSha256": "8d7b24780629934374b8a5a006aaa00556ebddeac85d5c7d303a4836dcfcaf90",
+      "frameCount": 21,
+      "approved": false
+    }
+  },
+  "screenshots": {
+    "farm-desktop.png": {
+      "path": "screenshots/farm-desktop.png",
+      "sha256": "34fc73752906cb01350c46cdd5e56b28a58018920d8b1868e3746df424bc62d7",
+      "artifactSize": {
+        "width": 584,
+        "height": 437
+      },
+      "browserViewport": {
+        "width": 1280,
+        "height": 720
+      }
+    },
+    "farm-mobile.png": {
+      "path": "screenshots/farm-mobile.png",
+      "sha256": "5f4a7572425a2bd03824f3c0f798c24e295c4a8eee9d6c52c50d301576d7b660",
+      "artifactSize": {
+        "width": 358,
+        "height": 580
+      },
+      "browserViewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    "house-desktop.png": {
+      "path": "screenshots/house-desktop.png",
+      "sha256": "61cda28ae4812a6c6a9b0bd45006576b6c93625f62798cb0729f5e13b893f588",
+      "artifactSize": {
+        "width": 818,
+        "height": 613
+      },
+      "browserViewport": {
+        "width": 1280,
+        "height": 896
+      }
+    },
+    "house-mobile.png": {
+      "path": "screenshots/house-mobile.png",
+      "sha256": "94b9c7f8e39ab41083969be1f9b8c8b27f6713a6d763eeddcb57abfdd4d0248e",
+      "artifactSize": {
+        "width": 358,
+        "height": 580
+      },
+      "browserViewport": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  },
+  "checks": [
+    "Candidate atlas/manifest assets load only with the exact DEV Pixel32 scene opt-in.",
+    "Farmhouse and front lip stay on the existing MapDef door anchor; the tree canopy is placed at (10,8), visible on both target viewports and clear of the existing crop rows and one-tile road.",
+    "Candidate shipping crate, path masks, crop masks, stone-wall, horizontal-fence, and vertical-fence frames are observed in MapScene.",
+    "House ground and object frames use separate layers; manifest furniture placement frames are observed.",
+    "Farm-to-house and house-to-farm movement succeeds; return clears house overlays and preserves all state except map/player location.",
+    "Responsive viewport changes preserve the candidate route; no page errors or failed requests were observed."
+  ],
+  "limitations": [
+    "The farm artifact captures the current camera viewport, not the complete 40x30 map at once.",
+    "Visual quality decision and user acceptance remain pending; no frame is approved for production."
+  ]
+}

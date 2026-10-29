@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "scope": "DEV-only opt-in candidate pet visual; no production asset integration or Gate 1 approval",
-  "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates&gate1CandidatePetFollow=pixel32-cat-follow",
-  "baseRevision": "6568e3e2b665ec7390eee29a9c55cdb00f32cbc4",
+  "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates&gate1CandidatePetFollow=pixel32-cat-quokka-follow",
+  "baseRevision": "4428e09109bac1c3c7c9c8c1bd207da645f64e47",
   "sourceHashes": {
-    "src/presentation/scenes/MapScene.ts": "68e6d402c5b373827f1735f81cc9615a7a6c22a967d9dd74f8f0437d8f7d75cb",
-    "src/presentation/pixel32-candidate-runtime.ts": "da3a345ab12b9337cc65ebe91c0da17e8fb8f05362bf59cc88f13a8e3432d38d"
+    "src/presentation/scenes/MapScene.ts": "a8d078a7e4b965c403955926726de2aae62721bfbfd0109a864a3c7736d6a9f2",
+    "src/presentation/pixel32-candidate-runtime.ts": "e3238f8881c600aa655634e034531b31fde34bcfb868468899dc6955771cc9f5"
   },
   "candidate": {
     "status": "candidate",
@@ -17,18 +17,34 @@
       "cat-down-hop-a": "9c5b47d97e9d1fac9b5ff2ebac06a4136bc2c21280e9b7b38278bc99a5231159",
       "cat-down-hop-b": "ac8425dbf7e51ca0bafc69547063fc4a8e3eb04fb98a8b913b6afce145927dde",
       "cat-down-land": "1f44e5172d529c5b597ac2d134ff0928c0413b12cf5bf19db9e334b63b2eac77",
+      "quokka-down-idle": "12d75669e228e4f24e1fc03a8c2cc3436894f3912bf0d2fe80f7c24145f7e138",
+      "quokka-down-hop-a": "63871a75c001ff88853e19c9e25cf382e9b58b194df3c03570c3bd59efa19674",
+      "quokka-down-hop-b": "e74b35e56d22bf179dfde56ba171119954f23679adfa4073cd219bd326ff4bdf",
+      "quokka-down-land": "4163e8ec050313c1907678bf3da307d011b1d795d510d18b17d3b775375a43b6",
       "cat-up-idle": "db4caacd6aa8305cb9cf5c40936b7510127ed8bee0df6ce110c7d4223de89a7b",
       "cat-up-hop-a": "ed1ba3064b43d6a50283a0f8ccb807bd8c4311fef4a0b925c721bd9b4a464a23",
       "cat-up-hop-b": "cf2b2a922941c8245fb069dd989f4fbe417e6c16fe368563e1700ba12c72d436",
       "cat-up-land": "f172e5c63cd64976afb5235ace9f4c9879459320777b1017d10880e4e5fd3377",
+      "quokka-up-idle": "84b14257f9ae44d745aa96284d2109122fa8d36dbd06abd89b87d7b714e1255e",
+      "quokka-up-hop-a": "64a6ce9e83e9fe29c358b7af1f087c6ece5828236327cb98f49d524234346eb8",
+      "quokka-up-hop-b": "b11a19870e923a7cda03fa30ecbaf98df95e363d7ba6d6e0e5229d9cfe4b5a41",
+      "quokka-up-land": "5f5773f89502a072db1b9665fd9ac0a8bdcf1b288dde8462a23d327d1187d91c",
       "cat-left-idle": "40b1f262135a4caa988999c3b1f6706ab079439df79057512e882c158492cd95",
       "cat-left-hop-a": "29c2d6ed4f1b7bf4f78ad19f238028c5a93971560d3ab03ed96d8c5a94e13f28",
       "cat-left-hop-b": "595a4fda2d7d997d58117ee046fc21a6b4ff4ea04872c9dc9734e61d943a5763",
       "cat-left-land": "9cd80c9530f0fccc2629e6b51d4acffde345910f3eefe3a9b0695ee5a2e32efc",
+      "quokka-left-idle": "1cf868c859f656315382419bf81b6af27cde5984656ccb550533ceba9e19d8f7",
+      "quokka-left-hop-a": "352608b6b31cb5f42b9a8b1d76736ae6f9288a2121f7b217cf9586ea4923c8b3",
+      "quokka-left-hop-b": "879968384cdf4f0d9596f69937c396f63c24d64d8e87f7c354d219dc49d8a17a",
+      "quokka-left-land": "ec459dd5afc16670d2a647c6570df3949473678c91fd2e57a690ac2f1b5034ac",
       "cat-right-idle": "8fd1680c7d418a99aa885f712d21b8da2a827c935c081b240080acfed5c6a30e",
       "cat-right-hop-a": "a04f5ae38c14b83ac16ff5cb3c10f4173d2064977493f3d6c5ce5a2f484138af",
       "cat-right-hop-b": "56943e5781298596391a24d61feb787295f30e6c4e5d11d130a1cfb870c0e941",
-      "cat-right-land": "161fab74dce65feee83f0aa8c79297b2bdec98388f1a9b52c0721b6c3f795c93"
+      "cat-right-land": "161fab74dce65feee83f0aa8c79297b2bdec98388f1a9b52c0721b6c3f795c93",
+      "quokka-right-idle": "f78253ea3d58a95d8aa8334794ae511452748e821c59177581a1c5d31fe2bfc5",
+      "quokka-right-hop-a": "4e0085404fbc12594275caa8e5607e9158ec21c6c4e2a46dafae81481f45bc29",
+      "quokka-right-hop-b": "b2681c13a6ff02c092a6437ecf60cd77b4d8a7b93b664bb16844695fed26478d",
+      "quokka-right-land": "d1eb8c2e67c3fc0fd43854bf517d55e3246d58517a3755741417a52bebe8cd64"
     }
   },
   "initial": {
@@ -56,6 +72,25 @@
           "width": 64,
           "height": 64
         }
+      },
+      "quokka": {
+        "direction": "up",
+        "frame": "quokka-up-idle",
+        "visible": true,
+        "busy": false,
+        "tile": {
+          "x": 6,
+          "y": 5
+        },
+        "rootX": 416,
+        "rootY": 384,
+        "depth": 16,
+        "bounds": {
+          "left": 384,
+          "top": 328,
+          "width": 64,
+          "height": 64
+        }
       }
     },
     "player": {
@@ -66,174 +101,350 @@
   },
   "movements": [
     {
-      "playerBefore": {
-        "x": 5,
-        "y": 5,
-        "facing": "up"
+      "before": {
+        "player": {
+          "x": 5,
+          "y": 5,
+          "facing": "up"
+        },
+        "cat": {
+          "x": 5,
+          "y": 6
+        },
+        "quokka": {
+          "x": 6,
+          "y": 5
+        }
       },
       "playerAfter": {
         "x": 6,
         "y": 5,
         "facing": "right"
       },
-      "pet": {
-        "direction": "up",
-        "frame": "cat-up-idle",
-        "visible": true,
-        "busy": false,
-        "tile": {
+      "pets": {
+        "enabled": true,
+        "manifest": {
+          "status": "candidate",
+          "approved": false
+        },
+        "cat": {
+          "direction": "up",
+          "frame": "cat-up-idle",
+          "visible": true,
+          "busy": false,
+          "tile": {
+            "x": 5,
+            "y": 5
+          },
+          "rootX": 352,
+          "rootY": 384,
+          "depth": 16,
+          "bounds": {
+            "left": 320,
+            "top": 328,
+            "width": 64,
+            "height": 64
+          }
+        },
+        "quokka": {
+          "direction": "left",
+          "frame": "quokka-left-idle",
+          "visible": true,
+          "busy": false,
+          "tile": {
+            "x": 5,
+            "y": 5
+          },
+          "rootX": 352,
+          "rootY": 384,
+          "depth": 16,
+          "bounds": {
+            "left": 320,
+            "top": 328,
+            "width": 64,
+            "height": 64
+          }
+        }
+      },
+      "frames": {
+        "cat": [
+          "cat-up-hop-a",
+          "cat-up-hop-b",
+          "cat-up-land",
+          "cat-up-idle"
+        ],
+        "quokka": [
+          "quokka-left-hop-a",
+          "quokka-left-hop-b",
+          "quokka-left-land",
+          "quokka-left-idle"
+        ]
+      }
+    },
+    {
+      "before": {
+        "player": {
+          "x": 6,
+          "y": 5,
+          "facing": "right"
+        },
+        "cat": {
           "x": 5,
           "y": 5
         },
-        "rootX": 352,
-        "rootY": 384,
-        "depth": 16,
-        "bounds": {
-          "left": 320,
-          "top": 328,
-          "width": 64,
-          "height": 64
+        "quokka": {
+          "x": 5,
+          "y": 5
         }
-      },
-      "frames": [
-        "cat-up-hop-a",
-        "cat-up-hop-b",
-        "cat-up-land",
-        "cat-up-idle"
-      ]
-    },
-    {
-      "playerBefore": {
-        "x": 6,
-        "y": 5,
-        "facing": "right"
       },
       "playerAfter": {
         "x": 6,
         "y": 6,
         "facing": "down"
       },
-      "pet": {
-        "direction": "right",
-        "frame": "cat-right-idle",
-        "visible": true,
-        "busy": false,
-        "tile": {
+      "pets": {
+        "enabled": true,
+        "manifest": {
+          "status": "candidate",
+          "approved": false
+        },
+        "cat": {
+          "direction": "right",
+          "frame": "cat-right-idle",
+          "visible": true,
+          "busy": false,
+          "tile": {
+            "x": 6,
+            "y": 5
+          },
+          "rootX": 416,
+          "rootY": 384,
+          "depth": 16,
+          "bounds": {
+            "left": 384,
+            "top": 328,
+            "width": 64,
+            "height": 64
+          }
+        },
+        "quokka": {
+          "direction": "right",
+          "frame": "quokka-right-idle",
+          "visible": true,
+          "busy": false,
+          "tile": {
+            "x": 6,
+            "y": 5
+          },
+          "rootX": 416,
+          "rootY": 384,
+          "depth": 16,
+          "bounds": {
+            "left": 384,
+            "top": 328,
+            "width": 64,
+            "height": 64
+          }
+        }
+      },
+      "frames": {
+        "cat": [
+          "cat-right-hop-a",
+          "cat-right-hop-b",
+          "cat-right-land",
+          "cat-right-idle"
+        ],
+        "quokka": [
+          "quokka-right-hop-a",
+          "quokka-right-hop-b",
+          "quokka-right-land",
+          "quokka-right-idle"
+        ]
+      }
+    },
+    {
+      "before": {
+        "player": {
+          "x": 6,
+          "y": 6,
+          "facing": "down"
+        },
+        "cat": {
           "x": 6,
           "y": 5
         },
-        "rootX": 416,
-        "rootY": 384,
-        "depth": 16,
-        "bounds": {
-          "left": 384,
-          "top": 328,
-          "width": 64,
-          "height": 64
+        "quokka": {
+          "x": 6,
+          "y": 5
         }
-      },
-      "frames": [
-        "cat-right-hop-a",
-        "cat-right-hop-b",
-        "cat-right-land",
-        "cat-right-idle"
-      ]
-    },
-    {
-      "playerBefore": {
-        "x": 6,
-        "y": 6,
-        "facing": "down"
       },
       "playerAfter": {
         "x": 5,
         "y": 6,
         "facing": "left"
       },
-      "pet": {
-        "direction": "down",
-        "frame": "cat-down-idle",
-        "visible": true,
-        "busy": false,
-        "tile": {
+      "pets": {
+        "enabled": true,
+        "manifest": {
+          "status": "candidate",
+          "approved": false
+        },
+        "cat": {
+          "direction": "down",
+          "frame": "cat-down-idle",
+          "visible": true,
+          "busy": false,
+          "tile": {
+            "x": 6,
+            "y": 6
+          },
+          "rootX": 416,
+          "rootY": 448,
+          "depth": 17,
+          "bounds": {
+            "left": 384,
+            "top": 392,
+            "width": 64,
+            "height": 64
+          }
+        },
+        "quokka": {
+          "direction": "down",
+          "frame": "quokka-down-idle",
+          "visible": true,
+          "busy": false,
+          "tile": {
+            "x": 6,
+            "y": 6
+          },
+          "rootX": 416,
+          "rootY": 448,
+          "depth": 17,
+          "bounds": {
+            "left": 384,
+            "top": 392,
+            "width": 64,
+            "height": 64
+          }
+        }
+      },
+      "frames": {
+        "cat": [
+          "cat-down-hop-a",
+          "cat-down-hop-b",
+          "cat-down-land",
+          "cat-down-idle"
+        ],
+        "quokka": [
+          "quokka-down-hop-a",
+          "quokka-down-hop-b",
+          "quokka-down-land",
+          "quokka-down-idle"
+        ]
+      }
+    },
+    {
+      "before": {
+        "player": {
+          "x": 5,
+          "y": 6,
+          "facing": "left"
+        },
+        "cat": {
           "x": 6,
           "y": 6
         },
-        "rootX": 416,
-        "rootY": 448,
-        "depth": 17,
-        "bounds": {
-          "left": 384,
-          "top": 392,
-          "width": 64,
-          "height": 64
+        "quokka": {
+          "x": 6,
+          "y": 6
         }
-      },
-      "frames": [
-        "cat-down-hop-a",
-        "cat-down-hop-b",
-        "cat-down-land",
-        "cat-down-idle"
-      ]
-    },
-    {
-      "playerBefore": {
-        "x": 5,
-        "y": 6,
-        "facing": "left"
       },
       "playerAfter": {
         "x": 5,
         "y": 5,
         "facing": "up"
       },
-      "pet": {
-        "direction": "left",
-        "frame": "cat-left-idle",
-        "visible": true,
-        "busy": false,
-        "tile": {
-          "x": 5,
-          "y": 6
+      "pets": {
+        "enabled": true,
+        "manifest": {
+          "status": "candidate",
+          "approved": false
         },
-        "rootX": 352,
-        "rootY": 448,
-        "depth": 17,
-        "bounds": {
-          "left": 320,
-          "top": 392,
-          "width": 64,
-          "height": 64
+        "cat": {
+          "direction": "left",
+          "frame": "cat-left-idle",
+          "visible": true,
+          "busy": false,
+          "tile": {
+            "x": 5,
+            "y": 6
+          },
+          "rootX": 352,
+          "rootY": 448,
+          "depth": 17,
+          "bounds": {
+            "left": 320,
+            "top": 392,
+            "width": 64,
+            "height": 64
+          }
+        },
+        "quokka": {
+          "direction": "left",
+          "frame": "quokka-left-idle",
+          "visible": true,
+          "busy": false,
+          "tile": {
+            "x": 5,
+            "y": 6
+          },
+          "rootX": 352,
+          "rootY": 448,
+          "depth": 17,
+          "bounds": {
+            "left": 320,
+            "top": 392,
+            "width": 64,
+            "height": 64
+          }
         }
       },
-      "frames": [
-        "cat-left-hop-a",
-        "cat-left-hop-b",
-        "cat-left-land",
-        "cat-left-idle"
-      ]
+      "frames": {
+        "cat": [
+          "cat-left-hop-a",
+          "cat-left-hop-b",
+          "cat-left-land",
+          "cat-left-idle"
+        ],
+        "quokka": [
+          "quokka-left-hop-a",
+          "quokka-left-hop-b",
+          "quokka-left-land",
+          "quokka-left-idle"
+        ]
+      }
     }
   ],
   "screenshots": [
     {
       "direction": "up",
       "file": "screenshots/01-up-follow.png",
-      "sha256": "e6a47896ba48cff35cd3756a7dfd3fc6bc547386c00a7101301e7df24577c2f7"
+      "sha256": "4340b1065661d3677b645db5ce23a49a2b36ed157115aa2789a22359a4ceaccc"
     },
     {
       "direction": "right",
       "file": "screenshots/02-right-follow.png",
-      "sha256": "244c36cd7045f831cade83150858e9262c57118e2096b8e8094b3cdb6ed157e0"
+      "sha256": "b4a742a9a0685c64e1222222f33bfd51c4f817f7eba1c957fc5d216e8ba005ed"
     },
     {
       "direction": "down",
       "file": "screenshots/03-down-follow.png",
-      "sha256": "e43ffa0c55639ed367c5c8ba2a11c4c7ab6e779f2dd81cab84ae648dd407aa32"
+      "sha256": "d5faf4ebae7dbfa0807c20c477a7bbd8799fa0f84813bb12acbfcaef687be101"
     },
     {
       "direction": "left",
       "file": "screenshots/04-left-follow.png",
-      "sha256": "03fda6ea6c7902e9b6c111dba6db82f5e2745786eb4f1dc9045231733edc3a4f"
+      "sha256": "c58f50e18ca4661892e918141e6157c1d0cb23451a37d20d0088e7cabf15ec30"
     }
   ],
   "candidateRequests": [
@@ -246,7 +457,8 @@
   "candidateHttpFailures": [],
   "pageErrors": [],
   "limitations": [
-    "The cat visual alone uses candidate frames; movement targets, 110 ms root motion, trail occupancy, depth ordering, and save behavior remain existing production behavior.",
+    "Both candidate visuals use the existing cat follower trail; the quokka only assumes that role in this exact DEV mode. Production keeps the quokka resident.",
+    "Movement targets, 110 ms root motion, trail occupancy, depth ordering, and save behavior remain existing production behavior.",
     "The manifest and asset remain candidate and unapproved.",
     "Evidence covers desktop Chromium only; no device performance or art approval is implied."
   ]

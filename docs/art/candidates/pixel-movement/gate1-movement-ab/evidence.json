@@ -1,0 +1,670 @@
+[
+  {
+    "name": "baseline-150ms",
+    "configuredDurationMs": 150,
+    "steps": [
+      {
+        "direction": "right",
+        "elapsedMs": 150.0000000000001,
+        "configuredDurationMs": 150,
+        "samples": [
+          {
+            "atMs": 2.8000000059604417,
+            "phase": 0.05080000000794731,
+            "progress": 0.10160000001589461,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 19.500000005960487,
+            "phase": 0.10160000001589461,
+            "progress": 0.20320000003178923,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 36.20000000596042,
+            "phase": 0.1524000000238419,
+            "progress": 0.30480000004768387,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 52.800000005960555,
+            "phase": 0.20786666669050866,
+            "progress": 0.4157333333810173,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 69.50000000596037,
+            "phase": 0.2633555555793976,
+            "progress": 0.5267111111587952,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 86.20000000596042,
+            "phase": 0.3188444444682865,
+            "progress": 0.6376888889365732,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 102.90000000596046,
+            "phase": 0.3743555555793977,
+            "progress": 0.7487111111587955,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 119.50000000596037,
+            "phase": 0.4298444444682866,
+            "progress": 0.8596888889365732,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 136.20000000596042,
+            "phase": 0.48533333335717554,
+            "progress": 0.9706666667143511,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 152.80000000596056,
+            "phase": 0.5,
+            "progress": null,
+            "frame": "right-idle"
+          }
+        ]
+      },
+      {
+        "direction": "down",
+        "elapsedMs": 150,
+        "configuredDurationMs": 150,
+        "samples": [
+          {
+            "atMs": 6.400000011920838,
+            "phase": 0.5554888888888889,
+            "progress": 0.11097777777777788,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 23.100000011920883,
+            "phase": 0.6109777777777778,
+            "progress": 0.22195555555555577,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 39.70000001192102,
+            "phase": 0.6664444444444446,
+            "progress": 0.3328888888888893,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 56.40000001192084,
+            "phase": 0.7219333333333335,
+            "progress": 0.44386666666666713,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 73.10000001192088,
+            "phase": 0.7774222222222225,
+            "progress": 0.5548444444444449,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 89.70000001192102,
+            "phase": 0.8328888888888892,
+            "progress": 0.6657777777777785,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 106.40000001192084,
+            "phase": 0.888355555555556,
+            "progress": 0.776711111111112,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 123.10000001192088,
+            "phase": 0.943844444444445,
+            "progress": 0.8876888888888901,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 139.80000001192093,
+            "phase": 0.9993333333333341,
+            "progress": 0.998666666666668,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 156.40000001192084,
+            "phase": 0,
+            "progress": null,
+            "frame": "down-idle"
+          }
+        ]
+      },
+      {
+        "direction": "left",
+        "elapsedMs": 149.9000000000001,
+        "configuredDurationMs": 150,
+        "samples": [
+          {
+            "atMs": 7.500000017881348,
+            "phase": 0.05548888888888894,
+            "progress": 0.11097777777777788,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 24.100000017881484,
+            "phase": 0.11095555555555572,
+            "progress": 0.22191111111111145,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 40.8000000178813,
+            "phase": 0.16644444444444467,
+            "progress": 0.33288888888888934,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 57.50000001788135,
+            "phase": 0.22193333333333362,
+            "progress": 0.44386666666666724,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 74.10000001788148,
+            "phase": 0.2774000000000004,
+            "progress": 0.5548000000000007,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 90.8000000178813,
+            "phase": 0.3328888888888894,
+            "progress": 0.6657777777777787,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 107.50000001788135,
+            "phase": 0.3883777777777784,
+            "progress": 0.7767555555555566,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 124.10000001788148,
+            "phase": 0.44384444444444515,
+            "progress": 0.8876888888888902,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 140.8000000178813,
+            "phase": 0.4993111111111119,
+            "progress": 0.9986222222222239,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 157.40000001788144,
+            "phase": 0.5,
+            "progress": null,
+            "frame": "left-idle"
+          }
+        ]
+      },
+      {
+        "direction": "up",
+        "elapsedMs": 150,
+        "configuredDurationMs": 150,
+        "samples": [
+          {
+            "atMs": 6.900000000000091,
+            "phase": 0.5554666666666669,
+            "progress": 0.11093333333333369,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 23.59999999999991,
+            "phase": 0.6109555555555559,
+            "progress": 0.22191111111111175,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 40.200000000000045,
+            "phase": 0.6664222222222228,
+            "progress": 0.33284444444444544,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 56.90000000000009,
+            "phase": 0.7218888888888897,
+            "progress": 0.44377777777777916,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 73.59999999999991,
+            "phase": 0.7773777777777787,
+            "progress": 0.5547555555555572,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 90.20000000000005,
+            "phase": 0.8328444444444456,
+            "progress": 0.6656888888888909,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 106.90000000000009,
+            "phase": 0.8883111111111125,
+            "progress": 0.7766222222222247,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 123.59999999999991,
+            "phase": 0.9438000000000015,
+            "progress": 0.8876000000000027,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 140.29999999999995,
+            "phase": 0.9992888888888906,
+            "progress": 0.9985777777777808,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 156.9000000000001,
+            "phase": 2.220446049250313e-16,
+            "progress": null,
+            "frame": "up-idle"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "candidate-slow-240ms",
+    "configuredDurationMs": 240,
+    "steps": [
+      {
+        "direction": "right",
+        "elapsedMs": 233.39999999999986,
+        "configuredDurationMs": 240,
+        "samples": [
+          {
+            "atMs": 4.000000011920974,
+            "phase": 0.0324930555543138,
+            "progress": 0.0649861111086276,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 20.700000011920906,
+            "phase": 0.0649861111086276,
+            "progress": 0.1299722222172552,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 37.40000001192095,
+            "phase": 0.0974791666629414,
+            "progress": 0.19495833332588283,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 54.10000001192088,
+            "phase": 0.1299722222172552,
+            "progress": 0.2599444444345104,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 70.7000000119209,
+            "phase": 0.16245138888268013,
+            "progress": 0.3249027777653603,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 87.40000001192095,
+            "phase": 0.1971319444382357,
+            "progress": 0.39426388887647146,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 104.00000001192097,
+            "phase": 0.23181249999379128,
+            "progress": 0.4636249999875826,
+            "frame": "right-contact-a"
+          },
+          {
+            "atMs": 120.7000000119209,
+            "phase": 0.2664930555493469,
+            "progress": 0.5329861110986938,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 137.40000001192095,
+            "phase": 0.3011736111049025,
+            "progress": 0.6023472222098049,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 154.00000001192097,
+            "phase": 0.33584027777156916,
+            "progress": 0.6716805555431383,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 170.7000000119209,
+            "phase": 0.3705208333271247,
+            "progress": 0.7410416666542494,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 187.30000001192093,
+            "phase": 0.4051874999937914,
+            "progress": 0.8103749999875828,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 204.00000001192097,
+            "phase": 0.43985416666045807,
+            "progress": 0.8797083333209162,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 220.70000001192102,
+            "phase": 0.47452083332712475,
+            "progress": 0.9490416666542496,
+            "frame": "right-passing"
+          },
+          {
+            "atMs": 237.40000001192084,
+            "phase": 0.49999999999999994,
+            "progress": null,
+            "frame": "right-idle"
+          }
+        ]
+      },
+      {
+        "direction": "down",
+        "elapsedMs": 233.39999999999986,
+        "configuredDurationMs": 240,
+        "samples": [
+          {
+            "atMs": 7.900000017881439,
+            "phase": 0.5346666666666666,
+            "progress": 0.06933333333333343,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 24.600000017881484,
+            "phase": 0.5693472222222222,
+            "progress": 0.1386944444444446,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 41.3000000178813,
+            "phase": 0.6040277777777778,
+            "progress": 0.20805555555555577,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 57.90000001788144,
+            "phase": 0.6386944444444446,
+            "progress": 0.27738888888888924,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 74.60000001788148,
+            "phase": 0.6733750000000002,
+            "progress": 0.34675000000000045,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 91.2000000178814,
+            "phase": 0.7080416666666669,
+            "progress": 0.41608333333333386,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 107.90000001788144,
+            "phase": 0.7427222222222225,
+            "progress": 0.485444444444445,
+            "frame": "down-contact-b"
+          },
+          {
+            "atMs": 124.60000001788148,
+            "phase": 0.7774027777777781,
+            "progress": 0.5548055555555561,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 141.2000000178814,
+            "phase": 0.8120694444444448,
+            "progress": 0.6241388888888896,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 157.90000001788144,
+            "phase": 0.8467361111111116,
+            "progress": 0.6934722222222229,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 174.60000001788148,
+            "phase": 0.8814166666666671,
+            "progress": 0.762833333333334,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 191.3000000178813,
+            "phase": 0.9160972222222226,
+            "progress": 0.832194444444445,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 207.90000001788144,
+            "phase": 0.9507638888888893,
+            "progress": 0.9015277777777784,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 224.60000001788148,
+            "phase": 0.9854444444444448,
+            "progress": 0.9708888888888896,
+            "frame": "down-passing"
+          },
+          {
+            "atMs": 241.3000000178813,
+            "phase": 0,
+            "progress": null,
+            "frame": "down-idle"
+          }
+        ]
+      },
+      {
+        "direction": "left",
+        "elapsedMs": 233.20000000000005,
+        "configuredDurationMs": 240,
+        "samples": [
+          {
+            "atMs": 8.100000011920883,
+            "phase": 0.03469444444444446,
+            "progress": 0.06938888888888892,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 24.70000001192102,
+            "phase": 0.06937500000000005,
+            "progress": 0.1387500000000001,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 41.40000001192084,
+            "phase": 0.10405555555555564,
+            "progress": 0.20811111111111127,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 58.10000001192088,
+            "phase": 0.13875000000000012,
+            "progress": 0.27750000000000025,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 74.70000001192102,
+            "phase": 0.17343055555555575,
+            "progress": 0.34686111111111156,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 91.30000001192093,
+            "phase": 0.2080972222222225,
+            "progress": 0.416194444444445,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 108.00000001192097,
+            "phase": 0.24276388888888922,
+            "progress": 0.48552777777777845,
+            "frame": "left-contact-a"
+          },
+          {
+            "atMs": 124.70000001192102,
+            "phase": 0.2774444444444448,
+            "progress": 0.5548888888888897,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 141.40000001192084,
+            "phase": 0.31212500000000043,
+            "progress": 0.6242500000000007,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 158.00000001192097,
+            "phase": 0.34679166666666716,
+            "progress": 0.6935833333333343,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 174.70000001192102,
+            "phase": 0.3814583333333339,
+            "progress": 0.7629166666666678,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 191.30000001192093,
+            "phase": 0.4161250000000006,
+            "progress": 0.8322500000000013,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 208.00000001192097,
+            "phase": 0.45079166666666726,
+            "progress": 0.9015833333333346,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 224.70000001192102,
+            "phase": 0.48545833333333394,
+            "progress": 0.970916666666668,
+            "frame": "left-passing"
+          },
+          {
+            "atMs": 241.30000001192093,
+            "phase": 0.49999999999999994,
+            "progress": null,
+            "frame": "left-idle"
+          }
+        ]
+      },
+      {
+        "direction": "up",
+        "elapsedMs": 233.39999999999986,
+        "configuredDurationMs": 240,
+        "samples": [
+          {
+            "atMs": 7.299999994039581,
+            "phase": 0.5346805555555555,
+            "progress": 0.06936111111111108,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 23.89999999403949,
+            "phase": 0.5693472222222221,
+            "progress": 0.13869444444444437,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 40.599999994039536,
+            "phase": 0.6040138888888887,
+            "progress": 0.20802777777777764,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 57.29999999403958,
+            "phase": 0.6386805555555554,
+            "progress": 0.2773611111111109,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 73.99999999403963,
+            "phase": 0.6733611111111109,
+            "progress": 0.3467222222222219,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 90.59999999403954,
+            "phase": 0.7080277777777775,
+            "progress": 0.41605555555555507,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 107.29999999403958,
+            "phase": 0.742708333333333,
+            "progress": 0.48541666666666605,
+            "frame": "up-contact-b"
+          },
+          {
+            "atMs": 123.99999999403963,
+            "phase": 0.7773888888888885,
+            "progress": 0.5547777777777771,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 140.69999999403944,
+            "phase": 0.812069444444444,
+            "progress": 0.6241388888888881,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 157.29999999403958,
+            "phase": 0.8467499999999996,
+            "progress": 0.6934999999999992,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 173.8999999940395,
+            "phase": 0.8814166666666662,
+            "progress": 0.7628333333333326,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 190.59999999403954,
+            "phase": 0.9160972222222218,
+            "progress": 0.8321944444444437,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 207.29999999403958,
+            "phase": 0.9507777777777774,
+            "progress": 0.9015555555555549,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 223.99999999403963,
+            "phase": 0.985458333333333,
+            "progress": 0.970916666666666,
+            "frame": "up-passing"
+          },
+          {
+            "atMs": 240.69999999403944,
+            "phase": 0,
+            "progress": null,
+            "frame": "up-idle"
+          }
+        ]
+      }
+    ]
+  }
+]

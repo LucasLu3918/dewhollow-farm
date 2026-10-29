@@ -1,0 +1,49 @@
+{
+  "task": "P4-040",
+  "status": "passed",
+  "candidateApproved": false,
+  "command": "SAVE_GATE1_PLOT_VISUAL_EVIDENCE=1 npm run test:e2e -- tests/e2e/gate1-plot-visual.spec.ts --workers=1",
+  "result": "1 passed",
+  "browserViewportCss": {
+    "width": 390,
+    "height": 844
+  },
+  "canvasScreenshotPx": {
+    "width": 356,
+    "height": 578
+  },
+  "cases": [
+    {
+      "shape": "1x1",
+      "plotCount": 1,
+      "expectedFrame": "spring-dry-soil-edge-0",
+      "screenshot": "plot-1x1.png",
+      "sha256": "9abc5ccf459751d59af041ae6f8e6746daea1f44641c1470d17385233330e1c1"
+    },
+    {
+      "shape": "3x3; center wet, remaining plots dry",
+      "plotCount": 9,
+      "expectedFrames": [
+        "spring-dry-soil-edge-a",
+        "spring-wet-soil-edge-0"
+      ],
+      "screenshot": "plot-3x3.png",
+      "sha256": "29bc4337ff8b262ddb111db0fec21f75ab81a784c4d09833c1ad8884bba41712"
+    },
+    {
+      "shape": "L",
+      "plotCount": 4,
+      "expectedFrame": "spring-wet-soil-edge-6",
+      "screenshot": "plot-L.png",
+      "sha256": "d574c7b8335b1f5f2acda865cb4dae1e20c3dc02b140b592dbd4f7afcf6c61d7"
+    }
+  ],
+  "candidateIsolation": {
+    "withoutExactRuntimeOptIn": "runtime disabled; rendered candidate soil frames: 0"
+  },
+  "notes": [
+    "The E2E loads the actual farm scene and IndexedDB save, checks the rendered atlas frame names and 64x64 world bounds, and captures each candidate shape.",
+    "This scoped result does not claim repository-wide Impact Graph completeness.",
+    "Candidate assets remain unapproved and are not registered as production assets."
+  ]
+}

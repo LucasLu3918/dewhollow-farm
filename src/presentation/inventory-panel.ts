@@ -109,6 +109,7 @@ export class InventoryPanel {
   private readonly dialog: PanelDialog;
   private category: InventoryCategory = 'all';
   private selectedKey: string | null = null;
+  private previewItemKey: string | null = null;
   private dataProvider: (() => InventoryPanelData) | null = null;
   private commandHandler: InventoryCommandHandler | null = null;
   private actionFeedback: { message: string; refused: boolean } | null = null;
@@ -171,6 +172,7 @@ export class InventoryPanel {
   }
 
   close(): void {
+    this.previewItemKey = null;
     this.dialog.close();
   }
 
@@ -181,6 +183,7 @@ export class InventoryPanel {
     const visibleEntries = filterInventoryEntries(data.entries, this.category);
     const selectedEntry = visibleEntries.find((entry) => inventoryEntryKey(entry) === this.selectedKey) ?? null;
     if (!selectedEntry) this.selectedKey = null;
+    if (!selectedEntry || inventoryEntryKey(selectedEntry) !== this.previewItemKey) this.previewItemKey = null;
     const slots = inventorySlotCount(data.capacity);
     const full = isInventoryFull(data.entries.length, slots);
     this.capacityLabel.textContent = `${data.entries.length} / ${slots}`;
@@ -228,6 +231,7 @@ export class InventoryPanel {
     if (key === this.selectedKey) slot.classList.add('inventory-slot--selected');
     slot.addEventListener('click', () => {
       this.selectedKey = key;
+      this.previewItemKey = null;
       this.actionFeedback = null;
       this.render();
     });
@@ -322,31 +326,66 @@ export class InventoryPanel {
     this.detail.dataset.quality = entry.quality;
     this.detail.dataset.count = String(entry.count);
 
-    const icon = doc.createElement('span');
-    icon.className = 'inventory-detail-icon';
     const iconView = createItemIconView(
       { id: entry.itemId, label: entry.name, quantity: entry.count },
       data.resolveIcon(entry.itemId),
     );
+    const previewOpen = this.previewItemKey === inventoryEntryKey(entry);
+    let preview: HTMLDivElement | null = null;
+    let icon: HTMLElement;
     if (iconView.fallback) {
+      icon = doc.createElement('span');
+      icon.className = 'inventory-detail-icon';
       icon.dataset.iconState = 'fallback';
       icon.dataset.diagnostic = iconView.diagnostic;
       icon.textContent = iconView.diagnostic === 'unknown-item' ? '？' : '✧';
       icon.setAttribute('aria-label', `圖示備援：${iconView.diagnostic}`);
     } else {
-      icon.dataset.iconState = 'available';
+      const button = doc.createElement('button');
+      button.type = 'button';
+      button.className = 'inventory-detail-icon inventory-detail-icon--button';
+      button.dataset.focusKey = `inventory-image-preview:${inventoryEntryKey(entry)}`;
+      button.setAttribute('aria-label', previewOpen ? `收合${entry.name}圖片預覽` : `放大查看${entry.name}圖片`);
+      button.setAttribute('aria-expanded', String(previewOpen));
+      button.setAttribute('aria-controls', 'inventory-detail-preview');
+      button.addEventListener('click', () => {
+        this.previewItemKey = this.previewItemKey === inventoryEntryKey(entry) ? null : inventoryEntryKey(entry);
+        this.render();
+      });
+      button.dataset.iconState = 'available';
       const image = doc.createElement('img');
       image.src = iconView.src;
       image.alt = '';
       image.loading = 'lazy';
       image.addEventListener('error', () => {
-        icon.dataset.iconState = 'fallback';
-        icon.dataset.diagnostic = 'icon-load-error';
-        image.remove();
-        icon.textContent = '✧';
-        icon.setAttribute('aria-label', '圖示備援：icon-load-error');
+        button.disabled = true;
+        button.dataset.iconState = 'fallback';
+        button.dataset.diagnostic = 'icon-load-error';
+        button.removeAttribute('aria-expanded');
+        button.removeAttribute('aria-controls');
+        button.setAttribute('aria-label', '圖示備援：icon-load-error');
+        button.replaceChildren(doc.createTextNode('✧'));
+        if (preview) {
+          preview.hidden = true;
+          preview.replaceChildren();
+        }
+        this.previewItemKey = null;
       });
-      icon.append(image);
+      button.append(image);
+      icon = button;
+      preview = doc.createElement('div');
+      preview.id = 'inventory-detail-preview';
+      preview.className = 'inventory-detail-preview';
+      preview.hidden = !previewOpen;
+      preview.setAttribute('role', 'region');
+      preview.setAttribute('aria-label', `${entry.name}放大預覽`);
+      if (previewOpen) {
+        const enlarged = doc.createElement('img');
+        enlarged.src = iconView.src;
+        enlarged.alt = `${entry.name}放大預覽`;
+        enlarged.loading = 'lazy';
+        preview.append(enlarged);
+      }
     }
 
     const name = doc.createElement('h4');
@@ -362,7 +401,9 @@ export class InventoryPanel {
     count.className = 'inventory-detail-count';
     count.textContent = `數量：${entry.count}`;
 
-    this.detail.append(icon, name, category, quality, count);
+    this.detail.append(icon);
+    if (preview) this.detail.append(preview);
+    this.detail.append(name, category, quality, count);
 
     if (entry.sellabilityLabel) {
       const sellability = doc.createElement('p');

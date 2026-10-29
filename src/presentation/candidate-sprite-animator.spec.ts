@@ -1,44 +1,43 @@
 import { describe, expect, it } from 'vitest';
 import {
-  candidateFrameAt,
+  candidateFrameAtGaitPhase,
   candidateToolImpactCrossed,
   candidateToolFeedback,
-  nonNegativeElapsedMs,
   type CandidateDirection,
 } from './candidate-sprite-animator';
 
 const DIRECTIONS: CandidateDirection[] = ['down', 'up', 'left', 'right'];
 
 describe('pixel32 候選動畫器', () => {
-  it('把早於動畫起點的繪製時間夾到零', () => {
-    expect(nonNegativeElapsedMs(100, 97.3)).toBe(0);
-  });
-
-  it('保留動畫起點之後的經過時間', () => {
-    expect(nonNegativeElapsedMs(100, 145)).toBe(45);
-  });
-
   it('四個方向的 idle 都選到該方向的基準影格', () => {
     for (const direction of DIRECTIONS) {
-      expect(candidateFrameAt(direction, 'idle', 0)).toEqual({
+      expect(candidateFrameAtGaitPhase(direction, 'idle', 0)).toEqual({
         frame: `${direction}-idle`,
         index: 0,
       });
     }
   });
 
-  it('走路影格依步伐時間循環，並在循環邊界回到第一個接地幀', () => {
-    expect(candidateFrameAt('down', 'walk', 0).frame).toBe('down-contact-a');
-    expect(candidateFrameAt('down', 'walk', 55).frame).toBe('down-passing');
-    expect(candidateFrameAt('down', 'walk', 110).frame).toBe('down-contact-b');
-    expect(candidateFrameAt('down', 'walk', 165).frame).toBe('down-passing');
-    expect(candidateFrameAt('down', 'walk', 220).frame).toBe('down-contact-a');
-    expect(candidateFrameAt('right', 'walk', 440)).toEqual(candidateFrameAt('right', 'walk', 0));
+  it('走路影格依 scheduler 步態相位循環，而非獨立毫秒計時', () => {
+    expect(candidateFrameAtGaitPhase('down', 'walk', 0).frame).toBe('down-contact-a');
+    expect(candidateFrameAtGaitPhase('down', 'walk', 0.25).frame).toBe('down-passing');
+    expect(candidateFrameAtGaitPhase('down', 'walk', 0.5).frame).toBe('down-contact-b');
+    expect(candidateFrameAtGaitPhase('down', 'walk', 0.75).frame).toBe('down-passing');
+    expect(candidateFrameAtGaitPhase('down', 'walk', 0.999).frame).toBe('down-passing');
+    expect(candidateFrameAtGaitPhase('right', 'walk', 0).frame).toBe('right-contact-a');
   });
 
-  it('拒絕負數與非有限的動畫時間', () => {
-    for (const elapsed of [-1, Number.NaN, Number.POSITIVE_INFINITY]) {
-      expect(() => candidateFrameAt('left', 'walk', elapsed)).toThrow(RangeError);
+  it('同一個 tile progress 在 150ms 與 240ms 方案選到同一影格', () => {
+    for (const stepDurationMs of [150, 240]) {
+      const gaitCycleMs = stepDurationMs * 2;
+      const elapsedAtHalfStep = stepDurationMs / 2;
+      expect(candidateFrameAtGaitPhase('left', 'walk', elapsedAtHalfStep / gaitCycleMs).frame).toBe('left-passing');
+    }
+  });
+
+  it('拒絕超出標準化步態相位範圍的數值', () => {
+    for (const phase of [-0.01, 1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(() => candidateFrameAtGaitPhase('left', 'walk', phase)).toThrow(RangeError);
     }
   });
 });

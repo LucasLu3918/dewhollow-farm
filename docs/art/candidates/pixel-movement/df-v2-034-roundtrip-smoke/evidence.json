@@ -1,0 +1,62 @@
+{
+  "task": "DF-V2-034",
+  "capturedAt": "2026-10-27T19:31:24Z",
+  "sourceRevision": "1ecebf1e9e196582bd924175713751dfe4c4df99 + working tree",
+  "route": "?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1SceneVisual=world-v2-cozy",
+  "provider": "Playwright Chromium local DEV server",
+  "viewport": {
+    "width": 1280,
+    "height": 720,
+    "deviceScaleFactor": 1
+  },
+  "test": {
+    "command": "npx playwright test tests/e2e/world-v2-roundtrip-smoke.spec.ts --workers=1",
+    "result": "passed",
+    "summary": "1 passed (47.0s)",
+    "assertions": [
+      "10 farm-to-house and 10 house-to-farm transitions",
+      "Movement in each house visit",
+      "Workbench interaction and panel close",
+      "One night of sleep; date advances from day 1 to day 2",
+      "Manual save and reload preserve map, player, calendar and gold",
+      "World-v2 candidate house layers appear indoors and are cleared on return to farm"
+    ]
+  },
+  "artifacts": {
+    "screenshots/farm.png": {
+      "sha256": "c2b50dd5cd89074964fc4a6fcd792d3e847a5c73cf9ea57ea2eafec3dc121a8a",
+      "width": 1280,
+      "height": 720
+    },
+    "screenshots/house.png": {
+      "sha256": "da14673c73e77970b05cd8592b3bc389b5ce37250c6eda6b236eca6d424917c7",
+      "width": 1280,
+      "height": 720
+    },
+    "screenshots/farm-after-roundtrips.png": {
+      "sha256": "ca0f8406b6906a7ca8720cd00c27bc9b0c54a9bf78c889f3a4debd5d0eb588b6",
+      "width": 1280,
+      "height": 720
+    },
+    "videos/ten-roundtrips.webm": {
+      "sha256": "38f36b22d2a19decba1a23ac3bddc39d003486b6912cdbd59bb124e74d0fc24c",
+      "sizeBytes": 12257709
+    }
+  },
+  "approval": {
+    "candidateMaterialsApproved": false,
+    "productionAssetsChanged": false
+  },
+  "verification": {
+    "fullSuite": {
+      "command": "npm run test:e2e",
+      "result": "passed",
+      "summary": "315 passed (12.1m)"
+    },
+    "projectCheck": {
+      "command": "npm run check",
+      "result": "passed",
+      "summary": "178 Vitest files; 1,756 passed, 1 skipped; typecheck, assets gates, build and 3.290 MB budget passed"
+    }
+  }
+}

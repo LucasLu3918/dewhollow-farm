@@ -76,7 +76,7 @@ describe('GameSession', () => {
 
   it('autosaves when the player sleeps', async () => {
     const repo = new MemorySaveRepository();
-    const session = sessionAt({ x: 2, y: 1, facing: 'left' }, repo, 'house'); // 小屋裡的床 (1,1)
+    const session = sessionAt({ x: 4, y: 8, facing: 'up' }, repo, 'house'); // 小屋裡的床 (4,7)
     const outcome = await session.dispatch({ type: 'interact' });
     expect(outcome.events).toContainEqual({ type: 'slept' });
     expect((await repo.load('slot-1'))?.state.calendar.day).toBe(2);
@@ -117,7 +117,7 @@ describe('GameSession', () => {
       },
       delete: async () => {},
     };
-    const session = sessionAt({ x: 2, y: 1, facing: 'left' }, failing, 'house');
+    const session = sessionAt({ x: 4, y: 8, facing: 'up' }, failing, 'house');
     const outcome = await session.dispatch({ type: 'interact' });
     expect(outcome.messages).toContain('自動存檔失敗：QuotaExceededError');
   });

@@ -1,0 +1,44 @@
+{
+  "id": "cowbarn",
+  "name": "牛舍",
+  "width": 6,
+  "height": 5,
+  "rows": [
+    "######",
+    "#..T.#",
+    "#...P#",
+    "#...P#",
+    "##D###"
+  ],
+  "legend": {
+    "#": {
+      "kind": "wall"
+    },
+    ".": {
+      "kind": "floor"
+    },
+    "P": {
+      "kind": "floor",
+      "slot": true
+    },
+    "T": {
+      "kind": "trough"
+    },
+    "D": {
+      "kind": "door",
+      "to": "pasture",
+      "spawn": {
+        "x": 15,
+        "y": 5
+      }
+    },
+    "F": {
+      "kind": "fence"
+    }
+  },
+  "spawn": {
+    "x": 2,
+    "y": 3
+  },
+  "flock": "cows"
+}

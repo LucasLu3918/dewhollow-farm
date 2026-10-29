@@ -1,0 +1,1717 @@
+{
+  "schemaVersion": 1,
+  "id": "dewhollow-world-v2-farm-candidate",
+  "title": "Dewhollow Farm Pixel32 scene slice",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "method": "hand-authored integer pixel primitives with deterministic seeded clusters",
+    "generator": "generate.mjs",
+    "generatorSha256": "5f13569ae24d0faf66c735ff99415e8c0415fcc7f47d71de895abe1036d03043"
+  },
+  "pixelContract": {
+    "nativeTileSize": 32,
+    "worldTileSize": 64,
+    "displayScale": 2,
+    "sampling": "nearest-neighbor",
+    "origin": "top-left",
+    "rectConvention": "half-open",
+    "anchorConvention": "integer-pixel-index",
+    "alpha": "RGBA; zero alpha only outside shadow/occlusion/object bounds"
+  },
+  "palette": {
+    "grass": "#648A53",
+    "grassLight": "#85AB67",
+    "grassDark": "#486745",
+    "soil": "#876047",
+    "soilLight": "#A67D57",
+    "soilDark": "#5B3C31",
+    "wall": "#C79B67",
+    "floor": "#AF8258",
+    "baseboard": "#6E503E",
+    "roof": "#8B6459",
+    "stone": "#899189",
+    "water": "#598E9B",
+    "highlight": "#F7D8A2",
+    "shadow": "#566B68",
+    "ink": "#382E2D",
+    "leaf": "#567849",
+    "leafLight": "#85AB67",
+    "leafDark": "#3F5D3C",
+    "window": "#78A8A4",
+    "windowLight": "#D7C98B",
+    "windowShadow": "#6F9B94",
+    "woodMid": "#B18759",
+    "roofLight": "#A87967",
+    "crate": "#A86F46",
+    "crateDark": "#704936",
+    "wetSoil": "#654A3D",
+    "doorDark": "#80563F",
+    "glass": "#8FB8A7",
+    "crateLight": "#BF8650"
+  },
+  "atlas": {
+    "file": "atlas.png",
+    "width": 768,
+    "height": 512,
+    "sha256": "cf4688263b8ebcf665aa59d52115d31057aea798740941f1a2c6e0fc3ce90ccc"
+  },
+  "autotile": {
+    "maskBits": {
+      "north": 1,
+      "east": 2,
+      "south": 4,
+      "west": 8
+    },
+    "variantsPerFamily": 16
+  },
+  "frames": {
+    "grass-base": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "grass-base",
+      "kind": "tile",
+      "layer": "ground",
+      "surface": "grass",
+      "season": "spring",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "grass-variant": {
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "grass-variant",
+      "kind": "tile",
+      "layer": "ground",
+      "surface": "grass",
+      "season": "spring",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "path-center": {
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-center",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "tileable": false,
+      "autotileMask": 15,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "path-edge": {
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-edge",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "tileable": false,
+      "autotileMask": 5,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "soil-dry": {
+      "x": 128,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "soil-dry",
+      "kind": "tile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "soil-wet": {
+      "x": 160,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "soil-wet",
+      "kind": "tile",
+      "layer": "groundOverlay",
+      "surface": "wet-soil",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "path-mask-00": {
+      "x": 0,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 0,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-00": {
+      "x": 0,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 0,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-01": {
+      "x": 32,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 1,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-01": {
+      "x": 32,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 1,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-02": {
+      "x": 64,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 2,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-02": {
+      "x": 64,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 2,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-03": {
+      "x": 96,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 3,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-03": {
+      "x": 96,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 3,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-04": {
+      "x": 128,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 4,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-04": {
+      "x": 128,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 4,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-05": {
+      "x": 160,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 5,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-05": {
+      "x": 160,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 5,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-06": {
+      "x": 192,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 6,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-06": {
+      "x": 192,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 6,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-07": {
+      "x": 224,
+      "y": 32,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 7,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-07": {
+      "x": 224,
+      "y": 96,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 7,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-08": {
+      "x": 0,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 8,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-08": {
+      "x": 0,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 8,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-09": {
+      "x": 32,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 9,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-09": {
+      "x": 32,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 9,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-0a": {
+      "x": 64,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 10,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-0a": {
+      "x": 64,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 10,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-0b": {
+      "x": 96,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 11,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-0b": {
+      "x": 96,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 11,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-0c": {
+      "x": 128,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 12,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-0c": {
+      "x": 128,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 12,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-0d": {
+      "x": 160,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 13,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-0d": {
+      "x": 160,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 13,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-0e": {
+      "x": 192,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 14,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-0e": {
+      "x": 192,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 14,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "path-mask-0f": {
+      "x": 224,
+      "y": 64,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "path-mask",
+      "kind": "autotile",
+      "layer": "ground",
+      "surface": "path",
+      "edgeSurface": "grass",
+      "autotileMask": 15,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "field-mask-0f": {
+      "x": 224,
+      "y": 128,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "field-mask",
+      "kind": "autotile",
+      "layer": "groundOverlay",
+      "surface": "dry-soil",
+      "edgeSurface": "grass",
+      "autotileMask": 15,
+      "maskBits": {
+        "north": 1,
+        "east": 2,
+        "south": 4,
+        "west": 8
+      },
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      },
+      "tileable": false
+    },
+    "farm-ground-shadow": {
+      "x": 0,
+      "y": 160,
+      "width": 32,
+      "height": 16,
+      "nativeWidth": 32,
+      "nativeHeight": 16,
+      "displayScale": 2,
+      "approved": false,
+      "role": "ground-shadow",
+      "kind": "shadow",
+      "layer": "shadow",
+      "surface": "shadow",
+      "anchor": "bottom-center",
+      "tileable": false,
+      "footprintTiles": {
+        "width": 1,
+        "height": 0.5
+      },
+      "pivot": {
+        "x": 16,
+        "y": 15
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 15
+      },
+      "hasTransparency": true,
+      "containsPartialAlpha": true
+    },
+    "house-exterior": {
+      "x": 32,
+      "y": 160,
+      "width": 160,
+      "height": 96,
+      "nativeWidth": 160,
+      "nativeHeight": 96,
+      "displayScale": 2,
+      "approved": false,
+      "role": "house-exterior",
+      "kind": "building",
+      "layer": "back",
+      "surface": "timber-and-terracotta",
+      "tileable": false,
+      "widthTiles": 5,
+      "heightTiles": 3,
+      "footprintTiles": {
+        "width": 5,
+        "height": 3
+      },
+      "pivot": {
+        "x": 80,
+        "y": 95
+      },
+      "footAnchor": {
+        "x": 80,
+        "y": 95
+      },
+      "collisionFootprint": "unchanged map data; art-only bounds"
+    },
+    "house-front": {
+      "x": 192,
+      "y": 160,
+      "width": 160,
+      "height": 32,
+      "nativeWidth": 160,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "house-front",
+      "kind": "occlusion",
+      "layer": "front",
+      "surface": "timber",
+      "tileable": false,
+      "widthTiles": 5,
+      "heightTiles": 1,
+      "footprintTiles": {
+        "width": 5,
+        "height": 1
+      },
+      "pivot": {
+        "x": 80,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 80,
+        "y": 31
+      },
+      "occludesActors": true
+    },
+    "tree-canopy": {
+      "x": 352,
+      "y": 160,
+      "width": 96,
+      "height": 96,
+      "nativeWidth": 96,
+      "nativeHeight": 96,
+      "displayScale": 2,
+      "approved": false,
+      "role": "tree-canopy",
+      "kind": "occlusion",
+      "layer": "front",
+      "surface": "leaf-and-bark",
+      "tileable": false,
+      "widthTiles": 3,
+      "heightTiles": 3,
+      "footprintTiles": {
+        "width": 3,
+        "height": 3
+      },
+      "pivot": {
+        "x": 48,
+        "y": 95
+      },
+      "footAnchor": {
+        "x": 48,
+        "y": 95
+      },
+      "occludesActors": true
+    },
+    "shipping-crate": {
+      "x": 448,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "shipping-crate",
+      "kind": "object",
+      "layer": "object",
+      "surface": "wood",
+      "tileable": false,
+      "widthTiles": 1,
+      "heightTiles": 1,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 27
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 27
+      },
+      "collisionFootprint": "existing shipping-box target; art-only bounds"
+    },
+    "stone-wall": {
+      "x": 480,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "stone-wall",
+      "kind": "wall",
+      "layer": "object",
+      "surface": "mossy-stone",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "fence-horizontal": {
+      "x": 512,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "fence",
+      "kind": "wall",
+      "layer": "object",
+      "surface": "painted-wood",
+      "direction": "horizontal",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "fence-vertical": {
+      "x": 544,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "fence",
+      "kind": "wall",
+      "layer": "object",
+      "surface": "painted-wood",
+      "direction": "vertical",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "fence-north-east": {
+      "x": 576,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "fence",
+      "kind": "wall",
+      "layer": "object",
+      "surface": "painted-wood",
+      "direction": "north-east",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "fence-north-west": {
+      "x": 608,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "fence",
+      "kind": "wall",
+      "layer": "object",
+      "surface": "painted-wood",
+      "direction": "north-west",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "fence-south-east": {
+      "x": 640,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "fence",
+      "kind": "wall",
+      "layer": "object",
+      "surface": "painted-wood",
+      "direction": "south-east",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    },
+    "fence-south-west": {
+      "x": 672,
+      "y": 160,
+      "width": 32,
+      "height": 32,
+      "nativeWidth": 32,
+      "nativeHeight": 32,
+      "displayScale": 2,
+      "approved": false,
+      "role": "fence",
+      "kind": "wall",
+      "layer": "object",
+      "surface": "painted-wood",
+      "direction": "south-west",
+      "tileable": true,
+      "footprintTiles": {
+        "width": 1,
+        "height": 1
+      },
+      "pivot": {
+        "x": 16,
+        "y": 31
+      },
+      "footAnchor": {
+        "x": 16,
+        "y": 31
+      }
+    }
+  },
+  "recommendedSceneGrammar": [
+    "ground",
+    "groundOverlay",
+    "shadow",
+    "back",
+    "object",
+    "runtimeActor",
+    "front"
+  ],
+  "limitations": [
+    "All frames are unapproved candidate art; never register in content/assets.json or public/.",
+    "Collision, interaction targets, spawn points, and map data stay unchanged; footprint metadata is visual guidance only.",
+    "Farm path and field masks are candidate geometry that requires Phaser neighbor-mask mapping and a human seam review.",
+    "This atlas is a compact farm visual slice, not full seasonal coverage or a production-quality complete world pack.",
+    "The atlas is made from original code-authored pixel shapes; no generated concept image is packed into it."
+  ]
+}

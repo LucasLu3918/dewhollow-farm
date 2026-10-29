@@ -393,13 +393,14 @@ test.describe('emotes', () => {
     await waitForGame(page);
     await press(page, 'ArrowUp', 4); // (7,9) → (7,5)
     await press(page, 'ArrowLeft', 5); // → (2,5)，正下方是小屋的門 (2,4)
-    await press(page, 'ArrowUp'); // 進小屋，落在 (4,5)
+    await press(page, 'ArrowUp'); // 進小屋，落在 (10,18)
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
-    await press(page, 'ArrowUp', 3); // → (4,2)（工作台在 (4,1)）
-    await press(page, 'ArrowLeft', 2); // → (2,2)
-    await press(page, 'ArrowUp'); // → (2,1)
-    await press(page, 'ArrowLeft'); // 床 (1,1) 擋住，只轉向，面向床
-    await expect.poll(async () => (await player(page)).tileX).toBe(2);
+    await press(page, 'ArrowUp', 9); // → (10,9)
+    await press(page, 'ArrowLeft', 6); // → (4,9)
+    await press(page, 'ArrowUp'); // → (4,8)，床在前方 (4,7)
+    await press(page, 'ArrowUp'); // 床擋住，只轉向，面向床
+    await expect.poll(async () => (await player(page)).tileX).toBe(4);
+    await expect.poll(async () => (await player(page)).tileY).toBe(8);
     await settle(page);
     await press(page, 'x');
     await expect.poll(async () => (await emotes(page)).map((e) => `${e.who}:${e.kind}`)).toContain('player:sleepy');

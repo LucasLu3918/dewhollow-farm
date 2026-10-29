@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:stress": "DEWHOLLOW_VIEWPORT_CYCLES=100 playwright test tests/e2e/viewport-cycle-stability.spec.ts --grep='100-cycle viewport stability' --workers=1",
     "sim": "SIM_REPORT=1 vitest run tests/sim",
     "budget": "node tools/build/check-dist.mjs",
     "assets:gate1:check": "node tools/art/check_gate1_assets.mjs",
@@ -20,9 +21,11 @@
     "assets:gate1:crops:check": "node tools/art/check_gate1_crops.mjs",
     "assets:gate1:interactables:check": "node tools/art/check_gate1_interactables.mjs",
     "assets:gate1:pets:check": "node tools/art/check_gate1_pets_pixel32.mjs",
+    "assets:gate1:world-v2-scene:check": "node tools/art/check_gate1_world_v2_scene.mjs",
+    "assets:pixel32-quality-scenes:check": "node tools/art/check_pixel32_quality_scenes.mjs",
     "licenses": "node tools/licenses/generate.mjs",
     "icons": "node tools/pwa/make-icons.mjs",
-    "check": "npm run assets:gate1:check && npm run assets:gate1:animation:check && npm run assets:gate1:map:check && npm run assets:gate1:crops:check && npm run assets:gate1:interactables:check && npm run assets:gate1:pets:check && npm run typecheck && npm test && npm run build && npm run budget"
+    "check": "npm run assets:gate1:check && npm run assets:gate1:animation:check && npm run assets:gate1:map:check && npm run assets:gate1:crops:check && npm run assets:gate1:interactables:check && npm run assets:gate1:pets:check && npm run assets:gate1:world-v2-scene:check && npm run assets:pixel32-quality-scenes:check && npm run typecheck && npm test && npm run build && npm run budget"
   },
   "dependencies": {
     "dexie": "^4.4.6",

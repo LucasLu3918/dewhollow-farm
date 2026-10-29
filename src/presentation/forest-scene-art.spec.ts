@@ -11,6 +11,7 @@ describe('forestSceneAssetFor', () => {
   it('uses forest-only ground art without changing other map art', () => {
     expect(forestSceneAssetFor('forest', 'grass', 2, 1)).toBe('scene.forest.grass');
     expect(forestSceneAssetFor('forest', 'path', 10, 5)).toBe('scene.forest.path');
+    expect(forestSceneAssetFor('forest', 'wall', 1, 1)).toBe('scene.forest.tree');
     expect(forestSceneAssetFor('farm', 'grass', 1, 1)).toBeNull();
   });
 
@@ -36,7 +37,7 @@ describe('forestSceneAssetFor', () => {
   });
 
   it('does not map unrelated tile kinds to forest art', () => {
-    const unrelatedKinds: TileKind[] = ['field', 'wall', 'door', 'forage', 'water'];
+    const unrelatedKinds: TileKind[] = ['field', 'door', 'forage', 'water'];
     for (const kind of unrelatedKinds) {
       expect(forestSceneAssetFor('forest', kind, 1, 1)).toBeNull();
     }

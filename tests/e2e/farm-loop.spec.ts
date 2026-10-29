@@ -41,23 +41,24 @@ async function waitForGame(page: Page): Promise<void> {
 }
 
 async function fieldToBed(page: Page): Promise<void> {
-  // 農場田邊 (7,5) → 小屋床位 (2,1)。
+  // 農場田邊 (7,5) → 小屋床前 (4,8)，面向床位 (4,7)。
   await walk(page, 'ArrowLeft', 5);
-  await walk(page, 'ArrowUp', 1); // 進門，落在小屋 (4,5)
-  await walk(page, 'ArrowUp', 3);
-  await walk(page, 'ArrowLeft', 2);
+  await walk(page, 'ArrowUp', 1); // 進門，落在小屋 (10,18)
+  await walk(page, 'ArrowUp', 9);
+  await walk(page, 'ArrowLeft', 6);
   await walk(page, 'ArrowUp', 1);
-  await page.keyboard.press('ArrowLeft'); // 面向床位 (1,1)
+  await page.keyboard.press('ArrowUp'); // 面向床位 (4,7)
   await page.keyboard.press('x');
 }
 
 async function bedToField(page: Page): Promise<void> {
-  // 床位 (2,1) → 門 → 農場田邊 (7,5)，最後面向 (7,4) 的田。
-  await walk(page, 'ArrowRight', 1);
-  await walk(page, 'ArrowDown', 4);
-  await walk(page, 'ArrowRight', 1);
-  await walk(page, 'ArrowDown', 2);
+  // 床前 (4,8) → 門 → 農場田邊 (7,5)，最後面向 (7,4) 的田。
+  await walk(page, 'ArrowRight', 6);
+  await walk(page, 'ArrowDown', 1);
+  await walk(page, 'ArrowDown', 9);
+  await walk(page, 'ArrowDown', 1); // 出門回到農場 (2,5)
   await walk(page, 'ArrowRight', 5);
+  await walk(page, 'ArrowDown', 1);
   await walk(page, 'ArrowUp', 1);
 }
 
@@ -91,7 +92,7 @@ async function readSavedGame(page: Page): Promise<{
 }
 
 test('completes farm, exploration, shipping and save loop without duplicate costs', async ({ page }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(180_000);
   await waitForGame(page);
 
   // 第 1 天耕地、播種、澆水；同一格重複開墾應被拒絕且不再扣體力。
@@ -149,10 +150,10 @@ test('completes farm, exploration, shipping and save loop without duplicate cost
   await walk(page, 'ArrowLeft', 5);
   await walk(page, 'ArrowUp', 1); // 進小屋 (4,5)
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
-  await walk(page, 'ArrowUp', 3);
-  await walk(page, 'ArrowLeft', 2);
+  await walk(page, 'ArrowUp', 9);
+  await walk(page, 'ArrowLeft', 6);
   await walk(page, 'ArrowUp', 1);
-  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowUp');
   await page.keyboard.press('x');
   await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 2 天');
   await expect(page.locator('#hud-energy-text')).toHaveText('100 / 100');
@@ -182,10 +183,10 @@ test('completes farm, exploration, shipping and save loop without duplicate cost
   await walk(page, 'ArrowLeft', 5);
   await walk(page, 'ArrowUp', 1); // 進小屋
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
-  await walk(page, 'ArrowUp', 3);
-  await walk(page, 'ArrowLeft', 2);
+  await walk(page, 'ArrowUp', 9);
+  await walk(page, 'ArrowLeft', 6);
   await walk(page, 'ArrowUp', 1);
-  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowUp');
   await page.keyboard.press('x');
   await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 4 天');
   await expect(page.locator('#hud-energy-text')).toHaveText('100 / 100');

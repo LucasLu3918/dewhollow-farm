@@ -1,0 +1,55 @@
+{
+  "slot": "slot-1",
+  "savedAt": "2026-01-01T00:00:00.000Z",
+  "state": {
+    "schemaVersion": 1,
+    "calendar": {
+      "year": 1,
+      "season": "spring",
+      "day": 4,
+      "minuteOfDay": 400
+    },
+    "energy": {
+      "current": 60,
+      "max": 100
+    },
+    "gold": 250,
+    "mapId": "farm",
+    "player": {
+      "x": 7,
+      "y": 9,
+      "facing": "down"
+    },
+    "plots": {
+      "4,3": {
+        "watered": true,
+        "crop": {
+          "cropId": "moon-bean",
+          "growthDays": 1
+        }
+      },
+      "5,3": {
+        "watered": false,
+        "crop": null
+      }
+    },
+    "bag": {
+      "seeds": {
+        "moon-bean": 2,
+        "sweet-radish": 5
+      },
+      "crops": {
+        "sweet-radish": 3
+      }
+    },
+    "shipBox": {
+      "items": {
+        "sweet-radish": 2
+      }
+    },
+    "flags": {},
+    "tool": "hoe",
+    "selectedSeed": "moon-bean",
+    "rng": 12345
+  }
+}

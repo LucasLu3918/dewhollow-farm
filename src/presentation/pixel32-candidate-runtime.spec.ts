@@ -6,7 +6,7 @@ import {
   PIXEL32_CANDIDATE_INTERACTABLES,
   candidateFramesFromManifest,
   explicitlyUnapprovedCandidateFramesFromManifest,
-  pixel32CandidateCatFrame,
+  pixel32CandidatePetFrame,
   pixel32CandidatePetFollowRequested,
   pixel32CandidateReviewRequested,
   pixel32CandidateRuntimeRequested,
@@ -138,9 +138,9 @@ describe('pixel32 candidate asset review opt-in', () => {
   });
 });
 
-describe('pixel32 candidate cat follow opt-in', () => {
+describe('pixel32 candidate cat and quokka follow opt-in', () => {
   const query = new URLSearchParams(
-    'renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates&gate1CandidatePetFollow=pixel32-cat-follow',
+    'renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1AssetPreview=pixel32-candidates&gate1CandidatePetFollow=pixel32-cat-quokka-follow',
   );
 
   it('requires development mode, the pixel32 runtime, candidate assets, and the exact pet-follow query', () => {
@@ -148,19 +148,22 @@ describe('pixel32 candidate cat follow opt-in', () => {
     expect(pixel32CandidatePetFollowRequested(query, false, true, true)).toBe(false);
     expect(pixel32CandidatePetFollowRequested(query, true, false, true)).toBe(false);
     expect(pixel32CandidatePetFollowRequested(query, true, true, false)).toBe(false);
-    expect(pixel32CandidatePetFollowRequested(new URLSearchParams('gate1CandidatePetFollow=pixel32-cat-follow'), true, false, false)).toBe(false);
+    expect(pixel32CandidatePetFollowRequested(new URLSearchParams('gate1CandidatePetFollow=pixel32-cat-quokka-follow'), true, false, false)).toBe(false);
+    expect(pixel32CandidatePetFollowRequested(new URLSearchParams('gate1CandidatePetFollow=pixel32-cat-follow'), true, true, true)).toBe(false);
     expect(pixel32CandidatePetFollowRequested(new URLSearchParams('gate1CandidatePetFollow=true'), true, true, true)).toBe(false);
   });
 
-  it('plays the manifest hop-a, hop-b, land sequence then returns to the directional idle frame', () => {
-    expect(pixel32CandidateCatFrame('down', null)).toBe('cat-down-idle');
-    expect(pixel32CandidateCatFrame('left', 0)).toBe('cat-left-hop-a');
-    expect(pixel32CandidateCatFrame('left', 129)).toBe('cat-left-hop-a');
-    expect(pixel32CandidateCatFrame('left', 130)).toBe('cat-left-hop-b');
-    expect(pixel32CandidateCatFrame('left', 259)).toBe('cat-left-hop-b');
-    expect(pixel32CandidateCatFrame('left', 260)).toBe('cat-left-land');
-    expect(pixel32CandidateCatFrame('left', 389)).toBe('cat-left-land');
-    expect(pixel32CandidateCatFrame('left', 390)).toBe('cat-left-idle');
-    expect(pixel32CandidateCatFrame('right', Number.NaN)).toBe('cat-right-idle');
+  it('plays each species manifest hop-a, hop-b, land sequence then returns to its directional idle frame', () => {
+    for (const art of ['cat', 'quokka'] as const) {
+      expect(pixel32CandidatePetFrame(art, 'down', null)).toBe(`${art}-down-idle`);
+      expect(pixel32CandidatePetFrame(art, 'left', 0)).toBe(`${art}-left-hop-a`);
+      expect(pixel32CandidatePetFrame(art, 'left', 129)).toBe(`${art}-left-hop-a`);
+      expect(pixel32CandidatePetFrame(art, 'left', 130)).toBe(`${art}-left-hop-b`);
+      expect(pixel32CandidatePetFrame(art, 'left', 259)).toBe(`${art}-left-hop-b`);
+      expect(pixel32CandidatePetFrame(art, 'left', 260)).toBe(`${art}-left-land`);
+      expect(pixel32CandidatePetFrame(art, 'left', 389)).toBe(`${art}-left-land`);
+      expect(pixel32CandidatePetFrame(art, 'left', 390)).toBe(`${art}-left-idle`);
+      expect(pixel32CandidatePetFrame(art, 'right', Number.NaN)).toBe(`${art}-right-idle`);
+    }
   });
 });

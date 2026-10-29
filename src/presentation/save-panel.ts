@@ -55,10 +55,19 @@ export class SavePanel {
   ) {
     this.doc = doc;
     this.root = required(doc, '#save-panel');
+    this.root.classList.add('ui-dialog-panel');
     this.dialog = new PanelDialog(this.root);
     this.list = required(doc, '#save-list');
+    this.list.classList.add('ui-dialog-panel__content');
     this.message = required(doc, '#save-message');
-    required(doc, '#save-close').addEventListener('click', () => this.close());
+    this.message.classList.add('ui-dialog-panel__status');
+    const header = required(doc, '#save-panel > header');
+    header.classList.add('ui-dialog-panel__header');
+    required(doc, '#save-title').classList.add('ui-dialog-panel__title');
+    required(doc, '#save-note').classList.add('ui-dialog-panel__intro');
+    const closeButton = required(doc, '#save-close');
+    closeButton.classList.add('ui-dialog-panel__close');
+    closeButton.addEventListener('click', () => this.close());
     this.fileInput = doc.createElement('input');
     this.fileInput.type = 'file';
     this.fileInput.accept = 'application/json,.json';
@@ -104,10 +113,10 @@ export class SavePanel {
   private renderSlot(summary: SlotSummary): void {
     const isCurrent = summary.slot === this.options.currentSlot;
     const item = this.doc.createElement('li');
-    item.className = 'save-slot';
+    item.className = 'save-slot ui-dialog-panel__card';
 
     const title = this.doc.createElement('p');
-    title.className = 'save-title';
+    title.className = 'save-title ui-dialog-panel__card-title';
     title.textContent = `${slotLabel(summary.slot)}${isCurrent ? '（正在玩）' : ''}`;
     const detail = this.doc.createElement('p');
     detail.className = summary.status === 'broken' ? 'save-detail error' : 'save-detail';
@@ -115,7 +124,7 @@ export class SavePanel {
     item.append(title, detail);
 
     const actions = this.doc.createElement('div');
-    actions.className = 'save-actions';
+    actions.className = 'save-actions ui-dialog-panel__actions';
     for (const action of slotActions(summary, isCurrent)) {
       actions.append(this.actionButton(summary, action));
     }

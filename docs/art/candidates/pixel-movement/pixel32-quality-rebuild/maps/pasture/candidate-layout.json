@@ -1,0 +1,68 @@
+{
+  "id": "pasture",
+  "name": "牧草地",
+  "width": 22,
+  "height": 14,
+  "rows": [
+    "FFFFFFFFFFFFFFFFFFFFFF",
+    "FFFFFFFFFFFFFFFWWWWWWF",
+    "FFFFFFFFFFFttttWWWWWWF",
+    "FtF.t..t..F....WWWWWWF",
+    "F.F.S.S.S.F....WWWBWWF",
+    "F.FFF.FFFFF.......=..F",
+    "F......T..........=..F",
+    "G=====================",
+    "F...........t........F",
+    "F.FFF.FFF.tFF.F.Fttt.F",
+    "F.Ftt...F.tFt.t.Fttt.F",
+    "F.F...ttF.tFt.ttF..t.F",
+    "F.FFF.FFF..FFFFFF....F",
+    "FFFFFFFFFFFFFFFFFFFFFF"
+  ],
+  "legend": {
+    ".": {
+      "kind": "grass"
+    },
+    "=": {
+      "kind": "path"
+    },
+    "F": {
+      "kind": "fence"
+    },
+    "W": {
+      "kind": "wall"
+    },
+    "t": {
+      "kind": "tuft"
+    },
+    "T": {
+      "kind": "trough"
+    },
+    "S": {
+      "kind": "grass",
+      "slot": true
+    },
+    "G": {
+      "kind": "door",
+      "to": "farm",
+      "spawn": {
+        "x": 38,
+        "y": 13
+      }
+    },
+    "B": {
+      "kind": "door",
+      "to": "cowbarn",
+      "requires": {
+        "type": "flag",
+        "flag": "cowbarn",
+        "hint": "牛舍還沒改建，先到雜貨店找人改建"
+      }
+    }
+  },
+  "spawn": {
+    "x": 1,
+    "y": 7
+  },
+  "flock": "sheep"
+}

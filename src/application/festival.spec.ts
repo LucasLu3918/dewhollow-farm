@@ -229,8 +229,8 @@ describe('主線：章節推進', () => {
 describe('星河兌換：夜市用星河碎片換物品', () => {
   // 夏 14 夜裡的鎮廣場：夜市開著，兌換攤位在節慶面板上（不必站在哪裡）。
   const MARKET = { mapId: 'plaza', calendar: at('summer', 14, 1200), weather: 'sunny' as const };
-  // 小屋的工作台 (4,1)，站在 (4,2) 面向上方。
-  const BENCH = { mapId: 'house', player: { x: 4, y: 2, facing: 'up' as const } };
+  // 小屋的工作台 (4,15)，站在 (4,16) 面向上方。
+  const BENCH = { mapId: 'house', player: { x: 4, y: 16, facing: 'up' as const } };
 
   it('用碎片換裝飾：碎片扣掉、物品進背包，今年的次數記下來', () => {
     const start = withItems(game({ ...MARKET }), { 'star-shard': 5 });

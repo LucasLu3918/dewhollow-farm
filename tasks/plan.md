@@ -412,3 +412,53 @@ Chromium 證據不等同原生實機；完整 12×10 runtime 組合、場景覆�
 - [x] 專項 E2E 1/1 通過；`npm run check` 通過（1,643 passed／1 skipped；build 2.808 MB）；完整 Chromium E2E 244/244（4 workers）通過。
 - [x] AIPS reconciliation、commit、PR #54 Required Checks 通過並合併至 `main`。
 - [ ] 真機／FPS／人工美術審查與 Gate 1 核准仍未完成。
+
+
+---
+
+# DF-V2-ART-QUALITY-RESET｜全地圖高細節 Pixel32 美術重建
+
+## 2026-10-29 實作狀態
+
+- 12 張場景候選、候選布局與 SHA／PNG 尺寸 Gate 已建立，精確 DEV route 可載入；production 預設未改，候選使用隔離記憶體存檔。
+- 已依使用者決策建立可更新圖層：農地與作物由 runtime plot renderer 繪製；森林樹木／採集物及牧場草叢由 `worldChanges` 控制；礦坑可採集岩石保留在動態物件層；室內互動家具、門、畜舍及角色仍由 runtime 呈現。
+- 候選 MapDef 的行走連通、互動可達數量、portal fallback 落點及代表碰撞／互動已驗證。`npm run check`：186 個 test files，1,800 passed、1 skipped；build 3.327 MB／8 MB；12 張素材 SHA／尺寸檢查通過。
+- 背包旋轉時 44px 觸控目標曾因縮放變為 43.59px；已將觸控背包按鈕下限提高至 48px。P6-063 16 狀態重載測試曾在整套負載下超過預設 30 秒；專項調至 90 秒，候選視覺比較內容不變。
+- `npm run check` 通過：186 個 test files，1,800 passed、1 skipped；production build 3.327 MB／8 MB；12 張素材 SHA／尺寸檢查通過。修正後專項 E2E 4/4 通過。
+- 完整 E2E（2 workers）380/380 通過，耗時 25.3 分鐘；10-cycle viewport smoke、12 地圖覆蓋／轉場、農務動態圖層、角色與碰撞均通過。100-cycle 壓力測試依既有決策留在獨立長測腳本，未在本次必要 suite 執行。
+- 候選美術仍僅為 DEV 預覽，所有確切圖檔維持 `approved: false`。使用者已確認整體高細節方向及多個階段 Gate；12 張桌機／手機精確圖檔逐張人工審核、原生手機驗收、AIPS 精確 head reconcile、commit、push、PR 及 merge 尚未完成。
+
+## 目標與範圍
+
+使用者指出目前地圖候選未達標，並確認高細節像素美術概念方向。可重新設計所有地圖的障礙、耕地、路徑、物件及互動位置。範圍涵蓋 12 個 authored map 與 farm 內的溫室條件區；保留 map ID、portal destination ID、解鎖旗標語意及存檔 schema。所有新美術只進 DEV candidate 路徑，確切素材仍待逐項核准。
+
+## 共用品質與功能 Gate
+
+- 場景具高密度像素細節、豐富材質與物件層次、方向一致的暖光／冷影、清晰可走路徑及完整構圖；不接受大面積單色空地或新舊材質明顯混搭。
+- 可見牆、樹、石塊、水面、家具及其他固體物件要阻擋移動；畫面可走區要與碰撞格對齊，不得把角色困在無出口區域。
+- 門、入口、床、工作台、商店、出貨箱、田地、溫室及畜舍互動均須由可達相鄰格觸發；田區保留耕作、澆水及所有作物階段的視覺空間。
+- 桌機及手機直式／橫式畫面都需檢查場景細節、角色可辨識度、互動點可見度與鏡頭取景。Chromium 模擬不取代原生 iOS／Android 驗收。
+- 生成式完整場景可以是 DEV 背景候選，但正式素材必須有可維護圖層、來源、manifest、SHA 與人工核准，不把整張概念圖直接切作正式 atlas。
+
+## 執行順序
+
+1. **品質契約與安全底層**：建立高細節素材 manifest／預覽契約，定義 tile-to-world 尺度、圖層、collision footprint、互動 anchor、舊存檔安全落點與視覺 Gate。
+2. **代表垂直切片**：重建 farm、greenhouse 區與 house／house-wing／house-full；完成高細節 DEV 場景、可達動線、碰撞、農務及室內互動測試，再由使用者審查 exact images。
+3. **戶外地圖批次**：重建 forest、lake、pasture、village、plaza、mine-entrance；共享植栽、地表、建築／岩石語言，但各圖保留不同構圖與玩法用途。
+4. **專用室內批次**：重建 coop、cowbarn；沿用室內光影與材質基準，依狹小版面調整家具、動物互動及通道。
+5. **全圖整合驗收**：逐圖驗證結構、舊存檔落點、所有入口／出口、碰撞與互動；擷取 12 張桌機與代表手機候選圖，完成 `npm run check`、完整 E2E、人工視覺 Gate，再分任務提交到目前工作分支。
+
+## 依賴與風險
+
+- 先固定共同品質／manifest／互動座標契約，再平行處理互不重疊的戶外與室內圖檔；共用 renderer 及正式整合由主 agent 串接。
+- 重排碰撞可能使既有存檔角色座標落到新障礙；每圖須覆蓋舊 spawn／portal 落點與載入時安全恢復。
+- 高細節整圖候選只驗證視覺方向；動態作物、門、床、商店、畜舍、季節與角色仍必須由遊戲狀態驅動並實際互動。
+- 全域 Impact Graph 仍為局部覆蓋；變更前需人工查核 MapScene、domain world collision、map loader、portal、interaction、save restore 及 E2E consumers。
+
+## 完成條件
+
+- [x] 12 張 authored map 均有高細節 DEV candidate scene；農場涵蓋 greenhouse 區，使用者已確認整體候選方向。
+- [x] 地圖結構、可走連通、代表阻擋／互動、portal 落點及舊存檔安全落點通過候選驗證。
+- [ ] 12 張桌機與代表手機截圖逐張完成人工美術與可玩性審查；exact asset hashes 維持未核准，直到使用者逐項核准。Chromium 手機模擬已測，原生手機仍待驗收。
+- [x] `npm run check` 與完整 E2E 通過：1,800 passed／1 skipped；380/380 E2E passed；AIPS Change Impact 須於提交後以精確 base/head/diff/path set reconcile。
+- [ ] 本輪變更提交到 `codex/world-art-rebuild`；全數規劃任務與 Gate 完成後再 push、開 PR 與合併。

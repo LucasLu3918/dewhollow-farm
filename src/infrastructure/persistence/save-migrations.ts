@@ -48,6 +48,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   21: migrateV21ToV22,
   22: migrateV22ToV23,
   23: migrateV23ToV24,
+  24: migrateV24ToV25,
 };
 
 /**
@@ -261,6 +262,62 @@ function migrateV23ToV24(raw: unknown): unknown {
     schemaVersion: 24,
     hotbar: [null, null, null, null],
   };
+}
+
+/** v24 → v25：小屋改為 22×20 格，將三種小屋內已保存座標平移到新室內；農場座標不變。 */
+function migrateV24ToV25(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(24) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v24 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  const state = raw as Record<string, unknown>;
+  const mapId = state.mapId;
+  const player = typeof mapId === 'string' && isHouseMapId(mapId) ? remapHousePoint(state.player) : null;
+  const decor = remapHouseDecor(state.decor);
+  const worldChanges = remapHouseWorldChanges(state.worldChanges);
+  return {
+    ...state,
+    schemaVersion: 25,
+    ...(player ? { player } : {}),
+    ...(decor ? { decor } : {}),
+    ...(worldChanges ? { worldChanges } : {}),
+  };
+}
+
+const HOUSE_LAYOUT_OFFSET = { x: 6, y: 7 } as const;
+
+function isHouseMapId(mapId: string): boolean {
+  return mapId === 'house' || mapId === 'house-wing' || mapId === 'house-full';
+}
+
+function remapHousePoint(value: unknown): unknown {
+  if (typeof value !== 'object' || value === null || !('x' in value) || !('y' in value)) return value;
+  const point = value as Record<string, unknown>;
+  if (typeof point.x !== 'number' || typeof point.y !== 'number') return value;
+  return { ...point, x: point.x + HOUSE_LAYOUT_OFFSET.x, y: point.y + HOUSE_LAYOUT_OFFSET.y };
+}
+
+function remapHouseDecor(value: unknown): unknown {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return value;
+  const decor = value as Record<string, unknown>;
+  return Object.fromEntries(Object.entries(decor).map(([roomId, placements]) => [
+    roomId,
+    isHouseMapId(roomId) && Array.isArray(placements)
+      ? placements.map((placement) => remapHousePoint(placement))
+      : placements,
+  ]));
+}
+
+function remapHouseWorldChanges(value: unknown): unknown {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return value;
+  const changes = value as Record<string, unknown>;
+  return Object.fromEntries(Object.entries(changes).map(([key, change]) => {
+    const match = /^(house|house-wing|house-full),(-?\d+),(-?\d+)$/.exec(key);
+    if (!match) return [key, change];
+    const x = Number(match[2]) + HOUSE_LAYOUT_OFFSET.x;
+    const y = Number(match[3]) + HOUSE_LAYOUT_OFFSET.y;
+    return [`${match[1]},${x},${y}`, change];
+  }));
 }
 
 /**

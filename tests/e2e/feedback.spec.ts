@@ -80,10 +80,10 @@ test('each ground makes its own footprint: grass, tilled field, then the stone p
 test('a harvested crop flies up to the player and is named as it lands', async ({ page }) => {
   test.setTimeout(60_000);
   await waitForGame(page);
-  // 田邊 (7,5) → 小屋的床 (2,1)：左走五步到 (2,5)、上一步進門（落在 (4,5)）、上三步到 (4,2)、繞過工作台到 (2,2)、上一步、左轉向床。
-  const toBed = ['ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowUp', 'ArrowLeft'];
-  // 小屋的床 (2,1) → 田邊 (7,5)：右一步到 (3,1)、下四步到 (3,5)、右一步到 (4,5)、下到門出去，再下一步、右五步，最後往上一步面向田。
-  const backToField = ['ArrowRight', 'ArrowDown', 'ArrowDown', 'ArrowDown', 'ArrowDown', 'ArrowRight', 'ArrowDown', 'ArrowDown', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowUp'];
+  // 田邊 (7,5) → 小屋床前 (4,8)，面向床位 (4,7)。
+  const toBed = [...Array(5).fill('ArrowLeft'), 'ArrowUp', ...Array(9).fill('ArrowUp'), ...Array(6).fill('ArrowLeft'), 'ArrowUp'];
+  // 床前 (4,8) → 門 → 農場 (2,5)，再回田邊 (7,5) 並面向田地。
+  const backToField = [...Array(6).fill('ArrowRight'), 'ArrowDown', ...Array(9).fill('ArrowDown'), 'ArrowDown', ...Array(5).fill('ArrowRight'), 'ArrowDown', 'ArrowUp'];
 
   // 開墾 (7,4)、播下月光豆（生長 2 天）、澆水；作物每天都要澆，否則會枯死。
   await press(page, 'ArrowUp', 4); // → (7,5) 面向 (7,4)

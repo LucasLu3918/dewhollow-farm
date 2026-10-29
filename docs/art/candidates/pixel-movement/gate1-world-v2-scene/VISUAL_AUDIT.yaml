@@ -1,0 +1,170 @@
+version: 1
+mode: V1
+status: in_progress
+
+target:
+  routes:
+    - "DEV farm MapScene: ?renderProfile=pixel32&gate1Runtime=pixel32-map-animation&gate1SceneVisual=world-v2-cozy"
+    - "DEV house MapScene: same opt-in route after farm door transition"
+  components:
+    - farm ground, path, field, wall and fence candidate layers
+    - farm house and tree candidate overlays
+    - house floor, wall, furniture and rug candidate layers
+
+baseline_source: existing farm Pixel32 candidate screenshot plus legacy house framing; before/after scene captures were not retained as a matched pair
+component_inventory:
+  - id: world-v2-farm-candidate
+    source: src/presentation/scenes/MapScene.ts
+    frames: [grass-base, field-mask, path-mask, stone-wall, fence, house-exterior, house-front, tree-canopy]
+  - id: world-v2-house-candidate
+    source: src/presentation/scenes/MapScene.ts
+    frames: [floor-a, floor-b, wall-middle, wall-corner, wall-window, bed, kitchen-counter, workbench, storage, rug, pet-bed]
+
+findings:
+  - id: VIS-DFV2-024-01
+    component: house rug overlay
+    route: DEV house MapScene
+    symptom: initial candidate rug depth covered the player near the entry
+    classification: outlier
+    valid_variant: false
+    approved_exception: false
+    root_cause:
+      source: src/presentation/scenes/MapScene.ts
+      style: null
+      token: null
+      mechanism: rug was inserted at actor foreground depth instead of ground depth
+    fix: added rug to the ground container below actors
+    status: fixed
+  - id: VIS-DFV2-024-02
+    component: farm field autotile
+    route: DEV farm MapScene
+    symptom: fully connected field tiles showed repeated grass corner holes
+    classification: outlier
+    valid_variant: false
+    approved_exception: false
+    root_cause:
+      source: docs/art/candidates/pixel-movement/gate1-world-v2-scene/farm/generate.mjs
+      style: null
+      token: null
+      mechanism: full-neighbor field mask left corner pixels transparent to the grass base
+    fix: full-neighbor mask now fills the complete tile with soil
+    status: fixed
+  - id: VIS-DFV2-024-03
+    component: ground/object MapScene layers
+    route: DEV farm and house MapScene
+    symptom: wall and furniture candidates could be selected for both the opaque ground image and the object image
+    classification: outlier
+    valid_variant: false
+    approved_exception: false
+    root_cause:
+      source: src/presentation/scenes/MapScene.ts
+      style: null
+      token: null
+      mechanism: candidate frame selection inferred layer from base tile kind and dropped the renderer layer argument
+    fix: renderer depth now selects explicit ground/object mapping; house floor remains under walls and furniture
+    status: fixed
+  - id: VIS-DFV2-024-05
+    component: house wall window placement
+    route: DEV house MapScene
+    symptom: the candidate window appeared both in the wall tile and as a manifest overlay at an inconsistent position
+    classification: outlier
+    valid_variant: false
+    approved_exception: false
+    root_cause:
+      source: src/presentation/scenes/MapScene.ts
+      style: null
+      token: null
+      mechanism: legacy wall tiles and candidate wall accessory placement both rendered the window
+    fix: removed wall-top and wall-window from layoutSuggestion overlays; the MapDef wall tile mapping is the single source of window position
+    status: fixed
+  - id: VIS-DFV2-024-04
+    component: house furniture layout
+    route: DEV house MapScene
+    symptom: multi-tile furniture used legacy symbol cells as single-tile anchors and overlapped
+    classification: outlier
+    valid_variant: false
+    approved_exception: false
+    root_cause:
+      source: src/presentation/scenes/MapScene.ts
+      style: null
+      token: null
+      mechanism: multi-tile frames ignored manifest layoutSuggestion placements and foot anchors
+    fix: render manifest placements with per-frame footAnchor; validate placement anchors against legacy house map bounds
+    status: fixed
+
+verification:
+  required_viewports: [desktop, mobile]
+  required_states: [default]
+  before: []
+  after:
+    - id: farm-desktop-after
+      kind: screenshot
+      target: DEV farm MapScene
+      state: default
+      viewport: { label: desktop, width: 2560, height: 1920 }
+      artifact: docs/art/candidates/pixel-movement/gate1-world-v2-scene/screenshots/farm-desktop.png
+      input_assets: [farm/atlas.png, farm/manifest.json]
+      provenance:
+        provider: Playwright Chromium local DEV server
+        source_revision: e4ce6fb59304677842d432d58ae91691d9af3ade + working tree
+        captured_at: "2026-10-27T16:38:34Z"
+        command: "SAVE_WORLD_V2_SCENE_EVIDENCE=1 npx playwright test tests/e2e/world-v2-candidate-scene.spec.ts --workers=1"
+    - id: farm-mobile-after
+      kind: screenshot
+      target: DEV farm MapScene
+      state: default
+      viewport: { label: mobile, width: 390, height: 844 }
+      artifact: docs/art/candidates/pixel-movement/gate1-world-v2-scene/screenshots/farm-mobile.png
+      input_assets: [farm/atlas.png, farm/manifest.json]
+      provenance:
+        provider: Playwright Chromium local DEV server
+        source_revision: e4ce6fb59304677842d432d58ae91691d9af3ade + working tree
+        captured_at: "2026-10-27T16:38:34Z"
+        command: "SAVE_WORLD_V2_SCENE_EVIDENCE=1 npx playwright test tests/e2e/world-v2-candidate-scene.spec.ts --workers=1"
+    - id: house-desktop-after
+      kind: screenshot
+      target: DEV house MapScene
+      state: default
+      viewport: { label: desktop, width: 1280, height: 896 }
+      artifact: docs/art/candidates/pixel-movement/gate1-world-v2-scene/screenshots/house-desktop.png
+      input_assets: [house/atlas.png, house/manifest.json]
+      provenance:
+        provider: Playwright Chromium local DEV server
+        source_revision: e4ce6fb59304677842d432d58ae91691d9af3ade + working tree
+        captured_at: "2026-10-27T16:38:34Z"
+        command: "SAVE_WORLD_V2_SCENE_EVIDENCE=1 npx playwright test tests/e2e/world-v2-candidate-scene.spec.ts --workers=1"
+    - id: house-mobile-after
+      kind: screenshot
+      target: DEV house MapScene
+      state: default
+      viewport: { label: mobile, width: 390, height: 844 }
+      artifact: docs/art/candidates/pixel-movement/gate1-world-v2-scene/screenshots/house-mobile.png
+      input_assets: [house/atlas.png, house/manifest.json]
+      provenance:
+        provider: Playwright Chromium local DEV server
+        source_revision: e4ce6fb59304677842d432d58ae91691d9af3ade + working tree
+        captured_at: "2026-10-27T16:38:34Z"
+        command: "SAVE_WORLD_V2_SCENE_EVIDENCE=1 npx playwright test tests/e2e/world-v2-candidate-scene.spec.ts --workers=1"
+
+review:
+  decision: PENDING
+  quality_assessed_by: visual_review
+  checks:
+    - area: candidate isolation
+      result: pass
+      evidence: [evidence.json, tests/e2e/world-v2-candidate-scene.spec.ts]
+    - area: farm and house rendered composition
+      result: pending user visual Gate
+      evidence: [screenshots/farm-desktop.png, screenshots/house-desktop.png]
+    - area: mobile framing and readability
+      result: pending user visual Gate
+      evidence: [screenshots/farm-mobile.png, screenshots/house-mobile.png]
+  notes:
+    - “pass” on integration checks is not a visual-art approval.
+    - The farm screenshots show the active camera viewport, not the complete 40x30 map at once.
+    - Candidate assets remain unapproved and P3 must wait for user review.
+
+profile_updated: false
+remaining_material_findings:
+  - User visual acceptance is pending for both desktop candidate scenes.
+  - Full-map farm coverage is not represented in a single capture.
