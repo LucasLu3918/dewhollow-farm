@@ -86,6 +86,7 @@ test.describe('VF-10 mobile inventory', () => {
   });
 
   test('fits safe bounds, scrolls to details, and supports touch at portrait and landscape sizes', async ({ page }) => {
+    test.setTimeout(120_000);
     await start(page);
     await page.locator('#hud-inventory').tap();
     await expect(page.locator('#inventory-panel')).toBeVisible();

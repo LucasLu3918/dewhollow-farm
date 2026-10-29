@@ -114,7 +114,9 @@ test('Pixel32 forest trunk blocks and chops; the redesigned lake dock is walkabl
   await page.keyboard.press('ArrowRight');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('forest');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.sprites()
-    .some((sprite) => sprite.key === 'pixel32-quality-scene-forest') ?? false)).toBe(true);
+    .some((sprite) => sprite.key === 'pixel32-quality-scene-forest') ?? false)).toBe(false);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.qualityDynamicObjects()
+    .some((object) => object.kind === 'tree' && object.texture === 'scene.forest.tree' && object.visible) ?? false)).toBe(true);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.qualityDynamicObjects()
     .some((object) => object.x === 8 && object.y === 13 && object.kind === 'tree' && object.visible) ?? false)).toBe(true);
 

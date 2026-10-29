@@ -47,6 +47,7 @@ describe('pixel32QualitySceneManifestFor', () => {
     expect(pixel32QualitySceneManifestFor('test-map', manifest)).toEqual({
       mapId: 'test-map',
       imageFile: 'scene.png',
+      renderMode: 'scene',
       width: 1000,
       height: 1000,
       sha256: 'a'.repeat(64),
@@ -79,6 +80,16 @@ describe('pixel32QualitySceneManifestFor', () => {
       dynamic_object_layer: { kinds: ['door'] },
     })).toBeNull();
   });
+
+  it('supports map-tile compositions for DEV candidates that must share map collision and interactions', () => {
+    const manifest = {
+      id: 'forest', status: 'candidate', approved: false, scene: 'dynamic-base.png',
+      dimensions_px: { width: 1536, height: 1024 }, sha256: 'c'.repeat(64),
+      render_mode: 'map-tiles',
+    };
+    expect(pixel32QualitySceneManifestFor('forest', manifest)?.renderMode).toBe('map-tiles');
+    expect(pixel32QualitySceneManifestFor('forest', { ...manifest, render_mode: 'baked-scene' })).toBeNull();
+  });
 });
 
 describe('pixel32QualitySceneFit', () => {
@@ -102,7 +113,7 @@ describe('pixel32QualitySceneFit', () => {
 
 describe('pixel32QualitySceneAsset', () => {
   it('resolves candidate images relative to the configured Vite base URL', () => {
-    const manifest = { mapId: 'farm', imageFile: 'scene.png', sha256: 'a'.repeat(64) };
+    const manifest = { mapId: 'farm', imageFile: 'scene.png', renderMode: 'scene' as const, sha256: 'a'.repeat(64) };
     expect(pixel32QualitySceneAsset(manifest, '/farm-preview/').imageUrl)
       .toBe('/farm-preview/docs/art/candidates/pixel-movement/pixel32-quality-rebuild/maps/farm/scene.png');
     expect(pixel32QualitySceneAsset(manifest, '/').imageUrl)

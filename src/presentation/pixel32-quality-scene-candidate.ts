@@ -14,6 +14,7 @@ export const PIXEL32_QUALITY_MAP_IDS = [
 export interface Pixel32QualitySceneManifest {
   mapId: string;
   imageFile: string;
+  renderMode: 'scene' | 'map-tiles';
   width?: number;
   height?: number;
   sha256: string;
@@ -70,6 +71,7 @@ export function pixel32QualitySceneManifestFor(mapId: string, value: unknown): P
     sha256?: unknown;
     dimensions?: { width?: unknown; height?: unknown };
     dimensions_px?: { width?: unknown; height?: unknown };
+    render_mode?: unknown;
     dynamic_object_layer?: { kinds?: unknown };
     dynamic_layer?: { kinds?: unknown };
   };
@@ -77,11 +79,13 @@ export function pixel32QualitySceneManifestFor(mapId: string, value: unknown): P
   const imageFile = manifest.source?.file ?? manifest.image ?? manifest.file ?? manifest.scene ?? 'scene.png';
   const sha256 = manifest.source?.sha256 ?? manifest.sha256;
   const dimensions = manifest.dimensions ?? manifest.dimensions_px;
+  const renderMode = manifest.render_mode ?? 'scene';
   const dynamicKinds = manifest.dynamic_object_layer?.kinds ?? manifest.dynamic_layer?.kinds;
   const allowedDynamicKinds = new Set<TileDef['kind']>(['tree', 'forage', 'tuft', 'rock', 'ore']);
   if (manifest.status !== 'candidate' || manifest.approved !== false
     || declaredMapId !== mapId
     || typeof imageFile !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]*\.png$/.test(imageFile)
+    || (renderMode !== 'scene' && renderMode !== 'map-tiles')
     || typeof sha256 !== 'string' || !/^[a-f0-9]{64}$/i.test(sha256)
     || (dimensions !== undefined && (!Number.isInteger(dimensions.width) || (dimensions.width as number) <= 0
       || !Number.isInteger(dimensions.height) || (dimensions.height as number) <= 0))
@@ -90,6 +94,7 @@ export function pixel32QualitySceneManifestFor(mapId: string, value: unknown): P
   const result: Pixel32QualitySceneManifest = {
     mapId,
     imageFile,
+    renderMode,
     width: dimensions?.width as number | undefined,
     height: dimensions?.height as number | undefined,
     sha256,

@@ -306,7 +306,7 @@ async function loadPixel32QualityMapCandidates(originalMaps: MapDef[]): Promise<
     const problems = pixel32QualityMapProblems(original, candidate);
     if (problems.length) throw new Error(`Pixel32 候選地圖驗證失敗（${mapId}）：${problems.join('；')}`);
     maps.push(candidate);
-    assets.push(pixel32QualitySceneAsset(manifest, import.meta.env.BASE_URL));
+    if (manifest.renderMode === 'scene') assets.push(pixel32QualitySceneAsset(manifest, import.meta.env.BASE_URL));
   }
   const portalProblems = pixel32QualityPortalProblems(maps);
   if (portalProblems.length) throw new Error(`Pixel32 候選入口驗證失敗：${portalProblems.join('；')}`);

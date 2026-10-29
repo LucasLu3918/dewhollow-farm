@@ -3,6 +3,7 @@
   "status": "candidate",
   "approved": false,
   "scene": "dynamic-base.png",
+  "render_mode": "map-tiles",
   "dimensions_px": {
     "width": 1536,
     "height": 1024
@@ -217,7 +218,7 @@
   },
   "limitations": [
     "Scene artwork is a DEV candidate only; approved is false.",
-    "Image generator output is a painted scene background, not a tile atlas or collision/interaction data.",
-    "Generated openings and landmarks are approximate visual anchors; map-specific collision, portal placement, and interaction rules remain to be wired and validated separately."
+    "The generated scene composite remains a visual reference; DEV runtime renders the validated candidate-layout with existing transparent forest art so visible obstacles, collision, chopping, and gathering share one MapDef.",
+    "The candidate layout and its art are unapproved and remain isolated behind the DEV Pixel32 preview query."
   ]
 }

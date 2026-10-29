@@ -7,6 +7,13 @@ type ViewportSnapshot = {
   zoom: number;
   visibleTiles: { width: number; height: number };
   dpr: number;
+  layout: {
+    viewport: { width: number; height: number };
+    scroll: { x: number; y: number };
+    app: Rect;
+    stage: Rect;
+    host: Rect;
+  };
 };
 type ResizeSample = { target: string; width: number; height: number; at: number };
 
@@ -86,12 +93,24 @@ async function snapshot(page: Page): Promise<ViewportSnapshot> {
     if (!canvas || !debug) throw new Error('畫布或 DEV viewport 診斷介面尚未就緒');
     const rect = canvas.getBoundingClientRect();
     const viewport = debug.pixelViewport();
+    const rectOf = (selector: string): Rect => {
+      const element = document.querySelector<HTMLElement>(selector);
+      const bounds = element?.getBoundingClientRect();
+      return bounds ? { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height } : { x: -1, y: -1, width: -1, height: -1 };
+    };
     return {
       mapId: debug.mapId(),
       canvas: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
       zoom: debug.cameraView().zoom,
       visibleTiles: viewport.actualWorldTilesVisible,
       dpr: window.devicePixelRatio,
+      layout: {
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        scroll: { x: window.scrollX, y: window.scrollY },
+        app: rectOf('.app'),
+        stage: rectOf('.stage'),
+        host: rectOf('#game'),
+      },
     };
   });
 }
@@ -101,7 +120,9 @@ function expectSameViewport(actual: ViewportSnapshot, expected: ViewportSnapshot
   expect(actual.dpr).toBe(expected.dpr);
   expect(Math.abs(actual.zoom - expected.zoom)).toBeLessThanOrEqual(1e-6);
   for (const dimension of ['x', 'y', 'width', 'height'] as const) {
-    expect(Math.abs(actual.canvas[dimension] - expected.canvas[dimension]), `canvas ${dimension}`).toBeLessThanOrEqual(1);
+    expect(Math.abs(actual.canvas[dimension] - expected.canvas[dimension]),
+      `canvas ${dimension}; layout before=${JSON.stringify(expected.layout)} after=${JSON.stringify(actual.layout)}`)
+      .toBeLessThanOrEqual(1);
   }
   expect(Math.abs(actual.visibleTiles.width - expected.visibleTiles.width)).toBeLessThanOrEqual(1e-6);
   expect(Math.abs(actual.visibleTiles.height - expected.visibleTiles.height)).toBeLessThanOrEqual(1e-6);
