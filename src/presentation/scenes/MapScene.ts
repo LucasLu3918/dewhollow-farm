@@ -110,6 +110,7 @@ import { ViewportCoordinator } from '../viewport/viewport-coordinator';
 import { resolveCandidateArt, type CandidateCropStage, type CandidateId } from '../candidate-art';
 import { candidateFrameAtGaitPhase, type CandidateDirection } from '../candidate-sprite-animator';
 import { candidateMovementStepDurationMs } from '../candidate-movement-profile';
+import { pixel32QualitySceneFit, type Pixel32QualitySceneAsset } from '../pixel32-quality-scene-candidate';
 import {
   PIXEL32_ANIMATION_ATLAS_KEY,
   PIXEL32_CROPS_ATLAS_KEY,
@@ -211,6 +212,8 @@ export interface MapSceneDeps {
   responsive: ResponsiveLayoutController;
   /** 鍵盤監聽與畫面都接好後呼叫一次（見 create 結尾與 main.ts 的 markStageReady）。 */
   onReady: () => void;
+  /** Exact DEV-only high-detail candidate backgrounds; absent in normal and production sessions. */
+  qualitySceneCandidates: Pixel32QualitySceneAsset[];
   /** 操作說明的文字（設定面板的動作名稱、虛擬按鍵的文字），來自 content/controls.json。 */
   controls: {
     settingsLabels: SettingsLabels;
@@ -300,6 +303,7 @@ interface SpriteDebugInfo {
   height: number;
   flipX: boolean;
   depth: number;
+  visible: boolean;
 }
 
 type CandidatePetArt = 'cat' | 'quokka';
@@ -417,6 +421,16 @@ declare global {
       mapId(): string;
       /** 玩家與地圖上所有圖片的貼圖名稱與畫面範圍（世界座標）。 */
       sprites(): SpriteDebugInfo[];
+      /** DEV-only state-driven map object layer anchors and visible frames. */
+      qualityDynamicObjects(): Array<{
+        x: number;
+        y: number;
+        kind: TileKind;
+        texture: string;
+        frame: string | null;
+        visible: boolean;
+      }>;
+      qualityPlots(): Array<{ x: number; y: number; texture: string; frame: string | null; visible: boolean }>;
       /** 開發用候選貼圖啟用狀態、實際覆蓋 key 與 fallback 清單。 */
       candidateArt(): {
         profile: string;
@@ -533,6 +547,9 @@ export class MapScene extends Phaser.Scene {
   private readonly viewportCoordinator = new ViewportCoordinator();
   private applyResponsiveLayout?: (layout: ReturnType<ResponsiveLayoutController['get']>) => void;
   private world!: Phaser.GameObjects.Container;
+  private qualitySceneSprite: Phaser.GameObjects.Image | null = null;
+  private qualitySceneLoadMapId: string | null = null;
+  private qualitySceneImage: HTMLImageElement | null = null;
   /** Non-interactive one-tile outline for the current authoritative interaction target. */
   private interactionTargetGfx: Phaser.GameObjects.Graphics | null = null;
   private interactionTargetCell: Point | null = null;
@@ -837,6 +854,7 @@ export class MapScene extends Phaser.Scene {
       this.continuousFarmActions.stop('scene-shutdown');
       // Phaser may already have removed the DisplayList; settle animation promises without drawing shutdown impacts.
       this.rig.shutdown();
+      this.clearQualitySceneBackground();
       this.clearWorldV2CandidateSprites();
       this.clearSceneOverlays();
       this.pixel32CandidateSprite?.destroy();
@@ -973,6 +991,24 @@ export class MapScene extends Phaser.Scene {
         cameraView: () => ({ x: camera.x, y: camera.y, width: camera.width / camera.zoom, height: camera.height / camera.zoom, zoom: camera.zoom, bounds: { ...camera.getBounds() } }),
         mapId: () => this.deps.session.state.mapId,
         sprites: () => this.debugSprites(),
+        qualityDynamicObjects: () => this.tileSprites.flatMap((tile) => tile.objectImage ? [{
+          x: tile.x,
+          y: tile.y,
+          kind: tile.base,
+          texture: tile.objectImage.texture.key,
+          frame: tile.objectImage.frame?.name ?? null,
+          visible: tile.objectImage.visible,
+        }] : []),
+        qualityPlots: () => this.world.getAll().flatMap((child) => {
+          if (child.getData('plot') !== true || !(child instanceof Phaser.GameObjects.Image)) return [];
+          return [{
+            x: Math.round(child.x / TILE_SIZE),
+            y: Math.round(child.y / TILE_SIZE),
+            texture: child.texture.key,
+            frame: child.frame?.name ?? null,
+            visible: child.visible,
+          }];
+        }),
         candidateArt: () => this.candidateArtDebugInfo(),
         worldV2SceneCandidate: () => ({
           enabled: this.worldV2SceneCandidate,
@@ -2203,6 +2239,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   private drawMap(mapId: string): void {
+    this.clearQualitySceneBackground();
     this.clearWorldV2CandidateSprites();
     this.clearPixel32CandidateOverlays();
     this.clearPixel32CandidateInteractables();
@@ -2211,13 +2248,28 @@ export class MapScene extends Phaser.Scene {
     this.heldPlots.clear();
     this.tileSprites = [];
     const map = this.deps.index.map(mapId);
-    this.tileSprites = renderMapTileLayers(legacyMapRenderPlan(map), {
-      image: (kind, x, y, depth) => {
-        return this.mapTileImage(mapId, map, kind, x, y, depth);
-      },
-      addGround: (image) => this.world.add(image),
-      placeObject: (image, kind, y) => this.placeObjectImage(image, kind, y),
-    });
+    const qualityCandidate = this.deps.qualitySceneCandidates.find((candidate) => candidate.mapId === mapId);
+    if (qualityCandidate) {
+      this.loadQualitySceneBackground(map, qualityCandidate);
+      if (qualityCandidate.dynamicLayerKinds?.length) {
+        const plan = legacyMapRenderPlan(map);
+        const dynamicPlan = {
+          ...plan,
+          tiles: plan.tiles.filter((tile) => tile.object !== null && qualityCandidate.dynamicLayerKinds?.includes(tile.object)),
+        };
+        this.tileSprites = renderMapTileLayers(dynamicPlan, {
+          image: (kind, x, y, depth) => this.mapTileImage(mapId, map, kind, x, y, depth),
+          addGround: (image) => this.world.add(image.setVisible(false)),
+          placeObject: (image, kind, y) => this.placeObjectImage(image, kind, y),
+        });
+      }
+    } else {
+      this.tileSprites = renderMapTileLayers(legacyMapRenderPlan(map), {
+        image: (kind, x, y, depth) => this.mapTileImage(mapId, map, kind, x, y, depth),
+        addGround: (image) => this.world.add(image),
+        placeObject: (image, kind, y) => this.placeObjectImage(image, kind, y),
+      });
+    }
 
     this.clearActors();
     this.createResidents(map);
@@ -2226,6 +2278,65 @@ export class MapScene extends Phaser.Scene {
     this.drawWorldV2CandidateOverlays(mapId);
     this.drawPixel32CandidateOverlays(mapId);
     this.drawPixel32CandidateInteractables(mapId);
+  }
+
+  private clearQualitySceneBackground(): void {
+    const loadingImage = this.qualitySceneImage;
+    this.qualitySceneImage = null;
+    if (loadingImage) {
+      loadingImage.onload = null;
+      loadingImage.onerror = null;
+      loadingImage.src = '';
+    }
+    const previous = this.qualitySceneSprite;
+    this.qualitySceneSprite = null;
+    this.qualitySceneLoadMapId = null;
+    if (!previous) return;
+    const textureKey = previous.texture.key;
+    previous.destroy();
+    if (textureKey.startsWith('pixel32-quality-scene-') && this.textures.exists(textureKey)) {
+      this.textures.remove(textureKey);
+    }
+  }
+
+  private loadQualitySceneBackground(map: MapDef, candidate: Pixel32QualitySceneAsset): void {
+    const show = (imageWidth: number, imageHeight: number): void => {
+      if (this.deps.session.state.mapId !== map.id || !this.world || this.qualitySceneSprite) return;
+      const fit = pixel32QualitySceneFit(imageWidth, imageHeight, map.width * TILE_SIZE, map.height * TILE_SIZE);
+      this.qualitySceneSprite = this.add.image(fit.x, fit.y, candidate.textureKey)
+        .setOrigin(0).setScale(fit.scale).setDepth(0);
+      this.world.add(this.qualitySceneSprite);
+      this.world.sendToBack(this.qualitySceneSprite);
+    };
+    if (this.textures.exists(candidate.textureKey)) {
+      const texture = this.textures.get(candidate.textureKey);
+      if (!texture) return;
+      texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+      const source = texture.getSourceImage();
+      show(source.width, source.height);
+      return;
+    }
+    if (this.qualitySceneLoadMapId === map.id) return;
+    this.qualitySceneLoadMapId = map.id;
+    const image = new Image();
+    this.qualitySceneImage = image;
+    image.onload = () => {
+      if (this.qualitySceneImage !== image) return;
+      this.qualitySceneImage = null;
+      if (!this.scene.isActive() || this.deps.session.state.mapId !== map.id || !image.naturalWidth || !image.naturalHeight) return;
+      const texture = this.textures.addImage(candidate.textureKey, image);
+      if (!texture) return;
+      texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+      this.qualitySceneLoadMapId = null;
+      show(image.naturalWidth, image.naturalHeight);
+    };
+    image.onerror = () => {
+      if (this.qualitySceneImage !== image) return;
+      this.qualitySceneImage = null;
+      this.qualitySceneLoadMapId = null;
+      if (this.deps.session.state.mapId === map.id) this.deps.hud.error(`候選場景載入失敗：${map.id}`);
+    };
+    image.src = candidate.imageUrl;
   }
 
   private lakeShoreCandidateFrameFor(map: MapDef, x: number, y: number): LakeShoreCandidateFrame | null {
@@ -2248,7 +2359,14 @@ export class MapScene extends Phaser.Scene {
         .setDepth(depth);
     }
     const key = forestSceneAssetFor(mapId, kind, x, y) ?? `tile.${kind}`;
-    return this.image(key, x, y, depth, undefined, depth === 0 ? 'ground' : 'object');
+    const image = this.image(key, x, y, depth, undefined, depth === 0 ? 'ground' : 'object');
+    if (mapId === 'forest' && kind === 'tree'
+      && this.deps.qualitySceneCandidates.find((candidate) => candidate.mapId === 'forest')?.dynamicLayerKinds?.includes('tree')) {
+      const baseScale = image.getData('baseScale') as number | undefined;
+      image.setData('pixel32QualityDynamicTree', true);
+      if (baseScale) image.setScale(baseScale * 1.5).setData('baseScale', baseScale * 1.5);
+    }
+    return image;
   }
 
   private clearSceneOverlays(): void {
@@ -2757,8 +2875,9 @@ export class MapScene extends Phaser.Scene {
     const { textureId, flipX, scale } = resolveAsset(this.deps.assets, assetId);
     image.setTexture(textureId);
     image.setFlipX(flipX);
-    image.setScale(scale);
-    image.setData('baseScale', scale);
+    const candidateTreeScale = image.getData('pixel32QualityDynamicTree') === true ? 1.5 : 1;
+    image.setScale(scale * candidateTreeScale);
+    image.setData('baseScale', scale * candidateTreeScale);
   }
 
   private debugSprites(): SpriteDebugInfo[] {
@@ -2782,6 +2901,7 @@ export class MapScene extends Phaser.Scene {
         height: Math.round(bounds.height),
         flipX: image.flipX,
         depth: image.depth,
+        visible: image.visible,
       };
     });
     const asSprite = (info: RigDebugInfo, depth: number): SpriteDebugInfo => ({
@@ -2793,6 +2913,7 @@ export class MapScene extends Phaser.Scene {
       height: info.height,
       flipX: info.flipX,
       depth,
+      visible: true,
     });
     const actors = this.visibleRigs().map(({ rig }) => asSprite(rig.debugInfo(), rig.root.depth));
     return [asSprite(player, this.rig.root.depth), ...actors, ...others];

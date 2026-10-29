@@ -1,0 +1,184 @@
+{
+  "id": "village",
+  "status": "candidate",
+  "approved": false,
+  "image": "scene.png",
+  "image_size_bytes": 4032418,
+  "sha256": "1be164720d341fa62d930265a27847a7359b5fcf1065333942c9455e0405fb0a",
+  "dimensions_px": {
+    "width": 1448,
+    "height": 1086
+  },
+  "aspect_target": "16:12",
+  "prompt": "Make an original 4:3 landscape background plate for the village map of a cozy farming RPG, strict orthographic straight-down top-down view, no isometric perspective, no tilt, all ground tiles aligned to a regular square orthogonal grid. High-end richly detailed pixel art matching the supplied farm and interior concepts only in handcrafted pixel texture, natural light, material detail and finish. Do not copy their layouts or specific buildings. The scene footprint represents a 16-by-12 tile map: reserve a visibly open unobstructed portal threshold at the bottom edge centered near x=0.47 for the farm exit; reserve another open threshold on the right edge near y=0.55 for the plaza exit; connect both by a broad readable pale stone-and-dirt walking route with a small widened junction around center. Put a compact timber-and-stone general store in upper-left quadrant near x=.22,y=.36 and a blacksmith shop near upper-right x=.76,y=.36, with readable distinct awnings, outdoor goods, nonverbal landmarks only (no letters/sign text). Add decorative cottage facades across top band, flower beds, short fences, trees, barrels and planters only along edges. In the center-right place an old communal hand pump near x=.53,y=.52 and a wooden notice-board-shaped landmark near x=.34,y=.52. Keep the walking route fully clear; buildings, trees, fences, barrels and planter clusters are solid obstacles. Rich foliage and warm afternoon light, crisp individual pixel clusters and subtle cast shadows, polished professional indie pixel-game art, visually legible from game camera, clear negative space for player movement. Exactly orthogonal overhead composition. No characters, no animals, no text, no signs with writing, no UI, no grid lines, no border.",
+  "source": {
+    "tool": "OpenAI image_gen",
+    "type": "generated original raster scene background",
+    "generation_id": "scene",
+    "style_reference_images": [
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-6feede6e-0747-40b0-9e52-1ddf7a0b2fce.png",
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-ceb8c9ad-a6c9-48ca-a4fb-f268cf68a636.png"
+    ],
+    "note": "Style references were used only for pixel-art craft, material detail, lighting, and finish quality; no user-uploaded reference images were provided to the generator."
+  },
+  "map_grid": {
+    "columns": 16,
+    "rows": 12
+  },
+  "anchors_note": "All normalized coordinates and extents are rough visual estimates in image space (origin top-left, x/y in 0–1). They are guidance for later map-grid authoring, not collision or interaction data; verify against the image and map runtime. Artwork is a DEV-only unapproved candidate.",
+  "anchors": {
+    "walkable_path_anchors_approx": [
+      {
+        "name": "central lane",
+        "polyline": [
+          [
+            0.47,
+            0.99
+          ],
+          [
+            0.47,
+            0.72
+          ],
+          [
+            0.5,
+            0.56
+          ],
+          [
+            0.76,
+            0.55
+          ],
+          [
+            0.99,
+            0.55
+          ]
+        ]
+      },
+      {
+        "name": "north shop lane",
+        "polyline": [
+          [
+            0.47,
+            0.55
+          ],
+          [
+            0.47,
+            0.33
+          ],
+          [
+            0.24,
+            0.33
+          ],
+          [
+            0.76,
+            0.33
+          ]
+        ]
+      }
+    ],
+    "solid_obstacle_anchors_approx": [
+      {
+        "name": "general store/building",
+        "rect": [
+          0.04,
+          0.05,
+          0.37,
+          0.35
+        ]
+      },
+      {
+        "name": "blacksmith/building",
+        "rect": [
+          0.62,
+          0.05,
+          0.97,
+          0.37
+        ]
+      },
+      {
+        "name": "edge trees, garden and fence clusters",
+        "rects": [
+          [
+            0,
+            0,
+            0.16,
+            0.23
+          ],
+          [
+            0.83,
+            0,
+            1,
+            0.19
+          ],
+          [
+            0,
+            0.72,
+            0.35,
+            1
+          ],
+          [
+            0.73,
+            0.72,
+            1,
+            1
+          ]
+        ]
+      }
+    ],
+    "interactable_landmark_anchors_approx": [
+      {
+        "name": "general store entrance / goods counter",
+        "point": [
+          0.22,
+          0.31
+        ]
+      },
+      {
+        "name": "blacksmith entrance / forge",
+        "point": [
+          0.76,
+          0.31
+        ]
+      },
+      {
+        "name": "notice board",
+        "point": [
+          0.33,
+          0.52
+        ]
+      },
+      {
+        "name": "hand pump",
+        "point": [
+          0.57,
+          0.54
+        ]
+      }
+    ],
+    "portal_opening_anchors_approx": [
+      {
+        "name": "farm exit",
+        "edge": "bottom",
+        "center": [
+          0.47,
+          1
+        ],
+        "clear_span": [
+          0.4,
+          0.55
+        ]
+      },
+      {
+        "name": "plaza exit",
+        "edge": "right",
+        "center": [
+          1,
+          0.55
+        ],
+        "clear_span": [
+          0.49,
+          0.62
+        ]
+      }
+    ]
+  }
+}

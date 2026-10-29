@@ -18,6 +18,7 @@ import { registerEmoteTextures } from '../emote';
 import { registerAnimalTextures } from '../animal-art';
 import { MapScene, type MapSceneDeps } from './MapScene';
 import { TILE_SIZE, UNIT } from '../constants';
+import type { Pixel32QualitySceneAsset } from '../pixel32-quality-scene-candidate';
 import type { ResponsiveLayoutController } from '../responsive/responsive-layout';
 import {
   CANDIDATE_ATLAS_TEXTURE,
@@ -119,6 +120,7 @@ export interface BootDeps {
   responsive: ResponsiveLayoutController;
   /** 地圖場景的鍵盤與畫面都接好時呼叫一次（移除開機載入提示，見 main.ts）。 */
   onReady: () => void;
+  qualitySceneCandidates: Pixel32QualitySceneAsset[];
   controls: MapSceneDeps['controls'];
 }
 
@@ -241,6 +243,7 @@ export class BootScene extends Phaser.Scene {
       settings: this.deps.settings,
       responsive: this.deps.responsive,
       onReady: this.deps.onReady,
+      qualitySceneCandidates: this.deps.qualitySceneCandidates,
       controls: this.deps.controls,
     };
     this.registry.set('gate1-candidate-id', candidateId);

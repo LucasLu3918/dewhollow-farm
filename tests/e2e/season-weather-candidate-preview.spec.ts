@@ -64,6 +64,9 @@ async function saveFarmState(page: Page, season: string, minuteOfDay: number, we
 }
 
 test('P6-063 compares all four seasons and four lighting states at the same farm location', async ({ page }) => {
+  // This candidate captures 16 states and reloads Phaser after each indexedDB update.
+  // Keep the full E2E run from timing out while the browser is under suite load.
+  test.setTimeout(90_000);
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/?renderProfile=pixel32&gate1Runtime=pixel32-map-animation');
   await expect(page.locator('#game canvas')).toBeVisible();

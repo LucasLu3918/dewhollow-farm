@@ -1,0 +1,188 @@
+{
+  "id": "lake",
+  "status": "candidate",
+  "approved": false,
+  "scene": "scene.png",
+  "dimensions_px": {
+    "width": 1499,
+    "height": 1049
+  },
+  "sha256": "b9439015d7120c2716cd85453760fd690105c411d60ba1eff9b5d78cadcbd44d",
+  "tool": "built-in image_gen",
+  "source": {
+    "type": "generated_original_art",
+    "style_reference_files": [
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-6feede6e-0747-40b0-9e52-1ddf7a0b2fce.png",
+      "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-ceb8c9ad-a6c9-48ca-a4fb-f268cf68a636.png"
+    ],
+    "style_reference_role": "shared pixel-art quality, texture, lighting and rendering style only; scene/subjects not copied",
+    "user_uploaded_images_used": false
+  },
+  "prompt": "Use case: game asset. Asset type: DEV scene background under an orthogonal tile grid, cozy farming adventure. Input images: Image 1 and Image 2 are style references only for shared high-detail pixel-art material rendering, warm sunlight, rich restrained colors, detailed crafted surfaces, polished quality; do not reproduce their scenes or characters. Original Moonmirror lakeshore map, strict orthogonal top-down camera directly overhead, no isometric or tilted perspective, landscape aspect about 10:7. Most of the upper and right map is a beautiful clear blue-green lake with layered water depth, subtle ripples, reeds, lily pads and reflected sky; a broad grassy crescent shore occupies the lower-left and bottom with a readable pale packed-earth path entering from a visibly open portal at the west edge around mid-height and continuing along shore. Create a short sturdy fishing pier projecting into the lake near the lower-right shore, with open standing space at its tip; place an obvious small fishing interaction landmark beside it (empty rod rack / bait basket, no person). Scatter stones and reed clumps as blocking shoreline obstacles, wildflowers and berry shrubs as non-blocking/interactable scenery. Preserve clear passage from west-edge portal along the shore and to the pier, readable boundaries between walkable grass/path and nonwalkable water. High-detail crisp pixel clusters, textured shore plants, rocks, ripples and wood, golden morning light and grounded shadows. DEV scene background only, not atlas. No people, animals, boats with people, UI, text, labels, logos, border, photorealism, blur, or copied assets.",
+  "anchors_normalized_0_to_1": {
+    "coordinate_origin": "top-left; x and y are normalized to scene width and height",
+    "confidence": "rough visual estimates only; all anchors are approximate and must be aligned to the target logical map grid before gameplay use",
+    "walkable_paths": [
+      {
+        "label": "shore path from forest portal",
+        "from": [
+          0.01,
+          0.48
+        ],
+        "via": [
+          [
+            0.12,
+            0.48
+          ],
+          [
+            0.22,
+            0.59
+          ],
+          [
+            0.4,
+            0.71
+          ]
+        ],
+        "to": [
+          0.63,
+          0.77
+        ]
+      },
+      {
+        "label": "pier approach and pier",
+        "from": [
+          0.62,
+          0.76
+        ],
+        "via": [
+          [
+            0.72,
+            0.74
+          ]
+        ],
+        "to": [
+          0.82,
+          0.57
+        ]
+      }
+    ],
+    "blocking_landmarks": [
+      {
+        "label": "lake water (non-walkable)",
+        "approximate_bbox": [
+          0.2,
+          0,
+          1,
+          0.7
+        ]
+      },
+      {
+        "label": "shoreline rock and reed clusters",
+        "approximate_centers": [
+          [
+            0.23,
+            0.1
+          ],
+          [
+            0.28,
+            0.34
+          ],
+          [
+            0.32,
+            0.55
+          ],
+          [
+            0.55,
+            0.69
+          ],
+          [
+            0.93,
+            0.77
+          ]
+        ]
+      }
+    ],
+    "interaction_landmarks": [
+      {
+        "label": "fishing pier / open standing spot at pier head",
+        "center": [
+          0.82,
+          0.57
+        ]
+      },
+      {
+        "label": "bait basket and rod rack",
+        "approximate_bbox": [
+          0.7,
+          0.63,
+          0.76,
+          0.75
+        ]
+      },
+      {
+        "label": "shore wildflower / berry patch",
+        "approximate_bbox": [
+          0.05,
+          0.54,
+          0.19,
+          0.77
+        ]
+      }
+    ],
+    "shoreline": [
+      {
+        "label": "walkable grassy/dirt crescent",
+        "approximate_bbox": [
+          0,
+          0.35,
+          0.73,
+          1
+        ]
+      },
+      {
+        "label": "waterline",
+        "approximate_polyline": [
+          [
+            0.18,
+            0
+          ],
+          [
+            0.3,
+            0.26
+          ],
+          [
+            0.39,
+            0.48
+          ],
+          [
+            0.58,
+            0.68
+          ],
+          [
+            0.76,
+            0.69
+          ],
+          [
+            1,
+            0.76
+          ]
+        ]
+      }
+    ],
+    "portal_openings": [
+      {
+        "label": "forest entrance",
+        "edge": "west",
+        "center": [
+          0,
+          0.48
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "Scene artwork is a DEV candidate only; approved is false.",
+    "Image generator output is a painted scene background, not a tile atlas or collision/interaction data.",
+    "Generated openings and landmarks are approximate visual anchors; map-specific collision, portal placement, and interaction rules remain to be wired and validated separately."
+  ]
+}

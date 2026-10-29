@@ -173,3 +173,46 @@
 - [x] 更新 DF-QA-01 報告及本任務狀態；候選維持 `candidate`／`approved: false`，不觸碰正式素材或 Gate 1 核准。
 - [x] 專項 E2E 1/1、`npm run check` 與完整 Chromium E2E 234/234（4 workers）通過。
 - [x] PR #41 已合併至 `main`。
+
+
+---
+
+# DF-V2-ART-QUALITY-RESET｜全地圖高細節 Pixel32 重建
+
+## 本輪執行紀錄（2026-10-29）
+
+- 已建立 12 張高細節 DEV 場景與候選 MapDef、來源／SHA／尺寸檢查，並接入精確 DEV opt-in；正式 runtime 與存檔格式不變，候選存檔使用記憶體隔離。
+- 已重排 12 張地圖的部分阻擋、田區、家具、入口與動物位置；驗證候選 map 結構、可走格連通、互動可達性、所有 portal 實際落點及原有目的地 spawn fallback。
+- `npm run check` 通過：186 個 test files，1,800 passed、1 skipped；production build 3.327 MB，低於 8 MB 首載預算；12 張候選素材 SHA／尺寸檢查通過。
+- 完成動態圖層：農務更新土壤／作物 sprite，砍樹／採集／割草後候選畫面同步隱藏對應物件，礦坑岩石沿用 runtime 互動層；候選 E2E 驗證耕作、森林砍樹、牧場割草、碰撞、portal 與室內動線。
+- 全套 E2E 中發現手機橫向背包按鈕受縮放影響僅 43.59px；觸控背包下限已提高至 48px，旋轉與尺寸案例通過。季節預覽測試需重載 16 次；專項時限調至 90 秒，全套中 32.6 秒完成。
+- 修正後 `npm run check` 通過：186 個 test files，1,800 passed、1 skipped；production build 3.327 MB；12 張候選素材 SHA／尺寸檢查通過。完整 E2E 2 workers 380/380 通過（25.3 分鐘）；10-cycle smoke 與全圖碰撞／portal／互動案例全綠。
+- 使用者已確認高細節候選方向及各階段 Gate；所有精確場景仍是 DEV 候選／`approved:false`。12 圖逐張桌機／手機人工審查、原生手機驗收與 exact asset 核准待辦。
+- Change Impact artifact 格式驗證通過（status `DRAFT`）；須於 commit 後依精確 base/head/diff/path set reconcile。尚未 commit、push、開 PR 或 merge。
+
+## Phase 1：共享契約與代表切片
+
+- [x] 新增全地圖候選美術 quality gate、資產來源／SHA manifest、像素尺度和場景層契約。
+- [x] 重做 farm 外景與 greenhouse 區、house／house-wing／house-full 室內候選，從原 MapScene DEV route 顯示。
+- [x] 依新版畫面重排農地、障礙、互動位置；保留 map ID、portal semantics 與 save schema。
+- [x] 測試碰撞 footprint、代表互動距離、可達動線、舊存檔角色安全落點與 viewport resize。
+- [ ] Checkpoint：farm／house 桌機與手機截圖逐張人工審查，確切素材核准待使用者。
+
+## Phase 2：其他戶外地圖
+
+- [x] 重做 forest、lake、pasture、village、plaza、mine-entrance 場景與阻擋／互動配置。
+- [x] 共用戶外材質及視覺語言；候選 E2E 驗證通路、portal、NPC／互動點，不覆蓋角色。
+- [ ] Checkpoint：6 張戶外場景桌機與代表手機截圖逐張人工審查，確切素材核准待使用者。
+
+## Phase 3：專用室內地圖
+
+- [x] 重做 coop、cowbarn 的高密度室內構圖、動物區、門與 trough 互動位置。
+- [x] 驗證狹小場景角色不被家具封住，門／互動點有可站立鄰格。
+- [x] 室內 5 個 authored map 與 farm greenhouse 區均可進出且代表互動正常。
+
+## Phase 4：全圖整合與交付
+
+- [x] 12/12 map 結構、spawn／portal／碰撞／代表互動通過候選驗證，舊存檔載入位置可安全恢復。
+- [x] `npm run check` 與必要完整 E2E 全綠；100-cycle viewport 壓力測試留在 `npm run test:e2e:stress` 專用長測腳本。
+- [ ] 完整地圖 candidate 截圖逐張人工檢視；確切素材仍維持 `approved:false`，正式素材核准待使用者。
+- [ ] AIPS Change Impact reconciliation、提交到目前分支；全部規劃任務完成後再 push／PR／merge。

@@ -1,0 +1,164 @@
+{
+  "id": "coop",
+  "status": "candidate",
+  "approved": false,
+  "source": {
+    "tool": "image_gen.imagegen",
+    "style_reference_only": "/Users/lucas/.codex/generated_images/01a17b05-cc89-72a0-83f6-35f628f78387/exec-ceb8c9ad-a6c9-48ca-a4fb-f268cf68a636.png",
+    "generated_file": "/Users/lucas/.codex/generated_images/01a18670-eac3-7101-a3c3-9bd779ee3517/exec-d08414c4-fe5b-4928-97a5-309d7d94625d.png",
+    "sha256": "a3aaf806cbae60b570cf4d51f46d358672a5a0f635862fb353d4077b8dbad372"
+  },
+  "prompt": "Original premium high-detail pixel art game BACKGROUND. Strict orthographic direct overhead top-down, grid-aligned geometry, no isometric/perspective/foreshortening. Crisp clusters, warm amber lights, cool blue window shadows, rich oak and textile detail. Room completely contained in image and unobstructed central walkable floor. Show physical wall/furniture footprints clearly for later collision mapping. No people, animals, UI, typography, labels, watermark. Reference only for quality and light/material treatment, invent new room. Play-area canvas aspect ratio 1.33:1 (8x6 grid), compact. Open entrance portal centered along bottom edge, broad clear aisle from entrance toward trough/gate. Nesting cubbies along upper-left wall, feed bin left wall. A sturdy low rail with a clear gate divides the right half as empty animal pen. Long feed trough in upper-right pen as the primary interaction landmark. Straw floor, plank walls, lantern; no animals.",
+  "landmark_coordinates": {
+    "coordinate_system": "normalized 0..1 pixel/image coordinates; origin top-left; boxes are [x1,y1,x2,y2]",
+    "approximate": true,
+    "map_logical_reference": {
+      "size_tiles": [
+        8,
+        6
+      ],
+      "existing_portal": {
+        "edge": "south",
+        "tile_center_norm": [
+          0.4375,
+          0.9167
+        ],
+        "tile": [
+          3,
+          5
+        ]
+      },
+      "spawn_tile": [
+        3,
+        4
+      ]
+    },
+    "walkable_paths": [
+      {
+        "name": "human aisle",
+        "points": [
+          [
+            0.5,
+            0.85
+          ],
+          [
+            0.5,
+            0.68
+          ],
+          [
+            0.5,
+            0.56
+          ],
+          [
+            0.7,
+            0.48
+          ]
+        ],
+        "width_norm": 0.17
+      },
+      {
+        "name": "animal circulation",
+        "points": [
+          [
+            0.72,
+            0.45
+          ],
+          [
+            0.72,
+            0.34
+          ],
+          [
+            0.78,
+            0.23
+          ]
+        ],
+        "width_norm": 0.12
+      }
+    ],
+    "blocking_furniture_and_barriers": [
+      {
+        "name": "animal pen rail",
+        "bbox_norm": [
+          0.51,
+          0.3,
+          0.98,
+          0.53
+        ]
+      },
+      {
+        "name": "feed station and storage",
+        "bbox_norm": [
+          0.03,
+          0.32,
+          0.17,
+          0.61
+        ]
+      },
+      {
+        "name": "nesting boxes",
+        "bbox_norm": [
+          0.05,
+          0.06,
+          0.32,
+          0.23
+        ]
+      }
+    ],
+    "interaction_landmarks": [
+      {
+        "name": "feed trough",
+        "anchor_norm": [
+          0.75,
+          0.18
+        ]
+      },
+      {
+        "name": "feed bin",
+        "anchor_norm": [
+          0.11,
+          0.45
+        ]
+      },
+      {
+        "name": "nesting boxes",
+        "anchor_norm": [
+          0.18,
+          0.16
+        ]
+      },
+      {
+        "name": "pen gate",
+        "anchor_norm": [
+          0.69,
+          0.45
+        ]
+      }
+    ],
+    "portals_and_exits": [
+      {
+        "name": "farm exit",
+        "edge": "south",
+        "scene_anchor_norm": [
+          0.5,
+          0.87
+        ],
+        "map_anchor_norm": [
+          0.4375,
+          0.9167
+        ],
+        "approximate": true,
+        "note": "Door appears centered in artwork; existing map D is slightly left of center and closer to south border. Crop/align in layout pass."
+      }
+    ]
+  },
+  "limitations": [
+    "Generated art is a visual background candidate, not a collision mask or tile map.",
+    "Coordinates are rough visual anchors and must be reconciled against map grid during layout authoring.",
+    "The rendered exit openings and existing logical door tiles differ slightly; some images include a stone apron outside the room footprint.",
+    "No gameplay interaction or movement behavior is implemented by these assets."
+  ],
+  "dimensions_px": {
+    "width": 1448,
+    "height": 1086
+  }
+}
