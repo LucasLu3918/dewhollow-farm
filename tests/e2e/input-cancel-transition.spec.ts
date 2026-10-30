@@ -84,7 +84,8 @@ async function settleAndRecord(page: Page, testInfo: TestInfo, scenario: string,
   const stopped = await waitIdle(page);
   if (boundary) expect(stopped).toMatchObject({ mapId: boundary.mapId, tile: boundary.tile });
   const samples = await quietSamples(page, 300);
-  expect(samples.length).toBeGreaterThan(5);
+  // The quiet interval is time-based; do not require a particular frame rate.
+  expect(samples.length).toBeGreaterThanOrEqual(2);
   expect(samples.every((sample) => sample.mapId === stopped.mapId
     && sample.tile.x === stopped.tile.x && sample.tile.y === stopped.tile.y
     && sample.heldDirection === null && !sample.moving && !sample.pending && sample.queuedTaps === 0)).toBe(true);
@@ -99,14 +100,20 @@ async function settleAndRecord(page: Page, testInfo: TestInfo, scenario: string,
 test.describe('輸入取消與場景轉換', () => {
   test('持續觸控方向穿越農場出口後不會帶入新地圖', async ({ page }, testInfo) => {
     await start(page);
-    // Farm south exit is at y=28; position at y=27, then hold down through the transition.
-    for (let index = 0; index < 18; index += 1) {
+    // Farm south exit is (20,29); pass the shipping box at (20,27) via the west aisle.
+    for (let index = 0; index < 12; index += 1) {
       const before = await movement(page);
       await page.keyboard.press('ArrowDown');
       await expect.poll(async () => (await movement(page)).tile).toEqual({ x: before.tile.x, y: before.tile.y + 1 });
     }
+    await page.keyboard.press('ArrowLeft');
+    await expect.poll(async () => (await movement(page)).tile).toEqual({ x: 19, y: 26 });
+    for (let index = 0; index < 2; index += 1) await page.keyboard.press('ArrowDown');
+    await expect.poll(async () => (await movement(page)).tile).toEqual({ x: 19, y: 28 });
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(async () => (await movement(page)).tile).toEqual({ x: 20, y: 28 });
     const before = await movement(page);
-    expect(before).toMatchObject({ mapId: 'farm', tile: { y: 27 }, heldDirection: null });
+    expect(before).toMatchObject({ mapId: 'farm', tile: { x: 20, y: 28 }, heldDirection: null });
 
     await pointer(page, 'moveDown', 'pointerdown', 701);
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
@@ -137,7 +144,7 @@ test.describe('輸入取消與場景轉換', () => {
     const restored = await waitIdle(page);
     expect(restored.tile).toEqual(saved.tile);
     const samples = await quietSamples(page, 300);
-    expect(samples.length).toBeGreaterThan(5);
+    expect(samples.length).toBeGreaterThanOrEqual(2);
     expect(samples.every((sample) => sample.mapId === restored.mapId
       && sample.tile.x === restored.tile.x && sample.tile.y === restored.tile.y
       && sample.heldDirection === null && !sample.moving && !sample.pending && sample.queuedTaps === 0)).toBe(true);

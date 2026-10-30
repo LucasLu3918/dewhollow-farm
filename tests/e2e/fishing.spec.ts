@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * M4（P1）：釣魚與技能。路線：農場出生點 → 森林 (2,7) → 上到 (2,5) → 右到 (22,5) → 下到 (22,6) → 進湖畔的門 (23,6)，
+ * M4（P1）：釣魚與技能。路線：農場出生點 (20,14) → 北門進森林 (2,7) → 上到 (2,5) → 右到 (22,5) → 下到 (22,6) → 進湖畔的門 (23,6)，
  * 落在湖畔 (1,7)，面向上方的水 (1,6)。上不上鉤由隨機數決定，所以反覆投竿直到上鉤。
  */
 interface Actor {
@@ -41,8 +41,8 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
 }
 
 async function toLake(page: Page): Promise<void> {
-  await walk(page, 'ArrowUp', 2);
-  await walk(page, 'ArrowRight', 32);
+  // 農場新版出生點位於中央縱路；北門在 (20,0)，可直達森林 spawn (2,7)。
+  await walk(page, 'ArrowUp', 14);
   await expect.poll(() => mapId(page)).toBe('forest');
   await walk(page, 'ArrowUp', 2);
   await walk(page, 'ArrowRight', 20);

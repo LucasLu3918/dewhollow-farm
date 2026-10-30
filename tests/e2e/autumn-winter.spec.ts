@@ -101,11 +101,11 @@ test('the greenhouse door stays shut until the remodel is bought, then leads int
     mapId: 'farm',
     weather: 'sunny',
     forecast: 'sunny',
-    player: { x: 30, y: 19, facing: 'down' },
+    player: { x: 8, y: 8, facing: 'left' },
     flags: {},
   });
 
-  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowLeft');
   await expect(page.locator('#hud-log')).toContainText('溫室還沒改建');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 });

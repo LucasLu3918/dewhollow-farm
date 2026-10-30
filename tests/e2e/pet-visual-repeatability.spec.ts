@@ -49,13 +49,21 @@ async function preparePetScene(browser: Browser): Promise<{ page: Page; close: (
     return { width: Math.round(width), height: Math.round(height) };
   })).toEqual({ width: 926, height: 694 });
 
-  for (let step = 0; step < 20; step += 1) {
+  const route = [
+    ...Array.from({ length: 12 }, () => 'ArrowDown'),
+    'ArrowLeft',
+    'ArrowDown',
+    'ArrowDown',
+    'ArrowRight',
+    'ArrowDown',
+  ];
+  for (const key of route) {
     const before = await page.evaluate(() => ({
       mapId: window.__dewhollow?.mapId(),
       player: window.__dewhollow?.actors().find((item) => item.id === 'player'),
     }));
     if (before.mapId === 'village') break;
-    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press(key);
     await expect.poll(() => page.evaluate(({ mapId, player }) => {
       const debug = window.__dewhollow;
       const current = debug?.actors().find((item) => item.id === 'player');

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { MapDef } from '../domain/content';
 import farm from '../../content/maps/farm.json';
+import greenhouse from '../../content/maps/greenhouse.json';
 import { groundLayerFor, isGroundLayer } from './map-layers';
 
 const farmMap = farm as MapDef;
+const greenhouseMap = greenhouse as MapDef;
 
 describe('groundLayerFor', () => {
   it('prefers an explicit ground under an object over neighboring terrain', () => {
@@ -23,9 +25,9 @@ describe('groundLayerFor', () => {
     expect(groundLayerFor(map, 1, 0)).toBe('grass');
   });
 
-  it('uses grass beneath both mirrored greenhouse fence sides', () => {
-    expect(groundLayerFor(farmMap, 27, 22)).toBe('grass');
-    expect(groundLayerFor(farmMap, 33, 22)).toBe('grass');
+  it('uses a stable floor beneath the standalone greenhouse walls', () => {
+    expect(groundLayerFor(greenhouseMap, 0, 3)).toBe('floor');
+    expect(groundLayerFor(greenhouseMap, 11, 3)).toBe('floor');
   });
 
   it('keeps wall tiles as objects over an opaque neighboring ground layer', () => {

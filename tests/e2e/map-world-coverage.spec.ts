@@ -61,7 +61,7 @@ async function writeSave(page: Page, fixture: {
     savedAt: '2026-10-28T00:00:00.000Z',
     state: {
       ...currentSaveFixture.state,
-      schemaVersion: 25,
+      schemaVersion: 26,
       calendar: {
         ...(currentSaveFixture.state.calendar as Record<string, unknown>),
         season: fixture.season ?? 'spring',
@@ -183,9 +183,9 @@ async function verifyTransition(page: Page, portal: DoorCell, source: MapDef): P
 }
 
 test('P6-064 runtime coverage discovers every authored map file', () => {
-  expect(mapFiles).toHaveLength(12);
+  expect(mapFiles).toHaveLength(13);
   expect(mapFiles.every(({ file, map }) => file === `content/maps/${map.id}.json`)).toBe(true);
-  expect(mapFiles.flatMap(({ map }) => portalCells(map))).toHaveLength(22);
+  expect(mapFiles.flatMap(({ map }) => portalCells(map))).toHaveLength(23);
 });
 
 for (const { file, map } of mapFiles) {

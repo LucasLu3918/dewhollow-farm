@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { MapDef } from '../domain/content';
+import greenhouseContent from '../../content/maps/greenhouse.json';
 import {
   INDOOR_FARM_REQUIRED_FRAMES,
   INDOOR_MINE_REQUIRED_FRAMES,
@@ -27,23 +28,7 @@ const mine: MapDef = {
   spawn: { x: 1, y: 1 },
 };
 
-const greenhouse: MapDef = {
-  id: 'farm', name: 'farm', width: 34, height: 26,
-  rows: Array.from({ length: 26 }, (_, y) => {
-    const row = Array.from({ length: 34 }, () => '.');
-    if (y === 20) { row[30] = 'Q'; row[27] = 'W'; row[28] = 'W'; row[29] = 'W'; row[31] = 'W'; row[32] = 'W'; row[33] = 'W'; }
-    if (y === 21) { row[27] = 'W'; row[28] = 'g'; row[29] = 'g'; row[30] = 'q'; row[31] = 'g'; row[32] = 'g'; row[33] = 'W'; }
-    if (y >= 22 && y <= 24) { row[27] = 'W'; row[33] = 'W'; }
-    if (y >= 22 && y <= 24) for (let x = 28; x <= 32; x += 1) row[x] = 'g';
-    if (y === 25) for (let x = 27; x <= 33; x += 1) row[x] = 'W';
-    return row.join('');
-  }),
-  legend: {
-    W: { kind: 'fence' }, Q: { kind: 'door' }, q: { kind: 'door' },
-    g: { kind: 'field', greenhouse: true },
-  },
-  spawn: { x: 0, y: 0 },
-};
+const greenhouse = greenhouseContent as MapDef;
 
 function manifest(requiredFrames: readonly string[]) {
   const ids = [...requiredFrames];
@@ -92,12 +77,13 @@ describe('P6-062 indoor scene candidate', () => {
     expect(indoorSceneCandidateFrameFor(mine, 0, 0, 'object')).toEqual({ atlas: 'mine', frame: 'rock-wall' });
   });
 
-  it('only presents greenhouse candidates after the existing unlock flag is true', () => {
-    expect(indoorSceneCandidateFrameFor(greenhouse, 28, 21, 'ground', false)).toBeNull();
-    expect(indoorSceneCandidateFrameFor(greenhouse, 28, 21, 'ground', true)).toEqual({ atlas: 'farm', frame: 'greenhouse-ground' });
-    expect(indoorSceneCandidateFrameFor(greenhouse, 27, 21, 'object', true)).toEqual({ atlas: 'farm', frame: 'greenhouse-glass' });
-    expect(indoorSceneCandidateFrameFor(greenhouse, 30, 20, 'object', true)).toEqual({ atlas: 'farm', frame: 'greenhouse-door' });
-    expect(indoorSceneCandidateFrameFor(greenhouse, 30, 25, 'object', true)).toEqual({ atlas: 'farm', frame: 'greenhouse-front' });
-    expect(greenhouse.rows[21]?.slice(28, 33)).toBe('ggqgg');
+  it('stacks the greenhouse ground, glass, door, and front wall in the standalone small map', () => {
+    expect(indoorSceneCandidateFrameFor(greenhouse, 1, 2, 'ground')).toEqual({ atlas: 'farm', frame: 'greenhouse-ground' });
+    expect(indoorSceneCandidateFrameFor(greenhouse, 0, 2, 'object')).toEqual({ atlas: 'farm', frame: 'greenhouse-glass' });
+    expect(indoorSceneCandidateFrameFor(greenhouse, 6, 8, 'object')).toEqual({ atlas: 'farm', frame: 'greenhouse-door' });
+    expect(indoorSceneCandidateFrameFor(greenhouse, 1, 8, 'object')).toEqual({ atlas: 'farm', frame: 'greenhouse-front' });
+    expect(greenhouse.rows[1]).toBe('#gggg..gggg#');
+    expect(greenhouse.rows[4]).toBe('#..........#');
+    expect(greenhouse.rows[5]).toBe('#gggg..gggg#');
   });
 });

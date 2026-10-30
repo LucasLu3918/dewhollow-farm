@@ -604,7 +604,8 @@ function finish(
   if (!result.ok) return reply(state, [messageFor(result.reason)], [refused(result.reason)]);
   const events: GameEvent[] = [];
   if (feedback) {
-    const [x, y] = feedback.key.split(',').map(Number);
+    const coordinateKey = feedback.key.includes('|') ? feedback.key.slice(feedback.key.lastIndexOf('|') + 1) : feedback.key;
+    const [x, y] = coordinateKey.split(',').map(Number);
     events.push({ type: 'acted', action: feedback.action, x: x ?? 0, y: y ?? 0 });
   }
   return reply(result.value, [successMessage], events);

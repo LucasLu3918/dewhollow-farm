@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import assets from '../../../content/assets.json';
 import cowbarn from '../../../content/maps/cowbarn.json';
+import farm from '../../../content/maps/farm.json';
 import houseFull from '../../../content/maps/house-full.json';
 import houseWing from '../../../content/maps/house-wing.json';
 import type { MapDef } from '../../domain/content';
@@ -15,6 +16,12 @@ const mapFiles = Object.entries(import.meta.glob('../../../content/maps/*.json',
   .sort((left, right) => left.file.localeCompare(right.file));
 
 describe('mapCoverageReport', () => {
+  it('opens one farm-field gate to the central path while keeping the surrounding fence solid', () => {
+    expect(farm.rows[24]?.[16]).toBe('=');
+    expect(farm.rows[23]?.[16]).toBe('W');
+    expect(farm.rows[25]?.[16]).toBe('W');
+  });
+
   it('covers every authored map, classifies house upgrades, and reports spawn-to-portal reachability', () => {
     const report = mapCoverageReport({
       files: mapFiles,
@@ -23,7 +30,7 @@ describe('mapCoverageReport', () => {
       conditionalVariants: ['house-full', 'house-wing'],
     });
 
-    expect(report.summary, JSON.stringify(report.issues)).toEqual({ totalMaps: 12, completeMaps: 12, coveragePercent: 100, portalCells: 22 });
+    expect(report.summary, JSON.stringify(report.issues)).toEqual({ totalMaps: 13, completeMaps: 13, coveragePercent: 100, portalCells: 23 });
     expect(report.maps.every((entry) => entry.idMatchesFile && entry.shape.valid && entry.spawn.valid)).toBe(true);
     expect(report.maps.every((entry) => entry.tileAssets.missing.length === 0)).toBe(true);
     expect(report.maps.find((entry) => entry.mapId === 'house-full')).toMatchObject({
@@ -37,8 +44,8 @@ describe('mapCoverageReport', () => {
     });
     expect(report.maps.every((entry) => entry.portals.every((portal) => portal.reachableInWorld
       || (entry.reachability.classification === 'conditional-variant' && portal.reachableFromSpawn)))).toBe(true);
-    expect(report.maps.find((entry) => entry.mapId === 'farm')?.portals.find((portal) => portal.symbol === 'q')).toMatchObject({
-      reachableFromSpawn: false,
+    expect(report.maps.find((entry) => entry.mapId === 'greenhouse')?.portals.find((portal) => portal.symbol === 'q')).toMatchObject({
+      reachableFromSpawn: true,
       reachableInWorld: true,
     });
   });

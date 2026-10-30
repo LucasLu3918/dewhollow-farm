@@ -46,10 +46,11 @@ async function pressOneTile(page: Page, key: string, dx: number, dy: number): Pr
 }
 
 async function moveToOpenCenter(page: Page): Promise<void> {
-  for (let step = 0; step < 6; step += 1) await pressOneTile(page, 'ArrowDown', 0, 1);
-  for (let step = 0; step < 8; step += 1) await pressOneTile(page, 'ArrowRight', 1, 0);
+  // The redesigned farm spawn is (20,14); move into a clear corridor with ten
+  // walkable tiles available in every cardinal direction.
+  for (let step = 0; step < 2; step += 1) await pressOneTile(page, 'ArrowUp', 0, -1);
   const center = await page.evaluate(() => window.__dewhollow!.movement().tile);
-  expect({ x: center.x, y: center.y }).toEqual({ x: 15, y: 15 });
+  expect({ x: center.x, y: center.y }).toEqual({ x: 20, y: 12 });
 }
 
 async function installCollector(page: Page, startTile: Tile): Promise<void> {
@@ -134,7 +135,7 @@ for (const direction of directions) {
     const { context, page } = await startCandidateFarm(browser);
     try {
       const initial = await page.evaluate(() => window.__dewhollow!.movement().tile);
-      expect({ x: initial.x, y: initial.y }).toEqual({ x: 7, y: 9 });
+      expect({ x: initial.x, y: initial.y }).toEqual({ x: 20, y: 14 });
       await moveToOpenCenter(page);
       const start = await page.evaluate(() => window.__dewhollow!.movement().tile);
       await installCollector(page, start);

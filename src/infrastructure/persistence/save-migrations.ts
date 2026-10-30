@@ -49,6 +49,7 @@ const MIGRATIONS: Readonly<Record<number, Migration>> = {
   22: migrateV22ToV23,
   23: migrateV23ToV24,
   24: migrateV24ToV25,
+  25: migrateV25ToV26,
 };
 
 /**
@@ -282,6 +283,83 @@ function migrateV24ToV25(raw: unknown): unknown {
     ...(decor ? { decor } : {}),
     ...(worldChanges ? { worldChanges } : {}),
   };
+}
+
+/** v25 → v26: namespace crop plots, move legacy greenhouse plots, and keep players inside after the room split. */
+function migrateV25ToV26(raw: unknown): unknown {
+  const parsed = z.object({ schemaVersion: z.literal(25) }).safeParse(raw);
+  if (!parsed.success) {
+    throw new SaveFormatError(`存檔 v25 格式錯誤於 ${describeIssue(parsed.error.issues[0])}`);
+  }
+  const state = raw as Record<string, unknown>;
+  const plots = migrateLegacyPlots(state.plots);
+  const player = state.mapId === 'farm' ? remapLegacyGreenhousePlayer(state.player) : null;
+  return {
+    ...state,
+    schemaVersion: 26,
+    ...(plots ? { plots } : {}),
+    ...(player ? { mapId: 'greenhouse', player } : {}),
+  };
+}
+
+function migrateLegacyPlots(value: unknown): unknown {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return value;
+  const legacyPlots: Record<string, unknown> = {};
+  const scopedPlots: Record<string, unknown> = {};
+  for (const [key, plot] of Object.entries(value)) {
+    if (key.includes('|')) {
+      scopedPlots[key] = plot;
+      continue;
+    }
+    const match = /^(-?\d+),(-?\d+)$/.exec(key);
+    if (!match) {
+      legacyPlots[key] = plot;
+      continue;
+    }
+    const x = Number(match[1]);
+    const y = Number(match[2]);
+    const greenhouse = x >= 28 && x <= 32 && y >= 21 && y <= 24;
+    const legacyFarm = remapLegacyFarmPlot(x, y);
+    const greenhousePlot = greenhouse ? remapLegacyGreenhousePlot(x, y) : null;
+    const mapId = greenhouse ? 'greenhouse' : 'farm';
+    const nextX = greenhouse ? greenhousePlot!.x : legacyFarm?.x ?? x;
+    const nextY = greenhouse ? greenhousePlot!.y : legacyFarm?.y ?? y;
+    legacyPlots[`${mapId}|${nextX},${nextY}`] = plot;
+  }
+  // If a mixed record already contains the target key, the explicitly map-scoped value is authoritative.
+  return { ...legacyPlots, ...scopedPlots };
+}
+
+/** Remap the old 5×4 greenhouse footprint into beds, skipping the new aisles. */
+function remapLegacyGreenhousePlot(x: number, y: number): { x: number; y: number } {
+  const localX = x - 27;
+  const localY = y - 20;
+  return {
+    x: localX <= 3 ? localX : localX + 3,
+    y: localY <= 3 ? localY : localY + 1,
+  };
+}
+
+/** Old v25 crop beds map one-to-one into the three new farm field blocks. */
+function remapLegacyFarmPlot(x: number, y: number): { x: number; y: number } | null {
+  if (y >= 3 && y <= 5 && x >= 4 && x <= 9) {
+    return { x: x <= 6 ? x : x + 3, y: y + 13 };
+  }
+  if (y >= 3 && y <= 5 && x >= 12 && x <= 17) {
+    return { x: x <= 14 ? x - 8 : x - 5, y: y + 17 };
+  }
+  if (y >= 14 && y <= 16 && x >= 18 && x <= 23) {
+    return { x: x <= 20 ? x - 14 : x - 11, y: y + 10 };
+  }
+  return null;
+}
+
+function remapLegacyGreenhousePlayer(value: unknown): unknown | null {
+  if (typeof value !== 'object' || value === null || !('x' in value) || !('y' in value)) return null;
+  const player = value as Record<string, unknown>;
+  if (typeof player.x !== 'number' || typeof player.y !== 'number') return null;
+  if (player.x < 28 || player.x > 32 || player.y < 21 || player.y > 24) return null;
+  return { ...player, x: player.x - 27, y: player.y - 20 };
 }
 
 const HOUSE_LAYOUT_OFFSET = { x: 6, y: 7 } as const;

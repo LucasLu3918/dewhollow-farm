@@ -45,9 +45,8 @@ test('the status line shows the date and tomorrow\'s forecast', async ({ page })
 test('the farm leads east into the forest, and the forest leads on to the lake and back', async ({ page }) => {
   test.setTimeout(90_000);
   await waitForGame(page);
-  // 出生點 (7,9)：往上到 (7,7)，再一路往右到農場東側的門 (39,7)。
-  await walk(page, 'ArrowUp', 2);
-  await walk(page, 'ArrowRight', 32);
+  // 新出生點 (20,14)：沿中央道路往東走到農場東側的門 (39,14)。
+  await walk(page, 'ArrowRight', 19);
   await expect.poll(() => mapId(page)).toBe('forest');
 
   // 森林出生點 (2,7)：往上到 (2,5)，右到 (22,5)，下到 (22,6)，再往右走進湖畔的門 (23,6)。
@@ -66,8 +65,7 @@ test('the farm leads east into the forest, and the forest leads on to the lake a
 test('water and trees block the way: walking into the lake does not move you', async ({ page }) => {
   test.setTimeout(90_000);
   await waitForGame(page);
-  await walk(page, 'ArrowUp', 2);
-  await walk(page, 'ArrowRight', 32);
+  await walk(page, 'ArrowRight', 19);
   await expect.poll(() => mapId(page)).toBe('forest');
   await walk(page, 'ArrowUp', 2);
   await walk(page, 'ArrowRight', 20);
@@ -88,10 +86,9 @@ test('a whole year of sleeping passes through every season without a page error'
   page.on('pageerror', (error) => errors.push(error.message));
   await waitForGame(page);
 
-  // 出生點 (7,9)：走進小屋後，從 (10,18) 前往床邊 (4,8)，面向床。之後每按一次 x 就睡一晚。
-  await walk(page, 'ArrowUp', 4);
-  await walk(page, 'ArrowLeft', 5);
-  await walk(page, 'ArrowUp', 1);
+  // 新出生點 (20,14)：沿主路前往小屋門 (27,9)，從 (10,18) 前往床邊 (4,8)。
+  await walk(page, 'ArrowRight', 7);
+  await walk(page, 'ArrowUp', 5);
   await expect.poll(() => mapId(page)).toBe('house');
   // 工作台位於南側，沿入口走道往北再轉西到床邊。
   await walk(page, 'ArrowUp', 9);
@@ -121,10 +118,9 @@ test('a whole year of sleeping passes through every season without a page error'
 
 test('the farmhouse has its bed inside, and furniture blocks the way', async ({ page }) => {
   await waitForGame(page);
-  // 田邊 (7,9) → (7,5) → (2,5)，走進小屋的門 (2,4)，落在新入口 (10,18)。
-  await walk(page, 'ArrowUp', 4);
-  await walk(page, 'ArrowLeft', 5);
-  await walk(page, 'ArrowUp', 1);
+  // 新出生點 (20,14)：沿主路前往小屋門 (27,9)，落在小屋入口 (10,18)。
+  await walk(page, 'ArrowRight', 7);
+  await walk(page, 'ArrowUp', 5);
   await expect.poll(() => mapId(page)).toBe('house');
   await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 10, y: 18 });
 
@@ -138,8 +134,7 @@ test('the farmhouse has its bed inside, and furniture blocks the way', async ({ 
 
 test('the forest\'s north door leads to the mine entrance, where a fallen rock blocks the cave', async ({ page }) => {
   await waitForGame(page);
-  await walk(page, 'ArrowUp', 2);
-  await walk(page, 'ArrowRight', 32);
+  await walk(page, 'ArrowRight', 19);
   await expect.poll(() => mapId(page)).toBe('forest');
 
   // 森林出生點 (2,7) → 往右到 (12,7)，往上到 (12,1)，再往上穿過北門 (12,0)。

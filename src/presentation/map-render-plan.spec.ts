@@ -62,10 +62,10 @@ describe('plotRenderPlan', () => {
       spawn: { x: 0, y: 0 },
     };
     const plots: PlotMap = {
-      '0,0': { watered: false, crop: { cropId: 'radish', growthDays: 1 }, dryDays: 0 },
-      '1,0': { watered: true, crop: { cropId: 'radish', growthDays: 2 }, dryDays: 0 },
-      '2,0': { watered: false, crop: { cropId: 'radish', growthDays: 8 }, dryDays: 0 },
-      '3,0': { watered: false, crop: null, dryDays: 0 },
+      'farm|0,0': { watered: false, crop: { cropId: 'radish', growthDays: 1 }, dryDays: 0 },
+      'farm|1,0': { watered: true, crop: { cropId: 'radish', growthDays: 2 }, dryDays: 0 },
+      'farm|2,0': { watered: false, crop: { cropId: 'radish', growthDays: 8 }, dryDays: 0 },
+      'farm|3,0': { watered: false, crop: null, dryDays: 0 },
     };
 
     const crops: Record<string, Pick<CropDef, 'id' | 'growthDays' | 'visualGrowthStages'>> = {
@@ -82,7 +82,7 @@ describe('plotRenderPlan', () => {
 
   it('keeps the legacy fallback for crops without optional visual milestones', () => {
     const plots: PlotMap = {
-      '0,0': { watered: false, crop: { cropId: 'legacy', growthDays: 2 }, dryDays: 0 },
+      'farm|0,0': { watered: false, crop: { cropId: 'legacy', growthDays: 2 }, dryDays: 0 },
     };
     const map: MapDef = { id: 'farm', name: 'farm', width: 1, height: 1, rows: ['g'], legend: { g: { kind: 'grass' } }, spawn: { x: 0, y: 0 } };
 

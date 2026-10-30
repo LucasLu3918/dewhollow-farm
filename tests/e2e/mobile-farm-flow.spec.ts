@@ -96,34 +96,48 @@ async function saveByTouch(page: Page): Promise<SavedGame> {
 }
 
 async function enterHouseAndSleep(page: Page): Promise<void> {
-  await move(page, 'Left', 5); // farm (7,5) -> door side (2,5)
-  await move(page, 'Up'); // farmhouse
+  await move(page, 'Down', 3); // field edge (10,24) -> south lane (10,27)
+  await move(page, 'Right', 9); // pass the shipping crate at (20,27) via (19,27)
+  await move(page, 'Up', 13); // farm crossroads (19,14)
+  await move(page, 'Right', 8); // farmhouse entrance lane (27,14)
+  await move(page, 'Up', 5); // farmhouse door (27,9)
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
-  await move(page, 'Up', 9);
-  await move(page, 'Left', 6);
-  await move(page, 'Up');
+  await move(page, 'Left', 5); // house spawn (10,18) -> clear aisle (5,18)
+  await move(page, 'Up', 10);
+  await move(page, 'Left'); // (4,8), south of the bed; bypass the workbench
   await turnTowardBlockedTile(page, 'Up'); // face the bed at (4,7)
   await interact(page);
   await expect(page.locator('#hud-log')).toContainText('你睡了一覺');
 }
 
 async function bedToPlot(page: Page): Promise<void> {
-  await move(page, 'Right', 6);
-  await move(page, 'Down');
-  await move(page, 'Down', 9);
-  await move(page, 'Down'); // house exit to farm (2,5)
+  await move(page, 'Right'); // leave the bed approach through the clear aisle
+  await move(page, 'Down', 10);
   await move(page, 'Right', 5);
-  await move(page, 'Down', 2);
-  await move(page, 'Up', 2); // return to (7,5), facing the crop at (7,4)
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
-  await expect.poll(() => tile(page)).toEqual({ x: 7, y: 5 });
+  await move(page, 'Down'); // house door at (10,19) transitions to farm spawn (27,10)
+  await expect.poll(() => page.evaluate(() => ({
+    mapId: window.__dewhollow?.mapId() ?? '',
+    tile: (() => { const { x, y } = window.__dewhollow?.movement().tile ?? { x: -1, y: -1 }; return { x, y }; })(),
+  }))).toEqual({ mapId: 'farm', tile: { x: 27, y: 10 } }); // door transition ends at the farm spawn
+  await move(page, 'Left', 7); // central road (20,10)
+  await move(page, 'Down', 16); // approach the shipping crate at (20,26)
+  await move(page, 'Left'); // pass beside the shipping crate at (19,26)
+  await move(page, 'Down', 2); // south lane (19,28)
+  await move(page, 'Left', 10); // field path (9,28)
+  await move(page, 'Up', 4); // plot approach (9,24)
+  await move(page, 'Right'); // stand west of the selected field target
+  await expect.poll(() => tile(page)).toEqual({ x: 10, y: 24 });
 }
 
 async function talkShopAndReturn(page: Page): Promise<SavedGame> {
   const beforeVisit = await saveByTouch(page);
   expect(beforeVisit.state.gold).toBe(100);
 
-  await move(page, 'Down', 20); // farm's south door -> village
+  await move(page, 'Down', 12); // approach the shipping crate from the north
+  await move(page, 'Left');
+  await move(page, 'Down', 2);
+  await move(page, 'Right');
+  await move(page, 'Down'); // farm's south door -> village
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
   await move(page, 'Up', 5);
   await move(page, 'Right', 2); // (9,5), next to Maomao at (10,5)
@@ -156,8 +170,10 @@ async function talkShopAndReturn(page: Page): Promise<SavedGame> {
   await move(page, 'Right', 4);
   await move(page, 'Down', 6); // village south door -> farm (7,28)
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
-  await move(page, 'Up', 23); // return to the field beside the farmhouse
-  await expect.poll(() => tile(page)).toEqual({ x: 7, y: 5 });
+  await move(page, 'Right', 2); // farm south lane (9,28)
+  await move(page, 'Up', 4); // field approach (9,24)
+  await move(page, 'Right'); // stand west of the selected field target
+  await expect.poll(() => tile(page)).toEqual({ x: 10, y: 24 });
   return bought;
 }
 
@@ -212,7 +228,7 @@ async function plantWaterAndHarvest(page: Page, beforeFarm: SavedGame): Promise<
   const harvestedCount = saved.state.inventory.stacks.find((stack) => stack.itemId === HARVESTED_CROP)?.count ?? 0;
   expect(harvestedCount - priorCrops).toBeGreaterThanOrEqual(HARVEST_MIN);
   expect(harvestedCount - priorCrops).toBeLessThanOrEqual(HARVEST_MAX);
-  expect(saved.state.plots['7,4']?.crop).toBeNull();
+  expect(saved.state.plots['farm|11,24']?.crop).toBeNull();
   expect(saved.state.inventory.stacks.find((stack) => stack.itemId === 'seed.dew-grass')?.count ?? 0).toBeGreaterThan(0);
 
   await page.reload();

@@ -21,6 +21,7 @@ import processing from '../../content/processing.json';
 import crafting from '../../content/crafting.json';
 import talents from '../../content/talents.json';
 import farm from '../../content/maps/farm.json';
+import greenhouse from '../../content/maps/greenhouse.json';
 import village from '../../content/maps/village.json';
 import forest from '../../content/maps/forest.json';
 import lake from '../../content/maps/lake.json';
@@ -59,7 +60,7 @@ const { pack } = loadContent({
     letters,
     festivals,
     mainQuest, repairs, randomEvents,
-  maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+  maps: [farm, greenhouse, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,
@@ -185,13 +186,13 @@ describe('a sprinkler (灑水器)', () => {
   it('waters every planted field overnight, even on a sunny day', () => {
     const bed = { x: 4, y: 8, facing: 'up' as const };
     const planted = { watered: false, crop: { cropId: 'moon-bean', growthDays: 0 }, dryDays: 0 };
-    const withSprinkler = run(at({ flags: { sprinkler: true }, weather: 'sunny', plots: { '5,3': planted }, player: bed }), { type: 'interact' });
+    const withSprinkler = run(at({ flags: { sprinkler: true }, weather: 'sunny', plots: { 'farm|5,3': planted }, player: bed }), { type: 'interact' });
     expect(withSprinkler.events).toContainEqual({ type: 'slept' });
-    expect(withSprinkler.state.plots['5,3']?.dryDays).toBe(0);
-    expect(withSprinkler.state.plots['5,3']?.crop?.growthDays).toBe(1);
+    expect(withSprinkler.state.plots['farm|5,3']?.dryDays).toBe(0);
+    expect(withSprinkler.state.plots['farm|5,3']?.crop?.growthDays).toBe(1);
 
-    const without = run(at({ weather: 'sunny', plots: { '5,3': planted }, player: bed }), { type: 'interact' });
-    expect(without.state.plots['5,3']?.dryDays).toBe(1);
-    expect(without.state.plots['5,3']?.crop?.growthDays).toBe(0);
+    const without = run(at({ weather: 'sunny', plots: { 'farm|5,3': planted }, player: bed }), { type: 'interact' });
+    expect(without.state.plots['farm|5,3']?.dryDays).toBe(1);
+    expect(without.state.plots['farm|5,3']?.crop?.growthDays).toBe(0);
   });
 });

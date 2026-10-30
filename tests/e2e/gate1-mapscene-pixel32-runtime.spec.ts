@@ -117,14 +117,18 @@ test('pixel32 map and player animation candidates run in the same DEV MapScene',
   await animateOneTile(page, 'ArrowRight', 'right', 'x', 1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 
-  // Exercise the other directions in the same grid runtime, then use the normal hoe command on (7, 4).
+  // Exercise the other directions, then enter the farm beds through the south aisle.
   await animateOneTile(page, 'ArrowLeft', 'left', 'x', -1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile.x ?? -1)).toBe(initial.movement!.tile.x);
   await animateOneTile(page, 'ArrowUp', 'up', 'y', -1);
-  for (let step = 1; step < 4; step += 1) await moveOneTile(page, 'ArrowUp', 'y', -1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().playerFrame ?? '')).toBe('up-idle');
   await animateOneTile(page, 'ArrowDown', 'down', 'y', 1);
-  await animateOneTile(page, 'ArrowUp', 'up', 'y', -1);
+  for (let step = 0; step < 12; step += 1) await moveOneTile(page, 'ArrowDown', 'y', 1);
+  await moveOneTile(page, 'ArrowLeft', 'x', -1);
+  await moveOneTile(page, 'ArrowDown', 'y', 1);
+  for (let step = 0; step < 10; step += 1) await moveOneTile(page, 'ArrowLeft', 'x', -1);
+  for (let step = 0; step < 3; step += 1) await moveOneTile(page, 'ArrowUp', 'y', -1);
+  await animateOneTile(page, 'ArrowRight', 'right', 'x', 1);
   await page.keyboard.press('x');
   await expect(page.locator('#hud-energy-text')).toHaveText('98 / 100');
   await expect(page.locator('#hud-log')).toContainText('開墾了一塊田');

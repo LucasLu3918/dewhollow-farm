@@ -49,6 +49,7 @@ import coop from '../content/maps/coop.json';
 import pasture from '../content/maps/pasture.json';
 import cowbarn from '../content/maps/cowbarn.json';
 import farm from '../content/maps/farm.json';
+import greenhouse from '../content/maps/greenhouse.json';
 import village from '../content/maps/village.json';
 import plaza from '../content/maps/plaza.json';
 import { createContentIndex } from './application/content-index';
@@ -119,7 +120,7 @@ function markStageReady(): void {
 async function bootstrap(): Promise<void> {
   const hud = new Hud(document);
   const inventory = new InventoryPanel(document);
-  const originalMaps = [farm, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn] as unknown as MapDef[];
+  const originalMaps = [farm, greenhouse, village, plaza, forest, lake, house, houseWing, houseFull, mineEntrance, coop, pasture, cowbarn] as unknown as MapDef[];
   const pixel32Runtime = pixel32CandidateRuntimeRequested(new URLSearchParams(window.location.search), import.meta.env.DEV);
   const qualityCandidates = pixel32QualitySceneCandidateRequested(
     new URLSearchParams(window.location.search), import.meta.env.DEV, pixel32Runtime,
@@ -308,7 +309,11 @@ async function loadPixel32QualityMapCandidates(originalMaps: MapDef[]): Promise<
     maps.push(candidate);
     if (manifest.renderMode === 'scene') assets.push(pixel32QualitySceneAsset(manifest, import.meta.env.BASE_URL));
   }
-  const portalProblems = pixel32QualityPortalProblems(maps);
+  const candidateIds = new Set(maps.map((map) => map.id));
+  const portalProblems = pixel32QualityPortalProblems([
+    ...maps,
+    ...originalMaps.filter((map) => !candidateIds.has(map.id)),
+  ]);
   if (portalProblems.length) throw new Error(`Pixel32 候選入口驗證失敗：${portalProblems.join('；')}`);
   return { maps, assets };
 }

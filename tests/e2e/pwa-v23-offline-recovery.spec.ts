@@ -46,10 +46,13 @@ async function readRecord(page: Page): Promise<SavedRecord> {
 
 function expectMigratedV23State(state: Record<string, unknown>): void {
   expect(state).toMatchObject({
-    schemaVersion: 25,
+    schemaVersion: 26,
     mapId: 'house-wing',
     player: { x: 10, y: 12, facing: 'up' },
-    plots: v23.state.plots,
+    plots: {
+      'farm|4,16': v23.state.plots['4,3'],
+      'farm|5,16': v23.state.plots['5,3'],
+    },
     inventory: v23.state.inventory,
     shipBox: v23.state.shipBox,
     flags: v23.state.flags,

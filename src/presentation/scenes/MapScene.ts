@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import type { ContentPack, Direction, MapDef, Point } from '../../domain/content';
-import { plotKey, type PlotMap, type PlotState } from '../../domain/farm';
+import { plotMapKey, type PlotMap, type PlotState } from '../../domain/farm';
 import { tileAt } from '../../domain/world';
 import { isGroundLayer } from '../map-layers';
 import { sceneOverlaysFor } from '../scene-overlays';
@@ -674,7 +674,7 @@ export class MapScene extends Phaser.Scene {
       },
       execute: async (target) => {
         const outcome = await this.handleAction('interact', undefined, undefined, true);
-        const acted = outcome?.events.find((event) => event.type === 'acted' && event.action === target.action && plotKey(event.x, event.y) === target.key);
+        const acted = outcome?.events.find((event) => event.type === 'acted' && event.action === target.action && plotMapKey(this.deps.session.state.mapId, event.x, event.y) === target.key);
         return { ...target, success: Boolean(acted) };
       },
     });
@@ -1841,7 +1841,7 @@ export class MapScene extends Phaser.Scene {
     }
     const reduced = prefersReducedMotion();
     const gates = this.effectGates();
-    const key = plotKey(event.x, event.y);
+    const key = plotMapKey(this.deps.session.state.mapId, event.x, event.y);
     // 產量在事件發生當下就算好：命中可能晚於下一個動作（揮動被補播），那時背包已經包含後面動作的物品。
     const gains = YIELD_ACTIONS.has(event.action) ? gainedItems(inventoryBefore.stacks, this.deps.session.state.inventory.stacks) : [];
     const impact = (): void => {
@@ -1913,7 +1913,7 @@ export class MapScene extends Phaser.Scene {
 
   /** 收成：作物從田裡飛到玩家頭上，再飄出名稱（見 effects.ts 的 pickupFlight）。 */
   private pickUp(x: number, y: number, plotsBefore: PlotMap): void {
-    const cropId = plotsBefore[plotKey(x, y)]?.crop?.cropId;
+    const cropId = plotsBefore[plotMapKey(this.deps.session.state.mapId, x, y)]?.crop?.cropId;
     if (!cropId) return;
     const crop = this.deps.index.crop(cropId);
     const asset = resolveAsset(this.deps.assets, `crop.${cropId}`);
@@ -2680,12 +2680,12 @@ export class MapScene extends Phaser.Scene {
     });
     renderPlotLayer(plans, {
       soil: (plot) => {
-        const state = shown[plotKey(plot.x, plot.y)];
+        const state = shown[plotMapKey(map.id, plot.x, plot.y)];
         const visual = state
           ? resolvePlotVisual(
             state,
             null,
-            plotNeighborMask(plot.x, plot.y, shown, state.watered),
+            plotNeighborMask(plot.x, plot.y, shown, state.watered, map.id),
             this.deps.session.state.calendar.season,
           )
           : null;
@@ -3044,7 +3044,6 @@ export class MapScene extends Phaser.Scene {
         x,
         y,
         layer,
-        this.deps.session.state.flags.greenhouse === true,
       );
       const textureKey = candidate?.atlas === 'farm' ? INDOOR_FARM_ATLAS_KEY
         : candidate?.atlas === 'mine' ? INDOOR_MINE_ATLAS_KEY : null;

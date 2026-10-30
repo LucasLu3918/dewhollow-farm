@@ -269,8 +269,8 @@ test('the black cat uses a stable foot baseline and stays aligned to its farm ti
   const player = await actor(page, 'player');
   const cat = await actor(page, 'cat');
   expect(await page.evaluate(() => window.__dewhollow?.textureSize('pet.cat'))).toEqual({ width: 96, height: 96 });
-  expect(cat).toMatchObject({ tileX: 7, tileY: 8, width: 48, height: 48 });
-  expect(player).toMatchObject({ tileX: 7, tileY: 9 });
+  expect(cat).toMatchObject({ tileX: 20, tileY: 13, width: 48, height: 48 });
+  expect(player).toMatchObject({ tileX: 20, tileY: 14 });
   expect(cat.left + cat.width / 2).toBe((cat.tileX + 0.5) * 64);
   expect(cat.top + cat.height).toBe((cat.tileY + 1) * 64);
   await page.evaluate(() => window.__dewhollow?.pauseScene());
@@ -283,13 +283,13 @@ test('the cat does not block the player: walking through its tile swaps their po
   await expect.poll(async () => {
     const [player, cat] = await Promise.all([actor(page, 'player'), actor(page, 'cat')]);
     return [player.tileX, player.tileY, cat.tileX, cat.tileY];
-  }).toEqual([7, 8, 7, 9]);
+  }).toEqual([20, 13, 20, 14]);
 
   await walk(page, 'ArrowDown');
   await expect.poll(async () => {
     const [player, cat] = await Promise.all([actor(page, 'player'), actor(page, 'cat')]);
     return [player.tileX, player.tileY, cat.tileX, cat.tileY];
-  }).toEqual([7, 9, 7, 8]);
+  }).toEqual([20, 14, 20, 13]);
 });
 
 test('the player remains in front of the cat during southbound crossing', async ({ page }) => {
@@ -309,18 +309,18 @@ test('the player is behind the cat while crossing northbound', async ({ page }) 
 
 test('farmhouse wall blocks movement while its doorway leads into the building', async ({ page }) => {
   await waitForGame(page);
-  for (const key of ['ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft']) await walk(page, key);
+  // 從新版中央出生點 (20,14) 走到農舍門西側 (26,9)。
+  for (const key of ['ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowRight']) await walk(page, key);
   await expect.poll(async () => {
     const player = await actor(page, 'player');
     return [player.tileX, player.tileY];
-  }).toEqual([1, 5]);
+  }).toEqual([26, 9]);
 
   const beforeWall = await actor(page, 'player');
-  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowUp');
   await page.waitForTimeout(150);
   expect(await actor(page, 'player')).toMatchObject({ tileX: beforeWall.tileX, tileY: beforeWall.tileY });
 
   await walk(page, 'ArrowRight');
-  await walk(page, 'ArrowUp');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
 });

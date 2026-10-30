@@ -156,16 +156,33 @@ async function expectObserverSettleWindow(page: Page, quietMs = 300): Promise<vo
 }
 
 async function enterHouseFromSpawn(page: Page): Promise<void> {
-  // 預設農場 spawn 為 (7,9)；沿現有草地到房門 (2,4)。
-  for (let step = 0; step < 4; step += 1) await move(page, 'ArrowUp');
-  for (let step = 0; step < 5; step += 1) await move(page, 'ArrowLeft');
-  await move(page, 'ArrowUp');
+  // 新農場 spawn 為 (20,14)；沿中央道路到小屋門 (27,9)。
+  for (let step = 0; step < 7; step += 1) await move(page, 'ArrowRight');
+  for (let step = 0; step < 5; step += 1) await move(page, 'ArrowUp');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
 }
 
 async function returnToFarmFromHouse(page: Page): Promise<void> {
   await move(page, 'ArrowDown');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+}
+
+async function reachShipbox(page: Page): Promise<void> {
+  // 從房門回程落點 (27,10) 沿中央路繞到出貨箱西側 (19,27)。
+  for (let step = 0; step < 7; step += 1) await move(page, 'ArrowLeft');
+  for (let step = 0; step < 16; step += 1) await move(page, 'ArrowDown');
+  await move(page, 'ArrowLeft');
+  await move(page, 'ArrowDown');
+}
+
+async function returnFromShipboxToHouse(page: Page): Promise<void> {
+  // 從出貨箱西側 (19,27) 經中央主路回到小屋門 (27,9)。
+  await move(page, 'ArrowUp');
+  await move(page, 'ArrowRight');
+  for (let step = 0; step < 16; step += 1) await move(page, 'ArrowUp');
+  for (let step = 0; step < 7; step += 1) await move(page, 'ArrowRight');
+  await move(page, 'ArrowUp');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
 }
 
 async function toggleSavePanel(page: Page): Promise<void> {
@@ -178,6 +195,7 @@ async function toggleSavePanel(page: Page): Promise<void> {
 test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
   for (const configuration of configurations) {
     test(`${configuration.family} ${configuration.width}×${configuration.height} DPR ${configuration.dpr} 的農場／小屋視野穩定`, async ({ browser }, testInfo) => {
+      test.setTimeout(60_000);
       const context = await browser.newContext({
         viewport: { width: configuration.width, height: configuration.height },
         deviceScaleFactor: configuration.dpr,
@@ -225,6 +243,7 @@ test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
         await expect(page.locator('#hud-log')).toContainText('已存檔');
         expectSameViewport(await captureStableSnapshot(page), house);
         await returnToFarmFromHouse(page);
+        await reachShipbox(page);
         expectSameViewport(await captureStableSnapshot(page), farm);
 
         await testInfo.attach(`${configuration.width}x${configuration.height}-dpr${configuration.dpr}-farm.png`, {
@@ -249,7 +268,7 @@ test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
   }
 
   test(`${configuredCycles}-cycle viewport stability across interaction, save, movement, house round trips and reload`, async ({ browser }, testInfo) => {
-    test.setTimeout(configuredCycles === 100 ? 35 * 60 * 1_000 : 5 * 60 * 1_000);
+    test.setTimeout(configuredCycles === 100 ? 35 * 60 * 1_000 : 10 * 60 * 1_000);
     const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
     try {
       await instrumentResizeObserver(context);
@@ -257,22 +276,31 @@ test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
       await page.goto('/');
       await waitForFarm(page);
 
-      // 先走到房門外的固定 spawn，後續每輪都由 (2,5) 開始及結束。
-      for (let step = 0; step < 4; step += 1) await move(page, 'ArrowUp');
-      for (let step = 0; step < 5; step += 1) await move(page, 'ArrowLeft');
+      // 先走進房間再回到 farm spawn (27,10)，每輪由出貨箱西側 (19,27) 開始及結束。
+      await enterHouseFromSpawn(page);
+      await move(page, 'ArrowDown');
+      await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+      await reachShipbox(page);
       const baseline = await captureStableSnapshot(page);
+      await move(page, 'ArrowRight'); // 面向箱子 (20,27)
+      await expect.poll(() => page.evaluate(() => window.__dewhollow?.interaction()?.action ?? '')).toBe('shipAll');
+      await move(page, 'ArrowUp');
+      await move(page, 'ArrowRight');
+      for (let step = 0; step < 16; step += 1) await move(page, 'ArrowUp');
+      for (let step = 0; step < 7; step += 1) await move(page, 'ArrowRight');
       await move(page, 'ArrowUp');
       await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
       const houseBaseline = await captureStableSnapshot(page);
       await move(page, 'ArrowDown');
       await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+      await reachShipbox(page);
       expectSameViewport(await captureStableSnapshot(page), baseline);
       const measurements: Array<{ cycle: number; step: string; snapshot: ViewportSnapshot }> = [];
 
       const stressStartedAt = Date.now();
       for (let cycle = 1; cycle <= configuredCycles; cycle += 1) {
-        // 從房門外向下走到出貨箱北側，再用真正的互動鍵執行 shipAll。
-        await move(page, 'ArrowDown');
+        // 面向出貨箱，再用真正的互動鍵執行 shipAll。
+        await move(page, 'ArrowRight');
         const atShipbox = await captureStableSnapshot(page);
         expectSameViewport(atShipbox, baseline);
         measurements.push({ cycle, step: 'move-to-shipbox', snapshot: atShipbox });
@@ -304,6 +332,9 @@ test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
         measurements.push({ cycle, step: 'move-back-to-door', snapshot: atDoor });
         await expectObserverSettleWindow(page, 50);
 
+        await move(page, 'ArrowRight');
+        for (let step = 0; step < 16; step += 1) await move(page, 'ArrowUp');
+        for (let step = 0; step < 7; step += 1) await move(page, 'ArrowRight');
         await move(page, 'ArrowUp');
         await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
         const enteredHouse = await captureStableSnapshot(page);
@@ -312,6 +343,7 @@ test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
         await expectObserverSettleWindow(page, 50);
         await move(page, 'ArrowDown');
         await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+        await reachShipbox(page);
         const leftHouse = await captureStableSnapshot(page);
         expectSameViewport(leftHouse, baseline);
         measurements.push({ cycle, step: 'leave-house', snapshot: leftHouse });
@@ -331,7 +363,7 @@ test.describe('世界 viewport 矩陣與狀態循環穩定性', () => {
         measurements.push({ cycle, step: 'reload', snapshot: afterReload });
         await expectObserverSettleWindow(page, 100);
 
-        if (cycle % 10 === 0) {
+        if (cycle % 10 === 0 || configuredCycles === 10) {
           const progress = {
             completedCycles: cycle,
             totalCycles: configuredCycles,

@@ -31,14 +31,12 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
   }
 }
 
-/** 從農場出生點走到礦坑入口的出生點 (8,8)。 */
+/** 從農場中央出生點走北門到森林，再由林內中央通道走到礦坑入口 (8,8)。 */
 async function toMineEntrance(page: Page): Promise<void> {
-  await walk(page, 'ArrowUp', 2);
-  await walk(page, 'ArrowRight', 32);
+  await walk(page, 'ArrowUp', 14);
   await expect.poll(() => mapId(page)).toBe('forest');
   await walk(page, 'ArrowRight', 10);
-  await walk(page, 'ArrowUp', 6);
-  await walk(page, 'ArrowUp', 1);
+  await walk(page, 'ArrowUp', 7);
   await expect.poll(() => mapId(page)).toBe('mine-entrance');
 }
 

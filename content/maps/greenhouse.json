@@ -1,0 +1,28 @@
+{
+  "id": "greenhouse",
+  "name": "晨露溫室",
+  "width": 12,
+  "height": 9,
+  "rows": [
+    "############",
+    "#gggg..gggg#",
+    "#gggg..gggg#",
+    "#gggg..gggg#",
+    "#..........#",
+    "#gggg..gggg#",
+    "#gggg..gggg#",
+    "#gggg..gggg#",
+    "######q#####"
+  ],
+  "legend": {
+    "#": { "kind": "wall", "ground": "floor" },
+    ".": { "kind": "floor" },
+    "g": { "kind": "field", "greenhouse": true },
+    "q": {
+      "kind": "door",
+      "to": "farm",
+      "spawn": { "x": 7, "y": 9 }
+    }
+  },
+  "spawn": { "x": 6, "y": 6 }
+}

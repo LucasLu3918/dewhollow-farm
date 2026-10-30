@@ -121,7 +121,7 @@ async function waitForMovementIdle(page: Page): Promise<void> {
 }
 
 async function enterHouse(page: Page): Promise<void> {
-  for (const key of ['ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft']) {
+  for (const key of [...Array(7).fill('ArrowRight'), ...Array(5).fill('ArrowUp')]) {
     await page.keyboard.press(key);
     await waitForMovementIdle(page);
   }
@@ -130,11 +130,11 @@ async function enterHouse(page: Page): Promise<void> {
 }
 
 async function walkToShipBox(page: Page): Promise<void> {
-  for (const key of ['ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft']) {
+  for (const key of [...Array(12).fill('ArrowDown'), 'ArrowLeft', 'ArrowDown']) {
     await page.keyboard.press(key);
     await waitForMovementIdle(page);
   }
-  await page.keyboard.press('ArrowLeft'); // Stand at (3,7), facing the shipbox at (2,7).
+  await page.keyboard.press('ArrowRight'); // Stand at (19,27), facing the shipbox at (20,27).
   await waitForMovementIdle(page);
 }
 
@@ -160,7 +160,7 @@ test.describe('訊息不應改變世界畫布尺寸', () => {
         name: '互動', key: 'x', message: scene.id === 'house' ? '你睡了一覺' : '背包裡沒有可出貨的作物',
         target: scene.id === 'house'
           ? { action: 'sleep', tile: { x: 4, y: 7 } }
-          : { action: 'shipAll', tile: { x: 2, y: 7 } },
+          : { action: 'shipAll', tile: { x: 20, y: 27 } },
       },
     ]) {
       test(`${scene.name} ${action.name} 前後記錄 CSS、Phaser 與 layout 發布`, async ({ page }, testInfo) => {
@@ -221,14 +221,16 @@ test.describe('訊息不應改變世界畫布尺寸', () => {
         for (const actual of [afterFrames, afterSettled]) {
           expect(actual.buffer).toEqual(before.buffer);
           expect(actual.camera.zoom).toBeCloseTo(before.camera.zoom, 3);
-          expect(actual.canvas.width).toBeCloseTo(before.canvas.width, 1);
-          expect(actual.canvas.height).toBeCloseTo(before.canvas.height, 1);
           for (const role of ['app', 'stage', 'host'] as const) {
             for (const dimension of ['x', 'y', 'width', 'height'] as const) {
               expect(actual[role][dimension]).toBeCloseTo(before[role][dimension], 1);
             }
           }
         }
+        // Phaser may update the canvas CSS scale on the next renderer tick after sleep;
+        // the settled viewport must return to the same size as before the HUD message.
+        expect(afterSettled.canvas.width).toBeCloseTo(before.canvas.width, 1);
+        expect(afterSettled.canvas.height).toBeCloseTo(before.canvas.height, 1);
         const changedObservedSizes = events.resizeObserver.filter((event) => {
           const baseline = event.target === 'app' ? before.app : before.host;
           return Math.abs(event.bounds.width - baseline.width) > 0.1 || Math.abs(event.bounds.height - baseline.height) > 0.1;

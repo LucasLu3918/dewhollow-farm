@@ -1,5 +1,5 @@
 import { levelOf, SKILL_IDS, SKILL_NAMES, type SkillId } from '../../src/domain/skills';
-import { isRipe, plotKey } from '../../src/domain/farm';
+import { isRipe, plotMapKey } from '../../src/domain/farm';
 import { countOf } from '../../src/domain/inventory';
 import { mineId, mineLayerOf, MINE_DEPTH } from '../../src/domain/mine';
 import { createNewGame, type GameState } from '../../src/domain/game-state';
@@ -220,8 +220,10 @@ function playDay(bot: Bot, index: ContentIndex): void {
 
 function plotTargets(s: GameState, mapId: string, pred: (key: string) => boolean): Pos[] {
   const out: Pos[] = [];
+  const prefix = `${mapId}|`;
   for (const key of Object.keys(s.plots)) {
-    const [x, y] = key.split(',').map(Number);
+    if (!key.startsWith(prefix)) continue;
+    const [x, y] = key.slice(prefix.length).split(',').map(Number);
     if (x === undefined || y === undefined || !pred(key)) continue;
     out.push({ mapId, x, y });
   }
@@ -263,14 +265,14 @@ function farmWork(bot: Bot, index: ContentIndex): void {
   const crop = bestCrop(index, bot.state);
   if (crop) {
     const seedItem = `seed.${crop}`;
-    const empty = tilesWhere(bot.state, map, (kind, t, x, y) => kind === 'field' && t.greenhouse !== true && !bot.state.plots[plotKey(x, y)]).length;
+    const empty = tilesWhere(bot.state, map, (kind, t, x, y) => kind === 'field' && t.greenhouse !== true && !bot.state.plots[plotMapKey(map.id, x, y)]).length;
     const seeds = countOf(bot.state.inventory, seedItem);
     const tilledEmpty = Object.values(bot.state.plots).filter((p) => !p.crop).length;
     const need = Math.min(seeds - tilledEmpty, empty);
     if (need > 0 && seeds > 0) {
       bot.useTool('hoe');
       for (let i = 0; i < need && bot.state.energy.current > FLOOR.farm; i += 1) {
-        const field = tilesWhere(bot.state, map, (kind, t, x, y) => kind === 'field' && t.greenhouse !== true && !bot.state.plots[plotKey(x, y)]);
+        const field = tilesWhere(bot.state, map, (kind, t, x, y) => kind === 'field' && t.greenhouse !== true && !bot.state.plots[plotMapKey(map.id, x, y)]);
         if (!bot.actOn(field, { type: 'interact' })) break;
       }
     }
@@ -326,7 +328,8 @@ function villageTrip(bot: Bot, index: ContentIndex): void {
   const counters = (shopId: string) => tilesWhere(bot.state, village, (_k, t) => t.kind === 'shop' && t.shop === shopId);
   const general = index.shop('general');
   const crop = bestCrop(index, bot.state);
-  const emptyPlots = tilesWhere(bot.state, index.map('farm'), (kind, t, x, y) => kind === 'field' && t.greenhouse !== true && !bot.state.plots[plotKey(x, y)]).length;
+  const farm = index.map('farm');
+  const emptyPlots = tilesWhere(bot.state, farm, (kind, t, x, y) => kind === 'field' && t.greenhouse !== true && !bot.state.plots[plotMapKey(farm.id, x, y)]).length;
   const wantSeeds = crop && emptyPlots > 0 ? Math.min(emptyPlots, 54) - countOf(bot.state.inventory, `seed.${crop}`) : 0;
 
   const toBuy = { seed: 0, hay: 0, chicken: 0 };

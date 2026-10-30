@@ -25,7 +25,7 @@ async function seedFarmSave(page: Page): Promise<void> {
           schemaVersion: 13,
           calendar: { year: 1, season: 'spring', day: 4, minuteOfDay: 600 },
           weather: 'sunny', forecast: 'sunny', energy: { current: 100, max: 100 }, gold: 600,
-          mapId: 'farm', player: { x: 5, y: 5, facing: 'up' }, plots: {},
+          mapId: 'farm', player: { x: 20, y: 14, facing: 'up' }, plots: {},
           inventory: { capacity: 24, stacks: [] }, shipBox: { entries: [] }, flags: {}, rng: 12345,
           tool: 'hoe', toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 },
           worldChanges: {}, skills: { farming: 0, foraging: 0, fishing: 0, mining: 0, cooking: 0 }, talents: {},
@@ -89,16 +89,16 @@ test('pixel32 candidate cat and quokka follow with four-direction hop sequences'
     return { pet: debug.candidatePetFollow(), player: debug.movement().tile };
   });
   expect(initial.pet.manifest).toEqual({ status: 'candidate', approved: false });
-  expect(initial.pet.cat).toMatchObject({ direction: 'up', frame: 'cat-up-idle', visible: true, tile: { x: 5, y: 6 } });
+  expect(initial.pet.cat).toMatchObject({ direction: 'up', frame: 'cat-up-idle', visible: true, tile: { x: 20, y: 15 } });
   expect(initial.pet.quokka).toMatchObject({ frame: expect.stringMatching(/^quokka-.*-idle$/), visible: true });
   expect(initial.pet.quokka?.tile).not.toBeNull();
   expect(initial.pet.quokka?.tile).not.toEqual(initial.pet.cat?.tile);
 
   const directions: Array<{ key: string; direction: 'up' | 'right' | 'down' | 'left'; target: { x: number; y: number } }> = [
-    { key: 'ArrowRight', direction: 'up', target: { x: 5, y: 5 } },
-    { key: 'ArrowDown', direction: 'right', target: { x: 6, y: 5 } },
-    { key: 'ArrowLeft', direction: 'down', target: { x: 6, y: 6 } },
-    { key: 'ArrowUp', direction: 'left', target: { x: 5, y: 6 } },
+    { key: 'ArrowRight', direction: 'up', target: { x: 20, y: 14 } },
+    { key: 'ArrowDown', direction: 'right', target: { x: 21, y: 14 } },
+    { key: 'ArrowLeft', direction: 'down', target: { x: 21, y: 15 } },
+    { key: 'ArrowUp', direction: 'left', target: { x: 20, y: 15 } },
   ];
   const records: Array<Record<string, unknown>> = [];
   const screenshots: Array<{ direction: string; file: string; sha256: string }> = [];
@@ -229,8 +229,25 @@ test('candidate pet visuals stay disabled and quokka remains a resident without 
   expect(state.pet).toMatchObject({ enabled: false, manifest: { status: null, approved: null }, cat: null });
   expect(state.actor).toBeDefined();
   expect(state.limitations).toContain('Pet frames are static directional samples; movement and follow animation remain production behavior.');
-  for (let step = 0; step < 20; step += 1) {
-    await page.keyboard.press('ArrowDown');
+  const routeToVillage = [
+    ...Array.from({ length: 12 }, () => 'ArrowDown'),
+    'ArrowLeft', // step around the shipbox at (20,27)
+    'ArrowDown',
+    'ArrowDown',
+    'ArrowRight',
+    'ArrowDown', // enter the farm's south portal from (20,28)
+  ];
+  for (const key of routeToVillage) {
+    const before = await page.evaluate(() => ({
+      mapId: window.__dewhollow!.mapId(),
+      tile: window.__dewhollow!.movement().tile,
+    }));
+    if (before.mapId === 'village') break;
+    await page.keyboard.press(key);
+    await expect.poll(() => page.evaluate(() => ({
+      mapId: window.__dewhollow!.mapId(),
+      tile: window.__dewhollow!.movement().tile,
+    }))).not.toEqual(before);
     await waitForPlayerIdle(page);
   }
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');

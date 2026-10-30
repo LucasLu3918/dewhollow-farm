@@ -2,7 +2,7 @@ import type { Point } from '../domain/content';
 import { decorAt } from '../domain/decor';
 import type { GameState } from '../domain/game-state';
 import { countOf } from '../domain/inventory';
-import { isRipe, plotKey } from '../domain/farm';
+import { isRipe, plotMapKey } from '../domain/farm';
 import { changeAt, effectiveKind } from '../domain/world-changes';
 import { neighbor, tileAt } from '../domain/world';
 import { residentAt } from './residents';
@@ -85,7 +85,7 @@ export function resolveInteraction(state: GameState, index: ContentIndex): Inter
   if (kind === 'tree') return descriptor('chopTree', 'chop', target);
   if (kind === 'tuft') return descriptor('cutGrass', 'cutGrass', target);
 
-  const key = plotKey(target.x, target.y);
+  const key = plotMapKey(state.mapId, target.x, target.y);
   if (kind === 'field' || state.plots[key]) {
     const plot = state.plots[key];
     if (plot?.crop && isRipe(plot.crop, index.crop(plot.crop.cropId).growthDays)) {

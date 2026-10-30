@@ -8,14 +8,44 @@ async function pressMovement(page: import('@playwright/test').Page, key: string)
   })).toBe(true);
 }
 
+async function placeBesideField(page: import('@playwright/test').Page): Promise<void> {
+  await page.keyboard.press('s');
+  await expect(page.locator('#hud-log')).toContainText('已存檔');
+  const record = await page.evaluate(() => new Promise<any>((resolve, reject) => {
+    const open = indexedDB.open('dewhollow-farm');
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const db = open.result;
+      const request = db.transaction('saves').objectStore('saves').get('slot-1');
+      request.onsuccess = () => { db.close(); resolve(request.result); };
+      request.onerror = () => { db.close(); reject(request.error); };
+    };
+  }));
+  record.state.player = { ...record.state.player, x: 10, y: 25, facing: 'up' };
+  await page.evaluate((value) => new Promise<void>((resolve, reject) => {
+    const open = indexedDB.open('dewhollow-farm');
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const db = open.result;
+      const tx = db.transaction('saves', 'readwrite');
+      tx.objectStore('saves').put(value);
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
+    };
+  }), record);
+  await page.reload();
+  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+}
+
 test.describe('interaction target feedback', () => {
   test('shows the descriptor cell, tracks turns, and leaves command results unchanged', async ({ page }, testInfo) => {
     await page.goto('/');
     await expect(page.locator('#game canvas')).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 
-    // Move beside the starting field, then turn right so both descriptors have visible targets.
-    for (let i = 0; i < 4; i += 1) await pressMovement(page, 'ArrowUp');
+    // Seed the actor beside two current field cells, then turn right so both descriptors have visible targets.
+    await placeBesideField(page);
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.interactionTargetMarker().visible ?? false)).toBe(true);
     const facingUp = await page.evaluate(() => ({
       descriptor: window.__dewhollow?.interaction(),

@@ -92,12 +92,12 @@ test('migrates a v23 save to four empty quickbar slots and saves as v25', async 
   await page.reload();
   await expect(page.locator('#game')).toHaveAttribute('data-ready', 'true');
   const migrated = await page.evaluate(() => window.__dewhollow!.gameState());
-  expect(migrated.schemaVersion).toBe(25);
+  expect(migrated.schemaVersion).toBe(26);
   expect(migrated.hotbar).toEqual([null, null, null, null]);
 
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
-  expect((await readSavedState(page)).schemaVersion).toBe(25);
+  expect((await readSavedState(page)).schemaVersion).toBe(26);
   expect((await readSavedState(page)).hotbar).toEqual([null, null, null, null]);
 });
 

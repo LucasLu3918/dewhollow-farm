@@ -96,7 +96,7 @@ test('V places a decor in the house, E puts on the clothes, and both are saved',
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
   const saved = await readRecord(page);
-  expect(saved.state.schemaVersion).toBe(25);
+  expect(saved.state.schemaVersion).toBe(26);
   expect(saved.state.decor).toEqual({ house: [{ itemId: 'star-string', x: 10, y: 10 }] });
   expect(saved.state.wearing).toEqual({ player: 'clothes' });
 });

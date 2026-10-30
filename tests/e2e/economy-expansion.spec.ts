@@ -1,9 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * 羊與布、小屋擴建（M6 之後的經濟擴充，存檔 v21）。路線（農場出生點 (7,9)）：
- * - 小屋的門在農場 (2,4)，從 (2,5) 往上進門，落在小屋 (4,5)。
- * - 牧草地：往右到 (38,9)、往下到 (38,13)，往右進牧草地的門 (39,13)，落在 (1,7)（春 15 天起開放）。
+ * 羊與布、小屋擴建（M6 之後的經濟擴充，存檔 v21）。路線（新農場出生點 (20,14)）：
+ * - 小屋門在農場 (27,9)，從 (27,10) 往上進門，落在小屋 (10,18)。
+ * - 牧草地門在農場 (0,14)，沿中央道路向西進門，落在牧草地 (1,7)（春 15 天起開放）。
  * - 羊圈在牧草地：乾草槽 (5,12)，座位 (3,11)、(5,11)、(7,11)。
  * 路線與格子依內容檔及實際 Chromium 路徑驗證。
  */
@@ -121,7 +121,7 @@ const DAY_FIFTEEN_WITH_SHEEP = {
     energy: { current: 100, max: 100 },
     gold: 600,
     mapId: 'farm',
-    player: { x: 7, y: 9, facing: 'down' },
+    player: { x: 20, y: 14, facing: 'left' },
     plots: {},
     inventory: { capacity: 24, stacks: [{ itemId: 'hay', quality: 'normal', count: 2 }] },
     shipBox: { entries: [] },
@@ -156,7 +156,7 @@ const WING_BOUGHT = {
     energy: { current: 100, max: 100 },
     gold: 100,
     mapId: 'farm',
-    player: { x: 3, y: 5, facing: 'left' },
+    player: { x: 27, y: 10, facing: 'up' },
     plots: {},
     inventory: { capacity: 24, stacks: [] },
     shipBox: { entries: [] },
@@ -187,9 +187,8 @@ test('a sheep in the pasture pen is fed at the trough, then petted, then sheared
   await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
 
   // 農場 → 牧草地（落在 (1,7)）。
-  await walk(page, 'ArrowRight', 31);
-  await walk(page, 'ArrowDown', 4);
-  await walk(page, 'ArrowRight', 1);
+  await walk(page, 'ArrowLeft', 19);
+  await walk(page, 'ArrowLeft', 1);
   await expect.poll(() => mapId(page)).toBe('pasture');
 
   // 乾草槽：從 (1,7) 往下走到 (1,12)，再往右走到 (4,12) 面向槽 (5,12)，餵一次。
@@ -215,8 +214,7 @@ test('after the east room is bought, the farm door to the house leads into the e
   await page.reload();
   await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
 
-  // 農場的小屋門在 (2,4)：站在 (3,5) 往左到 (2,5)，再往上進門。
-  await walk(page, 'ArrowLeft', 1);
+  // 新農場的小屋門在 (27,9)，存檔角色在門外 (27,10)。
   await walk(page, 'ArrowUp', 1);
   await expect.poll(() => mapId(page)).toBe('house-wing');
 });

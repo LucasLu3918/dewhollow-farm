@@ -12,9 +12,9 @@ const viewports = [
 ] as const;
 const dprs = [1, 2, 3] as const;
 const expectedOverlays = [
-  { id: 'house-back', frame: 'house-back', layer: 'back', tileX: 3, tileY: 3, displayList: 'world' },
-  { id: 'tree-canopy', frame: 'tree-canopy', layer: 'front', tileX: 8, tileY: 3, displayList: 'scene' },
-  { id: 'house-front', frame: 'house-front', layer: 'front', tileX: 3, tileY: 3, displayList: 'scene' },
+  { id: 'house-back', frame: 'house-back', layer: 'back', tileX: 19, tileY: 9, displayList: 'world' },
+  { id: 'tree-canopy', frame: 'tree-canopy', layer: 'front', tileX: 19, tileY: 3, displayList: 'scene' },
+  { id: 'house-front', frame: 'house-front', layer: 'front', tileX: 19, tileY: 9, displayList: 'scene' },
 ] as const;
 const nodeProcess = (globalThis as typeof globalThis & {
   process?: { cwd(): string; env?: Record<string, string | undefined> };
@@ -83,7 +83,7 @@ async function openCandidate(browser: Browser, viewport: typeof viewports[number
           schemaVersion: 13,
           calendar: { year: 1, season: 'spring', day: 4, minuteOfDay: 600 },
           weather: 'sunny', forecast: 'sunny', energy: { current: 100, max: 100 }, gold: 600,
-          mapId: 'farm', player: { x: 5, y: 5, facing: 'down' }, plots: {},
+          mapId: 'farm', player: { x: 20, y: 14, facing: 'down' }, plots: {},
           inventory: { capacity: 24, stacks: [] }, shipBox: { entries: [] }, flags: {}, rng: 12345,
           tool: 'hoe', toolTiers: { hoe: 0, can: 0, seedbag: 0, axe: 0, pick: 0, rod: 0, sickle: 0 },
           worldChanges: {}, skills: { farming: 0, foraging: 0, fishing: 0, mining: 0, cooking: 0 }, talents: {},
@@ -100,7 +100,7 @@ async function openCandidate(browser: Browser, viewport: typeof viewports[number
   await expect.poll(() => page.evaluate(() => {
     const tile = window.__dewhollow?.movement().tile;
     return tile ? { x: tile.x, y: tile.y } : null;
-  })).toEqual({ x: 5, y: 5 });
+  })).toEqual({ x: 20, y: 14 });
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateOverlays().overlays.length ?? 0)).toBe(3);
   return { context, page, candidateRequests, candidateFailures, candidateHttpFailures, pageErrors };
 }
@@ -160,7 +160,7 @@ test('captures pixel32 house/tree candidate overlays across five viewports and t
       });
 
       expect(state.mapId).toBe('farm');
-      expect(state.playerTile).toEqual({ x: 5, y: 5, facing: 'down' });
+      expect(state.playerTile).toEqual({ x: 20, y: 14, facing: 'down' });
       expect(state.browserDpr).toBe(dpr);
       expect(state.runtime.enabled).toBe(true);
       expect(state.runtime.playerFrame).toBe('down-idle');
@@ -173,7 +173,7 @@ test('captures pixel32 house/tree candidate overlays across five viewports and t
       expect(state.cameraZoom).toBeGreaterThan(0);
       expect(state.overlays.enabled).toBe(true);
       expect(state.overlays.overlays).toEqual(expectedOverlays.map((expected) => ({ ...expected, depth: expect.any(Number), visible: true })));
-      expect(state.overlays.overlays.every(({ tileX, tileY }) => tileX >= 0 && tileY >= 0 && tileX < 12 && tileY < 10)).toBe(true);
+      expect(state.overlays.overlays.every(({ tileX, tileY }) => tileX >= 0 && tileY >= 0 && tileX < 40 && tileY < 30)).toBe(true);
       expect(candidateRequests).toEqual(expect.arrayContaining([
         `/${candidateRoot}/pixel32-map/manifest.json`,
         `/${candidateRoot}/pixel32-map/map-atlas.png`,
@@ -229,7 +229,7 @@ test('captures pixel32 house/tree candidate overlays across five viewports and t
       inputs: candidateInputs,
       overlayFrames: expectedOverlays,
     },
-    claim: '15 Chromium-emulated CSS-scale screenshots of the same DEV-only pixel32 farm MapScene with the unapproved house/tree overlay fixture and a deterministic QA save at player tile (5,5). This does not establish native-device rendering, exact DPR raster output, art approval, complete asset coverage, or Gate 1 completion.',
+    claim: '15 Chromium-emulated CSS-scale screenshots of the same DEV-only pixel32 farm MapScene with the unapproved house/tree overlay fixture and a deterministic QA save at player tile (20,14). This does not establish native-device rendering, exact DPR raster output, art approval, complete asset coverage, or Gate 1 completion.',
     viewports,
     dprs,
     measurements,

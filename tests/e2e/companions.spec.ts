@@ -89,7 +89,12 @@ const REST: Pose = { y: 0, rotation: 0, scaleX: 1, scaleY: 1, legA: 0, legB: 0, 
 
 /** 從農場出生點往南走進村莊（穿過南門）。 */
 async function enterVillage(page: Page): Promise<void> {
-  await press(page, 'ArrowDown', 20);
+  // Go around the shipping box at (20,27) before reaching the south exit.
+  await press(page, 'ArrowDown', 12);
+  await press(page, 'ArrowLeft');
+  await press(page, 'ArrowDown', 2);
+  await press(page, 'ArrowRight');
+  await press(page, 'ArrowDown');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
   await expect.poll(async () => (await actor(page, 'maomao'))?.pose).toEqual(REST);
 }
@@ -237,10 +242,11 @@ test('the cat trails one step behind, always on the tile the player just left', 
   await waitForGame(page);
   for (let step = 1; step <= 3; step += 1) {
     await press(page, 'ArrowDown');
-    // 出生點 (7,9)：走第 n 步後，玩家在 (7,9+n)，貓在 (7,8+n)。
-    await expect.poll(async () => (await actor(page, 'player'))?.tileY).toBe(9 + step);
-    await expect.poll(async () => (await actor(page, 'cat'))?.tileY).toBe(8 + step);
-    expect((await actor(page, 'cat'))?.tileX).toBe(7);
+    // 新農場出生點 (20,14)：走第 n 步後，玩家與貓沿中央道路各前進一格。
+    await expect.poll(async () => (await actor(page, 'player'))?.tileY).toBe(14 + step);
+    await expect.poll(async () => (await actor(page, 'cat'))?.tileY).toBe(13 + step);
+    expect((await actor(page, 'player'))?.tileX).toBe(20);
+    expect((await actor(page, 'cat'))?.tileX).toBe(20);
   }
 });
 

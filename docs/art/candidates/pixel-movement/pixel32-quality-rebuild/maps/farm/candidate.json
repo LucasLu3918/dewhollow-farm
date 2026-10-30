@@ -76,7 +76,7 @@
         "y": 0.98
       }
     },
-    "gameplayAlignment": "Image aspect matches the farm 4:3 world. Layout includes collision-backed water scenery, reachable greenhouse entry and return door, and aligned crop/shipping areas. Candidate remains DEV-only and awaits per-tile visual gameplay verification."
+    "gameplayAlignment": "Image aspect matches the farm 4:3 world. The greenhouse is a separate small map reached through a collision-backed entrance; farm routes, fields, and shipping remain aligned to authored collision cells. Candidate remains DEV-only and awaits per-tile visual gameplay verification."
   },
   "mapGrid": {
     "columns": 40,

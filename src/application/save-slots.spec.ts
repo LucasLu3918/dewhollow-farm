@@ -21,6 +21,7 @@ import processing from '../../content/processing.json';
 import crafting from '../../content/crafting.json';
 import talents from '../../content/talents.json';
 import farm from '../../content/maps/farm.json';
+import greenhouse from '../../content/maps/greenhouse.json';
 import village from '../../content/maps/village.json';
 import forest from '../../content/maps/forest.json';
 import lake from '../../content/maps/lake.json';
@@ -57,7 +58,7 @@ import {
   summarizeRecord,
 } from './save-slots';
 
-const { pack } = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
+const { pack } = loadContent({ crops, npcs, schedules, events, friendship, quests, letters, festivals, mainQuest, repairs, randomEvents, maps: [farm, greenhouse, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn], start, tuning, assets, rigs, companions, tools, sounds, music, terrain, weather, items, shops, fish, animals, recipes, processing, crafting, talents, mine });
 const index = createContentIndex(pack);
 const migration = { inventoryCapacity: pack.tuning.inventory.capacity, daysPerSeason: pack.tuning.time.daysPerSeason, wakeMinute: pack.tuning.time.wakeMinute, playerName: '小涵' };
 const rating = { rating: index.rating, dexCategories: index.dexCategories, npcIds: index.npcs.map((n) => n.id), friendship: index.friendship };
@@ -244,8 +245,8 @@ describe('匯入的驗證', () => {
     expect(writes).toHaveLength(0);
   });
 
-  it('來自更新版本的檔案（v25）被拒絕，並提示更新遊戲', async () => {
-    const newer = JSON.stringify({ slot: 'slot-1', savedAt: 'x', state: { ...createNewGame(pack, 1), schemaVersion: 26 } });
+  it('來自更新版本的檔案（v27）被拒絕，並提示更新遊戲', async () => {
+    const newer = JSON.stringify({ slot: 'slot-1', savedAt: 'x', state: { ...createNewGame(pack, 1), schemaVersion: 27 } });
     const { repository } = spyRepository();
     await expect(serviceWith(repository).readImport(newer)).rejects.toThrow(/更新版本/);
   });
@@ -254,7 +255,7 @@ describe('匯入的驗證', () => {
     const v1 = JSON.stringify({ slot: 'slot-1', savedAt: '2026-10-20T10:00:00.000Z', state: V1_STATE });
     const { repository } = spyRepository();
     const record = await serviceWith(repository).readImport(v1);
-    expect(record.state.schemaVersion).toBe(25);
+    expect(record.state.schemaVersion).toBe(26);
     expect(record.state.inventory.stacks).toEqual([{ itemId: 'seed.moon-bean', quality: 'normal', count: 2 }]);
   });
 

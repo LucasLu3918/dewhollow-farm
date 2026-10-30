@@ -1,9 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * M4c：牧草地與牛舍。路線（農場出生點 (7,9)）：
- * 往右到 (38,9)、往下到 (38,13)，往右進牧草地的門 (39,13)，落在牧草地 (1,7)。
- * 牧草地的牛舍門在 (15,4)（要先改建），從 (15,5) 往上進，落在牛舍 (2,3)。
+ * M4c：牧草地與牛舍。由新農場出生點沿中央道路向西至牧草地門 (0,14)，落在牧草地 (1,7)。
+ * 牧草地的牛舍門在 (15,4)，從南側 (15,5) 往上進，落在牛舍 (2,3)。
  * 牛舍的乾草槽在 (3,2)，座位在 (1,1) 與 (4,1)。
  */
 interface Actor {
@@ -98,7 +97,7 @@ const DAY_FIFTEEN_WITH_COW = {
     energy: { current: 100, max: 100 },
     gold: 6000,
     mapId: 'farm',
-    player: { x: 7, y: 9, facing: 'down' },
+    player: { x: 20, y: 14, facing: 'left' },
     plots: {},
     inventory: { capacity: 24, stacks: [{ itemId: 'hay', quality: 'normal', count: 3 }] },
     shipBox: { entries: [] },
@@ -123,9 +122,8 @@ const DAY_FIFTEEN_WITH_COW = {
 test('the pasture gate is shut before spring day 15, and says when it opens', async ({ page }) => {
   test.setTimeout(120_000);
   await waitForGame(page);
-  await walk(page, 'ArrowRight', 31);
-  await walk(page, 'ArrowDown', 4);
-  await faceBlockedTile(page, 'ArrowRight');
+  await walk(page, 'ArrowLeft', 19);
+  await faceBlockedTile(page, 'ArrowLeft');
   await expect(page.locator('#hud-log')).toContainText('春 15 天起才開放');
   expect(await mapId(page)).toBe('farm');
 });
@@ -139,10 +137,9 @@ test('on spring day 15 the gate opens, and a cow in the remodeled barn is fed, p
   await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
   await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 15 天');
 
-  // 農場 → 牧草地（落在 (1,7)）。
-  await walk(page, 'ArrowRight', 31);
-  await walk(page, 'ArrowDown', 4);
-  await walk(page, 'ArrowRight', 1);
+  // 農場出生點 → 牧草地（G 門在 (0,14)，落在 (1,7)）。
+  await walk(page, 'ArrowLeft', 19);
+  await walk(page, 'ArrowLeft', 1);
   await expect.poll(() => mapId(page)).toBe('pasture');
 
   // 牧草地 → 牛舍（從 (15,5) 往上進門 (15,4)，落在 (2,3)）。

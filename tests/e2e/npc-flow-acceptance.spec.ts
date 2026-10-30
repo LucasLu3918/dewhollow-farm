@@ -88,7 +88,12 @@ test('a rendered resident conversation and shop flow survive reload without dupl
   await waitForGame(page);
 
   // Farm spawn → village, then route around the shop counter to stand west of 阿柑 (2,4).
-  await walk(page, 'ArrowDown', 20);
+  // The shipbox blocks the central path at (20,27); route around its west side.
+  await walk(page, 'ArrowDown', 12);
+  await walk(page, 'ArrowLeft', 1);
+  await walk(page, 'ArrowDown', 2);
+  await walk(page, 'ArrowRight', 1);
+  await walk(page, 'ArrowDown', 1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
   await expect.poll(async () => (await actor(page, 'a-gan')).tileX).toBe(2);
   await expect.poll(async () => (await actor(page, 'a-gan')).tileY).toBe(4);

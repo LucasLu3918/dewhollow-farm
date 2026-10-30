@@ -14,6 +14,12 @@ async function pressMovement(page: Page, key: string): Promise<void> {
   })).toBe(true);
 }
 
+async function moveToField(page: Page): Promise<void> {
+  for (const [key, count] of [['ArrowDown', 12], ['ArrowLeft', 1], ['ArrowDown', 2], ['ArrowLeft', 10], ['ArrowUp', 4], ['ArrowRight', 1]] as const) {
+    for (let step = 0; step < count; step += 1) await pressMovement(page, key);
+  }
+}
+
 test.describe('MB-07 compact HUD and shared panel shell', () => {
   test('primary action follows the facing target and dispatches through the existing interaction route', async ({ page }) => {
     await start(page);
@@ -23,7 +29,7 @@ test.describe('MB-07 compact HUD and shared panel shell', () => {
     await expect(action).toHaveAttribute('aria-label', /主要動作：/);
     await expect(action).toBeDisabled();
     await expect(action).toHaveText('沒有可互動的目標');
-    for (let step = 0; step < 4; step += 1) await pressMovement(page, 'ArrowUp');
+    await moveToField(page);
     await expect(action).toBeEnabled();
     await expect(action).toHaveText('開墾');
     await action.click();

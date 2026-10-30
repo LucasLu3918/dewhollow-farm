@@ -68,13 +68,16 @@ describe('溫室', () => {
     expect(item?.kind).toBe('building');
   });
 
-  it('農場上有溫室：溫室的田有 greenhouse 標記，入口需要 greenhouse 旗標', () => {
+  it('溫室是獨立地圖，農場入口需要 greenhouse 旗標且有自然回程', () => {
     const farm = shippedPack.maps.find((m) => m.id === 'farm');
+    const greenhouse = shippedPack.maps.find((m) => m.id === 'greenhouse');
     if (!farm) throw new Error('沒有農場');
-    const greenhouseTiles = farm.rows.join('').split('').filter((ch) => farm.legend[ch]?.greenhouse === true);
-    expect(greenhouseTiles.length).toBeGreaterThanOrEqual(15);
+    if (!greenhouse) throw new Error('沒有溫室地圖');
+    const greenhouseTiles = greenhouse.rows.join('').split('').filter((ch) => greenhouse.legend[ch]?.greenhouse === true);
+    expect(greenhouseTiles.length).toBeGreaterThanOrEqual(30);
     const entrance = Object.values(farm.legend).find((t) => t.requires?.type === 'flag' && t.requires.flag === 'greenhouse');
-    expect(entrance?.kind).toBe('door');
+    expect(entrance).toMatchObject({ kind: 'door', to: 'greenhouse', spawn: greenhouse.spawn });
+    expect(Object.values(greenhouse.legend).find((tile) => tile.kind === 'door')).toMatchObject({ to: 'farm', spawn: { x: 7, y: 9 } });
   });
 });
 

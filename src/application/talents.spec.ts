@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { plotMapKey } from '../domain/farm';
 import mineRulesJson from '../../content/mine.json';
 import type { ContentPack, MapDef } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
@@ -105,7 +106,7 @@ function run(state: GameState, command: Command) {
 }
 
 /** 讓 (x, y) 的田成熟（可以直接收成）。 */
-const ripePlot = { '1,1': { watered: true, dryDays: 0, crop: { cropId: 'dew-grass', growthDays: 1 } } };
+const ripePlot = { [plotMapKey('grove', 1, 1)]: { watered: true, dryDays: 0, crop: { cropId: 'dew-grass', growthDays: 1 } } };
 
 describe('chooseTalent', () => {
   it('refuses before the skill reaches level 5, with a reason, and changes nothing', () => {

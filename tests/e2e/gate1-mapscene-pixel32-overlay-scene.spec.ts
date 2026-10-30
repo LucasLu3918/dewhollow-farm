@@ -143,8 +143,8 @@ test('renders unapproved pixel32 overlays only in the explicit DEV review route'
   ]);
   const [houseBack, , houseFront] = overlayState.scene.overlays;
   if (!houseBack || !houseFront) throw new Error('Missing house candidate layers');
-  expect(houseBack).toMatchObject({ tileX: 3, tileY: 3, visible: true });
-  expect(houseFront).toMatchObject({ tileX: 3, tileY: 3, visible: true });
+  expect(houseBack).toMatchObject({ tileX: 19, tileY: 9, visible: true });
+  expect(houseFront).toMatchObject({ tileX: 19, tileY: 9, visible: true });
   expect(houseBack.depth).toBe(1);
   expect(houseFront.depth).toBeGreaterThan(1);
 
@@ -159,7 +159,7 @@ test('renders unapproved pixel32 overlays only in the explicit DEV review route'
   const resolveOcclusionPath = (filename: string) => path.join(occlusionDirectory, filename);
   const occlusionCaptures: OcclusionCapture[] = [];
   for (const [scenario, x, y] of [
-    ['house-behind', 4, 3], ['house-front', 4, 5], ['tree-behind', 8, 3], ['tree-front', 8, 5],
+    ['house-behind', 20, 9], ['house-front', 20, 11], ['tree-behind', 20, 3], ['tree-front', 20, 5],
   ] as const) {
     occlusionCaptures.push(await capturePlayerVisibility(page, scenario, x, y, resolveOcclusionPath));
   }
