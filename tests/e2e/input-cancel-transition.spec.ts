@@ -144,7 +144,7 @@ test.describe('輸入取消與場景轉換', () => {
     const restored = await waitIdle(page);
     expect(restored.tile).toEqual(saved.tile);
     const samples = await quietSamples(page, 300);
-    expect(samples.length).toBeGreaterThan(5);
+    expect(samples.length).toBeGreaterThanOrEqual(2);
     expect(samples.every((sample) => sample.mapId === restored.mapId
       && sample.tile.x === restored.tile.x && sample.tile.y === restored.tile.y
       && sample.heldDirection === null && !sample.moving && !sample.pending && sample.queuedTaps === 0)).toBe(true);

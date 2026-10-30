@@ -30,8 +30,19 @@ async function debug(page: Page): Promise<FarmSnapshot> {
 }
 
 async function press(page: Page, key: string): Promise<void> {
+  const before = key.startsWith('Arrow')
+    ? await page.evaluate(() => {
+      const tile = window.__dewhollow?.movement().tile;
+      return tile ? { x: tile.x, y: tile.y } : null;
+    })
+    : null;
   await page.keyboard.press(key);
   if (key.startsWith('Arrow')) {
+    await expect.poll(() => page.evaluate(() => {
+      const tile = window.__dewhollow?.movement().tile;
+      return tile ? { x: tile.x, y: tile.y } : null;
+    }))
+      .not.toEqual(before);
     await expect.poll(() => page.evaluate(() => {
       const movement = window.__dewhollow?.movement();
       return !movement || (!movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null);
@@ -60,7 +71,8 @@ async function fieldToBed(page: Page): Promise<void> {
   await walk(page, 'ArrowUp', 10);
   await walk(page, 'ArrowLeft', 1); // (4,8), south of the bed; bypass the workbench
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile ?? null)).toMatchObject({ x: 4, y: 8 });
-  await press(page, 'ArrowUp'); // face the bed at (4,7)
+  await page.keyboard.press('ArrowUp'); // face the bed at (4,7), which blocks movement
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile ?? null)).toMatchObject({ x: 4, y: 8 });
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.interaction() ?? null)).toMatchObject({
     action: 'sleep', target: { x: 4, y: 7 },
   });
