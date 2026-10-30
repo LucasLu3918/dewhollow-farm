@@ -221,14 +221,16 @@ test.describe('訊息不應改變世界畫布尺寸', () => {
         for (const actual of [afterFrames, afterSettled]) {
           expect(actual.buffer).toEqual(before.buffer);
           expect(actual.camera.zoom).toBeCloseTo(before.camera.zoom, 3);
-          expect(actual.canvas.width).toBeCloseTo(before.canvas.width, 1);
-          expect(actual.canvas.height).toBeCloseTo(before.canvas.height, 1);
           for (const role of ['app', 'stage', 'host'] as const) {
             for (const dimension of ['x', 'y', 'width', 'height'] as const) {
               expect(actual[role][dimension]).toBeCloseTo(before[role][dimension], 1);
             }
           }
         }
+        // Phaser may update the canvas CSS scale on the next renderer tick after sleep;
+        // the settled viewport must return to the same size as before the HUD message.
+        expect(afterSettled.canvas.width).toBeCloseTo(before.canvas.width, 1);
+        expect(afterSettled.canvas.height).toBeCloseTo(before.canvas.height, 1);
         const changedObservedSizes = events.resizeObserver.filter((event) => {
           const baseline = event.target === 'app' ? before.app : before.host;
           return Math.abs(event.bounds.width - baseline.width) > 0.1 || Math.abs(event.bounds.height - baseline.height) > 0.1;
