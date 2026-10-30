@@ -98,7 +98,14 @@ async function walkFromFieldToBed(page: Page): Promise<void> {
 
 async function walkFromBedToField(page: Page): Promise<void> {
   // Bed approach (4,8) → house door → farm spawn (27,10) → field gate → field edge (11,24).
-  for (const [key, count] of [['ArrowRight', 6], ['ArrowDown', 11], ['ArrowLeft', 7], ['ArrowDown', 14], ['ArrowLeft', 9]] as const) {
+  for (const [key, count] of [['ArrowRight', 6], ['ArrowDown', 11]] as const) {
+    await press(page, key, count);
+  }
+  await expect.poll(() => page.evaluate(() => ({
+    mapId: window.__dewhollow?.mapId() ?? '',
+    tile: (() => { const { x, y } = window.__dewhollow?.movement().tile ?? { x: -1, y: -1 }; return { x, y }; })(),
+  }))).toEqual({ mapId: 'farm', tile: { x: 27, y: 10 } });
+  for (const [key, count] of [['ArrowLeft', 7], ['ArrowDown', 14], ['ArrowLeft', 9]] as const) {
     await press(page, key, count);
   }
 }

@@ -114,8 +114,11 @@ async function bedToPlot(page: Page): Promise<void> {
   await move(page, 'Right'); // leave the bed approach through the clear aisle
   await move(page, 'Down', 10);
   await move(page, 'Right', 5);
-  await move(page, 'Down'); // house exit to farm (27,10)
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
+  await move(page, 'Down'); // house door at (10,19) transitions to farm spawn (27,10)
+  await expect.poll(() => page.evaluate(() => ({
+    mapId: window.__dewhollow?.mapId() ?? '',
+    tile: (() => { const { x, y } = window.__dewhollow?.movement().tile ?? { x: -1, y: -1 }; return { x, y }; })(),
+  }))).toEqual({ mapId: 'farm', tile: { x: 27, y: 10 } }); // door transition ends at the farm spawn
   await move(page, 'Left', 7); // central road (20,10)
   await move(page, 'Down', 16); // approach the shipping crate at (20,26)
   await move(page, 'Left'); // pass beside the shipping crate at (19,26)

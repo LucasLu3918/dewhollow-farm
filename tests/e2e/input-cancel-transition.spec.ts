@@ -84,7 +84,8 @@ async function settleAndRecord(page: Page, testInfo: TestInfo, scenario: string,
   const stopped = await waitIdle(page);
   if (boundary) expect(stopped).toMatchObject({ mapId: boundary.mapId, tile: boundary.tile });
   const samples = await quietSamples(page, 300);
-  expect(samples.length).toBeGreaterThan(5);
+  // The quiet interval is time-based; do not require a particular frame rate.
+  expect(samples.length).toBeGreaterThanOrEqual(2);
   expect(samples.every((sample) => sample.mapId === stopped.mapId
     && sample.tile.x === stopped.tile.x && sample.tile.y === stopped.tile.y
     && sample.heldDirection === null && !sample.moving && !sample.pending && sample.queuedTaps === 0)).toBe(true);

@@ -7,8 +7,12 @@ import { expect, test, type Page } from '@playwright/test';
  */
 async function press(page: Page, keys: string[]): Promise<void> {
   for (const key of keys) {
+    const before = key.startsWith('Arrow') ? await movementSnapshot(page) : null;
     await page.keyboard.press(key);
-    if (key.startsWith('Arrow')) await waitForMovementIdle(page);
+    if (before) {
+      await expect.poll(() => movementSnapshot(page)).not.toEqual(before);
+      await waitForMovementIdle(page);
+    }
   }
 }
 
@@ -17,6 +21,18 @@ async function waitForMovementIdle(page: Page): Promise<void> {
     const movement = window.__dewhollow?.movement();
     return !movement || (!movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null);
   })).toBe(true);
+}
+
+async function movementSnapshot(page: Page): Promise<{ mapId: string; x: number; y: number; facing: string }> {
+  return page.evaluate(() => {
+    const player = window.__dewhollow?.gameState().player;
+    return {
+      mapId: window.__dewhollow?.mapId() ?? '',
+      x: player?.x ?? -1,
+      y: player?.y ?? -1,
+      facing: player?.facing ?? '',
+    };
+  });
 }
 
 async function walk(page: Page, key: string, steps: number): Promise<void> {
@@ -81,7 +97,11 @@ async function fieldToBed(page: Page): Promise<void> {
 async function bedToField(page: Page): Promise<void> {
   // 床前 (4,8) → 門 → 農場 spawn (27,10)，沿中央大道通過農門回田區。
   await walk(page, 'ArrowRight', 6);
-  await walk(page, 'ArrowDown', 11); // 出門回到農場 (27,10)
+  await walk(page, 'ArrowDown', 11); // 第 11 步穿門；不要把下一步帶到新地圖
+  await expect.poll(() => page.evaluate(() => ({
+    mapId: window.__dewhollow?.mapId() ?? '',
+    tile: (() => { const { x, y } = window.__dewhollow?.movement().tile ?? { x: -1, y: -1 }; return { x, y }; })(),
+  }))).toEqual({ mapId: 'farm', tile: { x: 27, y: 10 } });
   await walk(page, 'ArrowLeft', 7);
   await walk(page, 'ArrowDown', 14);
   await walk(page, 'ArrowLeft', 9);

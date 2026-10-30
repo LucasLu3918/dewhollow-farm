@@ -147,12 +147,23 @@ async function batch(page: Page, expectedBefore: Tile, inputs: Direction[], kick
 } | null> {
   return page.evaluate(({ expected, batchInputs, kickoffDirection }) => new Promise((resolve) => {
     const deadline = performance.now() + 10_000;
-    const dispatchBatch = (movement: { tile: Tile; moving: boolean; pending: boolean }) => {
+    let kickoffPressed = false;
+    const directionKey = (direction: Direction) => ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[direction];
+    const releaseKickoff = () => {
+      if (!kickoffDirection || !kickoffPressed) return;
+      kickoffPressed = false;
+      const key = directionKey(kickoffDirection);
+      const trace = (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress;
+      trace?.inputEvents.push({ at: performance.now(), direction: kickoffDirection, key, type: 'keyup' });
+      window.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }));
+    };
+    const dispatchBatch = (movement: { tile: Tile; moving: boolean; pending: boolean }, allowIdleKickoff = false) => {
       if (movement.tile.x !== expected.x || movement.tile.y !== expected.y) {
+        releaseKickoff();
         resolve(null);
         return;
       }
-      if (!movement.moving && !movement.pending) return false;
+      if (!movement.moving && !movement.pending && !allowIdleKickoff) return false;
 
       // Readiness and all key events run in one browser task, so the active
       // step cannot finish between the check and the first queued tap.
@@ -160,7 +171,7 @@ async function batch(page: Page, expectedBefore: Tile, inputs: Direction[], kick
       let lastInputAt = 0;
       const queueDepths: number[] = [];
       for (const direction of batchInputs) {
-        const key = ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[direction];
+        const key = directionKey(direction);
         const trace = (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress;
         lastInputAt = performance.now();
         const record: Record<string, unknown> = { at: lastInputAt, direction, key, type: 'keydown' };
@@ -173,42 +184,60 @@ async function batch(page: Page, expectedBefore: Tile, inputs: Direction[], kick
         trace?.inputEvents.push({ at: upAt, direction, key, type: 'keyup' });
         window.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }));
       }
+      releaseKickoff();
       resolve({ beforeTile, lastInputAt, queueDepths });
       return true;
     };
 
-    const sendKickoff = () => {
+    const pressKickoff = () => {
       if (!kickoffDirection) return;
-      const key = ({ left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown' } as const)[kickoffDirection];
+      const key = directionKey(kickoffDirection);
       const trace = (window as Window & { __motionStress?: { inputEvents: Array<Record<string, unknown>> } }).__motionStress;
       const at = performance.now();
       const record: Record<string, unknown> = { at, direction: kickoffDirection, key, type: 'keydown' };
       trace?.inputEvents.push(record);
       window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+      kickoffPressed = true;
       if (trace) record['stateAfterKeydown'] = window.__dewhollow?.movement() ?? null;
-      trace?.inputEvents.push({ at: performance.now(), direction: kickoffDirection, key, type: 'keyup' });
-      window.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }));
     };
 
     const waitForStepAndDispatch = () => {
       const movement = window.__dewhollow?.movement();
       if (movement && dispatchBatch(movement) !== false) return;
       if (performance.now() >= deadline) {
+        releaseKickoff();
         resolve(null);
         return;
       }
       requestAnimationFrame(waitForStepAndDispatch);
     };
 
-    // The first movement step has no previous tap queued to start it. Inject its
-    // kickoff and stress batch synchronously so CI scheduling cannot let that
-    // 150 ms step settle before the first batch is queued.
+    // Start the first step and enqueue the batch in one browser task. Waiting
+    // for a later animation frame can miss the short initial movement window.
     if (kickoffDirection) {
-      sendKickoff();
+      pressKickoff();
       const movement = window.__dewhollow?.movement();
-      if (movement && dispatchBatch(movement) !== false) return;
+      if (movement) {
+        const kickoffDelta = ({
+          left: { x: -1, y: 0 },
+          right: { x: 1, y: 0 },
+          up: { x: 0, y: -1 },
+          down: { x: 0, y: 1 },
+        } as const)[kickoffDirection];
+        const kickoffNext = { x: expected.x + kickoffDelta.x, y: expected.y + kickoffDelta.y };
+        if (movement.tile.x === expected.x && movement.tile.y === expected.y) {
+          dispatchBatch(movement, true);
+          return;
+        }
+        // Domain coordinates commit as soon as the accepted kickoff request is
+        // applied. Treat that destination as the active step from expected.
+        if (movement.tile.x === kickoffNext.x && movement.tile.y === kickoffNext.y && (movement.moving || movement.pending)) {
+          dispatchBatch({ ...movement, tile: expected }, true);
+          return;
+        }
+      }
     }
-    requestAnimationFrame(waitForStepAndDispatch);
+    waitForStepAndDispatch();
   }), { expected: expectedBefore, batchInputs: inputs, kickoffDirection: kickoff });
 }
 
@@ -250,9 +279,12 @@ test('pixel32 candidate survives 50 reversals and 50 cross-turns during ten comm
       await waitForTile(page, { x, y: start.y });
     }
     await expect.poll(() => page.evaluate(() => {
-      const tile = window.__dewhollow?.movement().tile;
-      return tile ? { x: tile.x, y: tile.y } : null;
-    })).toEqual(start);
+      const movement = window.__dewhollow?.movement();
+      return movement ? {
+        tile: { x: movement.tile.x, y: movement.tile.y },
+        idle: !movement.moving && !movement.pending && movement.queuedTaps === 0 && movement.heldDirection === null,
+      } : null;
+    })).toEqual({ tile: start, idle: true });
     await installCollector(page);
     const startScreenshot = await page.screenshot({ animations: 'disabled', scale: 'css' });
     await testInfo.attach('pixel32-motion-stress-start.png', { body: startScreenshot, contentType: 'image/png' });

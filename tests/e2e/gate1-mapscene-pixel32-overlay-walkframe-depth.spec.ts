@@ -183,8 +183,10 @@ test('pixel32 candidate walk frames cross tree and house overlay depth anchors w
     'tree-crossing': await page.screenshot({ animations: 'disabled', scale: 'css' }),
   };
 
-  for (let step = 0; step < 8; step += 1) {
+  for (let expectedY = 6; expectedY <= 13; expectedY += 1) {
     await page.keyboard.press('ArrowDown');
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile ?? null))
+      .toMatchObject({ x: 19, y: expectedY });
     await waitForMovementIdle(page);
   }
   expect(await page.evaluate(() => window.__dewhollow!.movement().tile)).toMatchObject({ x: 19, y: 13 });
