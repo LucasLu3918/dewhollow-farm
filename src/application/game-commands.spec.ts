@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import mineRulesJson from '../../content/mine.json';
 import type { ContentPack, TileDef } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
-import { plotKey } from '../domain/farm';
+import { plotMapKey } from '../domain/farm';
 import { countOf, createInventory, type Inventory } from '../domain/inventory';
 import type { ItemStack } from '../domain/items';
 import { rollInt } from '../domain/random';
@@ -136,7 +136,8 @@ function probeState(overrides: Partial<GameState> = {}): GameState {
 }
 
 /** 田地 (2,1)：玩家站在 (3,1) 面向左側即可互動。 */
-const FIELD = plotKey(2, 1);
+const FIELD = plotMapKey('farm', 2, 1);
+const PROBE_FIELD = plotMapKey('interaction-probe', 1, 1);
 const FIELD_SIDE = { x: 3, y: 1, facing: 'left' as const };
 /** 出貨箱 (1,2)：玩家站在 (2,2) 面向左側。 */
 const SHIP_SIDE = { x: 2, y: 2, facing: 'left' as const };
@@ -365,7 +366,7 @@ describe('shared interaction query', () => {
   it('refreshes a queried descriptor against the changed plot before the next execution', () => {
     const planted = probeState({
       tool: 'seedbag',
-      plots: { '1,1': { watered: false, dryDays: 0, crop: null } },
+      plots: { [PROBE_FIELD]: { watered: false, dryDays: 0, crop: null } },
     });
     const probe = probeIndex({ kind: 'field' });
     const before = resolveInteraction(planted, probe);
@@ -377,22 +378,22 @@ describe('shared interaction query', () => {
   it('matches empty field, water, and fertilizing intents to the current tool and plot', () => {
     const probe = probeIndex({ kind: 'field' });
     expect(resolveInteraction(probeState({ tool: 'can' }), probe)).toMatchObject({ action: 'workPlot', labelKey: 'noSoil' });
-    expect(resolveInteraction(probeState({ tool: 'can', plots: { '1,1': { watered: false, dryDays: 0, crop: null } } }), probe))
+    expect(resolveInteraction(probeState({ tool: 'can', plots: { [PROBE_FIELD]: { watered: false, dryDays: 0, crop: null } } }), probe))
       .toMatchObject({ action: 'workPlot', labelKey: 'water' });
     expect(resolveInteraction(probeState({
       tool: 'seedbag',
       inventory: bagOf([{ itemId: 'fertilizer-basic', quality: 'normal', count: 1 }]),
-      plots: { '1,1': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 } } },
+      plots: { [PROBE_FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 } } },
     }), probe)).toMatchObject({ action: 'workPlot', labelKey: 'fertilize' });
 
-    const tilled = probeState({ tool: 'hoe', plots: { '1,1': { watered: false, dryDays: 0, crop: null } } });
+    const tilled = probeState({ tool: 'hoe', plots: { [PROBE_FIELD]: { watered: false, dryDays: 0, crop: null } } });
     expect(resolveInteraction(tilled, probe)).toMatchObject({ action: 'workPlot', labelKey: 'alreadyTilled' });
     expect(executeCommand(tilled, { type: 'interact' }, probe).events).toContainEqual({ type: 'refused', reason: 'ALREADY_TILLED' });
 
     const fertilized = probeState({
       tool: 'seedbag',
       inventory: bagOf([{ itemId: 'fertilizer-basic', quality: 'normal', count: 1 }]),
-      plots: { '1,1': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 }, fertilizer: 'basic' } },
+      plots: { [PROBE_FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 }, fertilizer: 'basic' } },
     });
     expect(resolveInteraction(fertilized, probe)).toMatchObject({ action: 'workPlot', labelKey: 'alreadyFertilized' });
     expect(executeCommand(fertilized, { type: 'interact' }, probe).events).toContainEqual({ type: 'refused', reason: 'ALREADY_FERTILIZED' });
@@ -400,7 +401,7 @@ describe('shared interaction query', () => {
     const fertilizerUsed = probeState({
       tool: 'seedbag',
       inventory: bagOf([]),
-      plots: { '1,1': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 }, fertilizer: 'basic' } },
+      plots: { [PROBE_FIELD]: { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 0 }, fertilizer: 'basic' } },
     });
     expect(resolveInteraction(fertilizerUsed, probe)).toMatchObject({ action: 'workPlot', labelKey: 'alreadyPlanted' });
     expect(executeCommand(fertilizerUsed, { type: 'interact' }, probe).events).toContainEqual({ type: 'refused', reason: 'ALREADY_PLANTED' });

@@ -4,7 +4,7 @@ import type { ContentPack } from '../domain/content';
 import { createNewGame, type GameState } from '../domain/game-state';
 import { addItem, countOf, createInventory } from '../domain/inventory';
 import { cropItemId } from '../domain/items';
-import { plotKey } from '../domain/farm';
+import { plotMapKey } from '../domain/farm';
 import { createContentIndex, type ContentIndex } from './content-index';
 import { executeCommand, type Command, type CommandOutcome } from './game-commands';
 import { residentsOn } from './residents';
@@ -268,7 +268,7 @@ describe('收成品質：居民喜歡的作物', () => {
         weather: 'sunny',
         energy: { ...state.energy, current: 20 },
         skills: { ...state.skills, farming: 140 },
-        plots: { [plotKey(1, 1)]: { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 }, fertilizer: undefined } },
+        plots: { [plotMapKey('village', 1, 1)]: { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 }, fertilizer: undefined } },
         friendship,
       },
       { type: 'interact' },

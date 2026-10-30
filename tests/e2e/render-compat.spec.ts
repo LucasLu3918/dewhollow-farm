@@ -50,11 +50,19 @@ async function areaRatios(page: Page, view: 'up' | 'down' | 'left' | 'right'): P
       canvas.height = 116;
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('沒有 2D context');
-      // 玩家世界座標固定在出生點；相機 viewport 會因安全區與控制版位調整，依當前 camera transform 取樣。
+      // 依當前 sprite 世界座標取樣；出生點隨農場重排而移動，相機也會依 viewport 調整。
       const camera = inspect.cameraView();
       const scroll = inspect.cameraScroll();
-      const playerScreenX = camera.x + (480 - scroll.x) * camera.zoom;
-      const playerScreenY = camera.y + (640 - scroll.y) * camera.zoom;
+      // Right-facing art is the left-facing texture mirrored by CharacterRig.
+      const textureKey = v === 'right' ? 'player.left' : `player.${v}`;
+      const sprite = inspect.sprites().find((item) => item.key === textureKey);
+      if (!sprite) throw new Error(`找不到角色方向素材 player.${v}`);
+      // Sprite bounds include pose-dependent rotation and scale. Anchor every phase
+      // to the stable logical foot position so the sampling window cannot follow gait.
+      const player = inspect.actors().find((actor) => actor.id === 'player');
+      if (!player) throw new Error('找不到玩家角色錨點');
+      const playerScreenX = camera.x + (player.footX - scroll.x) * camera.zoom;
+      const playerScreenY = camera.y + (player.footY - scroll.y) * camera.zoom;
       ctx.drawImage(img, playerScreenX - 64, playerScreenY - 100, 128, 116, 0, 0, 128, 116);
       const d = ctx.getImageData(0, 0, 128, 116).data;
       const at = 4 * (128 + 1);

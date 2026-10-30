@@ -21,6 +21,7 @@ import processing from '../../content/processing.json';
 import crafting from '../../content/crafting.json';
 import talents from '../../content/talents.json';
 import farm from '../../content/maps/farm.json';
+import greenhouse from '../../content/maps/greenhouse.json';
 import village from '../../content/maps/village.json';
 import forest from '../../content/maps/forest.json';
 import lake from '../../content/maps/lake.json';
@@ -58,7 +59,7 @@ const raw: RawContentFiles = {
     letters,
     festivals,
     mainQuest, repairs, randomEvents,
-  maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+  maps: [farm, greenhouse, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,

@@ -121,7 +121,7 @@ async function waitForMovementIdle(page: Page): Promise<void> {
 }
 
 async function enterHouse(page: Page): Promise<void> {
-  for (const key of ['ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft']) {
+  for (const key of [...Array(7).fill('ArrowRight'), ...Array(5).fill('ArrowUp')]) {
     await page.keyboard.press(key);
     await waitForMovementIdle(page);
   }
@@ -130,11 +130,11 @@ async function enterHouse(page: Page): Promise<void> {
 }
 
 async function walkToShipBox(page: Page): Promise<void> {
-  for (const key of ['ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft']) {
+  for (const key of [...Array(12).fill('ArrowDown'), 'ArrowLeft', 'ArrowDown']) {
     await page.keyboard.press(key);
     await waitForMovementIdle(page);
   }
-  await page.keyboard.press('ArrowLeft'); // Stand at (3,7), facing the shipbox at (2,7).
+  await page.keyboard.press('ArrowRight'); // Stand at (19,27), facing the shipbox at (20,27).
   await waitForMovementIdle(page);
 }
 
@@ -160,7 +160,7 @@ test.describe('訊息不應改變世界畫布尺寸', () => {
         name: '互動', key: 'x', message: scene.id === 'house' ? '你睡了一覺' : '背包裡沒有可出貨的作物',
         target: scene.id === 'house'
           ? { action: 'sleep', tile: { x: 4, y: 7 } }
-          : { action: 'shipAll', tile: { x: 2, y: 7 } },
+          : { action: 'shipAll', tile: { x: 20, y: 27 } },
       },
     ]) {
       test(`${scene.name} ${action.name} 前後記錄 CSS、Phaser 與 layout 發布`, async ({ page }, testInfo) => {

@@ -36,6 +36,11 @@ export function plotKey(x: number, y: number): string {
   return `${x},${y}`;
 }
 
+/** A crop plot key scoped to one map so local coordinates can safely repeat. */
+export function plotMapKey(mapId: string, x: number, y: number): string {
+  return `${mapId}|${plotKey(x, y)}`;
+}
+
 export function tillPlot(plots: PlotMap, key: string): Result<PlotMap, FarmFailure> {
   if (plots[key]) return fail('ALREADY_TILLED');
   return ok({ ...plots, [key]: { watered: false, crop: null, dryDays: 0 } });

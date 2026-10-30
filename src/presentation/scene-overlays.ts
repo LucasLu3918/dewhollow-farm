@@ -7,8 +7,8 @@ export interface SceneOverlay {
 
 const MAP_SCENE_OVERLAYS: Readonly<Record<string, readonly SceneOverlay[]>> = {
   farm: [
-    { assetId: 'scene.farm.tree', anchorTile: { x: 33, y: 21 } },
-    { assetId: 'scene.farm.house', anchorTile: { x: 2, y: 4 } },
+    { assetId: 'scene.farm.tree', anchorTile: { x: 36, y: 21 } },
+    { assetId: 'scene.farm.house', anchorTile: { x: 27, y: 9 } },
   ],
   village: [
     { assetId: 'scene.village.general-shop', anchorTile: { x: 3, y: 4 } },

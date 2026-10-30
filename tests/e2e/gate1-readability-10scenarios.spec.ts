@@ -20,16 +20,16 @@ type Scenario = {
 };
 
 const scenarios: Scenario[] = [
-  { id: 'dry-unripe', query: candidateQuery, mapId: 'farm', player: { x: 5, y: 5, facing: 'down' }, plots: { '5,6': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 1 } } } },
-  { id: 'wet-unripe', query: candidateQuery, mapId: 'farm', player: { x: 5, y: 5, facing: 'down' }, plots: { '5,6': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 1 } } } },
-  { id: 'dry-ripe', query: candidateQuery, mapId: 'farm', player: { x: 5, y: 5, facing: 'down' }, plots: { '5,6': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } } },
-  { id: 'wet-ripe', query: candidateQuery, mapId: 'farm', player: { x: 5, y: 5, facing: 'down' }, plots: { '5,6': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } } },
-  { id: 'player-farm', query: candidateQuery, mapId: 'farm', player: { x: 5, y: 5, facing: 'down' } },
-  { id: 'player-near-crop', query: candidateQuery, mapId: 'farm', player: { x: 4, y: 5, facing: 'right' }, plots: { '5,6': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } } },
-  { id: 'player-with-cat', query: petQuery, mapId: 'farm', player: { x: 5, y: 5, facing: 'up' } },
+  { id: 'dry-unripe', query: candidateQuery, mapId: 'farm', player: { x: 9, y: 18, facing: 'right' }, plots: { '7,5': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 1 } } } },
+  { id: 'wet-unripe', query: candidateQuery, mapId: 'farm', player: { x: 9, y: 18, facing: 'right' }, plots: { '7,5': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 1 } } } },
+  { id: 'dry-ripe', query: candidateQuery, mapId: 'farm', player: { x: 9, y: 18, facing: 'right' }, plots: { '7,5': { watered: false, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } } },
+  { id: 'wet-ripe', query: candidateQuery, mapId: 'farm', player: { x: 9, y: 18, facing: 'right' }, plots: { '7,5': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } } },
+  { id: 'player-farm', query: candidateQuery, mapId: 'farm', player: { x: 20, y: 14, facing: 'down' } },
+  { id: 'player-near-crop', query: candidateQuery, mapId: 'farm', player: { x: 9, y: 18, facing: 'right' }, plots: { '7,5': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } } },
+  { id: 'player-with-cat', query: petQuery, mapId: 'farm', player: { x: 20, y: 14, facing: 'up' } },
   { id: 'player-with-resident', query: runtimeQuery, mapId: 'village', player: { x: 7, y: 9, facing: 'down' } },
-  { id: 'greenhouse-door', query: runtimeQuery, mapId: 'farm', player: { x: 30, y: 19, facing: 'down' }, flags: { greenhouse: true } },
-  { id: 'greenhouse-interior', query: runtimeQuery, mapId: 'farm', player: { x: 30, y: 19, facing: 'down' }, flags: { greenhouse: true }, moveIntoGreenhouse: true },
+  { id: 'greenhouse-door', query: runtimeQuery, mapId: 'farm', player: { x: 7, y: 7, facing: 'down' }, flags: { greenhouse: true }, moveIntoGreenhouse: true },
+  { id: 'greenhouse-interior', query: runtimeQuery, mapId: 'greenhouse', player: { x: 6, y: 6, facing: 'down' }, flags: { greenhouse: true } },
 ];
 
 async function seedSave(page: Page, scenario: Scenario): Promise<void> {
@@ -124,10 +124,8 @@ test('captures ten blinded 100%-scale candidate readability stimuli', async ({ p
     }
     if (scenario.moveIntoGreenhouse) {
       await page.keyboard.press('ArrowDown');
-      await expect.poll(() => page.evaluate(() => {
-        const tile = window.__dewhollow?.movement().tile;
-        return tile ? { x: tile.x, y: tile.y } : null;
-      })).toEqual({ x: 30, y: 22 });
+      await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('greenhouse');
+      await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile ?? null)).toMatchObject({ x: 6, y: 6 });
     }
 
     const canvasBox = await page.locator('#game canvas').boundingBox();

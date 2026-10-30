@@ -94,13 +94,15 @@ test('pixel32 candidate MapScene shows five seconds of four-direction movement a
 
   const { context, page } = await startCandidateFarm(browser);
   const initial = await page.evaluate(() => window.__dewhollow!.movement().tile);
-  expect(initial).toMatchObject({ x: 7, y: 9 });
+  expect(initial).toMatchObject({ x: 20, y: 14 });
 
   const beforeWall = await page.evaluate(() => window.__dewhollow!.movement().tile);
   await page.keyboard.down('ArrowLeft');
+  // The new central avenue reaches the west boundary along y=14.
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile.x), { timeout: 10_000 }).toBe(1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().blockedDirection ?? null), { timeout: 10_000 }).toBe('left');
   const wallTile = await page.evaluate(() => window.__dewhollow!.movement().tile);
-  expect(wallTile.y).toBe(9);
+  expect(wallTile.y).toBe(14);
   expect(wallTile.x).toBe(1);
   expect(wallTile.x).toBeLessThan(beforeWall.x);
   await page.waitForTimeout(250);

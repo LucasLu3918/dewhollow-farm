@@ -61,9 +61,9 @@ async function walk(page: Page, key: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'Ar
 }
 
 async function enterHouseFromSpawn(page: Page): Promise<void> {
-  // Farm spawn (7,9) → outside the farmhouse door (2,5) → house entrance (10,18).
+  // Farm spawn (20,14) → south side of house door (27,10) → house entrance (10,18).
   await walk(page, 'ArrowUp', 4);
-  await walk(page, 'ArrowLeft', 5);
+  await walk(page, 'ArrowRight', 7);
   await move(page, 'ArrowUp');
   await waitForMap(page, 'house');
   await expect.poll(() => page.evaluate(() => {
@@ -79,7 +79,7 @@ async function leaveHouse(page: Page): Promise<void> {
   await expect.poll(() => page.evaluate(() => {
     const player = (window as unknown as { __dewhollow?: GameDebug }).__dewhollow?.gameState().player;
     return player && { x: player.x, y: player.y };
-  })).toEqual({ x: 2, y: 5 });
+  })).toEqual({ x: 27, y: 10 });
   await expectWorldV2Candidate(page, 'farm');
 }
 

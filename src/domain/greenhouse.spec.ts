@@ -21,7 +21,7 @@ const map: MapDef = {
 
 describe('溫室的田（domain/greenhouse.ts）', () => {
   it('finds the greenhouse cells on a map by their tiles, not by their position', () => {
-    expect(greenhouseKeysOf(map)).toEqual(['1,0', '2,0', '1,1']);
+    expect(greenhouseKeysOf(map)).toEqual(['test|1,0', 'test|2,0', 'test|1,1']);
   });
 
   it('a field outside the greenhouse takes only the seasons its crop allows', () => {

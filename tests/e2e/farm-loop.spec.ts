@@ -21,11 +21,35 @@ async function waitForMovementIdle(page: Page): Promise<void> {
 
 async function walk(page: Page, key: string, steps: number): Promise<void> {
   for (let i = 0; i < steps; i += 1) {
+    const before = await page.evaluate(() => ({
+      mapId: window.__dewhollow?.mapId() ?? '',
+      x: window.__dewhollow?.gameState().player.x ?? null,
+      y: window.__dewhollow?.gameState().player.y ?? null,
+    }));
     await page.keyboard.press(key);
-    await expect.poll(async () => page.evaluate(() =>
-      window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy ?? true,
-    )).toBe(false);
+    await expect.poll(() => page.evaluate(() => ({
+      mapId: window.__dewhollow?.mapId() ?? '',
+      x: window.__dewhollow?.gameState().player.x ?? null,
+      y: window.__dewhollow?.gameState().player.y ?? null,
+    }))).not.toEqual(before);
+    await waitForMovementIdle(page);
   }
+}
+
+/** 只有出貨箱這個設計阻擋格允許 tile 不變；仍須明確驗證位置不變且轉向箱子。 */
+async function faceBlockedShipbox(page: Page): Promise<void> {
+  const before = await page.evaluate(() => ({
+    mapId: window.__dewhollow?.mapId() ?? '',
+    player: window.__dewhollow?.gameState().player ?? null,
+  }));
+  expect(before).toMatchObject({ mapId: 'farm', player: { x: 19, y: 27, facing: 'up' } });
+
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(() => page.evaluate(() => ({
+    mapId: window.__dewhollow?.mapId() ?? '',
+    player: window.__dewhollow?.gameState().player ?? null,
+  }))).toMatchObject({ mapId: 'farm', player: { x: 19, y: 27, facing: 'right' } });
+  await waitForMovementIdle(page);
 }
 
 /** 開發模式的場景建立與鍵盤監聽在同一同步段落；等 mapId 可避免開場按鍵被丟掉。 */
@@ -41,9 +65,12 @@ async function waitForGame(page: Page): Promise<void> {
 }
 
 async function fieldToBed(page: Page): Promise<void> {
-  // 農場田邊 (7,5) → 小屋床前 (4,8)，面向床位 (4,7)。
-  await walk(page, 'ArrowLeft', 5);
-  await walk(page, 'ArrowUp', 1); // 進門，落在小屋 (10,18)
+  // 由田區東側農門接上中央大道，再由小屋正門進屋。
+  await walk(page, 'ArrowRight', 9);
+  await walk(page, 'ArrowUp', 10);
+  await walk(page, 'ArrowRight', 7);
+  await walk(page, 'ArrowUp', 5);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
   await walk(page, 'ArrowUp', 9);
   await walk(page, 'ArrowLeft', 6);
   await walk(page, 'ArrowUp', 1);
@@ -52,13 +79,38 @@ async function fieldToBed(page: Page): Promise<void> {
 }
 
 async function bedToField(page: Page): Promise<void> {
-  // 床前 (4,8) → 門 → 農場田邊 (7,5)，最後面向 (7,4) 的田。
+  // 床前 (4,8) → 門 → 農場 spawn (27,10)，沿中央大道通過農門回田區。
   await walk(page, 'ArrowRight', 6);
-  await walk(page, 'ArrowDown', 1);
-  await walk(page, 'ArrowDown', 9);
-  await walk(page, 'ArrowDown', 1); // 出門回到農場 (2,5)
-  await walk(page, 'ArrowRight', 5);
-  await walk(page, 'ArrowDown', 1);
+  await walk(page, 'ArrowDown', 11); // 出門回到農場 (27,10)
+  await walk(page, 'ArrowLeft', 7);
+  await walk(page, 'ArrowDown', 14);
+  await walk(page, 'ArrowLeft', 9);
+}
+
+async function moveToFarmField(page: Page): Promise<void> {
+  // 出生點 (20,14) 沿中央大道南下，再從農門進田區到 (11,24)。
+  await walk(page, 'ArrowDown', 10);
+  await walk(page, 'ArrowLeft', 9);
+}
+
+async function moveToShipbox(page: Page): Promise<void> {
+  // 從田格 (11,24) 繞到出貨箱西側 (19,27)，再轉身面向箱子。
+  await walk(page, 'ArrowRight', 8);
+  await walk(page, 'ArrowDown', 4);
+  await walk(page, 'ArrowUp', 1);
+  await faceBlockedShipbox(page);
+}
+
+async function moveFromShipboxToBed(page: Page): Promise<void> {
+  // 從出貨箱旁回到中央道路，再由房門進屋走到床前。
+  await walk(page, 'ArrowUp', 1);
+  await walk(page, 'ArrowRight', 1);
+  await walk(page, 'ArrowUp', 16);
+  await walk(page, 'ArrowRight', 7);
+  await walk(page, 'ArrowUp', 1);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
+  await walk(page, 'ArrowUp', 9);
+  await walk(page, 'ArrowLeft', 6);
   await walk(page, 'ArrowUp', 1);
 }
 
@@ -96,7 +148,7 @@ test('completes farm, exploration, shipping and save loop without duplicate cost
   await waitForGame(page);
 
   // 第 1 天耕地、播種、澆水；同一格重複開墾應被拒絕且不再扣體力。
-  await press(page, ['ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowUp']); // (7,9) → (7,5)
+  await moveToFarmField(page);
   await page.keyboard.press('x');
   await expect(page.locator('#hud-energy-text')).toHaveText('98 / 100');
   await expect(page.locator('#hud-log')).toContainText('開墾了一塊田');
@@ -121,8 +173,9 @@ test('completes farm, exploration, shipping and save loop without duplicate cost
   await expect(page.locator('#hud-energy-text')).toHaveText('96 / 100');
 
   // 第 1 天探索森林採集；重複採同一採集點會提示已採過，不能再次扣體力。
-  await walk(page, 'ArrowDown', 2);
-  await walk(page, 'ArrowRight', 32); // 農場東門 → 森林 (2,7)
+  await walk(page, 'ArrowRight', 9);
+  await walk(page, 'ArrowUp', 10);
+  await walk(page, 'ArrowRight', 19); // 由中央大道到東門 → 森林 (2,7)，避開田區圍籬與出貨箱
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('forest');
   await walk(page, 'ArrowDown', 1); // (2,8)，面向 (2,9) 野薄荷
   await page.keyboard.press('x');
@@ -145,10 +198,8 @@ test('completes farm, exploration, shipping and save loop without duplicate cost
   await walk(page, 'ArrowUp', 1); // 回到森林西門所在的第 7 列
   await walk(page, 'ArrowLeft', 2); // 森林西門 → 農場 (30,7)
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
-  await walk(page, 'ArrowLeft', 23);
-  await walk(page, 'ArrowUp', 2);
-  await walk(page, 'ArrowLeft', 5);
-  await walk(page, 'ArrowUp', 1); // 進小屋 (4,5)
+  await walk(page, 'ArrowDown', 2);
+  await walk(page, 'ArrowLeft', 3); // 森林西門落在 (30,7)，沿支路到小屋門 (27,9)
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
   await walk(page, 'ArrowUp', 9);
   await walk(page, 'ArrowLeft', 6);
@@ -173,19 +224,11 @@ test('completes farm, exploration, shipping and save loop without duplicate cost
   await expect(page.locator('#hud-log')).toContainText('收成了 月光豆');
 
   // 將作物與可出貨的採集物交給出貨箱，睡覺結算金幣。
-  await walk(page, 'ArrowLeft', 4);
-  await walk(page, 'ArrowDown', 2);
-  await page.keyboard.press('ArrowLeft'); // 面向出貨箱 (2,7)
+  await moveToShipbox(page);
   await page.keyboard.press('x');
   await expect(page.locator('#hud-log')).toContainText('把作物放進了出貨箱');
-  await walk(page, 'ArrowRight', 4); // 回到 (7,7)
-  await walk(page, 'ArrowUp', 2);
-  await walk(page, 'ArrowLeft', 5);
-  await walk(page, 'ArrowUp', 1); // 進小屋
+  await moveFromShipboxToBed(page);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
-  await walk(page, 'ArrowUp', 9);
-  await walk(page, 'ArrowLeft', 6);
-  await walk(page, 'ArrowUp', 1);
   await page.keyboard.press('ArrowUp');
   await page.keyboard.press('x');
   await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 4 天');

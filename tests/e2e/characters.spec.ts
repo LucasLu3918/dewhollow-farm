@@ -57,9 +57,9 @@ test('the player is drawn from the real 2x image at half scale, standing on her 
   expect(requested).toContain('xiaohan-2x.png');
   await expect(page.locator('#hud-log')).not.toContainText('素材載入失敗');
 
-  // 出生點 (7,9)：顯示成 64×80，腳底在格子底部 (9+1)×64 = 640。
+  // 新農場中央十字路口 (20,14)：顯示成 64×80，腳底貼齊所在格子底部。
   const [player] = await sprites(page, 'player.');
-  expect(player).toMatchObject({ key: 'player.down', left: 448, top: 560, width: 64, height: 80 });
+  expect(player).toMatchObject({ key: 'player.down', left: 20 * 64, top: 14 * 64 - 16, width: 64, height: 80 });
 });
 
 test('each direction has its own image, and facing right mirrors the side image', async ({ page }) => {
@@ -79,21 +79,21 @@ test('each direction has its own image, and facing right mirrors the side image'
 
   const current = async () => (await sprites(page, 'player.'))[0];
 
-  // 往上：背面。出生點 (7,9) → (7,8)，腳底 (8+1)×64 = 576。
+  // 往上：背面。出生點 (20,14) → (20,13)。
   await page.keyboard.press('ArrowUp');
   await expect.poll(async () => (await current())?.key).toBe('player.up');
-  await expect.poll(async () => (await current())?.top).toBe(496);
-  expect(await current()).toMatchObject({ left: 448, width: 64, height: 80, flipX: false });
+  await expect.poll(async () => (await current())?.top).toBe(13 * 64 - 16);
+  expect(await current()).toMatchObject({ left: 20 * 64, width: 64, height: 80, flipX: false });
 
-  // 往左：側面，不翻轉。(7,8) → (6,8)。
+  // 往左：側面，不翻轉。(20,13) → (19,13)。
   await page.keyboard.press('ArrowLeft');
-  await expect.poll(async () => (await current())?.left).toBe(6 * 64);
-  expect(await current()).toMatchObject({ key: 'player.left', top: 496, width: 64, height: 80, flipX: false });
+  await expect.poll(async () => (await current())?.left).toBe(19 * 64);
+  expect(await current()).toMatchObject({ key: 'player.left', top: 13 * 64 - 16, width: 64, height: 80, flipX: false });
 
-  // 往右：同一張側面圖，水平翻轉。大小與腳底位置不變。(6,8) → (7,8)。
+  // 往右：同一張側面圖，水平翻轉。(19,13) → (20,13)。
   await page.keyboard.press('ArrowRight');
-  await expect.poll(async () => (await current())?.left).toBe(7 * 64);
-  expect(await current()).toMatchObject({ key: 'player.left', top: 496, width: 64, height: 80, flipX: true });
+  await expect.poll(async () => (await current())?.left).toBe(20 * 64);
+  expect(await current()).toMatchObject({ key: 'player.left', top: 13 * 64 - 16, width: 64, height: 80, flipX: true });
 
   // 往下：回到正面，不翻轉。
   await page.keyboard.press('ArrowDown');
@@ -108,8 +108,12 @@ test('each direction has its own image, and facing right mirrors the side image'
 
 test('Maomao in the village uses the real image and stands on his tile', async ({ page }) => {
   await waitForGame(page);
-  // 從 (7,9) 往南走 20 格，穿過農場南門 (7,29) 進入村莊。
-  for (let i = 0; i < 20; i += 1) await pressMovement(page, 'ArrowDown');
+  // 從中央路口繞過南側出貨箱，再由農場南門進入村莊。
+  for (let i = 0; i < 12; i += 1) await pressMovement(page, 'ArrowDown');
+  await pressMovement(page, 'ArrowLeft');
+  for (let i = 0; i < 2; i += 1) await pressMovement(page, 'ArrowDown');
+  await pressMovement(page, 'ArrowRight');
+  await pressMovement(page, 'ArrowDown');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
 
   expect(await textureSize(page, 'npc.maomao')).toEqual({ width: 128, height: 160 });

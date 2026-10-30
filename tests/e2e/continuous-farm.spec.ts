@@ -7,9 +7,15 @@ async function start(page: Page): Promise<void> {
 }
 
 async function moveToEmptyField(page: Page): Promise<void> {
-  for (let i = 0; i < 4; i += 1) await pressMovement(page, 'ArrowLeft');
-  for (let i = 0; i < 4; i += 1) await pressMovement(page, 'ArrowUp');
-  await pressMovement(page, 'ArrowRight');
+  await saveGame(page);
+  const record = await savedRecord(page);
+  const state = record.state as { player: { x: number; y: number; facing: string }; mapId: string };
+  state.mapId = 'farm';
+  state.player = { ...state.player, x: 9, y: 24, facing: 'right' };
+  await restoreRecord(page, record);
+  await page.reload();
+  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 }
 
 async function pressMovement(page: Page, key: string): Promise<void> {
@@ -282,7 +288,7 @@ test.describe('可取消的長按連續農務', () => {
     await expect.poll(() => page.evaluate(() => {
       const candidate = window.__dewhollow?.interaction();
       return `${candidate?.labelKey}:${candidate?.plotKey}`;
-    })).toBe('alreadyTilled:6,5');
+    })).toBe('alreadyTilled:farm|11,24');
     await page.waitForTimeout(800);
     await page.mouse.up();
     const hits = await page.evaluate(() => window.__dewhollow?.effectLog().filter((entry) => entry.name === 'effect:till').length ?? 0);
@@ -356,7 +362,7 @@ test.describe('可取消的長按連續農務', () => {
 
   test('最後一顆種子只播一次；單次 command 與長按的背包、日曆、任務及 RNG 終態相同', async ({ page }) => {
     const initial = await prepareFarmState(page, (state) => {
-      state.plots = { '5,5': { watered: false, crop: null, dryDays: 0 } };
+      state.plots = { 'farm|10,24': { watered: false, crop: null, dryDays: 0 } };
       state.tool = 'seedbag';
       state.selectedSeed = 'moon-bean';
       const inventory = state.inventory as { capacity: number; stacks: Array<{ itemId: string; quality: string; count: number }> };
@@ -373,7 +379,7 @@ test.describe('可取消的長按連續農務', () => {
     await expect.poll(() => page.evaluate(() => {
       const candidate = window.__dewhollow?.interaction();
       return `${candidate?.labelKey}:${candidate?.plotKey}`;
-    })).toBe('plant:5,5');
+    })).toBe('plant:farm|10,24');
     await saveGame(page);
     const configured = await savedRecord(page);
 

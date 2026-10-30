@@ -4,6 +4,7 @@ import npcs from '../../../content/npcs.json';
 import start from '../../../content/start.json';
 import tuning from '../../../content/tuning.json';
 import farm from '../../../content/maps/farm.json';
+import greenhouse from '../../../content/maps/greenhouse.json';
 import village from '../../../content/maps/village.json';
 import forest from '../../../content/maps/forest.json';
 import lake from '../../../content/maps/lake.json';
@@ -54,7 +55,7 @@ const { pack } = loadContent({
     letters,
     festivals,
     mainQuest, repairs, randomEvents,
-  maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+  maps: [farm, greenhouse, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
   start,
   tuning,
   assets,

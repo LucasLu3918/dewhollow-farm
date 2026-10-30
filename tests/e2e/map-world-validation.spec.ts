@@ -64,7 +64,7 @@ async function putRecord(page: Page, overrides: SaveOverrides = {}): Promise<voi
   }), {
     season: overrides.season ?? 'spring',
     mapId: overrides.mapId ?? 'farm',
-    player: overrides.player ?? { x: 7, y: 9, facing: 'down' },
+    player: overrides.player ?? { x: 20, y: 14, facing: 'down' },
     tool: overrides.tool ?? 'hoe',
     plots: overrides.plots ?? {},
     flags: overrides.flags ?? {},
@@ -269,20 +269,20 @@ test('farm and village grass render with distinct spring, summer, autumn, and wi
     const farmTiles = await sprites(page);
     expect(farmTiles.map((sprite) => sprite.key)).toContain('tile.grass');
     await capture(page, `farm-${season}.png`);
-    farmSamples.push(await grassPixel(page, 10, 9));
+    farmSamples.push(await grassPixel(page, 19, 13));
 
+    // Load a village save directly; route traversal is covered by the portal test below.
     // A fresh scene is needed after pauseScene; the saved season is deterministic.
+    await putRecord(page, { season, mapId: 'village', player: { x: 7, y: 10, facing: 'down' } });
     await page.reload();
-    await expect.poll(() => mapId(page)).toBe('farm');
-    await walk(page, 'ArrowDown', 20);
     await expect.poll(() => mapId(page)).toBe('village');
     expect((await sprites(page)).map((sprite) => sprite.key)).toContain('tile.grass');
-    villageSamples.push(await grassPixel(page, 1, 1));
+    villageSamples.push(await grassPixel(page, 8, 9));
   }
 
   const unique = (samples: [number, number, number][]) => new Set(samples.map((rgb) => rgb.join(',')));
-  expect(unique(farmSamples).size, '農場草地的取樣像素應反映每季草色變化').toBe(SEASONS.length);
-  expect(unique(villageSamples).size, '村莊草地的取樣像素應反映每季草色變化').toBe(SEASONS.length);
+  expect(unique(farmSamples).size, `農場草地的取樣像素應反映每季草色變化：${JSON.stringify(farmSamples)}`).toBe(SEASONS.length);
+  expect(unique(villageSamples).size, `村莊草地的取樣像素應反映每季草色變化：${JSON.stringify(villageSamples)}`).toBe(SEASONS.length);
 });
 
 test('a mature spring field renders from a deterministic saved crop state', async ({ page }) => {
@@ -290,13 +290,51 @@ test('a mature spring field renders from a deterministic saved crop state', asyn
   await expect(page.locator('#game canvas')).toBeVisible();
   await putRecord(page, {
     season: 'spring',
-    plots: { '8,8': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } },
+    player: { x: 9, y: 16, facing: 'right' },
+    plots: { 'farm|10,16': { watered: true, dryDays: 0, crop: { cropId: 'sweet-radish', growthDays: 3 } } },
   });
   await page.reload();
   await expect.poll(() => mapId(page)).toBe('farm');
   await expect(page.locator('#hud-day')).toHaveText('第 1 年 春 第 4 天');
   expect((await sprites(page)).map((sprite) => sprite.key)).toEqual(expect.arrayContaining(['tile.soil', 'crop.sweet-radish']));
   await capture(page, 'farm-mature-field.png');
+});
+
+test('redesigned farm field edges stay walkable while the farmhouse wall blocks movement', async ({ page }) => {
+  await waitForGame(page);
+  await putRecord(page, { player: { x: 4, y: 16, facing: 'right' } });
+  await page.reload();
+  await expect.poll(() => mapId(page)).toBe('farm');
+  await walk(page, 'ArrowRight');
+  await walk(page, 'ArrowDown');
+  await expect.poll(async () => {
+    const actor = await player(page);
+    return [actor.tileX, actor.tileY];
+  }).toEqual([5, 17]);
+
+  // The west edge of the farmhouse is solid even though its surrounding yard is open grass.
+  await putRecord(page, { player: { x: 22, y: 7, facing: 'right' } });
+  await page.reload();
+  await expect.poll(() => mapId(page)).toBe('farm');
+  await blockedMove(page, 'ArrowRight');
+  expect((await sprites(page)).map((sprite) => sprite.key)).toContain('tile.wall');
+});
+
+test('the village general-store wall blocks movement and the reachable storefront still opens', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#game canvas')).toBeVisible();
+  await putRecord(page, { mapId: 'village', player: { x: 5, y: 2, facing: 'left' } });
+  await page.reload();
+  await expect.poll(() => mapId(page)).toBe('village');
+  await blockedMove(page, 'ArrowLeft');
+  expect((await sprites(page)).map((sprite) => sprite.key)).toContain('tile.wall');
+
+  await putRecord(page, { mapId: 'village', player: { x: 3, y: 5, facing: 'up' } });
+  await page.reload();
+  await expect.poll(() => mapId(page)).toBe('village');
+  await page.keyboard.press('x');
+  await expect(page.locator('#shop-panel')).toBeVisible();
+  await expect(page.locator('#shop-title')).toHaveText('雜貨店');
 });
 
 test('the lakeside fishing view and mine entrance have deterministic visual baselines', async ({ page }) => {
@@ -315,57 +353,37 @@ test('the lakeside fishing view and mine entrance have deterministic visual base
   await capture(page, 'mine-entrance.png');
 });
 
-test('field edges stay walkable while farm buildings, greenhouse fence, forest trees, and door transitions block correctly', async ({ page }) => {
+test('greenhouse interior and forest tree movement, collision, and visual depth stay coherent', async ({ page }) => {
   test.setTimeout(180_000);
   await waitForGame(page);
+  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 20, y: 14 });
 
-  // The field and grass edge is traversable in both directions.
-  await walk(page, 'ArrowUp', 4); // (7,9) -> (7,5), the south edge of the field.
-  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 7, y: 5 });
-  await walk(page, 'ArrowUp');
-  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 7, y: 4 });
-  await walk(page, 'ArrowDown');
+  // Unlock the room in a deterministic save and approach its door along the central farm route.
+  await putRecord(page, { mapId: 'farm', player: { x: 8, y: 8, facing: 'left' }, flags: { greenhouse: true } });
+  await page.reload();
+  await expect.poll(() => mapId(page)).toBe('farm');
+  await walk(page, 'ArrowLeft'); // Q at (7,8)
+  await expect.poll(() => mapId(page)).toBe('greenhouse');
+  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 6, y: 6 });
 
-  // The south doorway connects the farm and village; a village shop wall blocks movement.
-  await walk(page, 'ArrowDown', 4); // back to farm spawn (7,9)
-  await walk(page, 'ArrowDown', 20);
-  await expect.poll(() => mapId(page)).toBe('village');
-  await walk(page, 'ArrowUp', 8); // (7,2)
-  await walk(page, 'ArrowLeft', 2); // (5,2), beside the shop wall at x=4
+  // Reach a greenhouse bed, till it, and prove the same local coordinates are saved separately.
+  await walk(page, 'ArrowUp', 4); // (6,2), on a greenhouse field row
+  await walk(page, 'ArrowLeft'); // face the field at (5,2)
+  await page.keyboard.press('x');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().plots['greenhouse|4,2']?.watered)).toBe(false);
+  await walk(page, 'ArrowLeft', 4); // (1,2), immediately inside the west wall
   await blockedMove(page, 'ArrowLeft');
-  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 5, y: 2 });
   expect((await sprites(page)).map((sprite) => sprite.key)).toContain('tile.wall');
   expect((await sprites(page)).map((sprite) => sprite.key)).toContain('tile.door');
 
-  // Return through the same doorway and approach the east exit.
-  await walk(page, 'ArrowDown', 8); // (5,10)
-  await walk(page, 'ArrowRight', 2); // doorway column x=7
-  await walk(page, 'ArrowDown'); // village doorway at (7,11)
+  // The south-facing return door leads to a farm route; continue along the road to the forest gate.
+  await walk(page, 'ArrowRight', 5); // (6,2)
+  await walk(page, 'ArrowDown', 6); // q -> farm (7,9)
   await expect.poll(() => mapId(page)).toBe('farm');
-  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 7, y: 28 });
-
-  // Remodel the greenhouse in a deterministic save, enter through Q, then approach the west fence
-  // from inside. This avoids claiming an inaccessible outside tile can be reached through a wall.
-  await putRecord(page, { flags: { greenhouse: true } });
-  await page.reload();
-  await expect.poll(() => mapId(page)).toBe('farm');
-  await walk(page, 'ArrowUp', 2); // (7,7)
-  await walk(page, 'ArrowRight', 23); // (30,7)
-  await walk(page, 'ArrowDown', 12); // (30,19), above the greenhouse door
-  await walk(page, 'ArrowDown'); // Q entrance -> greenhouse interior (30,22)
-  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 30, y: 22 });
-  await walk(page, 'ArrowLeft', 2); // (28,22), immediately inside the west fence at x=27
-  await blockedMove(page, 'ArrowLeft');
-  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 28, y: 22 });
-  const greenhouseSprites = await sprites(page);
-  expect(greenhouseSprites.map((sprite) => sprite.key)).toContain('tile.fence');
-
-  // Exit through the greenhouse's q door and use the east farm door to enter the forest.
-  await walk(page, 'ArrowRight', 2); // (30,22)
-  await walk(page, 'ArrowUp'); // q exit -> (30,19)
-  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 30, y: 19 });
-  await walk(page, 'ArrowUp', 12); // y=7
-  await walk(page, 'ArrowRight', 8); // x=38, beside east doorway
+  await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 7, y: 9 });
+  await walk(page, 'ArrowRight', 13); // x=20
+  await walk(page, 'ArrowDown', 5); // y=14, main crossroad
+  await walk(page, 'ArrowRight', 18); // x=38, beside east doorway
   await walk(page, 'ArrowRight'); // enter at x=39
   await expect.poll(() => mapId(page)).toBe('forest');
   await expect.poll(async () => ({ x: (await player(page)).tileX, y: (await player(page)).tileY })).toEqual({ x: 2, y: 7 });

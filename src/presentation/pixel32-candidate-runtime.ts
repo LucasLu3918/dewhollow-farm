@@ -55,11 +55,11 @@ export interface Pixel32CandidateInteractable {
   tileY: number;
 }
 
-/** Fixed, collision-free DEV review layout. Coordinates are anchored in farm tiles. */
+/** DEV-only unapproved review overlays anchored beside the central open farm path. */
 export const PIXEL32_CANDIDATE_OVERLAYS: readonly Pixel32CandidateOverlay[] = [
-  { id: 'house-back', frame: 'house-back', tileX: 3, tileY: 3, layer: 'back', widthTiles: 3, heightTiles: 2 },
-  { id: 'tree-canopy', frame: 'tree-canopy', tileX: 8, tileY: 3, layer: 'front', widthTiles: 2, heightTiles: 2 },
-  { id: 'house-front', frame: 'house-front', tileX: 3, tileY: 3, layer: 'front', widthTiles: 3, heightTiles: 2 },
+  { id: 'house-back', frame: 'house-back', tileX: 19, tileY: 9, layer: 'back', widthTiles: 3, heightTiles: 2 },
+  { id: 'tree-canopy', frame: 'tree-canopy', tileX: 19, tileY: 3, layer: 'front', widthTiles: 2, heightTiles: 2 },
+  { id: 'house-front', frame: 'house-front', tileX: 19, tileY: 9, layer: 'front', widthTiles: 3, heightTiles: 2 },
 ];
 
 /** Fixed DEV review samples placed beside the existing farm door and shipbox. */

@@ -5,16 +5,16 @@ import { plotNeighborMask, resolvePlotVisual } from './plot-visual';
 describe('plotNeighborMask', () => {
   it('encodes adjacent tilled plots as north/east/south/west bits', () => {
     const plots: PlotMap = {
-      '2,1': { watered: false, crop: null, dryDays: 0 },
-      '3,2': { watered: false, crop: null, dryDays: 0 },
-      '2,3': { watered: false, crop: null, dryDays: 0 },
-      '1,2': { watered: false, crop: null, dryDays: 0 },
+      'farm|2,1': { watered: false, crop: null, dryDays: 0 },
+      'farm|3,2': { watered: false, crop: null, dryDays: 0 },
+      'farm|2,3': { watered: false, crop: null, dryDays: 0 },
+      'farm|1,2': { watered: false, crop: null, dryDays: 0 },
       '2,2': { watered: false, crop: null, dryDays: 0 },
       '1,1': { watered: true, crop: null, dryDays: 0 },
     };
 
     expect(plotNeighborMask(2, 2, plots, false)).toBe(0b1111);
-    expect(plotNeighborMask(2, 2, { ...plots, '3,2': { watered: true, crop: null, dryDays: 0 } }, false)).toBe(0b1101);
+    expect(plotNeighborMask(2, 2, { ...plots, 'farm|3,2': { watered: true, crop: null, dryDays: 0 } }, false)).toBe(0b1101);
     expect(plotNeighborMask(0, 0, plots, false)).toBe(0);
   });
 });

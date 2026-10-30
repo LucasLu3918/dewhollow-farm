@@ -7,11 +7,11 @@ import { sceneOverlaysFor } from './scene-overlays';
 describe('sceneOverlaysFor', () => {
   it('places only the authored farm house and boundary tree visuals', () => {
     expect(sceneOverlaysFor('farm')).toEqual([
-      { assetId: 'scene.farm.tree', anchorTile: { x: 33, y: 21 } },
-      { assetId: 'scene.farm.house', anchorTile: { x: 2, y: 4 } },
+      { assetId: 'scene.farm.tree', anchorTile: { x: 36, y: 21 } },
+      { assetId: 'scene.farm.house', anchorTile: { x: 27, y: 9 } },
     ]);
-    const treeAnchor = tileAt(farm as MapDef, 33, 21);
-    expect(treeAnchor?.kind).toBe('fence');
+    const treeAnchor = tileAt(farm as MapDef, 36, 21);
+    expect(treeAnchor?.kind).toBe('wall');
     expect(isWalkable(treeAnchor!.kind)).toBe(false);
   });
 

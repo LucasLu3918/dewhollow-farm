@@ -213,29 +213,26 @@ test('records comparable farm movement and farming input clips for all render pr
     const afterDiagonal = await page.evaluate(() => window.__dewhollow?.movement()?.tile);
     timeline.push({ event: 'simultaneous-up-right-resolves-through-grid-input', elapsedMs: elapsedMs(), before: beforeDiagonal, after: afterDiagonal });
 
-    // Return to the deterministic farm start, then hoe the known plot directly north at (7, 4).
+    // Return to the farm spawn, then enter the outdoor bed from its south aisle.
     let position = await page.evaluate(() => window.__dewhollow?.movement()?.tile);
     while (position && position.y < start.y) {
-      await page.keyboard.press('ArrowDown');
-      await idle(page);
+      await page.keyboard.press('ArrowDown'); await idle(page);
       position = await page.evaluate(() => window.__dewhollow?.movement()?.tile);
     }
     while (position && position.x < start.x) {
-      await page.keyboard.press('ArrowRight');
-      await idle(page);
+      await page.keyboard.press('ArrowRight'); await idle(page);
       position = await page.evaluate(() => window.__dewhollow?.movement()?.tile);
     }
     while (position && position.x > start.x) {
-      await page.keyboard.press('ArrowLeft');
-      await idle(page);
+      await page.keyboard.press('ArrowLeft'); await idle(page);
       position = await page.evaluate(() => window.__dewhollow?.movement()?.tile);
     }
-    for (let step = 0; step < 4; step += 1) {
-      const before = await page.evaluate(() => window.__dewhollow?.movement()?.tile?.y ?? 0);
-      await page.keyboard.press('ArrowUp');
-      await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement()?.tile?.y ?? 0)).toBe(before - 1);
-      await idle(page);
-    }
+    for (let step = 0; step < 12; step += 1) { await page.keyboard.press('ArrowDown'); await idle(page); }
+    await page.keyboard.press('ArrowLeft'); await idle(page);
+    await page.keyboard.press('ArrowDown'); await idle(page);
+    for (let step = 0; step < 10; step += 1) { await page.keyboard.press('ArrowLeft'); await idle(page); }
+    for (let step = 0; step < 3; step += 1) { await page.keyboard.press('ArrowUp'); await idle(page); }
+    await page.keyboard.press('ArrowRight'); await idle(page);
     await page.keyboard.press('x');
     await expect(page.locator('#hud-energy-text')).toHaveText('98 / 100');
     timeline.push({ event: 'hoe-farm-plot', elapsedMs: elapsedMs(), tile: await page.evaluate(() => window.__dewhollow?.movement()?.tile), energy: await page.locator('#hud-energy-text').innerText() });

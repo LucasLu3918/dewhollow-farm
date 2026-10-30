@@ -12,7 +12,7 @@ function record(overrides: Record<string, unknown>): Record<string, unknown> {
     slot: 'slot-1',
     savedAt: '2026-10-22T10:00:00.000Z',
     state: {
-      schemaVersion: 25,
+      schemaVersion: 26,
       calendar: { year: 2, season: 'spring', day: 1, minuteOfDay: 360 },
       weather: 'sunny',
       forecast: 'sunny',
@@ -134,7 +134,7 @@ test('豐收重置：第一次按只顯示說明，第二次確認後清空農�
   await page.keyboard.press('s');
   await expect(page.locator('#hud-log')).toContainText('已存檔');
   const saved = await readRecord(page);
-  expect(saved.state.schemaVersion).toBe(25);
+  expect(saved.state.schemaVersion).toBe(26);
   expect(saved.state.resetBonus).toBe(1);
   expect(saved.state.gold).toBe(100);
   expect(saved.state.flags).not.toHaveProperty('house-wing');

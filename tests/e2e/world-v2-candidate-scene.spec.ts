@@ -97,9 +97,9 @@ test('DEV world-v2 farm and house scene candidate stays opt-in and renders both 
   await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate().enabled ?? false)).toBe(true);
   await capture(page, 'farm-mobile');
 
-  await walk(page, 'ArrowUp', 4);
-  await walk(page, 'ArrowLeft', 5);
-  await page.keyboard.press('ArrowUp');
+  await walk(page, 'ArrowUp', 5);
+  await walk(page, 'ArrowRight', 6);
+  await page.keyboard.press('ArrowRight');
   await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.mapId() ?? '')).toBe('house');
   await expect.poll(() => page.evaluate(() => (window as unknown as { __dewhollow?: CandidateDebug }).__dewhollow?.worldV2SceneCandidate().frames ?? [])).toContain(
     'gate1-world-v2-house-atlas:rug',

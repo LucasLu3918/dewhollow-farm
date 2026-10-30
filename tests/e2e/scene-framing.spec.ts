@@ -66,13 +66,12 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
 
 async function enterScene(page: Page, scene: Scene): Promise<void> {
   if (scene === 'house') {
-    await walk(page, 'ArrowUp', 4);
-    await walk(page, 'ArrowLeft', 5);
+    await walk(page, 'ArrowUp', 5);
+    await walk(page, 'ArrowRight', 7);
   } else {
-    await walk(page, 'ArrowRight', 27);
-    await walk(page, 'ArrowUp', 4);
+    await walk(page, 'ArrowRight', 16);
+    await walk(page, 'ArrowUp', 8);
   }
-  await page.keyboard.press('ArrowUp');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe(scene);
 }
 

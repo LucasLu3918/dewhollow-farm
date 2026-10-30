@@ -24,10 +24,10 @@ function transitionKind(from: Direction, to: Direction): 'reverse' | 'cross' | '
 }
 
 function createBatches(): DirectionBatch[] {
-  const expectedNext: Direction[] = [
-    'left', 'left', 'left', 'left', 'left', 'up', 'up', 'up', 'up', 'left',
-  ];
-  const crossTurnsPerBatch = [4, 6, 4, 6, 4, 5, 4, 6, 6, 5];
+  const expectedNext: Direction[] = Array.from({ length: 10 }, () => 'left');
+  // Each batch starts and ends facing left, so its perpendicular turns must be even.
+  // These feasible counts sum to the required 50 cross-turns across the ten batches.
+  const crossTurnsPerBatch = [4, 6, 4, 6, 4, 6, 4, 6, 6, 4];
   let previous: Direction = initialDirection;
 
   const batches = expectedNext.map((end, index) => {
@@ -238,14 +238,17 @@ test('pixel32 candidate survives 50 reversals and 50 cross-turns during ten comm
   const page = await context.newPage();
   const cryptoHash = (bytes: Uint8Array) => crypto.createHash('sha256').update(bytes).digest('hex');
   const batches = createBatches();
-  const route: Tile[] = [
-    { x: 6, y: 9 }, { x: 5, y: 9 }, { x: 4, y: 9 }, { x: 3, y: 9 }, { x: 2, y: 9 }, { x: 1, y: 9 },
-    { x: 1, y: 8 }, { x: 1, y: 7 }, { x: 1, y: 6 }, { x: 1, y: 5 },
-  ];
-  const start = { x: 7, y: 9 };
+  const route: Tile[] = Array.from({ length: 10 }, (_, index) => ({ x: 10 - index, y: 13 }));
+  const start = { x: 11, y: 13 };
 
   try {
     await startCandidate(page);
+    await page.keyboard.press('ArrowUp');
+    await waitForTile(page, { x: 20, y: 13 });
+    for (let x = 19; x >= start.x; x -= 1) {
+      await page.keyboard.press('ArrowLeft');
+      await waitForTile(page, { x, y: start.y });
+    }
     await expect.poll(() => page.evaluate(() => {
       const tile = window.__dewhollow?.movement().tile;
       return tile ? { x: tile.x, y: tile.y } : null;
@@ -257,7 +260,9 @@ test('pixel32 candidate survives 50 reversals and 50 cross-turns during ten comm
     const batchesEvidence: Array<{ index: number; expectedNext: Direction; lastInputAt: number; beforeTile: Tile; afterTile: Tile; queueDepths: number[] }> = [];
 
     for (const [index, inputBatch] of batches.entries()) {
-      const before = route[index]!;
+      // The first batch starts from the uncounted kickoff step; later batches start
+      // from the preceding committed tile while its queued next step is in flight.
+      const before = index === 0 ? start : route[index - 1]!;
       const dispatched = await batch(page, before, inputBatch.inputs, index === 0 ? initialDirection : undefined);
       if (!dispatched) throw new Error(`無法在格位 ${before.x},${before.y} 的有效移動步驟中派發輸入`);
       expect(dispatched.beforeTile).toEqual(before);
@@ -265,22 +270,23 @@ test('pixel32 candidate survives 50 reversals and 50 cross-turns during ten comm
       expect(depths).toHaveLength(10);
       expect(depths.every((depth) => depth === 1)).toBe(true);
       expect(Math.max(...depths)).toBeLessThanOrEqual(1);
-      if (index < route.length - 1) {
-        const expected = route[index + 1]!;
-        await waitForTile(page, expected);
-        const actual = await currentTile(page);
-        expect(actual).toEqual(expected);
-        expect(Math.abs(actual.x - before.x) + Math.abs(actual.y - before.y)).toBe(1);
-        batchesEvidence.push({ index: index + 1, expectedNext: inputBatch.expectedNext, lastInputAt, beforeTile: before, afterTile: actual, queueDepths: depths });
-      } else {
-        await expect.poll(() => page.evaluate(({ x, y }) => {
-          const movement = window.__dewhollow?.movement();
-          return movement?.blockedDirection === 'left' && movement.tile.x === x && movement.tile.y === y;
-        }, before), { timeout: 10_000 }).toBe(true);
-        batchesEvidence.push({ index: index + 1, expectedNext: inputBatch.expectedNext, lastInputAt, beforeTile: before, afterTile: before, queueDepths: depths });
-      }
+      const expected = route[index]!;
+      await waitForTile(page, expected);
+      const actual = await currentTile(page);
+      expect(actual).toEqual(expected);
+      expect(Math.abs(actual.x - before.x) + Math.abs(actual.y - before.y)).toBe(1);
+      batchesEvidence.push({ index: index + 1, expectedNext: inputBatch.expectedNext, lastInputAt, beforeTile: before, afterTile: actual, queueDepths: depths });
     }
 
+    // Keep the 100 stress intents separate from the explicit wall-collision check.
+    await expect.poll(() => page.evaluate(() => {
+      const movement = window.__dewhollow?.movement();
+      return movement?.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
+    }), { timeout: 10_000 }).toBe(true);
+    await page.evaluate(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }));
+      window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowLeft', bubbles: true, cancelable: true }));
+    });
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().blockedDirection ?? null), { timeout: 10_000 }).toBe('left');
     await expect.poll(() => page.evaluate(() => {
       const movement = window.__dewhollow?.movement();
@@ -319,22 +325,22 @@ test('pixel32 candidate survives 50 reversals and 50 cross-turns during ten comm
     }, []);
     expect(transitions).toHaveLength(10);
     expect(transitions.map(({ to }) => to)).toEqual(route);
-    expect(finalState.movement).toMatchObject({ tile: { x: 1, y: 5 }, heldDirection: null, blockedDirection: 'left', moving: false, pending: false, queuedTaps: 0 });
-    expect(finalState.actor).toMatchObject({ tileX: 1, tileY: 5, busy: false });
+    expect(finalState.movement).toMatchObject({ tile: { x: 1, y: 13 }, heldDirection: null, blockedDirection: 'left', moving: false, pending: false, queuedTaps: 0 });
+    expect(finalState.actor).toMatchObject({ tileX: 1, tileY: 13, busy: false });
     expect(finalState.actor?.footX).toBeCloseTo(96, 0);
-    expect(finalState.actor?.footY).toBeCloseTo(384, 0);
+    expect(finalState.actor?.footY).toBeCloseTo(13 * 64 + 64, 0);
     expect(finalState.runtime).toMatchObject({ enabled: true, playerVisible: true });
 
     const observedFrames = [...new Set(sampled.samples.map(({ frame }) => frame).filter((frame): frame is string => frame !== null))];
-    for (const direction of ['left', 'up'] as const) {
-      expect(observedFrames.some((frame) => frame.startsWith(`${direction}-`) && !frame.endsWith('-idle'))).toBe(true);
-    }
+    // All ten committed steps are leftward. Perpendicular taps are counted as
+    // queued input stress, but latest-tap-wins does not promise a vertical step.
+    expect(observedFrames.some((frame) => frame.startsWith('left-') && !frame.endsWith('-idle'))).toBe(true);
     const feet = sampled.samples.map(({ foot }) => foot).filter((foot): foot is { x: number; y: number } => foot !== null);
     expect(feet.length).toBeGreaterThan(20);
     expect(Math.min(...feet.map(({ x }) => x))).toBeGreaterThanOrEqual(95);
-    expect(Math.max(...feet.map(({ x }) => x))).toBeLessThanOrEqual(481);
-    expect(Math.min(...feet.map(({ y }) => y))).toBeGreaterThanOrEqual(383);
-    expect(Math.max(...feet.map(({ y }) => y))).toBeLessThanOrEqual(641);
+    expect(Math.max(...feet.map(({ x }) => x))).toBeLessThanOrEqual(start.x * 64 + 96);
+    expect(Math.min(...feet.map(({ y }) => y))).toBeGreaterThanOrEqual(13 * 64 + 63);
+    expect(Math.max(...feet.map(({ y }) => y))).toBeLessThanOrEqual(13 * 64 + 65);
     const lateSamples = sampled.samples.filter(({ at }) => at >= stopObservedAt);
     expect(lateSamples.length).toBeGreaterThanOrEqual(15);
     expect(lateSamples.at(-1)!.at - lateSamples[0]!.at).toBeGreaterThanOrEqual(250);
@@ -383,7 +389,7 @@ test('pixel32 candidate survives 50 reversals and 50 cross-turns during ten comm
       status: 'candidate-only browser evidence; does not pass Gate 1',
       capturedAt: new Date().toISOString(),
       environment: { browser: 'Playwright Chromium', viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, route: '/?renderProfile=pixel32&gate1Runtime=pixel32-map-animation' },
-      route: { start, committedTiles: [start, ...route], successfulTransitions: transitions.length, blockedAttempt: { direction: 'left', tileRemained: { x: 1, y: 5 } } },
+      route: { start, committedTiles: [start, ...route], successfulTransitions: transitions.length, blockedAttempt: { direction: 'left', tileRemained: { x: 1, y: 13 } } },
       inputStress: {
         definition: 'one directional intent is one synthetic keydown/keyup tap; reversal means the next intent is opposite the previous intent; cross-turn means it is perpendicular; each batch is dispatched synchronously within one in-flight 150ms step and latest-tap-wins selects the next tile direction',
         kickoff: { tapCount: 1, direction: initialDirection, includedInStressIntentCount: false },

@@ -96,14 +96,16 @@ describe('pixel32 overlay candidate preview', () => {
     expect(pixel32OverlayPreviewRequested(new URLSearchParams(), true, true)).toBe(false);
   });
 
-  it('keeps a deterministic 3-layer review layout with the house panels sharing one anchor', () => {
+  it('keeps a deterministic DEV review layout beside reachable farm paths with shared house anchors', () => {
     expect(PIXEL32_CANDIDATE_OVERLAYS.map(({ id, layer }) => ({ id, layer }))).toEqual([
       { id: 'house-back', layer: 'back' },
       { id: 'tree-canopy', layer: 'front' },
       { id: 'house-front', layer: 'front' },
     ]);
-    expect(PIXEL32_CANDIDATE_OVERLAYS[0]).toMatchObject({ tileX: 3, tileY: 3, widthTiles: 3, heightTiles: 2 });
-    expect(PIXEL32_CANDIDATE_OVERLAYS[2]).toMatchObject({ tileX: 3, tileY: 3, widthTiles: 3, heightTiles: 2 });
+    expect(PIXEL32_CANDIDATE_OVERLAYS[0]).toMatchObject({ tileX: 19, tileY: 9, widthTiles: 3, heightTiles: 2 });
+    expect(PIXEL32_CANDIDATE_OVERLAYS[1]).toMatchObject({ tileX: 19, tileY: 3, widthTiles: 2, heightTiles: 2 });
+    expect(PIXEL32_CANDIDATE_OVERLAYS[2]).toMatchObject({ tileX: 19, tileY: 9, widthTiles: 3, heightTiles: 2 });
+    expect(PIXEL32_CANDIDATE_OVERLAYS.every(({ tileX, tileY }) => tileX >= 0 && tileY >= 0)).toBe(true);
   });
 });
 

@@ -23,8 +23,6 @@ export const INDOOR_MINE_REQUIRED_FRAMES = [
   'mine-lantern', 'mine-elevator',
 ] as const;
 
-const greenhouseBounds = { left: 27, right: 33, top: 20, bottom: 25 };
-
 export function indoorSceneCandidateRequested(
   search: URLSearchParams,
   isDev: boolean,
@@ -51,10 +49,21 @@ export function indoorSceneCandidateFrameFor(
   x: number,
   y: number,
   layer: 'ground' | 'object',
-  greenhouseUnlocked = false,
 ): { atlas: 'farm' | 'mine'; frame: string } | null {
   const tile = tileAt(map, x, y);
   if (!tile) return null;
+
+  if (map.id === 'greenhouse') {
+    if (layer === 'ground' && tile.kind === 'field' && tile.greenhouse) {
+      return { atlas: 'farm', frame: 'greenhouse-ground' };
+    }
+    if (layer === 'object' && tile.kind === 'door') return { atlas: 'farm', frame: 'greenhouse-door' };
+    if (layer === 'object' && tile.kind === 'wall') {
+      if (y === 0) return { atlas: 'farm', frame: 'greenhouse-back' };
+      if (y === map.height - 1) return { atlas: 'farm', frame: 'greenhouse-front' };
+      return { atlas: 'farm', frame: 'greenhouse-glass' };
+    }
+  }
 
   if (map.id.startsWith('mine-')) {
     if (layer === 'ground') {
@@ -81,18 +90,6 @@ export function indoorSceneCandidateFrameFor(
     }
     if (tile.kind === 'door') return { atlas: 'mine', frame: 'mine-exit-door' };
     return null;
-  }
-
-  if (map.id === 'farm' && greenhouseUnlocked
-    && x >= greenhouseBounds.left && x <= greenhouseBounds.right
-    && y >= greenhouseBounds.top && y <= greenhouseBounds.bottom) {
-    if (tile.greenhouse) return { atlas: 'farm', frame: 'greenhouse-ground' };
-    if (tile.kind === 'door') return { atlas: 'farm', frame: 'greenhouse-door' };
-    if (tile.kind === 'wall' || tile.kind === 'fence') {
-      if (y === greenhouseBounds.top) return { atlas: 'farm', frame: 'greenhouse-back' };
-      if (y === greenhouseBounds.bottom) return { atlas: 'farm', frame: 'greenhouse-front' };
-      return { atlas: 'farm', frame: 'greenhouse-glass' };
-    }
   }
 
   if (map.id === 'coop' || map.id === 'cowbarn') {

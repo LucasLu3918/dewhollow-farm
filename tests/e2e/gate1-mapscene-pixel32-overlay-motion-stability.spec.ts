@@ -97,7 +97,7 @@ test('pixel32 candidate overlay layers stay stable while the player moves around
   await page.goto(candidateQuery);
   await expect(page.locator('#game canvas')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().enabled ?? false)).toBe(true);
-  await placePlayerAt(page, 8, 5);
+  await placePlayerAt(page, 20, 5);
 
   const samples: Record<string, unknown>[] = [];
   const screenshots: Record<string, { file: string; sha256: string }> = {};
@@ -135,14 +135,14 @@ test('pixel32 candidate overlay layers stay stable while the player moves around
   };
 
   const start = await capture('tree-start');
-  expect(start.tile).toEqual({ x: 8, y: 5, facing: 'down' });
+  expect(start.tile).toEqual({ x: 20, y: 5, facing: 'down' });
   const treeStartDepth = start.overlays.overlays.find(({ id }) => id === 'tree-canopy')!.depth;
   expect(start.player.depth).toBeGreaterThan(treeStartDepth);
   const route = [
     { id: 'tree-behind', directions: [directions[0], directions[2]] },
     { id: 'tree-sides', directions: [directions[3], directions[1]] },
-    { id: 'house-approach', directions: [directions[3], directions[3], directions[3], directions[0], directions[0]] },
-    { id: 'house-return', directions: [directions[2], directions[2], directions[1], directions[1], directions[1]] },
+    { id: 'house-approach', directions: [directions[2], directions[2], directions[2], directions[2], directions[2], directions[2]] },
+    { id: 'house-return', directions: [directions[0], directions[0], directions[0], directions[0], directions[0], directions[0]] },
   ] as const;
   const beforeByRoute: Record<string, { tile: { x: number; y: number }; depths: number[] }> = {};
 
@@ -159,13 +159,13 @@ test('pixel32 candidate overlay layers stay stable while the player moves around
         const canopyDepth = state.overlays.overlays.find(({ id }) => id === 'tree-canopy')!.depth;
         expect(state.player.depth, 'player north of the tree foot anchor should render behind its canopy').toBeLessThan(canopyDepth);
       }
-      if (segment.id === 'house-approach' && direction.id === 'north' && state.tile.y === 3) {
-        const houseDepth = state.overlays.overlays.find(({ id }) => id === 'house-front')!.depth;
-        expect(state.player.depth, 'player north of the house foot anchor should render behind its front layer').toBeLessThan(houseDepth);
-      }
-      if (segment.id === 'house-return' && direction.id === 'south' && state.tile.y === 5) {
+      if (segment.id === 'house-approach' && direction.id === 'south' && state.tile.y === 11) {
         const houseDepth = state.overlays.overlays.find(({ id }) => id === 'house-front')!.depth;
         expect(state.player.depth, 'player south of the house foot anchor should render in front of its front layer').toBeGreaterThan(houseDepth);
+      }
+      if (segment.id === 'house-return' && direction.id === 'north' && state.tile.y === 9) {
+        const houseDepth = state.overlays.overlays.find(({ id }) => id === 'house-front')!.depth;
+        expect(state.player.depth, 'player north of the house foot anchor should render behind its front layer').toBeLessThan(houseDepth);
       }
       expect(state.movement.moving).toBe(false);
       beforeByRoute[segment.id] = { tile: state.tile, depths: state.overlays.overlays.map(({ depth }) => depth) };

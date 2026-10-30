@@ -45,12 +45,12 @@ for (const mapId of ['house', 'house-wing', 'house-full']) {
 
     await expect(page.locator('#hud-log')).toContainText('已讀取存檔');
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe(mapId);
-    await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().schemaVersion ?? 0)).toBe(25);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().schemaVersion ?? 0)).toBe(26);
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().player)).toEqual({ x: 10, y: 12, facing: 'up' });
     expect(await page.evaluate(() => window.__dewhollow?.gameState().decor['house-wing'])).toEqual([
       { itemId: 'night-canvas', x: 17, y: 11 },
     ]);
-    expect(await page.evaluate(() => window.__dewhollow?.gameState().plots['4,3'])).toMatchObject({
+    expect(await page.evaluate(() => window.__dewhollow?.gameState().plots['farm|4,16'])).toMatchObject({
       watered: true,
       crop: { cropId: 'moon-bean', growthDays: 1 },
     });
@@ -62,17 +62,36 @@ for (const mapId of ['house', 'house-wing', 'house-full']) {
     }
     await page.keyboard.press('ArrowDown');
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
-    await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().player)).toMatchObject({ x: 2, y: 5 });
+    const farmSpawn = mapId === 'house'
+      ? { x: 27, y: 10 }
+      : { x: 2, y: 5 };
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().player)).toMatchObject(farmSpawn);
 
     // Re-enter through the farm portal; expansion flags select the matching room.
-    await page.keyboard.press('ArrowUp');
+    await expect.poll(() => page.evaluate(() => {
+      const movement = window.__dewhollow?.movement();
+      return movement && movement.heldDirection === null && !movement.moving && !movement.pending && movement.queuedTaps === 0;
+    })).toBe(true);
+    if (mapId === 'house') {
+      await page.keyboard.press('ArrowUp');
+    } else {
+      for (let y = 6; y <= 9; y += 1) {
+        await page.keyboard.press('ArrowDown');
+        await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().player.y ?? -1)).toBe(y);
+      }
+      for (let x = 3; x <= 26; x += 1) {
+        await page.keyboard.press('ArrowRight');
+        await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().player.x ?? -1)).toBe(x);
+      }
+      await page.keyboard.press('ArrowRight');
+    }
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe(mapId);
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().player)).toMatchObject({ x: 10, y: 18 });
 
     await page.keyboard.press('s');
     await expect(page.locator('#hud-log')).toContainText('已存檔');
     const saved = await readState(page);
-    expect(saved).toMatchObject({ schemaVersion: 25, mapId, player: { x: 10, y: 18 }, plots: record.state.plots });
+    expect(saved).toMatchObject({ schemaVersion: 26, mapId, player: { x: 10, y: 18 }, plots: { 'farm|4,16': record.state.plots['4,3'] } });
     expect(saved.decor['house-wing']).toEqual([{ itemId: 'night-canvas', x: 17, y: 11 }]);
   });
 }

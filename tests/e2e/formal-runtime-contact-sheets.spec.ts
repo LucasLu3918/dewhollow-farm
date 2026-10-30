@@ -212,14 +212,16 @@ test('captures formal runtime player and pet contact sheets for visual acceptanc
   await page.goto('/');
   await expect(page.locator('#game canvas')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
-  for (let step = 0; step < 24; step += 1) {
-    if (await page.evaluate(() => window.__dewhollow?.mapId() === 'village')) break;
+  // The redesigned farm's south exit is reached via the west side of the shipping box.
+  await page.keyboard.press('ArrowLeft');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile ?? null)).toMatchObject({ x: 19, y: 14 });
+  for (let step = 0; step < 14; step += 1) {
     await page.keyboard.press('ArrowDown');
-    await expect.poll(() => page.evaluate(() => {
-      const player = window.__dewhollow?.actors().find((actor) => actor.id === 'player');
-      return player !== undefined && !player.busy;
-    })).toBe(true);
+    await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile ?? null)).toMatchObject({ x: 19, y: 15 + step });
   }
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.movement().tile ?? null)).toMatchObject({ x: 20, y: 28 });
+  await page.keyboard.press('ArrowDown');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('village');
   await waitForCameraToSettle(page);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.actors().find((actor) => actor.id === 'marsupial')?.pose.y ?? 0)).toBe(0);

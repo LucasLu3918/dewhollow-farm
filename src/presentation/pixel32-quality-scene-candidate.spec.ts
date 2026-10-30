@@ -206,7 +206,7 @@ describe('pixel32QualityMapProblems', () => {
     const originals = import.meta.glob('../../content/maps/*.json', { eager: true, import: 'default' }) as Record<string, MapDef>;
     const layouts = import.meta.glob('../../docs/art/candidates/pixel-movement/pixel32-quality-rebuild/maps/*/candidate-layout.json', { eager: true, import: 'default' }) as Record<string, MapDef>;
     const manifests = import.meta.glob('../../docs/art/candidates/pixel-movement/pixel32-quality-rebuild/maps/*/candidate.json', { eager: true, import: 'default' }) as Record<string, unknown>;
-    const candidates: MapDef[] = [];
+    const candidates: MapDef[] = Object.values(originals);
     for (const mapId of PIXEL32_QUALITY_MAP_IDS) {
       const original = originals[`../../content/maps/${mapId}.json`];
       const candidate = layouts[`../../docs/art/candidates/pixel-movement/pixel32-quality-rebuild/maps/${mapId}/candidate-layout.json`];

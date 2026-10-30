@@ -36,6 +36,7 @@ import coop from '../../content/maps/coop.json';
 import pasture from '../../content/maps/pasture.json';
 import cowbarn from '../../content/maps/cowbarn.json';
 import farm from '../../content/maps/farm.json';
+import greenhouse from '../../content/maps/greenhouse.json';
 import village from '../../content/maps/village.json';
 import plaza from '../../content/maps/plaza.json';
 import schedules from '../../content/schedules.json';
@@ -189,7 +190,7 @@ describe('the shipped forest has tufts a player can reach', () => {
     letters,
     festivals,
     mainQuest, repairs, randomEvents,
-    maps: [farm, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
+    maps: [farm, greenhouse, village, plaza, forest, lake, house, mineEntrance, coop, pasture, cowbarn],
     start,
     tuning,
     assets,

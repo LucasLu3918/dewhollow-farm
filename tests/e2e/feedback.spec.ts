@@ -18,6 +18,12 @@ interface Actor {
   pose: { y: number };
 }
 
+interface MovementSnapshot {
+  mapId: string;
+  tile: { x: number; y: number };
+  facing: string;
+}
+
 async function effectNames(page: Page): Promise<string[]> {
   const log = (await page.evaluate(() => window.__dewhollow?.effectLog() ?? [])) as LogEntry[];
   return log.map((entry) => entry.name);
@@ -35,9 +41,28 @@ async function waitForGame(page: Page): Promise<void> {
 
 async function press(page: Page, key: string, times = 1): Promise<void> {
   for (let i = 0; i < times; i += 1) {
+    const before = key.startsWith('Arrow') ? await movementSnapshot(page) : null;
     await page.keyboard.press(key);
-    if (key.startsWith('Arrow')) await waitForMovementIdle(page);
+    if (before) {
+      // Wait for the input to be consumed before checking idle; idle may still describe the previous frame.
+      await expect.poll(() => movementSnapshot(page)).not.toEqual(before);
+      await waitForMovementIdle(page);
+    }
   }
+}
+
+async function movementSnapshot(page: Page): Promise<MovementSnapshot> {
+  return page.evaluate(() => {
+    const debug = window.__dewhollow;
+    if (!debug) throw new Error('缺少 window.__dewhollow');
+    const player = debug.actors().find((actor) => actor.id === 'player');
+    if (!player) throw new Error('找不到玩家');
+    return {
+      mapId: debug.mapId(),
+      tile: { x: player.tileX, y: player.tileY },
+      facing: debug.gameState().player.facing,
+    };
+  });
 }
 
 async function waitForMovementIdle(page: Page): Promise<void> {
@@ -57,15 +82,34 @@ async function settle(page: Page): Promise<void> {
     .toBe(false);
 }
 
+/** 從新版中央出生點繞過出貨箱，走到新版農田西側，再面向 (12,24) 的田格。 */
+async function walkToFarmField(page: Page): Promise<void> {
+  for (const [key, count] of [['ArrowDown', 10], ['ArrowLeft', 9]] as const) {
+    await press(page, key, count);
+  }
+}
+
+async function walkFromFieldToBed(page: Page): Promise<void> {
+  // Farm field → central road → house portal → tile south of the bed (4,8).
+  for (const [key, count] of [['ArrowRight', 9], ['ArrowUp', 10], ['ArrowRight', 7], ['ArrowUp', 5], ['ArrowUp', 9], ['ArrowLeft', 6], ['ArrowUp', 1]] as const) {
+    await press(page, key, count);
+  }
+}
+
+async function walkFromBedToField(page: Page): Promise<void> {
+  // Bed approach (4,8) → house door → farm spawn (27,10) → field gate → field edge (11,24).
+  for (const [key, count] of [['ArrowRight', 6], ['ArrowDown', 11], ['ArrowLeft', 7], ['ArrowDown', 14], ['ArrowLeft', 9]] as const) {
+    await press(page, key, count);
+  }
+}
+
 test('each ground makes its own footprint: grass, tilled field, then the stone path', async ({ page }) => {
   await waitForGame(page);
-  await press(page, 'ArrowUp', 4); // (7,9) → (7,5)，離開的是草地
-  await settle(page);
-  await press(page, 'ArrowDown'); // 離開田地 (7,5)
-  await settle(page);
-  await press(page, 'ArrowDown', 4); // 草地 → 路 (7,10)
-  await settle(page);
-  await press(page, 'ArrowUp'); // 離開路 (7,10)
+  // 從出貨箱西側走到草地 (13,24)，再踩進田格並回到路面。
+  for (const [key, count] of [['ArrowDown', 12], ['ArrowLeft', 1], ['ArrowDown', 2], ['ArrowLeft', 6], ['ArrowUp', 4], ['ArrowLeft', 1], ['ArrowLeft', 3], ['ArrowUp', 1]] as const) {
+    await press(page, key, count);
+    await settle(page);
+  }
   await settle(page);
 
   const names = (await effectNames(page)).filter((name) => name.startsWith('step:'));
@@ -78,15 +122,10 @@ test('each ground makes its own footprint: grass, tilled field, then the stone p
 });
 
 test('a harvested crop flies up to the player and is named as it lands', async ({ page }) => {
-  test.setTimeout(60_000);
+  test.setTimeout(180_000);
   await waitForGame(page);
-  // 田邊 (7,5) → 小屋床前 (4,8)，面向床位 (4,7)。
-  const toBed = [...Array(5).fill('ArrowLeft'), 'ArrowUp', ...Array(9).fill('ArrowUp'), ...Array(6).fill('ArrowLeft'), 'ArrowUp'];
-  // 床前 (4,8) → 門 → 農場 (2,5)，再回田邊 (7,5) 並面向田地。
-  const backToField = [...Array(6).fill('ArrowRight'), 'ArrowDown', ...Array(9).fill('ArrowDown'), 'ArrowDown', ...Array(5).fill('ArrowRight'), 'ArrowDown', 'ArrowUp'];
-
-  // 開墾 (7,4)、播下月光豆（生長 2 天）、澆水；作物每天都要澆，否則會枯死。
-  await press(page, 'ArrowUp', 4); // → (7,5) 面向 (7,4)
+  // 開墾 (12,24)、播下月光豆（生長 2 天）、澆水；作物每天都要澆，否則會枯死。
+  await walkToFarmField(page);
   await settle(page);
   await press(page, 'x'); // 開墾
   await settle(page);
@@ -98,20 +137,20 @@ test('a harvested crop flies up to the player and is named as it lands', async (
   await settle(page);
 
   // 第一晚睡醒後澆水（第 2 天）；第二晚睡醒後作物已成熟，面向它按 x 就是收成。
-  for (const key of toBed) await press(page, key);
+  await walkFromFieldToBed(page);
   await settle(page);
   await press(page, 'x'); // 睡覺
   await settle(page);
-  for (const key of backToField) await press(page, key);
+  await walkFromBedToField(page);
   await settle(page);
   await press(page, 'x'); // 澆水
   await settle(page);
 
-  for (const key of toBed) await press(page, key);
+  await walkFromFieldToBed(page);
   await settle(page);
   await press(page, 'x'); // 睡覺
   await settle(page);
-  for (const key of backToField) await press(page, key);
+  await walkFromBedToField(page);
   await settle(page);
   await press(page, 'x'); // 收成
   await settle(page);
@@ -123,7 +162,7 @@ test('a harvested crop flies up to the player and is named as it lands', async (
 
 test('the tool makes its sound when it lands, after the swing starts', async ({ page }) => {
   await waitForGame(page);
-  await press(page, 'ArrowUp', 5);
+  await walkToFarmField(page);
   await settle(page);
   await press(page, 'x');
   await settle(page);

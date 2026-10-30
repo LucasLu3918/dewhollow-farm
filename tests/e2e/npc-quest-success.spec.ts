@@ -72,12 +72,9 @@ async function readSave(page: Page): Promise<SavedGame> {
 
 async function sleepAtHome(page: Page, firstNight: boolean, expectedDay: number): Promise<void> {
   if (firstNight) {
-    // Farm spawn (7,9) → circle the shipbox at (2,7) → farmhouse door at (2,4).
-    await walk(page, 'ArrowLeft', 5);
-    await walk(page, 'ArrowUp', 1);
-    await walk(page, 'ArrowLeft', 1);
-    await walk(page, 'ArrowUp', 3);
-    await walk(page, 'ArrowRight', 1);
+    // Farm spawn (20,14) → main path → house door H at (27,9).
+    await walk(page, 'ArrowUp', 4);
+    await walk(page, 'ArrowRight', 7);
     await walk(page, 'ArrowUp', 1);
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
 
@@ -103,7 +100,7 @@ async function captureCompletion(page: Page, testInfo: TestInfo): Promise<void> 
 test('accepting and completing the day-four forest bulletin is visible and saved', async ({ page }, testInfo) => {
   test.setTimeout(120_000);
   await waitForGame(page);
-  expect(await actor(page, 'player')).toMatchObject({ tileX: 7, tileY: 9 });
+  expect(await actor(page, 'player')).toMatchObject({ tileX: 20, tileY: 14 });
 
   // The clean game's date-seeded board includes daily-forest on spring day 4.
   await sleepAtHome(page, true, 2);
@@ -123,16 +120,14 @@ test('accepting and completing the day-four forest bulletin is visible and saved
   expect(accepted.state.calendar).toMatchObject({ year: 1, season: 'spring', day: 4 });
   expect(accepted.state.quests['daily-forest']).toMatchObject({ status: 'active' });
 
-  // Leave the house from the bed route through the south door to farm spawn (2,5).
+  // Leave the house through the south door to farm spawn (27,10), then use the north forest gate.
   await walk(page, 'ArrowRight', 6);
   await walk(page, 'ArrowDown', 1);
   await walk(page, 'ArrowDown', 9);
   await walk(page, 'ArrowDown', 1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
-  await walk(page, 'ArrowRight', 1);
-  await walk(page, 'ArrowDown', 2);
-  await walk(page, 'ArrowRight', 36); // x=3 → x=39 on the open row y=7.
-  await walk(page, 'ArrowRight', 1); // Enter the forest through E at (39,7).
+  await walk(page, 'ArrowLeft', 7);
+  await walk(page, 'ArrowUp', 10);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('forest');
   await expect(page.locator('#hud-log')).toContainText('委託完成：森林入口巡視');
   await expect(page.locator('#hud-log')).toContainText('成就達成：第一件委託');

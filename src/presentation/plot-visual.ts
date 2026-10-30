@@ -1,5 +1,5 @@
 import type { Season } from '../domain/calendar';
-import type { PlotMap, PlotState } from '../domain/farm';
+import { plotMapKey, type PlotMap, type PlotState } from '../domain/farm';
 
 export type PlotVisualPhase =
   | 'tilled-dry'
@@ -35,13 +35,13 @@ export interface PlotVisual {
 const SOIL_ANCHOR = { x: 32, y: 62 } as const;
 
 /** Return the north/east/south/west adjacency mask for currently tilled plots. */
-export function plotNeighborMask(x: number, y: number, plots: PlotMap, watered: boolean): number {
+export function plotNeighborMask(x: number, y: number, plots: PlotMap, watered: boolean, mapId = 'farm'): number {
   if (!Number.isInteger(x) || !Number.isInteger(y)) return 0;
   let mask = 0;
-  if (plots[`${x},${y - 1}`]?.watered === watered) mask |= 1;
-  if (plots[`${x + 1},${y}`]?.watered === watered) mask |= 2;
-  if (plots[`${x},${y + 1}`]?.watered === watered) mask |= 4;
-  if (plots[`${x - 1},${y}`]?.watered === watered) mask |= 8;
+  if (plots[plotMapKey(mapId, x, y - 1)]?.watered === watered) mask |= 1;
+  if (plots[plotMapKey(mapId, x + 1, y)]?.watered === watered) mask |= 2;
+  if (plots[plotMapKey(mapId, x, y + 1)]?.watered === watered) mask |= 4;
+  if (plots[plotMapKey(mapId, x - 1, y)]?.watered === watered) mask |= 8;
   return mask;
 }
 

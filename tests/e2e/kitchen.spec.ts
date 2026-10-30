@@ -27,7 +27,7 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
 test('the kitchen opens a panel of recipes; without ingredients a dish cannot be made', async ({ page }) => {
   await waitForGame(page);
   await walk(page, 'ArrowUp', 4);
-  await walk(page, 'ArrowLeft', 5);
+  await walk(page, 'ArrowRight', 7);
   await walk(page, 'ArrowUp', 1);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
   await walk(page, 'ArrowUp', 9); // (10,9)

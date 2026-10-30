@@ -2,8 +2,8 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * M4（P0）：採集與砍伐、雜貨店、鐵匠。
- * 路線（以 content/maps 的座標為準）：農場南門 (7,29) → 村莊；村莊雜貨店櫃檯 (3,4)、鐵匠櫃檯 (12,4)；
- * 森林：農場東門 (39,7) → 森林，樹 (3,2)、野薄荷 (2,9)。
+ * 路線以 content/maps 的座標為準：農場出生點 (20,14) 北行進森林；南行繞過出貨箱 (20,27) 進村莊；
+ * 村莊雜貨店櫃檯 (3,4)、鐵匠櫃檯 (12,4)；森林樹 (3,2)、野薄荷 (2,9)。
  */
 interface Actor {
   id: string;
@@ -37,16 +37,20 @@ async function walk(page: Page, key: string, steps: number): Promise<void> {
   }
 }
 
-/** 從農場出生點走到森林的 (2,7)。 */
+/** 從農場出生點沿中央道路北行，走到森林的 (2,7)。 */
 async function toForest(page: Page): Promise<void> {
-  await walk(page, 'ArrowUp', 2);
-  await walk(page, 'ArrowRight', 32);
+  await walk(page, 'ArrowUp', 14);
   await expect.poll(() => mapId(page)).toBe('forest');
 }
 
 /** 從農場出生點走到村莊的 (7,10)。 */
 async function toVillage(page: Page): Promise<void> {
-  await walk(page, 'ArrowDown', 20);
+  // The shipbox blocks the central path at (20,27); go around its west side.
+  await walk(page, 'ArrowDown', 12);
+  await walk(page, 'ArrowLeft', 1);
+  await walk(page, 'ArrowDown', 2);
+  await walk(page, 'ArrowRight', 1);
+  await walk(page, 'ArrowDown', 1);
   await expect.poll(() => mapId(page)).toBe('village');
 }
 

@@ -58,12 +58,14 @@ export function legacyMapRenderPlan(map: MapDef): MapRenderPlan {
 /** Convert the already merged held/current plot snapshot into render-only crop presentation values. */
 export function plotRenderPlan(
   plots: PlotMap,
-  map: Pick<MapDef, 'width' | 'height'>,
+  map: Pick<MapDef, 'id' | 'width' | 'height'>,
   cropForCropId: (cropId: string) => Pick<CropDef, 'id' | 'growthDays' | 'visualGrowthStages'>,
 ): PlotRenderTile[] {
   const result: PlotRenderTile[] = [];
   for (const [key, plot] of Object.entries(plots)) {
-    const [x, y] = key.split(',').map(Number);
+    const prefix = `${map.id}|`;
+    if (!key.startsWith(prefix)) continue;
+    const [x, y] = key.slice(prefix.length).split(',').map(Number);
     if (x === undefined || y === undefined) continue;
     if (x < 0 || y < 0 || x >= map.width || y >= map.height) continue;
 

@@ -1,6 +1,6 @@
 import type { Season } from './calendar';
 import type { MapDef } from './content';
-import { plotKey } from './farm';
+import { plotMapKey } from './farm';
 
 /**
  * 溫室（M6）：溫室裡的田（地圖格子的 greenhouse 標記）不受季節限制。
@@ -8,12 +8,12 @@ import { plotKey } from './farm';
  * 只看季節與格子的標記，不改體力成本。
  */
 
-/** 一張地圖上所有溫室的田，以田地鍵（`x,y`）表示。 */
+/** 一張地圖上所有溫室的田，以 map-scoped crop key 表示。 */
 export function greenhouseKeysOf(map: MapDef): string[] {
   const keys: string[] = [];
   map.rows.forEach((row, y) => {
     for (let x = 0; x < row.length; x++) {
-      if (map.legend[row.charAt(x)]?.greenhouse === true) keys.push(plotKey(x, y));
+      if (map.legend[row.charAt(x)]?.greenhouse === true) keys.push(plotMapKey(map.id, x, y));
     }
   });
   return keys;

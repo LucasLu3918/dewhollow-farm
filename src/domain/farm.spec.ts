@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { growCrops, harvestPlot, isRipe, plantCrop, plotKey, tillPlot, waterPlot } from './farm';
+import { growCrops, harvestPlot, isRipe, plantCrop, plotKey, plotMapKey, tillPlot, waterPlot } from './farm';
 import type { PlotMap } from './farm';
 
 const KEY = plotKey(3, 4);
@@ -8,6 +8,11 @@ const days = (id: string) => (id === 'sweet-radish' ? 3 : 5);
 describe('farm plots', () => {
   it('builds stable keys', () => {
     expect(plotKey(3, 4)).toBe('3,4');
+  });
+
+  it('keeps crop plots from different maps in separate namespaces', () => {
+    expect(plotMapKey('farm', 3, 4)).toBe('farm|3,4');
+    expect(plotMapKey('greenhouse', 3, 4)).not.toBe(plotMapKey('farm', 3, 4));
   });
 
   it('tills an empty field into soil', () => {

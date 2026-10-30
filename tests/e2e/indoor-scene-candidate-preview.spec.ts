@@ -78,8 +78,8 @@ test('P6-062 indoor candidates stay DEV gated and render existing maps without c
     { mapId: 'house', player: { x: 10, y: 18, facing: 'up' }, flags: {}, expectedFrames: [], expectedWorldFrames: ['floor-a', 'wall-left-corner'], viewport: { width: 390, height: 844 }, screenshot: 'p6-062-farm-interiors/screenshots/house-390x844.png' },
     { mapId: 'house-wing', player: { x: 10, y: 18, facing: 'up' }, flags: {}, expectedFrames: [], expectedWorldFrames: ['floor-a', 'wall-left-corner'], viewport: { width: 390, height: 844 }, screenshot: 'p6-062-farm-interiors/screenshots/house-wing-390x844.png' },
     { mapId: 'house-full', player: { x: 10, y: 18, facing: 'up' }, flags: {}, expectedFrames: [], expectedWorldFrames: ['floor-a', 'wall-left-corner'], viewport: { width: 390, height: 844 }, screenshot: 'p6-062-farm-interiors/screenshots/house-full-390x844.png' },
-    { mapId: 'farm', player: { x: 30, y: 22, facing: 'up' }, flags: {}, expectedFrames: [], viewport: { width: 390, height: 844 }, screenshot: 'p6-062-farm-interiors/screenshots/greenhouse-locked-390x844.png' },
-    { mapId: 'farm', player: { x: 30, y: 22, facing: 'up' }, flags: { greenhouse: true }, expectedFrames: ['greenhouse-ground', 'greenhouse-glass', 'greenhouse-front', 'greenhouse-door'], viewport: { width: 390, height: 844 }, screenshot: 'p6-062-farm-interiors/screenshots/greenhouse-390x844.png' },
+    { mapId: 'farm', player: { x: 7, y: 9, facing: 'up' }, flags: {}, expectedFrames: [], viewport: { width: 390, height: 844 }, screenshot: 'p6-062-farm-interiors/screenshots/greenhouse-locked-390x844.png' },
+    { mapId: 'greenhouse', player: { x: 6, y: 6, facing: 'up' }, flags: { greenhouse: true }, expectedFrames: ['greenhouse-ground', 'greenhouse-glass', 'greenhouse-front', 'greenhouse-door'], viewport: { width: 390, height: 844 }, screenshot: 'p6-062-farm-interiors/screenshots/greenhouse-390x844.png' },
   ];
 
   for (const fixture of fixtures) {

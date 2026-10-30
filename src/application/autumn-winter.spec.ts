@@ -3,7 +3,7 @@ import { createNewGame, type GameState } from '../domain/game-state';
 import type { Calendar } from '../domain/calendar';
 import { totalDay } from '../domain/calendar';
 import { addItem, countOf, createInventory } from '../domain/inventory';
-import { plotKey, type PlotMap } from '../domain/farm';
+import { plotMapKey, type PlotMap } from '../domain/farm';
 import { shippedIndex, shippedPack } from '../../tests/sim/shipped-content';
 import { executeCommand, type Command, type CommandOutcome } from './game-commands';
 
@@ -67,15 +67,15 @@ describe('豐穗祭：作物交換', () => {
 });
 
 describe('豐穗祭：收成比賽', () => {
-  /** 6 塊成熟的南瓜田在農場 (10..15, 12)，玩家站在每塊田的上方（11 列）向下面對它。 */
+  /** 6 塊成熟的南瓜田在農場 (10..15, 16)，玩家站在田的上方（15 列）面向它。 */
   function pumpkinFields(day: Calendar): GameState {
     const plots: PlotMap = {};
-    for (let x = 10; x <= 15; x++) plots[plotKey(x, 12)] = plot('bell-pumpkin', 10);
+    for (let x = 10; x <= 15; x++) plots[plotMapKey('farm', x, 16)] = plot('bell-pumpkin', 10);
     return game({ calendar: day, mapId: 'farm', plots, flags: {} });
   }
 
   function harvestAt(state: GameState, x: number): CommandOutcome {
-    return run({ ...state, player: { x, y: 11, facing: 'down' } }, { type: 'interact' });
+    return run({ ...state, player: { x, y: 15, facing: 'down' } }, { type: 'interact' });
   }
 
   it('收成指定的作物累計到 6 個就完成，當天發一次獎勵；之後同一年不再發', () => {
@@ -100,8 +100,8 @@ describe('豐穗祭：收成比賽', () => {
   });
 
   it('收成別的作物不計入比賽', () => {
-    const plots: PlotMap = { [plotKey(10, 12)]: plot('dew-grass', 1) };
-    const out = run(game({ calendar: at('autumn', 12, 720), mapId: 'farm', plots, player: { x: 10, y: 11, facing: 'down' } }), { type: 'interact' });
+    const plots: PlotMap = { [plotMapKey('farm', 10, 16)]: plot('dew-grass', 1) };
+    const out = run(game({ calendar: at('autumn', 12, 720), mapId: 'farm', plots, player: { x: 10, y: 15, facing: 'down' } }), { type: 'interact' });
     expect(out.state.festival.harvest.count).toBe(0);
   });
 
@@ -196,36 +196,38 @@ describe('溫室：改建、入口與冬季種植', () => {
   });
 
   it('溫室的門要有 greenhouse 旗標才開；進去後落在溫室裡面，走出去回到農場', () => {
-    const outside = game({ calendar: at('winter', 5, 600), mapId: 'farm', player: { x: 30, y: 19, facing: 'down' } });
+    const outside = game({ calendar: at('winter', 5, 600), mapId: 'farm', player: { x: 7, y: 7, facing: 'down' } });
     const locked = run(outside, { type: 'move', direction: 'down' });
     expect(locked.state.mapId).toBe('farm');
     expect(locked.events).toContainEqual({ type: 'refused', reason: 'LOCKED_DOOR' });
 
     const opened = run({ ...outside, flags: { greenhouse: true } }, { type: 'move', direction: 'down' });
-    expect(opened.state.mapId).toBe('farm');
-    expect(opened.state.player).toMatchObject({ x: 30, y: 22 });
+    expect(opened.state.mapId).toBe('greenhouse');
+    expect(opened.state.player).toMatchObject({ x: 6, y: 6 });
 
-    const out = run({ ...opened.state, player: { x: 30, y: 22, facing: 'up' } }, { type: 'move', direction: 'up' });
-    expect(out.state.player).toMatchObject({ x: 30, y: 19 });
+    const inside = run(opened.state, { type: 'move', direction: 'down' });
+    const out = run(inside.state, { type: 'move', direction: 'down' });
+    expect(out.state.mapId).toBe('farm');
+    expect(out.state.player).toMatchObject({ x: 7, y: 9 });
   });
 
   it('冬季在溫室裡可以播秋季的作物，在溫室外的田不行', () => {
     const inside = game({
       calendar: at('winter', 5, 600),
-      mapId: 'farm',
+      mapId: 'greenhouse',
       flags: { greenhouse: true },
-      player: { x: 30, y: 22, facing: 'right' },
-      plots: { [plotKey(31, 22)]: plot(null) },
+      player: { x: 3, y: 2, facing: 'right' },
+      plots: { [plotMapKey('greenhouse', 4, 2)]: plot(null) },
       inventory: createInventory(60),
       selectedSeed: 'bell-pumpkin',
       tool: 'seedbag',
     });
     const withSeed = addTo(inside, { 'seed.bell-pumpkin': 1 });
     const planted = run(withSeed, { type: 'interact' });
-    expect(planted.state.plots[plotKey(31, 22)]?.crop).toEqual({ cropId: 'bell-pumpkin', growthDays: 0 });
+    expect(planted.state.plots[plotMapKey('greenhouse', 4, 2)]?.crop).toEqual({ cropId: 'bell-pumpkin', growthDays: 0 });
 
     const outside = addTo(
-      game({ calendar: at('winter', 5, 600), mapId: 'farm', plots: { [plotKey(10, 13)]: plot(null) }, player: { x: 10, y: 12, facing: 'down' }, tool: 'seedbag', selectedSeed: 'bell-pumpkin', inventory: createInventory(60) }),
+      game({ calendar: at('winter', 5, 600), mapId: 'farm', plots: { [plotMapKey('farm', 10, 16)]: plot(null) }, player: { x: 10, y: 15, facing: 'down' }, tool: 'seedbag', selectedSeed: 'bell-pumpkin', inventory: createInventory(60) }),
       { 'seed.bell-pumpkin': 1 },
     );
     expect(run(outside, { type: 'interact' }).events).toContainEqual({ type: 'refused', reason: 'NOT_IN_SEASON' });
@@ -238,14 +240,14 @@ describe('溫室：改建、入口與冬季種植', () => {
       flags: { greenhouse: true },
       player: { x: 4, y: 8, facing: 'up' },
       plots: {
-        [plotKey(31, 22)]: plot('bell-pumpkin', 3, false),
-        [plotKey(10, 13)]: plot('bell-pumpkin', 3, false),
+        [plotMapKey('greenhouse', 4, 2)]: plot('bell-pumpkin', 3, false),
+        [plotMapKey('farm', 10, 16)]: plot('bell-pumpkin', 3, false),
       },
     });
     const slept = run(state, { type: 'interact' });
     expect(slept.state.calendar.season).toBe('winter');
-    expect(slept.state.plots[plotKey(31, 22)]?.crop?.cropId).toBe('bell-pumpkin');
-    expect(slept.state.plots[plotKey(10, 13)]?.crop).toBeNull();
+    expect(slept.state.plots[plotMapKey('greenhouse', 4, 2)]?.crop?.cropId).toBe('bell-pumpkin');
+    expect(slept.state.plots[plotMapKey('farm', 10, 16)]?.crop).toBeNull();
     expect(slept.messages.some((m) => m.includes('枯死了'))).toBe(true);
   });
 });

@@ -264,9 +264,12 @@ test.describe('桌機短視窗版面', () => {
 
   test('1280×720 的遊戲畫面、主要操作與回饋列都在首屏，不需垂直捲動', async ({ page }) => {
     await start(page);
-    for (let i = 0; i < 4; i += 1) {
-      await page.keyboard.press('ArrowUp');
-      await page.waitForFunction(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy === false);
+    // 從新中央出生點繞過出貨箱，走到新版田區的格子旁。
+    for (const [key, count] of [['ArrowDown', 12], ['ArrowLeft', 1], ['ArrowDown', 2], ['ArrowLeft', 10], ['ArrowUp', 4], ['ArrowRight', 1]] as const) {
+      for (let step = 0; step < count; step += 1) {
+        await page.keyboard.press(key);
+        await page.waitForFunction(() => window.__dewhollow?.actors().find((actor) => actor.id === 'player')?.busy === false);
+      }
     }
 
     const action = page.locator('#hud-action');

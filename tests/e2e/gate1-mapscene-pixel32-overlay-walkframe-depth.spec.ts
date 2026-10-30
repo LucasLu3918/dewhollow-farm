@@ -157,7 +157,8 @@ test('pixel32 candidate walk frames cross tree and house overlay depth anchors w
   await page.goto(candidateQuery);
   await expect(page.locator('#game canvas')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.pixel32CandidateRuntime().enabled ?? false)).toBe(true);
-  await placePlayerAt(page, 8, 3);
+  // The DEV candidate overlays use the redesigned farm anchors at x=19.
+  await placePlayerAt(page, 19, 3);
 
   const treeSamples = await crossAnchorWhileSampling(page, 'down', 3, 5);
   const treeDepth = treeSamples[0]?.overlays.find(({ id }) => id === 'tree-canopy')?.depth;
@@ -177,34 +178,34 @@ test('pixel32 candidate walk frames cross tree and house overlay depth anchors w
   expect(treeNorth.some(({ moving, player }) => moving && player.depth < treeDepth!), 'moving samples north of the tree anchor should be behind the canopy').toBe(true);
   expect(treeSouth.some(({ moving, player }) => moving && player.depth > treeDepth!), 'moving samples south of the tree anchor should be in front of the canopy').toBe(true);
   expect(treeSamples.every(({ blockedDirection }) => blockedDirection === null), 'tree route should not be blocked').toBe(true);
-  expect(await page.evaluate(() => window.__dewhollow!.movement().tile)).toMatchObject({ x: 8, y: 5 });
+  expect(await page.evaluate(() => window.__dewhollow!.movement().tile)).toMatchObject({ x: 19, y: 5 });
   const screenshotBytes: Record<string, Uint8Array> = {
     'tree-crossing': await page.screenshot({ animations: 'disabled', scale: 'css' }),
   };
 
-  for (let step = 0; step < 3; step += 1) {
-    await page.keyboard.press('ArrowLeft');
+  for (let step = 0; step < 8; step += 1) {
+    await page.keyboard.press('ArrowDown');
     await waitForMovementIdle(page);
   }
-  expect(await page.evaluate(() => window.__dewhollow!.movement().tile)).toMatchObject({ x: 5, y: 5 });
-  const houseSamples = await crossAnchorWhileSampling(page, 'up', 5, 3);
+  expect(await page.evaluate(() => window.__dewhollow!.movement().tile)).toMatchObject({ x: 19, y: 13 });
+  const houseSamples = await crossAnchorWhileSampling(page, 'up', 13, 9);
   const houseDepth = houseSamples[0]?.overlays.find(({ id }) => id === 'house-front')?.depth;
   expect(houseDepth).toBeDefined();
   expect(houseSamples.some(({ moving, player }) => moving
     && ['up-contact-a', 'up-contact-b', 'up-passing'].includes(player.frame ?? '')), 'house crossing must sample an active directional walk frame').toBe(true);
-  const houseNorth = houseSamples.filter(({ player }) => player.footY < 320);
-  const houseSouth = houseSamples.filter(({ player }) => player.footY > 320);
+  const houseNorth = houseSamples.filter(({ player }) => player.footY < 704);
+  const houseSouth = houseSamples.filter(({ player }) => player.footY > 704);
   const houseAnchorWalkSamples = houseSamples.filter(({ moving, player }) => moving
     && ['up-contact-a', 'up-contact-b', 'up-passing'].includes(player.frame ?? '')
-    && Math.abs(player.footY - 320) <= 16 && Math.abs(player.depth - houseDepth!) <= 0.3);
+    && Math.abs(player.footY - 704) <= 16 && Math.abs(player.depth - houseDepth!) <= 0.3);
   expect(houseAnchorWalkSamples.length > 0,
     `house crossing should sample a directional walk frame within 16px of the moving depth anchor; nearby=${JSON.stringify(houseSamples
-      .filter(({ moving, player }) => moving && Math.abs(player.footY - 320) <= 24)
+      .filter(({ moving, player }) => moving && Math.abs(player.footY - 704) <= 24)
       .map(({ elapsedMs, player }) => ({ elapsedMs, ...player })))}`).toBe(true);
   expect(houseNorth.some(({ moving, player }) => moving && player.depth < houseDepth!), 'moving samples north of the house anchor should be behind its front layer').toBe(true);
   expect(houseSouth.some(({ moving, player }) => moving && player.depth > houseDepth!), 'moving samples south of the house anchor should be in front of its front layer').toBe(true);
   expect(houseSamples.every(({ blockedDirection }) => blockedDirection === null), 'house route should not be blocked').toBe(true);
-  expect(await page.evaluate(() => window.__dewhollow!.movement().tile)).toMatchObject({ x: 5, y: 3 });
+  expect(await page.evaluate(() => window.__dewhollow!.movement().tile)).toMatchObject({ x: 19, y: 9 });
   screenshotBytes['house-crossing'] = await page.screenshot({ animations: 'disabled', scale: 'css' });
 
   const overlaySignatures = [...treeSamples, ...houseSamples].map(({ overlays }) => overlays.map(({ id, frame, layer, tileX, tileY, depth, displayList, visible }) => ({
@@ -238,8 +239,8 @@ test('pixel32 candidate walk frames cross tree and house overlay depth anchors w
     candidate: { route: candidateQuery, map: mapManifest, animation: animationManifest, inputHashes },
     viewport: { width: 1280, height: 900, dpr: 1, screenshotScale: 'css' },
     anchors: {
-      treeCanopy: { worldFootY: 320, overlayDepth: treeDepth, crossing: { from: { x: 8, y: 3 }, to: { x: 8, y: 5 } }, samples: treeSamples },
-      houseFront: { worldFootY: 320, overlayDepth: houseDepth, crossing: { from: { x: 5, y: 5 }, to: { x: 5, y: 3 } }, samples: houseSamples },
+      treeCanopy: { worldFootY: 320, overlayDepth: treeDepth, crossing: { from: { x: 19, y: 3 }, to: { x: 19, y: 5 } }, samples: treeSamples },
+      houseFront: { worldFootY: 704, overlayDepth: houseDepth, crossing: { from: { x: 19, y: 13 }, to: { x: 19, y: 9 } }, samples: houseSamples },
     },
     overlaySignatureStable: true,
     screenshots,

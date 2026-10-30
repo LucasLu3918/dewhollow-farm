@@ -30,7 +30,7 @@ async function walk(page: Page, key: string, count: number, x: number, y: number
 
 test('Pixel32 high-detail map candidates preserve movement blocking and portal interaction', async ({ page }) => {
   await page.goto(candidateQuery);
-  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect(page.locator('#game canvas')).toBeVisible({ timeout: 20_000 });
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 
   const start = await page.evaluate(() => ({
@@ -42,16 +42,14 @@ test('Pixel32 high-detail map candidates preserve movement blocking and portal i
     memorySaveNotice: [...document.querySelectorAll('#hud-log li.error')]
       .some((entry) => entry.textContent?.includes('Pixel32 候選預覽使用隔離的暫存存檔')),
   }));
-  expect(start.tile).toMatchObject({ x: 7, y: 9 });
+  expect(start.tile).toMatchObject({ x: 20, y: 14 });
   expect(start.memorySaveNotice).toBe(true);
-  await waitForStep(page, 7, 9);
+  await waitForStep(page, 20, 14);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.sprites()
     .some((sprite) => sprite.key === 'pixel32-quality-scene-farm') ?? false)).toBe(true);
   expect(start.startupErrors).toEqual([]);
 
   // Follow the candidate's center lane and south opening into its fenced crop beds.
-  await walk(page, 'ArrowDown', 5, 7, 9);
-  await walk(page, 'ArrowRight', 13, 7, 14);
   await walk(page, 'ArrowDown', 12, 20, 14);
   await walk(page, 'ArrowLeft', 1, 20, 26);
   await walk(page, 'ArrowDown', 1, 19, 26);
@@ -73,7 +71,7 @@ test('Pixel32 high-detail map candidates preserve movement blocking and portal i
   await page.screenshot({ path: 'test-results/pixel32-quality-farm-before-till.png' });
   await page.keyboard.press('x');
   await expect(page.locator('#hud-log')).toContainText('開墾了一塊田');
-  await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().plots['11,26']?.watered)).toBe(false);
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().plots['farm|11,26']?.watered)).toBe(false);
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.qualityPlots()
     .some((plot) => plot.x === 11 && plot.y === 26 && plot.visible) ?? false)).toBe(true);
   await page.screenshot({ path: 'test-results/pixel32-quality-farm-after-till.png' });
@@ -105,12 +103,11 @@ test('Pixel32 high-detail map candidates preserve movement blocking and portal i
 test('Pixel32 forest trunk blocks and chops; the redesigned lake dock is walkable and fishable', async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto(candidateQuery);
-  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect(page.locator('#game canvas')).toBeVisible({ timeout: 20_000 });
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 
   // Use the candidate's south lane and east portal to enter the forest.
-  await walk(page, 'ArrowDown', 5, 7, 9);
-  await walk(page, 'ArrowRight', 31, 7, 14);
+  await walk(page, 'ArrowRight', 18, 20, 14);
   await page.keyboard.press('ArrowRight');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('forest');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.sprites()
@@ -172,12 +169,10 @@ test('Pixel32 forest trunk blocks and chops; the redesigned lake dock is walkabl
 
 test('Pixel32 village facade blocks movement while the reachable storefront opens normally', async ({ page }) => {
   await page.goto(candidateQuery);
-  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect(page.locator('#game canvas')).toBeVisible({ timeout: 20_000 });
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 
   // Reach the southern village portal through the open central farm lane.
-  await walk(page, 'ArrowDown', 5, 7, 9);
-  await walk(page, 'ArrowRight', 13, 7, 14);
   await walk(page, 'ArrowDown', 12, 20, 14);
   await walk(page, 'ArrowLeft', 1, 20, 26);
   await walk(page, 'ArrowDown', 2, 19, 26);
@@ -205,24 +200,28 @@ test('Pixel32 village facade blocks movement while the reachable storefront open
 test('Pixel32 pasture tuft layer hides only the cut tuft while the gate route remains playable', async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto(candidateQuery);
-  await expect(page.locator('#game canvas')).toBeVisible();
+  await expect(page.locator('#game canvas')).toBeVisible({ timeout: 20_000 });
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
 
-  // The pasture gate opens on spring day 15; advance through normal bed interactions in the isolated save.
-  await walk(page, 'ArrowRight', 19, 7, 9);
+  // The pasture gate opens on spring day 15; approach the farmhouse from the new crossroads.
+  await walk(page, 'ArrowUp', 5, 20, 14);
+  await walk(page, 'ArrowRight', 6, 20, 9);
   await page.keyboard.press('ArrowRight');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('house');
   await walk(page, 'ArrowUp', 13, 10, 18);
   await walk(page, 'ArrowRight', 7, 10, 5);
   await page.keyboard.press('ArrowUp');
+  await expect.poll(() => page.evaluate(() => window.__dewhollow?.interaction() ?? null)).toMatchObject({
+    action: 'sleep', target: { x: 17, y: 4 },
+  });
   for (let day = 2; day <= 15; day += 1) {
     await page.keyboard.press('x');
     await expect.poll(() => page.evaluate(() => window.__dewhollow?.gameState().calendar.day)).toBe(day);
   }
 
   // Return to farm, then open the candidate's west pasture gate at its unlocked date.
-  await walk(page, 'ArrowDown', 13, 17, 5);
-  await walk(page, 'ArrowLeft', 7, 17, 18);
+  await walk(page, 'ArrowLeft', 7, 17, 5);
+  await walk(page, 'ArrowDown', 13, 10, 5);
   await page.keyboard.press('ArrowDown');
   await expect.poll(() => page.evaluate(() => window.__dewhollow?.mapId() ?? '')).toBe('farm');
   const position = await page.evaluate(() => window.__dewhollow?.movement().tile);

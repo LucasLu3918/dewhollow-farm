@@ -92,7 +92,7 @@ test('pixel32 candidate accepts 100 exact one-tile short presses in every direct
   try {
     // This four-tile rectangle stays in open farm grass/path and returns to its
     // origin each cycle: 100 taps per direction without touching a boundary.
-    expect(startState.tile).toEqual({ x: 7, y: 9 });
+    expect(startState.tile).toEqual({ x: 20, y: 14 });
     for (let cycle = 1; cycle <= 100; cycle += 1) {
       for (const direction of directions) {
         const step = await pressOneTile(page, direction);
@@ -105,9 +105,9 @@ test('pixel32 candidate accepts 100 exact one-tile short presses in every direct
     expect(counts).toEqual({ right: 100, down: 100, left: 100, up: 100 });
 
     // Separately prove wall rejection after the measured 400 short presses.
-    for (let step = 0; step < 6; step += 1) await pressOneTile(page, directions[2]);
+    for (let step = 0; step < 19; step += 1) await pressOneTile(page, directions[2]);
     const wallBefore = await readState(page);
-    expect(wallBefore.tile).toEqual({ x: 1, y: 9 });
+    expect(wallBefore.tile).toEqual({ x: 1, y: 14 });
     await page.keyboard.down('ArrowLeft');
     await page.waitForFunction(({ x, y }) => {
       const movement = window.__dewhollow?.movement();
